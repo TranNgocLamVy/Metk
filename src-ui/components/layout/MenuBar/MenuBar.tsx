@@ -4,7 +4,7 @@ import { HStack } from "@/components/custom/Stack/Stack";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/providers/Theme/ThemeProvider";
 import MenuBarItem from "./MenuBarItem/MenuBarItem";
-import { EditDropdownOptions, FileDropdownOptions, HelpDropdownOptions } from "./items";
+import { EditDropdownOptions, FileDropdownOptions, HelpDropdownOptions, LayerDropdownOptions, MapDropdownOptions, ProjectDropdownOptions, ViewDropdownOptions, WorldDropdownOptions } from "./items";
 
 export default function MenuBar() {
 	const { theme, setTheme } = useTheme();
@@ -17,8 +17,13 @@ export default function MenuBar() {
 	return (
 		<HStack className="w-full h-fit pb-0.5 overflow-hidden bg-accent-foreground/10 dark:bg-foreground/5 shadow-md" data-tauri-drag-region>
 			<HStack gap={0} className="text-foreground/70">
-				<MenuBarItem item={FileDropdownOptions} />
+				<MenuBarItem item={FileDropdownOptions}  />
 				<MenuBarItem item={EditDropdownOptions} />
+				<MenuBarItem item={ViewDropdownOptions} />
+				<MenuBarItem item={WorldDropdownOptions} />
+				<MenuBarItem item={MapDropdownOptions} />
+				<MenuBarItem item={LayerDropdownOptions} />
+				<MenuBarItem item={ProjectDropdownOptions} />
 				<MenuBarItem item={HelpDropdownOptions} />
 			</HStack>
 

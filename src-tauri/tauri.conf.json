@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "auto-tile",
+  "productName": "AutoTile",
   "version": "0.1.0",
   "identifier": "com.auto-tile.app",
   "build": {
@@ -12,7 +12,8 @@
   "app": {
     "windows": [
       {
-        "title": "auto-tile",
+        "label": "main",
+        "title": "AutoTile",
         "width": 800,
         "minWidth": 400,
         "height": 600,
@@ -20,7 +21,8 @@
         "decorations": false,
         "resizable": true,
         "fullscreen": false,
-        "closable": true
+        "closable": true,
+        "center": true
       }
     ],
     "security": {

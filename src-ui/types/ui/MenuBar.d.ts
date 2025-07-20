@@ -2,7 +2,7 @@
 
 declare global {
     type MenuBarItemType = {
-        name: string
+        name: string | (() => string);
         visible?: () => boolean;
         disabled?: () => boolean;
         className?: string;
@@ -11,21 +11,37 @@ declare global {
 
     type MenuBarDropDownGroupType = MenuBarDropDownItemType[] | (() => MenuBarDropDownItemType[])
 
-    type MenuBarDropDownItemType = MenuBarDropDownOptionItemType | MenuBarDropDownCheckItemType | MenuBarDropDownRadioItemType
+    type MenuBarDropDownItemType = MenuBarDropDownOptionItemType | MenuBarDropDownCheckItemType | MenuBarDropDownRadioItemType | MenuBarDropDownSubMenuItemType;
 
     type MenuBarDropDownOptionItemType = {
         type: 'option';
-        name: string;
+        name: string | (() => string);
+        startIcon?: React.ReactNode;
+        endIcon?: React.ReactNode;
+        shortCut?: string;
         visible?: () => boolean;
         disabled?: () => boolean;
-        onClick?: () => void;
-        subMenus?: MenuBarDropDownGroupType[];
+        onClick: () => void;
+    }
+
+    type MenuBarDropDownSubMenuItemType = {
+        type: 'subMenu';
+        name: string | (() => string);
+        startIcon?: React.ReactNode;
+        endIcon?: React.ReactNode;
+        shortCut?: string;
+        visible?: () => boolean;
+        disabled?: () => boolean;
+        subMenus: MenuBarDropDownGroupType[];
         subMenusClassName?: string;
     }
 
     type MenuBarDropDownCheckItemType = {
         type: 'check';
-        name: string;
+        name: string | (() => string);
+        startIcon?: React.ReactNode;
+        endIcon?: React.ReactNode;
+        shortCut?: string;
         visible?: () => boolean;
         disabled?: () => boolean;
         checked: () => boolean;
@@ -34,7 +50,10 @@ declare global {
 
     type MenuBarDropDownRadioItemType = {
         type: 'radio';
-        name: string;
+        name: string | (() => string);
+        startIcon?: React.ReactNode;
+        endIcon?: React.ReactNode;
+        shortCut?: string;
         visible?: () => boolean;
         disabled?: () => boolean;
         value: () => string;
@@ -44,7 +63,7 @@ declare global {
             value: string;
             visible?: () => boolean;
             disabled?: () => boolean;
-        }
+        }[];
     }
 }
 

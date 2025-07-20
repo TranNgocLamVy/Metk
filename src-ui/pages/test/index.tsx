@@ -1,20 +1,14 @@
-import { FileDropdown } from "@/components/layout/MenuBar/Dropdown/FileDropdown";
-import { useTheme } from "@/components/providers/Theme/ThemeProvider";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
+import { useTestStore } from "@/zustand/test"
 
 export default function TestPage() {
-    const { theme, setTheme } = useTheme();
-
-    const changeTheme = () => {
-        if (theme === "light") {
-            setTheme("dark");
-        } else {
-            setTheme("light");
-        }
-    }
+    const { count, increment } = useTestStore()
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-start px-4 py-8">
+            <Button onClick={increment}>
+                Count: {count}
+            </Button>
         </div>
     )
 }
