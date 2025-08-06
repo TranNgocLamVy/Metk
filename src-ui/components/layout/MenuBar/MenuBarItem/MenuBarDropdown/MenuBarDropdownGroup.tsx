@@ -1,9 +1,9 @@
-import { DropdownMenuGroup, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { DropdownMenuGroup, DropdownMenuSeparator } from "@/components/shadcn/dropdown-menu";
 import { Fragment } from "react/jsx-runtime";
 import { MenuBarDropdownItem } from "./MenuBarDropdownItem";
 
 type MenuBarDropdownGroupProps = {
-	groups: MenuBarDropDownGroupType[];
+	groups: MenuDropDownGroupType[];
 };
 
 export default function MenuBarDropdownGroup({ groups }: MenuBarDropdownGroupProps) {

@@ -1,6 +1,6 @@
 import { MapPlus, Upload, Save } from "lucide-react"
 
-const WorldDropdownOptionGroup1: MenuBarDropDownGroupType = [
+const WorldDropdownOptionGroup1: MenuDropDownGroupType = [
     {
         type: "option",
         name: "New World",
@@ -15,7 +15,7 @@ const WorldDropdownOptionGroup1: MenuBarDropDownGroupType = [
     }
 ]
 
-const WorldDropdownOptionGroup2: MenuBarDropDownGroupType = [
+const WorldDropdownOptionGroup2: MenuDropDownGroupType = [
     {
         type: "option",
         name: "Save World",
@@ -25,9 +25,9 @@ const WorldDropdownOptionGroup2: MenuBarDropDownGroupType = [
 ]
 
 
-export const WorldDropdownOptions: MenuBarItemType = {
+export const WorldDropdownOptions: MenuItemType = {
     name: "World",
-    className: "w-70",
+    className: "w-80",
     groups: [
         WorldDropdownOptionGroup1,
         WorldDropdownOptionGroup2

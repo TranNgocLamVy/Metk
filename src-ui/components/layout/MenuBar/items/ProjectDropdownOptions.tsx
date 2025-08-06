@@ -1,6 +1,6 @@
 import { FolderCog, FolderPlus, FolderSync } from "lucide-react"
 
-const ProjectDropdownOptionGroup1: MenuBarDropDownGroupType = [
+const ProjectDropdownOptionGroup1: MenuDropDownGroupType = [
     {
         type: "option",
         name: "Add Folder to Project",
@@ -15,7 +15,7 @@ const ProjectDropdownOptionGroup1: MenuBarDropDownGroupType = [
     }
 ]
 
-const ProjectDropdownOptionGroup2: MenuBarDropDownGroupType = [
+const ProjectDropdownOptionGroup2: MenuDropDownGroupType = [
     {
         type: "option",
         name: "Project Properties",
@@ -25,9 +25,9 @@ const ProjectDropdownOptionGroup2: MenuBarDropDownGroupType = [
 ]
 
 
-export const ProjectDropdownOptions: MenuBarItemType = {
+export const ProjectDropdownOptions: MenuItemType = {
     name: "Project",
-    className: "w-70",
+    className: "w-100",
     groups: [
         ProjectDropdownOptionGroup1,
         ProjectDropdownOptionGroup2

@@ -1,6 +1,6 @@
 import { Book, HeartPlus, MessageSquare, Star } from "lucide-react"
 
-const HelpDropdownOptionGroup1: MenuBarDropDownGroupType = [
+const HelpDropdownOptionGroup1: MenuDropDownGroupType = [
     {
         type: "option",
         name: "User Manual",
@@ -15,7 +15,7 @@ const HelpDropdownOptionGroup1: MenuBarDropDownGroupType = [
     }
 ]
 
-const HelpDropdownOptionGroup2: MenuBarDropDownGroupType = [
+const HelpDropdownOptionGroup2: MenuDropDownGroupType = [
     {
         type: "option",
         name: "Support developer",
@@ -31,9 +31,9 @@ const HelpDropdownOptionGroup2: MenuBarDropDownGroupType = [
 ]
 
 
-export const HelpDropdownOptions: MenuBarItemType = {
+export const HelpDropdownOptions: MenuItemType = {
     name: "Help",
-    className: "w-70",
+    className: "w-80",
     groups: [
         HelpDropdownOptionGroup1,
         HelpDropdownOptionGroup2

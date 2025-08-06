@@ -24,6 +24,7 @@ fn read_png_file(path: String) -> Result<Vec<u8>, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![greet, read_png_file])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

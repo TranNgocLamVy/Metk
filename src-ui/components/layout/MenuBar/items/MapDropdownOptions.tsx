@@ -1,7 +1,7 @@
 import { ArrowBigLeft, ArrowBigRight, Crop, Grid2x2Plus, Map, Move, SquareArrowUpRight } from "lucide-react";
 import AutoGrid from '@/components/custom/icons/AutoGrid';
 
-const MapDropdownOptionGroup1: MenuBarDropDownGroupType = [
+const MapDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Add External Tileset",
@@ -16,7 +16,7 @@ const MapDropdownOptionGroup1: MenuBarDropDownGroupType = [
 	},
 ];
 
-const MapDropdownOptionGroup2: MenuBarDropDownGroupType = [
+const MapDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Resize Map",
@@ -43,7 +43,7 @@ const MapDropdownOptionGroup2: MenuBarDropDownGroupType = [
 	},
 ];
 
-const MapDropdownOptionGroup3: MenuBarDropDownGroupType = [
+const MapDropdownOptionGroup3: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "AutoMap",
@@ -58,7 +58,7 @@ const MapDropdownOptionGroup3: MenuBarDropDownGroupType = [
 	},
 ];
 
-const MapDropdownOptionGroup4: MenuBarDropDownGroupType = [
+const MapDropdownOptionGroup4: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Select Next Tileset",
@@ -73,7 +73,7 @@ const MapDropdownOptionGroup4: MenuBarDropDownGroupType = [
 	},
 ];
 
-const MapDropdownOptionGroup5: MenuBarDropDownGroupType = [
+const MapDropdownOptionGroup5: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Map Properties",
@@ -82,8 +82,8 @@ const MapDropdownOptionGroup5: MenuBarDropDownGroupType = [
 	},
 ];
 
-export const MapDropdownOptions: MenuBarItemType = {
+export const MapDropdownOptions: MenuItemType = {
 	name: "Map",
-	className: "w-70",
+	className: "w-100",
 	groups: [MapDropdownOptionGroup1, MapDropdownOptionGroup2, MapDropdownOptionGroup3, MapDropdownOptionGroup4, MapDropdownOptionGroup5],
 };

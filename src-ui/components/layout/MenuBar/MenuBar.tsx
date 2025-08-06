@@ -1,7 +1,7 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Minus, Copy, X, SunMoon } from "lucide-react";
 import { HStack } from "@/components/custom/Stack/Stack";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn/button";
 import { useTheme } from "@/components/providers/Theme/ThemeProvider";
 import MenuBarItem from "./MenuBarItem/MenuBarItem";
 import { EditDropdownOptions, FileDropdownOptions, HelpDropdownOptions, LayerDropdownOptions, MapDropdownOptions, ProjectDropdownOptions, ViewDropdownOptions, WorldDropdownOptions } from "./items";
@@ -15,7 +15,7 @@ export default function MenuBar() {
 	};
 
 	return (
-		<HStack className="w-full h-fit pb-0.5 overflow-hidden bg-accent-foreground/10 dark:bg-foreground/5 shadow-md" data-tauri-drag-region>
+		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-background dark:bg-foreground/5 shadow-md absolute" data-tauri-drag-region>
 			<HStack gap={0} className="text-foreground/70">
 				<MenuBarItem item={FileDropdownOptions}  />
 				<MenuBarItem item={EditDropdownOptions} />
@@ -24,7 +24,7 @@ export default function MenuBar() {
 				<MenuBarItem item={MapDropdownOptions} />
 				<MenuBarItem item={LayerDropdownOptions} />
 				<MenuBarItem item={ProjectDropdownOptions} />
-				<MenuBarItem item={HelpDropdownOptions} />
+				{/* <MenuBarItem item={HelpDropdownOptions} /> */}
 			</HStack>
 
 			<HStack gap={0} className="ml-auto">

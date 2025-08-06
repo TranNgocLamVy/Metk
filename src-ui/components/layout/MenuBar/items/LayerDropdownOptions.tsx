@@ -1,6 +1,6 @@
 import { ArrowBigLeft, ArrowBigRight, ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Columns3Cog, Copy, Eye, Folder, Grid2X2, Group, Image, Layers, Layers2, Lock, Scan, Scissors, Shapes, Trash2, Ungroup } from "lucide-react";
 
-const LayerDropdownOptionGroup1: MenuBarDropDownGroupType = [
+const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
 		name: "New Layer",
@@ -96,7 +96,7 @@ const LayerDropdownOptionGroup1: MenuBarDropDownGroupType = [
 	},
 ];
 
-const LayerDropdownOptionGroup2: MenuBarDropDownGroupType = [
+const LayerDropdownOptionGroup2: MenuDropDownGroupType = [
     {
 		type: "option",
 		name: "Select Next Layer",
@@ -129,7 +129,7 @@ const LayerDropdownOptionGroup2: MenuBarDropDownGroupType = [
 	},
 ];
 
-const LayerDropdownOptionGroup3: MenuBarDropDownGroupType = [
+const LayerDropdownOptionGroup3: MenuDropDownGroupType = [
     {
 		type: "option",
 		name: "Show/Hide Layer",
@@ -156,7 +156,7 @@ const LayerDropdownOptionGroup3: MenuBarDropDownGroupType = [
 	},
 ]
 
-const LayerDropdownOptionGroup4: MenuBarDropDownGroupType = [
+const LayerDropdownOptionGroup4: MenuDropDownGroupType = [
     {
 		type: "option",
 		name: "Layer Properties",
@@ -165,8 +165,8 @@ const LayerDropdownOptionGroup4: MenuBarDropDownGroupType = [
 	},
 ]
 
-export const LayerDropdownOptions: MenuBarItemType = {
+export const LayerDropdownOptions: MenuItemType = {
 	name: "Layer",
-	className: "w-70",
+	className: "w-100",
 	groups: [LayerDropdownOptionGroup1, LayerDropdownOptionGroup2, LayerDropdownOptionGroup3, LayerDropdownOptionGroup4],
 };

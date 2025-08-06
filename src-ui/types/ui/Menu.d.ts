@@ -1,19 +1,19 @@
 
 
 declare global {
-    type MenuBarItemType = {
+    type MenuItemType = {
         name: string | (() => string);
         visible?: () => boolean;
         disabled?: () => boolean;
         className?: string;
-        groups: MenuBarDropDownGroupType[];
+        groups: MenuDropDownGroupType[];
     }
 
-    type MenuBarDropDownGroupType = MenuBarDropDownItemType[] | (() => MenuBarDropDownItemType[])
+    type MenuDropDownGroupType = MenuDropDownItemType[] | (() => MenuDropDownItemType[])
 
-    type MenuBarDropDownItemType = MenuBarDropDownOptionItemType | MenuBarDropDownCheckItemType | MenuBarDropDownRadioItemType | MenuBarDropDownSubMenuItemType;
+    type MenuDropDownItemType = MenuDropDownOptionItemType | MenuDropDownCheckItemType | MenuDropDownRadioItemType | MenuDropDownSubMenuItemType;
 
-    type MenuBarDropDownOptionItemType = {
+    type MenuDropDownOptionItemType = {
         type: 'option';
         name: string | (() => string);
         startIcon?: React.ReactNode;
@@ -24,7 +24,7 @@ declare global {
         onClick: () => void;
     }
 
-    type MenuBarDropDownSubMenuItemType = {
+    type MenuDropDownSubMenuItemType = {
         type: 'subMenu';
         name: string | (() => string);
         startIcon?: React.ReactNode;
@@ -32,11 +32,11 @@ declare global {
         shortCut?: string;
         visible?: () => boolean;
         disabled?: () => boolean;
-        subMenus: MenuBarDropDownGroupType[];
+        subMenus: MenuDropDownGroupType[];
         subMenusClassName?: string;
     }
 
-    type MenuBarDropDownCheckItemType = {
+    type MenuDropDownCheckItemType = {
         type: 'check';
         name: string | (() => string);
         startIcon?: React.ReactNode;
@@ -45,10 +45,10 @@ declare global {
         visible?: () => boolean;
         disabled?: () => boolean;
         checked: () => boolean;
-        onCheckedChange: (checked: boolean) => void;
+        toggle: () => void;
     }
 
-    type MenuBarDropDownRadioItemType = {
+    type MenuDropDownRadioItemType = {
         type: 'radio';
         name: string | (() => string);
         startIcon?: React.ReactNode;
@@ -57,10 +57,11 @@ declare global {
         visible?: () => boolean;
         disabled?: () => boolean;
         value: () => string;
-        onValueChange: (value: string) => void;
+        onValueChange: (value: any) => void;
         items: {
             name: string;
             value: string;
+            startIcon?: React.ReactNode;
             visible?: () => boolean;
             disabled?: () => boolean;
         }[];

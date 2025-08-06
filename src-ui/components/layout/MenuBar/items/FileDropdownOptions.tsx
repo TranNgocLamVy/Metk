@@ -1,6 +1,6 @@
 import { FolderPlus, FolderOpen, FolderOpenDot, FileClock, FolderClock, X, LogOut, FolderX, SquareX, Command, PenLine, Save, SaveAll, ImageUp, FolderUp, Grid2x2Plus, SquarePlus, BrushCleaning, SquareArrowOutUpRight } from "lucide-react";
 
-const FileDropdownOptionGroup1: MenuBarDropDownGroupType = [
+const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
 		name: "New",
@@ -82,7 +82,7 @@ const FileDropdownOptionGroup1: MenuBarDropDownGroupType = [
 	},
 ];
 
-const FileDropdownOptionGroup2: MenuBarDropDownGroupType = [
+const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Save",
@@ -121,7 +121,7 @@ const FileDropdownOptionGroup2: MenuBarDropDownGroupType = [
 	},
 ];
 
-const FileDropdownOptionGroup3: MenuBarDropDownGroupType = [
+const FileDropdownOptionGroup3: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
 		name: "Command",
@@ -139,7 +139,7 @@ const FileDropdownOptionGroup3: MenuBarDropDownGroupType = [
 	},
 ];
 
-const FileDropdownOptionGroup4: MenuBarDropDownGroupType = [
+const FileDropdownOptionGroup4: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Close",
@@ -166,8 +166,8 @@ const FileDropdownOptionGroup4: MenuBarDropDownGroupType = [
 	},
 ];
 
-export const FileDropdownOptions: MenuBarItemType = {
+export const FileDropdownOptions: MenuItemType = {
 	name: "File",
-    className: "w-90",
+    className: "w-100",
 	groups: [FileDropdownOptionGroup1, FileDropdownOptionGroup2, FileDropdownOptionGroup3, FileDropdownOptionGroup4],
 };

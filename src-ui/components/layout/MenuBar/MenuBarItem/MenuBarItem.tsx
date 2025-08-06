@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/shadcn/dropdown-menu";
 import MenuBarDropdownGroup from "./MenuBarDropdown/MenuBarDropdownGroup";
 
 interface MenuBarItemProps {
-	item: MenuBarItemType;
+	item: MenuItemType;
 }
 export default function MenuBarItem({ item }: MenuBarItemProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 					<p>{name}</p>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className={className} side="bottom" align="start">
+			<DropdownMenuContent className={className} side="bottom" align="start" >
 				<MenuBarDropdownGroup groups={item.groups} />
 			</DropdownMenuContent>
 		</DropdownMenu>
