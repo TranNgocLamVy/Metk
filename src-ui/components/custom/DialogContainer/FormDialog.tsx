@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Fragment } from "react/jsx-runtime";
-import { toast } from "sonner";
 
+import { ToastService } from "@/appcore/services/ToastService";
 import { Button } from "@/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/shadcn/dialog";
 import { useDialogStore } from "@/stores/ui/DialogStore";
@@ -83,7 +83,7 @@ export function FormDialog() {
 			if (input.validate) {
 				const result = input.validate(values[input.name]);
 				if (!result.valid) {
-					toast.warning(result.message);
+					ToastService.warning({message: result.message});
 					console.warn(`Validation failed for ${input.name}: ${result.message}`);
 					return;
 				}

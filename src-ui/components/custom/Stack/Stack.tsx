@@ -1,7 +1,7 @@
 import { CSSProperties, ReactNode } from "react";
 
 interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
-	children: ReactNode;
+	children?: ReactNode;
 	gap?: number | string;
 	align?: CSSProperties["alignItems"];
 	justify?: CSSProperties["justifyContent"];
