@@ -1,11 +1,10 @@
 import { useLayoutEffect, useRef } from "react";
 
-
-interface MainContainerProps {
+interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
     children?: React.ReactNode;
 }
 
-export default function MainContainer({ children }: MainContainerProps) {
+export default function MainContainer({ children, ...props }: MainContainerProps) {
     const ref = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
@@ -18,7 +17,7 @@ export default function MainContainer({ children }: MainContainerProps) {
     }, [ref.current])
 
     return (
-        <main ref={ref} className="w-full h-screen flex flex-col">
+        <main {...props} ref={ref} className="w-full h-screen flex flex-col">
             {children}
         </main>
     );
