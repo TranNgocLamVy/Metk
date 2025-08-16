@@ -1,18 +1,10 @@
 import { BaseExporter } from "@/plugin-api";
 
 export class ExporterRegistry {
-    private static instance: ExporterRegistry;
     private exporters: Map<string, typeof BaseExporter>;
 
-    private constructor() {
+    public constructor() {
         this.exporters = new Map();
-    }
-
-    public static Instance(): ExporterRegistry {
-        if (!this.instance) {
-            this.instance = new ExporterRegistry();
-        }
-        return this.instance;
     }
 
     public registerExporter(name: string, exporter: typeof BaseExporter): void {

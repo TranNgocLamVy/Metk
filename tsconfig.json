@@ -23,6 +23,7 @@
     "strictPropertyInitialization": false,
 
     /* Paths */
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src-ui/*"],

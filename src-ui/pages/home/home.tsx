@@ -1,6 +1,7 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
-import { ProjectManager } from "@/appcore/models/Project/ProjectManager";
+import { Appcore } from "@/appcore";
 import { HStack, VStack } from "@/components/custom/Stack/Stack";
 import { Button } from "@/components/shadcn/button";
 import { Separator } from "@/components/shadcn/separator";
@@ -11,8 +12,12 @@ export default function HomePage() {
 	const projects = useProjectStore((s) => s.projects);
 
 	const createProject = () => {
-		ProjectManager.getInstance().createProject();
+        Appcore.getInstance().projectManager.createProject();
 	};
+
+    const openProject = () => {
+
+    }
 
 	return (
 		<VStack align="start" justify="start" className="w-full h-full p-16">
@@ -37,17 +42,17 @@ export default function HomePage() {
 					return (
 						<HStack align="center" justify="start" key={project.id}>
 							<Tooltip>
-								<TooltipTrigger>
-									<Button key={project.id} variant={"ghost"} className="w-40 justify-start cursor-pointer">
-										<SquareArrowOutUpRight />
+								<TooltipTrigger asChild>
+									<NavLink key={project.id} to={`/project/${project.id}`} className="flex flex-row items-center gap-2 w-40 justify-start cursor-pointer">
+										<SquareArrowOutUpRight size={20} />
 										{project.name}
-									</Button>
+									</NavLink>
 								</TooltipTrigger>
                                 <TooltipContent side="left">
                                     {project.description ? <p>{`Description: ${project.description}`}</p> : null}
                                     <p>{`Version: ${project.version}`}</p>
-                                    <p>{`Created At: ${project.createdAt.toDateString()}`}</p>
-                                    <p>{`Updated At: ${project.updatedAt.toDateString()}`}</p>
+                                    <p>{`Created At: ${new Date(project.createdAt).toLocaleString()}`}</p>
+                                    <p>{`Updated At: ${new Date(project.updatedAt).toLocaleString()}`}</p>
                                 </TooltipContent>
 							</Tooltip>
 							<h3 className="text-xs cursor-default">{project.directory}</h3>

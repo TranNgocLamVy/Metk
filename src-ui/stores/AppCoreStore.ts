@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
-export type AppCoreState = {
+export type AppcoreState = {
     isLoading: boolean;
     setIsLoading: (value: boolean) => void;
 }
 
-export const useAppCore = create<AppCoreState>((set) => ({
+export const useAppcore = create<AppcoreState>((set) => ({
     isLoading: false,
     setIsLoading: (value) => set({ isLoading: value }),
 }));

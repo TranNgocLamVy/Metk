@@ -1,25 +1,18 @@
-import { BaseTileMap } from "@/plugin-api";
+
+import { BaseTilemap } from "@/plugin-api";
 
 export class TileMapRestry {
-    private static instance: TileMapRestry;
-    private tileMaps: Map<string, typeof BaseTileMap>;
+    private tileMaps: Map<string, typeof BaseTilemap>;
 
-    private constructor() {
+    public constructor() {
         this.tileMaps = new Map();
     }
 
-    public static Instance(): TileMapRestry {
-        if (!this.instance) {
-            this.instance = new TileMapRestry();
-        }
-        return this.instance;
-    }
-
-    public registerTileMap(name: string, tileMap: typeof BaseTileMap): void {
+    public registerTileMap(name: string, tileMap: typeof BaseTilemap): void {
         this.tileMaps.set(name, tileMap);
     }
 
-    public getTileMap(name: string): typeof BaseTileMap | undefined {
+    public getTileMap(name: string): typeof BaseTilemap | undefined {
         return this.tileMaps.get(name);
     }
 

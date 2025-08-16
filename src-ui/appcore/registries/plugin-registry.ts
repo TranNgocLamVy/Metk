@@ -1,25 +1,36 @@
-import { BaseCommand, BaseExporter, BaseImporter, BaseTileMap, IPluginRegistry } from "@/plugin-api";
+import { BaseCommand, BaseExporter, BaseImporter, BaseTilemap, IPluginRegistry } from "@/plugin-api";
 
 import { CommandRegistry } from "./command-registry";
 import { ExporterRegistry } from "./exporter-registry";
 import { ImporterRegistry } from "./importer-registry";
 import { TileMapRestry } from "./tilemap-registry";
 
-export class PluginRegisty implements IPluginRegistry {
+export class PluginRegistry implements IPluginRegistry {
+    private readonly tileMapRegistry: TileMapRestry;
+    private readonly commandRegistry: CommandRegistry;
+    private readonly importerRegistry: ImporterRegistry;
+    private readonly exporterRegistry: ExporterRegistry;
 
-    registerTileMap(tileMap: typeof BaseTileMap): void {
-        TileMapRestry.Instance().registerTileMap(tileMap.name, tileMap);
+    public constructor() {
+        this.tileMapRegistry = new TileMapRestry();
+        this.commandRegistry = new CommandRegistry();
+        this.importerRegistry = new ImporterRegistry(); 
+        this.exporterRegistry = new ExporterRegistry();
+    }
+
+    registerTileMap(tileMap: typeof BaseTilemap): void {
+        this.tileMapRegistry.registerTileMap(tileMap.name, tileMap);
     }
 
     registerCommand(command: typeof BaseCommand): void {
-        CommandRegistry.Instance().registerCommand(command.name, command);
+        this.commandRegistry.registerCommand(command.name, command);
     }
 
     registerImporter(importer: typeof BaseImporter): void {
-        ImporterRegistry.Instance().registerImporter(importer.name, importer);
+        this.importerRegistry.registerImporter(importer.name, importer);
     }
 
     registerExporter(exporter: typeof BaseExporter): void {
-        ExporterRegistry.Instance().registerExporter(exporter.name, exporter);
+        this.exporterRegistry.registerExporter(exporter.name, exporter);
     }
 }

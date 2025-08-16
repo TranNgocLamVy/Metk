@@ -1,5 +1,7 @@
-import { DropdownMenuGroup, DropdownMenuSeparator } from "@/components/shadcn/dropdown-menu";
 import { Fragment } from "react/jsx-runtime";
+
+import { DropdownMenuGroup, DropdownMenuSeparator } from "@/components/shadcn/dropdown-menu";
+
 import { MenuBarDropdownItem } from "./MenuBarDropdownItem";
 
 type MenuBarDropdownGroupProps = {

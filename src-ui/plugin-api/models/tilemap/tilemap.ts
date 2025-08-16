@@ -1,6 +1,6 @@
-import { BaseObject } from '../base-object';
-import { BaseTilelayer } from './tilelayer';
-import { BaseTileset } from './tileset';
+import { BaseObject } from "../base-object";
+import { BaseTilelayer } from "./tilelayer";
+import { BaseTileset } from "./tileset";
 
 interface ITilemap {
     orientation: "orthogonal" | "isometric" | "staggered" | "hexagonal";
@@ -14,8 +14,6 @@ interface ITilemap {
     nextObjectId: number;
     tilesets: BaseTileset[];
     layers: BaseTilelayer[];
-
-
 }
 
 type TilemapData = Pick<ITilemap, "orientation" | "renderOrder" | "tileWidth" | "tileHeight" | "width" | "height" | "infinite" | "nextLayerId" | "nextObjectId" | "tilesets" | "layers">;

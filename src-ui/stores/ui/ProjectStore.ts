@@ -1,16 +1,15 @@
 import { create } from "zustand";
 
-import { ProjectFileData } from "@/appcore/models/Project/Project";
+import { Project } from "@/appcore/models/Project";
 
 interface ProjectStore {
-    projects: ProjectFileData[];
-    currentProject: ProjectFileData | null;
-    currentProjectName: string;
+    currentProject: Project | null;
+    projects: Project[];
 
-    setProjects: (projects: ProjectFileData[]) => void;
-    addProject: (project: ProjectFileData) => void;
-    removeProject: (project: ProjectFileData) => void;
-    setCurrentProject: (project: ProjectFileData) => void;
+    setProjects: (projects: Project[]) => void;
+    addProject: (project: Project) => void;
+    removeProject: (id: string) => void;
+    setCurrentProject: (id: string) => void;
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
@@ -19,24 +18,22 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     currentProjectName: "",
 
     setProjects: (projects) => {
-        set({ projects });
+        set({ projects: [...projects] });
     },
     addProject: (project) => {
         set((state) => ({
             projects: [...state.projects, project],
-            currentProject: project,
         }));
     },
-    removeProject: (project) => {
+    removeProject: (id) => {
         set((state) => ({
-            projects: state.projects.filter((p) => p.id !== project.id),
-            currentProject: state.currentProject === project ? null : state.currentProject,
+            projects: state.projects.filter((p) => p.id !== id),
+            currentProject: state.currentProject?.id === id ? null : state.currentProject,
         }));
     },
-    setCurrentProject: (project) => {
+    setCurrentProject: (id) => {
         set((state) => ({
-            currentProject: project,
-            currentProjectName: project.name,
+            currentProject: state.projects.find((p) => p.id === id),
         }));
     },
 }));

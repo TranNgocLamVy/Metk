@@ -1,7 +1,8 @@
-import { BaseObject } from '../base-object';
-import { Texture } from 'pixi.js';
-import { TextureUtils } from '@/appcore/utils/texture-utils';
+import { Texture } from "pixi.js";
 
+import { TextureUtils } from "@/appcore/utils/TextureUtils";
+
+import { BaseObject } from "../base-object";
 
 const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
     texture.destroy();

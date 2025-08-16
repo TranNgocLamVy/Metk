@@ -1,5 +1,6 @@
 import { ArrowBigLeft, ArrowBigRight, Crop, Grid2x2Plus, Map, Move, SquareArrowUpRight } from "lucide-react";
-import AutoGrid from '@/components/custom/icons/AutoGrid';
+
+import AutoGrid from "@/components/custom/icons/AutoGrid";
 
 const MapDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -54,7 +55,9 @@ const MapDropdownOptionGroup3: MenuDropDownGroupType = [
 		type: "check",
 		name: "AutoMap while mapping",
 		checked: () => true,
-		onCheckedChange(checked) {},
+        toggle() {
+            
+        },
 	},
 ];
 

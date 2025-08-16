@@ -1,8 +1,8 @@
-import * as React from "react";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { ChevronRightIcon, CircleIcon, Square, SquareCheckBig } from "lucide-react";
+import * as React from "react";
 
 import { cn } from "@/components/shadcn/utils/shadcn-utils";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
 function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
 	return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;

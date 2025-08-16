@@ -1,18 +1,10 @@
-import { BaseCommand } from "@/plugin-api/models";
+import { BaseCommand } from "@/plugin-api";
 
 export class CommandRegistry {
-    private static instance: CommandRegistry;
     private commands: Map<string, typeof BaseCommand>;
 
-    private constructor() {
+    public constructor() {
         this.commands = new Map();
-    }
-
-    public static Instance(): CommandRegistry {
-        if (!this.instance) {
-            this.instance = new CommandRegistry();
-        }
-        return this.instance;
     }
 
     public registerCommand(name: string, command: typeof BaseCommand): void {

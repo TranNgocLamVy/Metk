@@ -1,6 +1,8 @@
-import { ContextMenuItem as ShadContextMenuItem, ContextMenuShortcut, ContextMenuSub, ContextMenuSubTrigger, ContextMenuSubContent, ContextMenuCheckboxItem, ContextMenuRadioGroup, ContextMenuRadioItem } from "@/components/shadcn/context-menu";
-import MenuBarDropdownGroup from "./ContextMenuItemGroup";
 import { twMerge } from "tailwind-merge";
+
+import { ContextMenuCheckboxItem, ContextMenuItem as ShadContextMenuItem, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuShortcut, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger } from "@/components/shadcn/context-menu";
+
+import MenuBarDropdownGroup from "./ContextMenuItemGroup";
 
 type ContextMenuItemProps = {
 	item: MenuDropDownItemType;
@@ -52,7 +54,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 
 	if (item.type === "check") {
 		return (
-			<ContextMenuCheckboxItem className="gap-2 h-6 text-xs" onSelect={(e) => e.preventDefault()} checked={item.checked()} onCheckedChange={item.onCheckedChange} disabled={disabled}>
+			<ContextMenuCheckboxItem className="gap-2 h-6 text-xs" onSelect={(e) => e.preventDefault()} checked={item.checked()} onCheckedChange={item.toggle} disabled={disabled}>
 				{wrapIcon(item.startIcon, false)}
 				{name}
 				{wrapIcon(item.endIcon, false)}

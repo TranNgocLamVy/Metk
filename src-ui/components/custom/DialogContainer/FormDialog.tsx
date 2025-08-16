@@ -75,13 +75,13 @@ export function FormDialog() {
 
 	const { title, description, okText = "OK", cancelText = "Cancel", inputs, validateBeforeSubmit } = formDialog;
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		const inputs = formDialog.inputs as Field[];
 		for (const input of inputs) {
 			if (input.validate) {
-				const result = input.validate(values[input.name]);
+				const result = await input.validate(values[input.name]);
 				if (!result.valid) {
 					ToastService.warning({message: result.message});
 					console.warn(`Validation failed for ${input.name}: ${result.message}`);
@@ -90,9 +90,13 @@ export function FormDialog() {
 			}
 		}
 
-		if (validateBeforeSubmit && !validateBeforeSubmit(values)) {
-			console.warn("Overall validation failed");
-			return;
+		if (validateBeforeSubmit) {
+            const result = await validateBeforeSubmit(values);
+            if (!result.valid) {
+                ToastService.warning({message: result.message});
+                console.warn(result.message);
+                return;
+            }
 		}
 
 		closeFormDialog(values);

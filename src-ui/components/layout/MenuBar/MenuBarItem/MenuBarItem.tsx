@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+
 import { Button } from "@/components/shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/shadcn/dropdown-menu";
+
 import MenuBarDropdownGroup from "./MenuBarDropdown/MenuBarDropdownGroup";
 
 interface MenuBarItemProps {

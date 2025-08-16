@@ -1,22 +1,11 @@
-import { type } from "arktype";
 import EventEmitter from "eventemitter3";
 import { v4 as uuidv4 } from "uuid";
 
 import { DialogService } from "@/appcore/services/DialogService";
+import { exists } from "@tauri-apps/plugin-fs";
 
-export const ProjectDataParser = type({
-    id: "string",
-    directory: "string",
-    name: "string",
-    version: "string = '0.1.0'",
-    description: "string = ''",
-    createdAt: "Date",
-    updatedAt: "Date",
-    tilemapPath: "string[]",
-    tilesetPath: "string[]",
-})
-
-export type ProjectFileData = typeof ProjectDataParser.infer;
+import { ProjectData } from "../schemas/projectSchema";
+import { ProjectStorageService } from "../services/ProjectStorageService";
 
 export class Project extends EventEmitter {
     public readonly id: string;
@@ -24,12 +13,14 @@ export class Project extends EventEmitter {
     public name: string;
     public version: string;
     public description: string;
-    public createdAt: Date;
-    public updatedAt: Date;
-    public tilemap: any[]; // TODO: Tilemap
-    public tileset: any[]; // TODO: Tileset
+    public createdAt: string;
+    public updatedAt: string;
+    public tilemapPath: string[] = []
+    public tilesetPath: string[] = []
+    public tilemap: any[] = []; // TODO: Tilemap
+    public tileset: any[] = []; // TODO: Tileset
 
-    private constructor(data: ProjectFileData) {
+    constructor(data: ProjectData & { directory: string }) {
         super();
         this.id = data.id;
         this.directory = data.directory;
@@ -38,29 +29,33 @@ export class Project extends EventEmitter {
         this.description = data.description;
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
-
-        this.tilemap = [];
-        data.tilemapPath.forEach((path) => {
-            // TODO: Load tilemap
-        });
-
-        this.tileset = [];
-        data.tilesetPath.forEach((path) => {
-            // TODO: Load tileset
-        });
+        this.tilemapPath = data.tilemapPath;
+        this.tilesetPath = data.tilesetPath;
     }
 
-    public serialize(): ProjectFileData {
+    public load() {
+        // TODO: Load tilemap and tileset
+    }
+
+    public async save() {
+        const projectData = this.serialize();
+        await ProjectStorageService.saveProject(projectData, this.directory);
+    }
+
+    public unload() {
+        // TODO: Unload tilemap and tileset
+    }
+
+    public serialize(): ProjectData {
         return {
             id: this.id,
-            directory: this.directory,
             name: this.name,
             version: this.version,
             description: this.description,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             tilemapPath: this.tilemap.map((tilemap) => {
-                // TODO: Serialize tilemap
+                // TODO: Serialize tilemap 
                 return "";
             }),
             tilesetPath: this.tileset.map((tileset) => {
@@ -100,22 +95,36 @@ export class Project extends EventEmitter {
                     placeholder: "Select a folder",
                     required: true,
                 }
-            ]
+            ],
+            async validateBeforeSubmit(values) {
+                const path = values.destination + "\\" + values.name;
+                const isExists = await exists(path);
+
+                if (isExists) {
+                    return { valid: false, message: `Folder with name "${values.name}" already exists at "${values.destination}"` }
+                }
+
+                return { valid: true }
+            },
         })
         if (!form) return null;
-        
-        const projectData: ProjectFileData = {
+
+        const fullDirectory = form.destination + "\\" + form.name;
+
+        const project = new Project({
             id: uuidv4(),
-            directory: form.destination,
+            directory: fullDirectory,
             name: form.name,
             version: "0.1.0",
             description: "",
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toDateString(),
+            updatedAt: new Date().toDateString(),
             tilemapPath: [],
             tilesetPath: [],
-        };
+        });
 
-        return new Project(projectData);
+        await ProjectStorageService.createProject(project.serialize(), fullDirectory);
+
+        return project;
     }
 }

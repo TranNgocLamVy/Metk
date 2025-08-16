@@ -20,7 +20,7 @@ export type FormDialogOptions<I extends readonly Field[] = readonly Field[]> = {
     okText?: string;
     cancelText?: string;
     inputs: I;
-    validateBeforeSubmit?: (values: Simplify<ShapeFromInputs<I>>) => ValidateResult;
+    validateBeforeSubmit?: (values: Simplify<ShapeFromInputs<I>>) => Promise<ValidateResult>;
 };
 
 export type FormDialogItem<I extends readonly Field[] = readonly Field[]> = FormDialogOptions<I> & {
@@ -41,7 +41,7 @@ export type BaseField = {
     placeholder?: string;
     defaultValue?: any;
     required?: boolean;
-    validate?: (value: any) => ValidateResult;
+    validate?: (value: any) => Promise<ValidateResult>;
 };
 
 export type TextFieldInput = BaseField & {
@@ -57,7 +57,7 @@ export type NumberFieldInput = BaseField & {
     min?: number;
     max?: number;
     defaultValue?: number;
-    validate?: (value: number) => ValidateResult;
+    validate?: (value: number) => Promise<ValidateResult>;
 };
 
 export type CheckboxFieldInput = BaseField & {

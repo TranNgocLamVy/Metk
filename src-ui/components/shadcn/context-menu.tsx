@@ -1,8 +1,8 @@
-import * as React from "react";
-import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
+import * as React from "react";
 
 import { cn } from "@/components/shadcn/utils/shadcn-utils";
+import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
 
 function ContextMenu({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Root>) {
 	return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />;
