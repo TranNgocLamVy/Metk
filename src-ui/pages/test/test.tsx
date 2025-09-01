@@ -5,7 +5,8 @@ import { useTestStore } from "./store";
 
 export default function TestPage() {
     const test = useTestStore((s) => s.test);
-	const inc = useTestStore((s) => s.test).increment;
+    useTestStore((s) => s.version);
+	const inc = useTestStore((s) => s.increment);
 
 	return (
 		<VStack>

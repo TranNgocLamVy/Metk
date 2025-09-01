@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 
-import { ProjectManager } from "./managers/ProjectManager";
-import { PluginRegistry } from "./registries/plugin-registry";
+import { ProjectManager } from "../models/manager/ProjectManager";
+import { PluginRegistry } from "../registries/plugin-registry";
 
 export class Appcore extends EventEmitter {
     private static instance: Appcore;
@@ -17,7 +17,6 @@ export class Appcore extends EventEmitter {
             return;
         }
         this.instance = new Appcore();
-        this.instance.initializeEvent();
     }
 
     public static uninitializeAppcore() {
@@ -25,19 +24,9 @@ export class Appcore extends EventEmitter {
             console.log("Appcore not initialized");
             return;
         }
-        this.instance.uninitializeEvent();
     }
 
     public static getInstance(): Appcore {
         return this.instance;
     }
-    
-    private initializeEvent() {
-
-    }
-
-    private uninitializeEvent() {
-
-    }
-
 }

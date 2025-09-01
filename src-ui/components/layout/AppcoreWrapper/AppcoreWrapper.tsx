@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
-import { Appcore } from "@/appcore";
+import { Appcore } from "@/appcore/core";
 import { useNavigationStore } from "@/stores/ui/NavigationStore";
 
 interface AppcoreWrapperProps {

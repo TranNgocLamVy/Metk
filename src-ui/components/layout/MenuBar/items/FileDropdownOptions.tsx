@@ -1,6 +1,6 @@
 import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquareArrowOutUpRight, SquarePlus, SquareX, X } from "lucide-react";
 
-import { Appcore } from "@/appcore";
+import { Appcore } from "@/appcore/core";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{

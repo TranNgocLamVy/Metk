@@ -1,7 +1,12 @@
-import { BaseCommand } from "@/plugin-api";
+import { Appcore } from "../core";
+import { BaseCommand } from "../models/command/Command";
 
 export class CommandRegistry {
     private commands: Map<string, typeof BaseCommand>;
+
+    public static getInstance(): CommandRegistry {
+        return Appcore.getInstance().pluginRegistry.commandRegistry;
+    }
 
     public constructor() {
         this.commands = new Map();

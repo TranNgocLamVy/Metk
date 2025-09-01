@@ -1,10 +1,10 @@
-import { BaseTile, BaseTileset } from './tileset';
-import { BaseTilelayer, TileData } from './tilelayer';
-import { BaseTilemap } from './tilemap';
-import { Container, Sprite } from 'pixi.js';
+import { Container, Sprite } from "pixi.js";
 
+import { BaseTilelayer, TileData } from "../tile/Tilelayer";
+import { BaseTilemap } from "../tile/Tilemap";
+import { BaseTileset } from "../tile/Tileset";
 
-export class TileRenderer {
+export class TilemapRenderer {
     private mainContainer: Container;
     private tilemap: BaseTilemap;
     private tilesets: BaseTileset[];

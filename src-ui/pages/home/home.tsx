@@ -1,7 +1,7 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-import { Appcore } from "@/appcore";
+import { Appcore } from "@/appcore/core";
 import { HStack, VStack } from "@/components/custom/Stack/Stack";
 import { Button } from "@/components/shadcn/button";
 import { Separator } from "@/components/shadcn/separator";

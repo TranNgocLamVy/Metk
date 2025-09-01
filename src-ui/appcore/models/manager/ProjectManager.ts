@@ -4,9 +4,9 @@ import { DialogService } from "@/appcore/services/DialogService";
 import { ToastService } from "@/appcore/services/ToastService";
 import { useProjectStore } from "@/stores/ui/ProjectStore";
 
-import { Project } from "../models/Project";
-import { ProjectManagerData } from "../schemas/projectSchema";
-import { ProjectStorageService } from "../services/ProjectStorageService";
+import { ProjectManagerData } from "../../schemas/projectSchema";
+import { ProjectStorageService } from "../../services/ProjectStorageService";
+import { Project } from "../project/Project";
 
 export type ProjectEventType = {
     projectsUpdated: () => void;

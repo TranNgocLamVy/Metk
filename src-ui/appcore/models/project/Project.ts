@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { DialogService } from "@/appcore/services/DialogService";
 import { exists } from "@tauri-apps/plugin-fs";
 
-import { ProjectData } from "../schemas/projectSchema";
-import { ProjectStorageService } from "../services/ProjectStorageService";
+import { ProjectData } from "../../schemas/projectSchema";
+import { ProjectStorageService } from "../../services/ProjectStorageService";
 
 export class Project extends EventEmitter {
     public readonly id: string;

@@ -2,27 +2,24 @@ import { create } from "zustand";
 
 export class TestClass {
     count = 0;
-
-    constructor(private publish: (next: TestClass) => void) { }
-
     increment() {
         this.count++;
-        // publish a NEW instance or a cloned reference so Zustand sees a change
-        const next = new TestClass(this.publish);
-        next.count = this.count;
-        this.publish(next);
+        return this;
     }
 }
 
 type TestStore = {
+    version: number;
     test: TestClass;
+    increment: () => void;
 };
 
 export const useTestStore = create<TestStore>((set) => {
-    // helper that updates `test` with a NEW reference:
-    const publish = (next: TestClass) => set({ test: next });
-
     return {
-        test: new TestClass(publish),
+        version: 0,
+        test: new TestClass(),
+        increment: () => {
+            set((s) => ({ version: s.version + 1, test: s.test.increment() }));
+        },
     };
 });

@@ -1,17 +1,22 @@
-import { Application } from "@pixi/react";
-import { useRef } from "react"
+import { Application } from "pixi.js";
+import { useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
-interface CanvasProps extends React.HTMLAttributes<HTMLDivElement> { }
+import { Application as PixiCanvas } from "@pixi/react";
 
-export default function Canvas({ className, children, ...props }: CanvasProps) {
+interface CanvasProps extends React.HTMLAttributes<HTMLDivElement> {
+    initCanvas?: (app: Application) => void;
+}
+
+export default function Canvas({ initCanvas, className, children, ...props }: CanvasProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const mergedClassName = twMerge("overflow-hidden", className);
+    
 	return (
 		<div ref={containerRef} className={mergedClassName} {...props}>
-			<Application resizeTo={containerRef} backgroundAlpha={0} autoStart sharedTicker>
+			<PixiCanvas resizeTo={containerRef} backgroundAlpha={0} autoStart sharedTicker onInit={initCanvas}>
                 {children}
-			</Application>
+			</PixiCanvas>
 		</div>
 	);
 }

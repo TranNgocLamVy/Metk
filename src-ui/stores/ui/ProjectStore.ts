@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Project } from "@/appcore/models/Project";
+import { Project } from "@/appcore/models/project/Project";
 
 interface ProjectStore {
     currentProject: Project | null;

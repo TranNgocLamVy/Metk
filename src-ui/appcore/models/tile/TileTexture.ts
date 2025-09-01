@@ -1,12 +1,11 @@
 import { Texture } from "pixi.js";
 
 const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
-    console.log("Texture finalized, destroying:", texture);
     texture.destroy();
 });
 
 export class TileTexture {
-    public texture: Texture;
+    private texture: Texture;
     public tileWidth: number;
     public tileHeight: number;
 
@@ -20,5 +19,9 @@ export class TileTexture {
     public destroy(): void {
         tileTextureFinalizer.unregister(this);
         this.texture.destroy();
+    }
+
+    public get(): Texture {
+        return this.texture;
     }
 }

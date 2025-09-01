@@ -1,8 +1,12 @@
-
-import { BaseTilemap } from "@/plugin-api";
+import { Appcore } from "../core";
+import { BaseTilemap } from "../models/tile/Tilemap";
 
 export class TileMapRestry {
     private tileMaps: Map<string, typeof BaseTilemap>;
+
+    public static getInstance(): TileMapRestry {
+        return Appcore.getInstance().pluginRegistry.tileMapRegistry;
+    }
 
     public constructor() {
         this.tileMaps = new Map();
