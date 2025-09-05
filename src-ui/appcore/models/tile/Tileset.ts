@@ -1,36 +1,24 @@
 import { Texture } from "pixi.js";
 
-import { BaseObject } from "@/appcore/core/BaseObject";
-import { Result } from "@/appcore/interface/common/result";
-import { ITile, ITileset, TileEvent, TilesetEvent } from "@/appcore/interface/tile/ITileset";
-import { TextureUtils } from "@/appcore/utils/TextureUtils";
+import { Result, ResultStatus } from "@/appcore/interface/common/result";
+import { BaseObject, BaseObjectEvents } from "@/appcore/models/core/BaseObject";
+import { FileHandle } from "@tauri-apps/plugin-fs";
 
-const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
-    texture.destroy();
-});
+export interface ITileset {
+    getName(): string;
+    setName(name: string): Result;
+}
 
-// interface ITileset {
-//     tilesetId: number;
-//     tilesetName: string;
-//     tileWidth: number;
-//     tileHeight: number;
-//     tileCount: number;
-//     tileColumns: number;
-//     tileRows: number;
-//     image: {
-//         path: string;
-//         texture: Texture;
-//     }
-//     tiles: BaseTile[];
+export interface TilesetEvents extends BaseObjectEvents {
+    Renamed: ( name: string ) => void;
+}
 
-//     getTile(id: number): BaseTile | null;
-//     destroy(): void;
-// }
-
-
-export abstract class BaseTileset extends BaseObject<TilesetEvent> implements ITileset {
+export abstract class BaseTileset extends BaseObject implements ITileset {
     public name: string;
-    public tiles: BaseTile[];
+
+    public static event = {
+        ...BaseObject.event,
+    }
 
     public getName(): string {
         return this.name;
@@ -38,89 +26,26 @@ export abstract class BaseTileset extends BaseObject<TilesetEvent> implements IT
 
     public setName(name: string): Result {
         this.name = name;
-        this.emit("Renamed", name);
-        return { status: "Success" };
+        this.emit(BaseTileset.event.UpdateProperty);
+        return { status: ResultStatus.Success };
     }
 
-    abstract getTile(id: number): BaseTile | null;
+    public abstract getTile(id: number): BaseTile | null;
 
-    // constructor(data: TilesetData) {
-    //     super();
-
-    //     const { tilesetName, tilesetId, tileWidth, tileHeight, image } = data;
-    //     this.tilesetId = tilesetId;
-    //     this.tilesetName = tilesetName;
-    //     this.tileWidth = tileWidth;
-    //     this.tileHeight = tileHeight;
-    //     this.image = image;  
-
-    //     const sliceTile = TextureUtils.sliceTexture(this.image.texture, this.tileWidth, this.tileHeight);
-
-    //     this.tileCount = sliceTile.length;
-    //     this.tileColumns = Math.ceil(Math.sqrt(this.tileCount));
-    //     this.tileRows = Math.ceil(this.tileCount / this.tileColumns);
-
-    //     this.tiles = sliceTile.map((texture, index) => {
-    //         return new BaseTile({
-    //             id: index + 1,
-    //             Class: "BaseTile",
-    //             tileWidth: this.tileWidth,
-    //             tileHeight: this.tileHeight,
-    //             texture: texture
-    //         });
-    //     });
-
-    //     tileTextureFinalizer.register(this, this.image.texture);
-    // }
-
-    // public getTile(id: number): BaseTile | null{
-    //     if (id < 1 || id > this.tileCount) {
-    //         return null;
-    //     }
-    //     return this.tiles[id - 1];
-    // }
-
-    // public destroy(): void {
-    //     tileTextureFinalizer.unregister(this);
-    //     this.image.texture.destroy();
-    // }
+    public static loadTileset(filePath: string): Promise<BaseTileset | null> {
+        throw new Error("Method not implemented.");
+    }
 }
 
-// interface ITile {
-//     id: number;
-//     Class: string;
-//     tileWidth: number;
-//     tileHeight: number;
-//     texture: Texture;
 
-//     destroy(): void;
-// }
+export interface ITile {
+    getTexture(): Texture;
+}
 
-// type TileData = Pick<ITile, "id" | "Class" | "tileWidth" | "tileHeight" | "texture">;
+export type TileEvent = {
+    UpdateProperty: () => void;
+} 
 
-export abstract class BaseTile extends BaseObject<TileEvent> implements ITile {
-    // public id: number;
-    // public Class: string;
-    // public tileWidth: number;
-    // public tileHeight: number; 
-    // public texture: Texture;
-
-    // constructor(data: TileData) {
-    //     super();
-    //     const { id, Class, tileWidth, tileHeight, texture } = data;
-    //     this.id = id;
-    //     this.Class = Class;
-    //     this.tileWidth = tileWidth;
-    //     this.tileHeight = tileHeight;
-    //     this.texture = texture;
-
-    //     tileTextureFinalizer.register(this, this.texture);
-    // }
-
-    // destroy(): void {
-    //     tileTextureFinalizer.unregister(this);
-    //     this.texture.destroy();
-    // }
-
-    abstract getTexutre(): Texture;
+export abstract class BaseTile extends BaseObject implements ITile {
+    abstract getTexture(): Texture;
 }

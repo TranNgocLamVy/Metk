@@ -2,7 +2,7 @@ import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { EventBus } from "@/appcore/core/EventBus";
+import { EventBus } from "@/appcore/models/core/EventBus";
 import { TextureUtils } from "@/appcore/utils/TextureUtils";
 
 import { CommandManager } from "../command/CommandManager";

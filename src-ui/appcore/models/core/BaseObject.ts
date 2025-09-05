@@ -1,0 +1,34 @@
+﻿import { EventEmitter } from "eventemitter3";
+
+import { Result } from "@/appcore/interface/common/result";
+import { Type } from "@/plugin-api";
+
+export type BaseObjectEvents = {
+    UpdateProperty: () => void;
+};
+
+export abstract class BaseObject extends EventEmitter {
+    public properties: Map<string, Type>;
+    public static event = {
+        UpdateProperty: "UpdateProperty"
+    }
+    constructor() {
+        super();
+        const cls = this.constructor as any;
+        this.properties = cls.properties ? new Map(cls.properties) : new Map();
+    }
+
+    public getProperty(key: string): any {
+        return (this as any)[key];
+    }
+
+    public setProperty(key: string, value: Type): Result {
+        try {
+            (this as any)[key] = value;
+            this.emit(BaseObject.event.UpdateProperty);
+            return { status: "Success" };
+        } catch (error) {
+            return { status: "Error", message: error as any };
+        }
+    }
+}

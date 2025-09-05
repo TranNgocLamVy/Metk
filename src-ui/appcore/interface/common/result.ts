@@ -6,8 +6,10 @@ export const ResultStatus = {
 } as const;
 export type ResultStatus = keyof typeof ResultStatus;
 
-type ResultData = {
+export type Result = {
     status: ResultStatus;
     message?: string;
-}
-export type Result = ResultData | Promise<ResultData>;
+} | Promise<{
+    status: ResultStatus;
+    message?: string;
+}>;

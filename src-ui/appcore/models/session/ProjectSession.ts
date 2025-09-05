@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { EventBus } from "@/appcore/core/EventBus";
+import { EventBus } from "@/appcore/models/core/EventBus";
 
 import { CommandManager } from "../command/CommandManager";
 import { Project } from "../project/Project";

@@ -1,6 +1,6 @@
-import { BaseObject } from "@/appcore/core/BaseObject";
 import { Result } from "@/appcore/interface/common/result";
 import { ITilemap, TilemapEvent } from "@/appcore/interface/tile/ITilemap";
+import { BaseObject } from "@/appcore/models/core/BaseObject";
 
 // interface ITilemap {
 //     id: string;

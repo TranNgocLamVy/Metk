@@ -3,16 +3,22 @@ import { ImageSource, Rectangle, Texture } from "pixi.js";
 import { readFile } from "@tauri-apps/plugin-fs";
 
 export class TextureUtils {
-    public static async loadTextureFromFile(filePath: string): Promise<Texture> {
-        const fileBuffer = await readFile(filePath);
-        const blob = new Blob([new Uint8Array(fileBuffer)], { type: 'image/png' });
-        const url = URL.createObjectURL(blob);
+    public static async loadTextureFromPath(filePath: string): Promise<Texture | null> {
+        try {
+            const fileBuffer = await readFile(filePath);
 
-        const image = new Image();
-        image.src = url;
-        await image.decode();
+            const blob = new Blob([new Uint8Array(fileBuffer)], { type: 'image/png' });
+            const url = URL.createObjectURL(blob);
 
-        return new Texture({ source: new ImageSource({ resource: image, scaleMode: "nearest" }) });
+            const image = new Image();
+            image.src = url;
+            await image.decode();
+
+            return new Texture({ source: new ImageSource({ resource: image, scaleMode: "nearest" }) });
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
     }
 
     public static sliceTexture(texture: Texture, tileWidth: number, tileHeight: number): Texture[] {

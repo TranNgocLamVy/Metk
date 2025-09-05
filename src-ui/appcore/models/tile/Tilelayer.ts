@@ -1,8 +1,8 @@
 import { Texture } from "pixi.js";
 
-import { BaseObject } from "@/appcore/core/BaseObject";
 import { Result } from "@/appcore/interface/common/result";
 import { ITileData, ITilelayer, TilelayerEvent } from "@/appcore/interface/tile/ITilelayer";
+import { BaseObject } from "@/appcore/models/core/BaseObject";
 
 export abstract class BaseTileLayer extends BaseObject<TilelayerEvent> implements ITilelayer {
     public id: string;
