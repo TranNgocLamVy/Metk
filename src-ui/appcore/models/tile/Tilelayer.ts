@@ -1,68 +1,41 @@
 import { Texture } from "pixi.js";
 
 import { Result } from "@/appcore/interface/common/result";
-import { ITileData, ITilelayer, TilelayerEvent } from "@/appcore/interface/tile/ITilelayer";
 import { BaseObject } from "@/appcore/models/core/BaseObject";
 
-export abstract class BaseTileLayer extends BaseObject<TilelayerEvent> implements ITilelayer {
+export interface ITilelayer {
+    getName(): string;
+    rename(name: string): Promise<Result>;
+    getTileAt(position: { x: number, y: number }): ITileData;
+    setTileAt(position: { x: number, y: number }, tile: ITileData): Promise<Result>;
+}
+
+export abstract class BaseTileLayer extends BaseObject implements ITilelayer {
     public id: string;
     protected name: string;
-    // protected layerClass: string;
-    // protected coordinate: { x: number, y: number } = { x: 0, y: 0 };
-    // protected offset: { x: number, y: number } = { x: 0, y: 0 };
-    // protected size: { width: number, height: number }
-    // protected opacity: number = 1;
-    protected visible: boolean = true;
-    protected locked: boolean = false;
-
+    public static event = {
+        ...BaseObject.event,
+    }
     public getName(): string {
         return this.name;
     }
-    public setName(name: string): Result {
+    public async rename(name: string): Promise<Result> {
         this.name = name;
-        this.emit("Renamed", name);
+        this.emit(BaseTileLayer.event.UpdateProperty);
         return { status: "Success" };
     }
-    // public getLayerClass(): string {
-    //     return this.layerClass;
-    // }
-    // public setLayerClass(layerClass: string): void {
-    //     this.layerClass = layerClass;
-    // }
-    // public getSize(): { width: number, height: number } {
-    //     return this.size;
-    // }
-    // public resize(width: number, height: number): void {
-    //     this.size = { width, height }
-    //     this.emit("Resized", { width, height })
-    // }
-    // public isVisible(): boolean {
-    //     return this.visible;
-    // }
-    // public setVisible(visible: boolean): void {
-    //     this.visible = visible;
-    //     this.emit("ChangeVisible", visible);
-    // }
-    // public isLocked(): boolean {
-    //     return this.locked;
-    // }
-    // public setLocked(locked: boolean): void {
-    //     this.locked = locked;
-    //     this.emit("ChangeLocked", locked);
-    // }
-    // public getOpacity(): number {
-    //     return this.opacity;
-    // }
-    // public setOpacity(opacity: number): void {
-    //     this.opacity = opacity;
-    //     this.emit("ChangeOpacity", opacity)
-    // }
-    abstract getTileAt(index: number): BaseTileData;
-    abstract setTileAt(position: { x: number, y: number }, tile: any): Result;
+    abstract getTileAt(position: { x: number, y: number }): BaseTileData;
+    abstract setTileAt(position: { x: number, y: number }, tile: any): Promise<Result>;
+}
+
+
+export interface ITileData {
+    getCoordinate(): { x: number, y: number };
+    getTexture(): Texture | null;
 }
 
 export abstract class BaseTileData implements ITileData {
     abstract getCoordinate(): { x: number, y: number };
 
-    abstract getTexture(): Texture;
+    abstract getTexture(): Texture | null;
 }

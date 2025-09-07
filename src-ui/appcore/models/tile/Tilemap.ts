@@ -1,43 +1,38 @@
-import { Result } from "@/appcore/interface/common/result";
-import { ITilemap, TilemapEvent } from "@/appcore/interface/tile/ITilemap";
+import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { BaseObject } from "@/appcore/models/core/BaseObject";
 
-// interface ITilemap {
-//     id: string;
-//     orientation: "orthogonal" | "isometric" | "staggered" | "hexagonal";
-//     renderOrder: "right-down" | "right-up" | "left-down" | "left-up";
-//     tileWidth: number;
-//     tileHeight: number;
-//     width: number;
-//     height: number;
-//     infinite: boolean;
-//     nextLayerId: number;
-//     nextObjectId: number;
-//     tilesets: BaseTileset[];
-//     layers: BaseTileLayer[];
-// }
+export interface ITilemap {
+    getName(): string;
+    rename(name: string): Promise<Result>;
+    addTilelayer(): Promise<Result>;
+    removeTilelayer(id: string): Promise<Result>;
+    reorderTilelayer(id: string, newIndex: number): Promise<Result>;
+}
 
-// type TilemapData = Pick<ITilemap, "orientation" | "renderOrder" | "tileWidth" | "tileHeight" | "width" | "height" | "infinite" | "nextLayerId" | "nextObjectId" | "tilesets" | "layers">;
-
-// type TilemapEvent = {
-
-// }
-
-export abstract class BaseTilemap extends BaseObject<TilemapEvent> implements ITilemap {
+export abstract class BaseTilemap extends BaseObject implements ITilemap {
     public id: string;
     protected name: string;
-
+    public static event = {
+        ...BaseObject.event,
+        TilelayerAdded: "TilelayerAdded",
+        TilelayerRemoved: "TilelayerRemoved",
+        TilelayerReordered: "TilelayerReordered",
+    }
     public getName(): string {
         return this.name;
     }
-    public setName(name: string): Result {
+    public async rename(name: string): Promise<Result> {
         this.name = name;
-        this.emit("Renamed", name);
-        return { status: "Success" };
+        this.emit(BaseTilemap.event.UpdateProperty);
+        return { status: ResultStatus.Success };
     }
-    abstract addTilelayer(): Result;
-    abstract removeTilelayerAt(id: string): Result;
-    abstract reorderTilelayer(id: string, newIndex: number): Result;
-    abstract createTileMap(): Promise<BaseTilemap>;
-    abstract loadTilemap(file: File): Promise<BaseTilemap>;
+    abstract addTilelayer(): Promise<Result>;
+    abstract removeTilelayer(id: string): Promise<Result>;
+    abstract reorderTilelayer(id: string, newIndex: number): Promise<Result>;
+    public static loadTilemap(filePath: string): Promise<BaseTilemap | null> {
+        throw new Error("Method not implemented.");
+    }
+    public static createTileMap(): Promise<BaseTilemap | null> {
+        throw new Error("Method not implemented.");
+    }
 }

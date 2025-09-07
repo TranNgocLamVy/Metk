@@ -14,7 +14,7 @@ export class DefaultTileset extends BaseTileset {
     public tilecount: number;
     public tilewidth: number;
     public tileheight: number;
-    public version: number;
+    public version: string;
     public image?: {
         source: string;
         width: number;
@@ -35,7 +35,7 @@ export class DefaultTileset extends BaseTileset {
         this.tilecount = tilesetData.tilecount;
         this.tilewidth = tilesetData.tilewidth;
         this.tileheight = tilesetData.tileheight;
-        this.version = tilesetData.version;
+        this.version = tilesetData.version ?? "1.0";
         this.image = tilesetData.image;
         this.grid = tilesetData.grid;
 

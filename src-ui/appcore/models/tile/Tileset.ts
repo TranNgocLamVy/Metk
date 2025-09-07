@@ -1,17 +1,14 @@
 import { Texture } from "pixi.js";
+import { create } from "zustand";
 
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
-import { BaseObject, BaseObjectEvents } from "@/appcore/models/core/BaseObject";
-import { FileHandle } from "@tauri-apps/plugin-fs";
+import { BaseObject } from "@/appcore/models/core/BaseObject";
 
 export interface ITileset {
     getName(): string;
-    setName(name: string): Result;
+    rename(name: string): Promise<Result>;
 }
 
-export interface TilesetEvents extends BaseObjectEvents {
-    Renamed: ( name: string ) => void;
-}
 
 export abstract class BaseTileset extends BaseObject implements ITileset {
     public name: string;
@@ -24,7 +21,7 @@ export abstract class BaseTileset extends BaseObject implements ITileset {
         return this.name;
     }
 
-    public setName(name: string): Result {
+    public async rename(name: string): Promise<Result> {
         this.name = name;
         this.emit(BaseTileset.event.UpdateProperty);
         return { status: ResultStatus.Success };
@@ -32,7 +29,11 @@ export abstract class BaseTileset extends BaseObject implements ITileset {
 
     public abstract getTile(id: number): BaseTile | null;
 
-    public static loadTileset(filePath: string): Promise<BaseTileset | null> {
+    public static async loadTileset(filePath: string): Promise<BaseTileset | null> {
+        throw new Error("Method not implemented.");
+    }
+
+    public static async createTileset(): Promise<BaseTileset | null> {
         throw new Error("Method not implemented.");
     }
 }

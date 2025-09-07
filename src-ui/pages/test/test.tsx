@@ -2,6 +2,7 @@ import { Viewport } from "pixi-viewport";
 import { Application, Container, Point, Sprite, Texture } from "pixi.js";
 import { useRef, useState } from "react";
 
+import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
 import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
 import { VStack } from "@/components/custom/Stack/Stack";
 import Canvas from "@/components/drawing/Canvas/Canvas";
@@ -18,7 +19,10 @@ export default function TestPage() {
 	const test = async () => {
 		const filePath = await openDialog();
 		if (!filePath || !viewport) return;
-	};
+
+        const tilemap = await DefaultTilemap.loadTilemap(filePath);
+        console.log(tilemap);
+    }
 
 	const initApp = (app: Application) => {
 		setApp(app);

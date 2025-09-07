@@ -3,10 +3,6 @@
 import { Result } from "@/appcore/interface/common/result";
 import { Type } from "@/plugin-api";
 
-export type BaseObjectEvents = {
-    UpdateProperty: () => void;
-};
-
 export abstract class BaseObject extends EventEmitter {
     public properties: Map<string, Type>;
     public static event = {
@@ -22,7 +18,7 @@ export abstract class BaseObject extends EventEmitter {
         return (this as any)[key];
     }
 
-    public setProperty(key: string, value: Type): Result {
+    public async setProperty(key: string, value: Type): Promise<Result> {
         try {
             (this as any)[key] = value;
             this.emit(BaseObject.event.UpdateProperty);

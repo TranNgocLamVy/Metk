@@ -16,18 +16,18 @@ const tileData = type({
 })
 export type TileData = typeof tileData.infer;
 
-const tilesetDataSchema = type({
+export const tilesetDataSchema = type({
     name: type("string"),
     tilecount: type("string.numeric.parse"),
     columns: type("string.numeric.parse"),
     tilewidth: type("string.numeric.parse"),
     tileheight: type("string.numeric.parse"),    
-    version: type("string.numeric.parse"),
+    version: type("string").optional(),
     image: type({
         source: type("string"),
         width: type("string.numeric.parse"),
         height: type("string.numeric.parse"),
-    }).optional(),
+    }),
     tileOffset: type({
         x: type("string.numeric.parse"),
         y: type("string.numeric.parse"),
