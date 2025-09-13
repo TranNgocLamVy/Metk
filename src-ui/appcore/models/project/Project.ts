@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { DialogService } from "@/appcore/services/DialogService";
 import { exists } from "@tauri-apps/plugin-fs";
 
-import { ProjectData } from "../../schemas/projectSchema";
+import { ProjectData, ProjectMetaData } from "../../schemas/projectSchema";
 import { ProjectStorageService } from "../../services/ProjectStorageService";
 
 export class Project extends EventEmitter {
@@ -17,8 +17,6 @@ export class Project extends EventEmitter {
     public updatedAt: string;
     public tilemapPath: string[] = []
     public tilesetPath: string[] = []
-    public tilemap: any[] = []; // TODO: Tilemap
-    public tileset: any[] = []; // TODO: Tileset
 
     constructor(data: ProjectData & { directory: string }) {
         super();
@@ -54,14 +52,8 @@ export class Project extends EventEmitter {
             description: this.description,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
-            tilemapPath: this.tilemap.map((tilemap) => {
-                // TODO: Serialize tilemap 
-                return "";
-            }),
-            tilesetPath: this.tileset.map((tileset) => {
-                // TODO: Serialize tileset
-                return "";
-            }),
+            tilemapPath: [],
+            tilesetPath: []
         };
     }
 
@@ -73,7 +65,7 @@ export class Project extends EventEmitter {
 
     }
 
-    static async createProject(): Promise<Project | null> {
+    static async createProject(): Promise<ProjectMetaData | null> {
         const form = await DialogService.openFormDialog({
             title: "Create new Project",
             okText: "Create",
@@ -125,6 +117,14 @@ export class Project extends EventEmitter {
 
         await ProjectStorageService.createProject(project.serialize(), fullDirectory);
 
-        return project;
+        return {
+            id: project.id,
+            name: project.name,
+            version: project.version,
+            description: project.description,
+            createdAt: project.createdAt,
+            updatedAt: project.updatedAt,
+            directory: fullDirectory,
+        }
     }
 }

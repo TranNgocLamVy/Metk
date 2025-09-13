@@ -1,5 +1,4 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
-import { NavLink } from "react-router-dom";
 
 import { Appcore } from "@/appcore/core";
 import { HStack, VStack } from "@/components/custom/Stack/Stack";
@@ -43,10 +42,14 @@ export default function HomePage() {
 						<HStack align="center" justify="start" key={project.id}>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<NavLink key={project.id} to={`/project/${project.id}`} className="flex flex-row items-center gap-2 w-40 justify-start cursor-pointer">
+									{/* <NavLink key={project.id} to={`/project/${project.id}`} className="flex flex-row items-center gap-2 w-40 justify-start cursor-pointer">
 										<SquareArrowOutUpRight size={20} />
 										{project.name}
-									</NavLink>
+									</NavLink> */}
+                                    <Button>
+                                        <SquareArrowOutUpRight size={20} />
+										{project.name}
+                                    </Button>
 								</TooltipTrigger>
                                 <TooltipContent side="left">
                                     {project.description ? <p>{`Description: ${project.description}`}</p> : null}

@@ -12,8 +12,18 @@ export const ProjectSchema = type("string.json.parse").to({
 })
 export type ProjectData = typeof ProjectSchema.infer
 
+export const ProjectMetaDataSchema = type("string.json.parse").to({
+    id: type("string"),
+    name: type("string"),
+    version: type("string").default("0.1.0"),
+    description: type("string").default(""),
+    createdAt: type("string.date"),
+    updatedAt: type("string.date"),
+    directory: type("string"),
+})
+export type ProjectMetaData = typeof ProjectMetaDataSchema.infer
 
 export const ProjectManagerSchema = type("string.json.parse").to({
-    projectPaths: type("string[]").default(() => [])
+    projectMetaDatas: ProjectMetaDataSchema.array().default(() => []),
 })
 export type ProjectManagerData = typeof ProjectManagerSchema.infer

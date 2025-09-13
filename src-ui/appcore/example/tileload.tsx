@@ -13,11 +13,11 @@ import { useExtend } from "@pixi/react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 
 export default function TestPage() {
-	useExtend({ Sprite });
+    useExtend({ Sprite });
 
-	const [app, setApp] = useState<Application | null>(null);
-	const [viewport, setViewport] = useState<Viewport | null>(null);
-	const [tilesetManager, setTilesetManager] = useState<TilesetManager>(new TilesetManager());
+    const [app, setApp] = useState<Application | null>(null);
+    const [viewport, setViewport] = useState<Viewport | null>(null);
+    const [tilesetManager, setTilesetManager] = useState<TilesetManager>(new TilesetManager());
     const [tilemap, setTilemap] = useState<DefaultTilemap | null>(null);
     const [tilemapRenderer, setTilemapRenderer] = useState<DefaultTilemapRenderer | null>(null);
 
@@ -25,11 +25,11 @@ export default function TestPage() {
 
     }, [])
 
-	const loadTilemap = async () => {
-		const filePath = await openDialog();
-		if (!filePath || !viewport) return;
+    const loadTilemap = async () => {
+        const filePath = await openDialog();
+        if (!filePath || !viewport) return;
 
-		const tilemap = await DefaultTilemap.loadTilemap(filePath, {
+        const tilemap = await DefaultTilemap.loadTilemap(filePath, {
             tilesetManager: tilesetManager,
         });
 
@@ -38,8 +38,8 @@ export default function TestPage() {
         const tileRenderer = new DefaultTilemapRenderer({tilemap})
         setTilemapRenderer(tileRenderer);
         tileRenderer.initRenderer(viewport);
-		console.log(tilemap);
-	};
+        console.log(tilemap);
+    };
 
     const loadTileset = async () => {
         const filePath = await openDialog();
@@ -51,35 +51,35 @@ export default function TestPage() {
     }
 
 
-	const initApp = (app: Application) => {
-		setApp(app);
-		const viewport = new Viewport({
-			screenWidth: app.screen.width,
-			screenHeight: app.screen.height,
-			worldWidth: app.screen.width,
-			worldHeight: app.screen.height,
-			passiveWheel: true,
-			stopPropagation: true,
-			allowPreserveDragOutside: true,
-			events: app.renderer.events,
-		});
+    const initApp = (app: Application) => {
+        setApp(app);
+        const viewport = new Viewport({
+            screenWidth: app.screen.width,
+            screenHeight: app.screen.height,
+            worldWidth: app.screen.width,
+            worldHeight: app.screen.height,
+            passiveWheel: true,
+            stopPropagation: true,
+            allowPreserveDragOutside: true,
+            events: app.renderer.events,
+        });
 
-		viewport.drag({ mouseButtons: "middle" }).wheel().decelerate({ friction: 0 });
+        viewport.drag({ mouseButtons: "middle" }).wheel().decelerate({ friction: 0 });
 
-		viewport.eventMode = "static";
-		viewport.hitArea = app.screen;
+        viewport.eventMode = "static";
+        viewport.hitArea = app.screen;
 
-		app.stage.addChild(viewport);
-		setViewport(viewport);
-	};
+        app.stage.addChild(viewport);
+        setViewport(viewport);
+    };
 
-	return (
-		<VStack className="h-full">
-			<HStack>
-				<Button onClick={loadTilemap}>Load Tilemap</Button>
-				<Button onClick={loadTileset}>Load Tileset</Button>
-			</HStack>
-			<Canvas initCanvas={(app) => initApp(app)} className="h-full" />
-		</VStack>
-	);
+    return (
+        <VStack className="h-full">
+            <HStack>
+                <Button onClick={loadTilemap}>Load Tilemap</Button>
+                <Button onClick={loadTileset}>Load Tileset</Button>
+            </HStack>
+            <Canvas initCanvas={(app) => initApp(app)} className="h-full" />
+        </VStack>
+    );
 }

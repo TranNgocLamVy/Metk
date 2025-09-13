@@ -1,5 +1,5 @@
 
-import { CommandRegistry } from "@/appcore/registries/command-registry";
+// import { CommandRegistry } from "@/appcore/registries/command-registry";
 
 import { EventBus } from "../core/EventBus";
 import { BaseCommand, CommandContext } from "./Command";
@@ -15,15 +15,15 @@ export class CommandManager {
     }
 
     public execute(commandName: string) {
-        const command = CommandRegistry.getInstance().getCommand(commandName);
-        if (command) {
-            const context: CommandContext = { }
-            this.currentCommand = new command(context);
-            this.currentCommand.execute();
-            if (this.currentCommand.commandConfig.undoAble) {
-                this.commandStack.push(this.currentCommand);
-            }
-        }
+        // const command = CommandRegistry.getInstance().getCommand(commandName);
+        // if (command) {
+        //     const context: CommandContext = { }
+        //     this.currentCommand = new command(context);
+        //     this.currentCommand.execute();
+        //     if (this.currentCommand.commandConfig.undoAble) {
+        //         this.commandStack.push(this.currentCommand);
+        //     }
+        // }
     }
 
     public undo() {

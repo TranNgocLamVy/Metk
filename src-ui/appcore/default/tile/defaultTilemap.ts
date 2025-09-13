@@ -2,19 +2,44 @@ import { type } from "arktype";
 import { XMLParser } from "fast-xml-parser";
 
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
-import { BaseTilemap } from "@/appcore/models/tile/Tilemap";
-import { ExternalTileset, TilemapData, TilemapSchema, UnionTilesetData } from "@/appcore/schemas/tilemapSchema";
+import { ITilemap } from "@/appcore/interface/tile/ITilemap";
+import { BaseObject } from "@/appcore/models/core/BaseObject";
+import { TilesetManager } from "@/appcore/models/manager/TilesetManager";
+import { ExternalTileset, TilemapData, TilemapSchema } from "@/appcore/schemas/tilemapSchema";
 import { TilesetData } from "@/appcore/schemas/tilesetSchema";
 import { TextureUtils } from "@/appcore/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";
 
+import { DefaultTilemapRenderer } from "../renderer/defaultTilemapRenderer";
 import { DefaultTileLayer } from "./defaultTilelayer";
-import { DefaultTileset } from "./defaultTileset";
+import { DefaultTile, DefaultTileset } from "./defaultTileset";
 
-export class DefaultTilemap extends BaseTilemap {
+export type CreateTilemapContext = {
+    tilesetManager: TilesetManager,
+}
+
+export class DefaultTilemap extends BaseObject implements ITilemap {
     public metaData: {
         basePath: string,
+    }
+    private context: CreateTilemapContext;
+
+    public id: string;
+    protected name: string;
+    public static event = {
+        ...BaseObject.event,
+        TilelayerAdded: "TilelayerAdded",
+        TilelayerRemoved: "TilelayerRemoved",
+        TilelayerReordered: "TilelayerReordered",
+    }
+    public getName(): string {
+        return this.name;
+    }
+    public async rename(name: string): Promise<Result> {
+        this.name = name;
+        this.emit(BaseObject.event.UpdateProperty);
+        return { status: ResultStatus.Success };
     }
 
     public version: string;
@@ -39,19 +64,16 @@ export class DefaultTilemap extends BaseTilemap {
     public parallaxoriginx: number;
     public parallaxoriginy: number;
 
-    private tilesets : {
+    public tilesets: {
         type: "external" | "internal",
         tileset: DefaultTileset,
     }[] = [];
 
-    private tilelayers: DefaultTileLayer[] = [];
+    public tilelayers: DefaultTileLayer[] = [];
 
-    public static event = {
-        ...BaseTilemap.event,
-    }
-
-    constructor(filePath: string, tilemapData: TilemapData) {
+    constructor(filePath: string, tilemapData: TilemapData, context: CreateTilemapContext) {
         super();
+        this.context = context;
 
         const basePath = filePath.split("\\").slice(0, -1).join("\\");
         this.metaData = { basePath };
@@ -79,8 +101,6 @@ export class DefaultTilemap extends BaseTilemap {
         this.staggerindex = tilemapData.staggerindex;
         this.parallaxoriginx = tilemapData.parallaxoriginx ?? 0;
         this.parallaxoriginy = tilemapData.parallaxoriginy ?? 0;
-
-        this.loadAssets(tilemapData.tileset, tilemapData.layer);
     }
 
     public async loadAssets(tilesets: any[], tilelayers: any[]): Promise<Result> {
@@ -96,7 +116,11 @@ export class DefaultTilemap extends BaseTilemap {
                 continue;
             }
             if ((tilesetData as ExternalTileset).source) {
-                // TODO: Load external tileset
+                const externalTilesetData = tilesetData as ExternalTileset;
+                const tilesetFullPath = await join(basePath, externalTilesetData.source);
+                const tileset = await this.context.tilesetManager.getTileset(tilesetFullPath);
+                if (!tileset) continue;
+                this.tilesets.push({ type: "external", tileset: (tileset as DefaultTileset) });
                 continue;
             }
             const internalTilesetData = tilesetData as TilesetData;
@@ -121,25 +145,54 @@ export class DefaultTilemap extends BaseTilemap {
     }
 
     public async addTilelayer(): Promise<Result> {
-        this.emit(BaseTilemap.event.TilelayerAdded);
+        this.emit(DefaultTilemap.event.TilelayerAdded);
         return { status: "Success" };
     }
 
     public async removeTilelayer(id: string): Promise<Result> {
-        this.emit(BaseTilemap.event.TilelayerRemoved);
+        this.emit(DefaultTilemap.event.TilelayerRemoved);
         return { status: "Success" };
     }
 
     public async reorderTilelayer(id: string, newIndex: number): Promise<Result> {
-        this.emit(BaseTilemap.event.TilelayerReordered);
+        if (newIndex < 0 || newIndex >= this.tilelayers.length) {
+            return { status: "Error", message: "Invalid index" };
+        }
+        const tilelayerIndex = this.tilelayers.findIndex(tilelayer => tilelayer.id === id);
+        if (tilelayerIndex === -1) {
+            return { status: "Error", message: "Tilelayer not found" };
+        }
+        const targetIndex = Math.max(0, Math.min(newIndex, this.tilelayers.length - 1));
+        const [tilelayer] = this.tilelayers.splice(tilelayerIndex, 1);
+        this.tilelayers.splice(targetIndex, 0, tilelayer);
+        this.emit(DefaultTilemap.event.TilelayerReordered, {
+            id,
+            oldIndex: tilelayerIndex,
+            newIndex: targetIndex,
+        });
+
         return { status: "Success" };
+    }
+
+
+    public async getTilesetTileById(id: number): Promise<DefaultTile | null> {
+        if (id == 0) return null;
+        let i = 0;
+        for (const tileset of this.tilesets) {
+            const tilesetCount = tileset.tileset.getTileCount();
+            if (id - i < tilesetCount) {
+                return tileset.tileset.getTile(id - i - 1);
+            }
+            i += tilesetCount;
+        }
+        return null;
     }
 
     public static async createTileMap(): Promise<DefaultTilemap | null> {
         return null;
     }
 
-    public static async loadTilemap(filePath: string): Promise<DefaultTilemap | null> {
+    public static async loadTilemap(filePath: string, context: CreateTilemapContext): Promise<DefaultTilemap | null> {
         const file = await open(filePath);
         const stat = await file.stat();
         const buf = new Uint8Array(stat.size);
@@ -163,7 +216,8 @@ export class DefaultTilemap extends BaseTilemap {
             return null;
         }
 
-        const newTilemap = new DefaultTilemap(filePath, parseJSON.map);
+        const newTilemap = new DefaultTilemap(filePath, parseJSON.map, context);
+        await newTilemap.loadAssets(parseJSON.map.tileset, parseJSON.map.layer);
 
         return newTilemap;
     }

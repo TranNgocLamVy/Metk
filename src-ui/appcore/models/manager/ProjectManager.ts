@@ -4,43 +4,48 @@ import { DialogService } from "@/appcore/services/DialogService";
 import { ToastService } from "@/appcore/services/ToastService";
 import { useProjectStore } from "@/stores/ui/ProjectStore";
 
-import { ProjectManagerData } from "../../schemas/projectSchema";
+import { ProjectManagerData, ProjectMetaData } from "../../schemas/projectSchema";
 import { ProjectStorageService } from "../../services/ProjectStorageService";
 import { Project } from "../project/Project";
 
 export type ProjectEventType = {
     projectsUpdated: () => void;
-    projectOpen: (project: Project) => void;
+    projectOpen: (project: ProjectMetaData) => void;
 }
 
 export class ProjectManager extends EventEmitter<ProjectEventType> {
     public currentProject: Project | null = null;
-    public projects: Project[] = [];
     public tilemaps: any[]
     public tilesets: any[]
-    public projectPaths: string[] = [];
+    public projectMataDatas: ProjectMetaData[] = [];
     public constructor() {
         super();
         this.load();
         this.on("projectsUpdated", () => {
-            useProjectStore.getState().setProjects([...this.projects]);
+            useProjectStore.getState().setProjects([...this.projectMataDatas]);
         });
     }
 
     private async load() {
         const data = await ProjectStorageService.loadProjectManager();
-        this.projectPaths = data.projectPaths;
-        await Promise.all(this.projectPaths.map(async (path) => {
-            const projectData = await ProjectStorageService.loadProject(path);
-            if (projectData) {
-                const project = new Project({...projectData, directory: path});
-                this.projects.push(project);
-            }
-        }))
+        this.projectMataDatas = data.projectMetaDatas;
         this.save();
     }
 
     public async save() {
+        this.projectMataDatas = this.projectMataDatas.map((p) => {
+            if (p.id === this.currentProject?.id) {
+                return {
+                    ...this.currentProject.serialize(),
+                    directory: this.currentProject.directory,
+                    updatedAt: new Date().toDateString(),
+                }
+            }
+            return {
+                ...p,
+                updatedAt: new Date().toDateString(),
+            }
+        })
         const data = this.serialize();
         await ProjectStorageService.saveProjectManager(data);
         setTimeout(() => {
@@ -49,31 +54,48 @@ export class ProjectManager extends EventEmitter<ProjectEventType> {
     }
 
     public async createProject() {
-        const project = await Project.createProject();
+        const projectMetaData = await Project.createProject();
 
-        if (!project) return;
+        if (!projectMetaData) return;
 
-        this.projects.push(project);
+        this.projectMataDatas.push(projectMetaData);
 
-        ToastService.success({ message: `Successfully created ${project.name} project` })
+        ToastService.success({ message: `Successfully created ${projectMetaData.name} project` })
 
         this.save();
 
         const open = await DialogService.openPermissionDialog({
-            title: `Open "${project.name}" now?`,
+            title: `Open "${projectMetaData.name}" now?`,
             description: "This will open the new project in the editor",
             okText: "Open",
             cancelText: "Cancel",
         })
 
         if (open) {
-            this.emit("projectOpen", project);
+            this.openProject(projectMetaData.id);
         }
+    }
+
+    public async openProject(id: string) {
+        const projectMetaData = this.projectMataDatas.find((p) => p.id === id);
+        if (!projectMetaData) return;
+        const projectData = await ProjectStorageService.loadProject(projectMetaData.directory);
+        if (!projectData) return;
+        const project = new Project({
+            ...projectData,
+            directory: projectMetaData.directory,
+        });
+        if (this.currentProject) {
+            this.currentProject.unload();
+        }
+        this.currentProject = project;
+        this.currentProject.load();
+        this.emit("projectOpen", project);
     }
 
     private serialize(): ProjectManagerData {
         return {
-            projectPaths: this.projects.map((project) => project.directory),
+            projectMetaDatas: this.projectMataDatas,
         };
     }
 }

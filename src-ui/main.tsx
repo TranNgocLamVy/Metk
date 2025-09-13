@@ -16,24 +16,24 @@ import { Toaster } from "@/components/shadcn/sonner";
 import { appRoutes } from "./pages";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<React.StrictMode>
-		<ThemeProvider>
-			<Router>
-				<MenuBar />
-				<MainContainer>
-					<Toaster position="top-right" richColors closeButton />
-					<DialogContainer />
-					<ErrorBoundary fallbackRender={FallbackRender}>
-						<AppcoreWrapper>
-							<Routes>
-								{appRoutes.map(({ path, element }, index) => (
-									<Route key={index} path={path} element={element} />
-								))}
-							</Routes>
-						</AppcoreWrapper>
-					</ErrorBoundary>
-				</MainContainer>
-			</Router>
-		</ThemeProvider>
-	</React.StrictMode>
+	// <React.StrictMode>
+	// </React.StrictMode>
+	<ThemeProvider>
+		<Router>
+			<MenuBar />
+			<MainContainer>
+				<Toaster position="top-right" richColors closeButton />
+				<DialogContainer />
+				<ErrorBoundary fallbackRender={FallbackRender}>
+					<AppcoreWrapper>
+						<Routes>
+							{appRoutes.map(({ path, element }, index) => (
+								<Route key={index} path={path} element={element} />
+							))}
+						</Routes>
+					</AppcoreWrapper>
+				</ErrorBoundary>
+			</MainContainer>
+		</Router>
+	</ThemeProvider>
 );

@@ -2,13 +2,20 @@ import { type } from "arktype";
 import { XMLParser } from "fast-xml-parser";
 import { Texture } from "pixi.js";
 
-import { BaseTile, BaseTileset } from "@/appcore/models/tile/Tileset";
+import { Result, ResultStatus } from "@/appcore/interface/common/result";
+import { ITile, ITileset } from "@/appcore/interface/tile/ITileset";
+import { BaseObject } from "@/appcore/models/core/BaseObject";
 import { TileData, TilesetData, tilesetSchema } from "@/appcore/schemas/tilesetSchema";
 import { TextureUtils } from "@/appcore/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";
 
-export class DefaultTileset extends BaseTileset {
+const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
+    texture.destroy();
+});
+
+export class DefaultTileset extends BaseObject implements ITileset {
+    public name: string;
     public texture: Texture | null;
     public columns: number;
     public tilecount: number;
@@ -40,7 +47,7 @@ export class DefaultTileset extends BaseTileset {
         this.grid = tilesetData.grid;
 
 
-        if(!this.texture) return;
+        if (!this.texture) return;
         const tileTextureList = TextureUtils.sliceTexture(this.texture, this.tilewidth, this.tileheight);
         if (tilesetData.tile.length > 0) {
             this.tiles = tilesetData.tile.map(tileData => {
@@ -54,11 +61,25 @@ export class DefaultTileset extends BaseTileset {
         }
     }
 
-    getTile(id: number): BaseTile | null {
+    public getName(): string {
+        return this.name;
+    }
+
+    public async rename(name: string): Promise<Result> {
+        this.name = name;
+        this.emit(BaseObject.event.UpdateProperty);
+        return { status: ResultStatus.Success };
+    }
+
+    getTile(id: number): DefaultTile | null {
         return this.tiles.find(tile => tile.id === id) || null;
     }
 
-    public static override async loadTileset(filePath: string): Promise<DefaultTileset | null> {
+    public getTileCount(): number {
+        return this.tiles.length;
+    }
+
+    public static async loadTileset(filePath: string): Promise<DefaultTileset | null> {
         const file = await open(filePath);
         const stat = await file.stat();
         const buf = new Uint8Array(stat.size);
@@ -95,7 +116,7 @@ export class DefaultTileset extends BaseTileset {
     }
 }
 
-export class DefaultTile extends BaseTile {
+export class DefaultTile extends BaseObject implements ITile {
     public id: number;
     protected texture: Texture;
 
@@ -103,9 +124,15 @@ export class DefaultTile extends BaseTile {
         super();
         this.id = tileData.id;
         this.texture = texture;
+        tileTextureFinalizer.register(this, texture);
     }
 
-    getTexture(): Texture {
+    public getTexture(): Texture {
         return this.texture;
+    }
+
+    public destroy(): void {
+        tileTextureFinalizer.unregister(this);
+        this.texture.destroy();
     }
 }

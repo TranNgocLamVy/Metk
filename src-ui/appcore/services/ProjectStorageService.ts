@@ -17,7 +17,7 @@ export class ProjectStorageService {
         if (projectData instanceof type.errors) {
             console.error(projectData.summary);
             return {
-                projectPaths: []
+                projectMetaDatas: []
             };
         }
         return projectData;

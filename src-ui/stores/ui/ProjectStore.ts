@@ -1,13 +1,14 @@
 import { create } from "zustand";
 
 import { Project } from "@/appcore/models/project/Project";
+import { ProjectMetaData } from "@/appcore/schemas/projectSchema";
 
 interface ProjectStore {
-    currentProject: Project | null;
-    projects: Project[];
+    currentProject: ProjectMetaData | null;
+    projects: ProjectMetaData[];
 
-    setProjects: (projects: Project[]) => void;
-    addProject: (project: Project) => void;
+    setProjects: (projects: ProjectMetaData[]) => void;
+    addProject: (project: ProjectMetaData) => void;
     removeProject: (id: string) => void;
     setCurrentProject: (id: string) => void;
 }
