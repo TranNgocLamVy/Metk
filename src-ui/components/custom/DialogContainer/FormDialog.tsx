@@ -5,7 +5,7 @@ import { Fragment } from "react/jsx-runtime";
 import { ToastService } from "@/appcore/services/ToastService";
 import { Button } from "@/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/shadcn/dialog";
-import { useDialogStore } from "@/stores/ui/DialogStore";
+import { useDialogStore } from "@/stores/menu/DialogStore";
 import { Field } from "@/types/dialogs/formDialog";
 
 import FilePickerField from "../Input/FilePicker/FilePicker";

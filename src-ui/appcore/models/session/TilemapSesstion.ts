@@ -1,89 +1,73 @@
-// import { Viewport } from "pixi-viewport";
-// import { Application } from "pixi.js";
-// import { v4 as uuidv4 } from "uuid";
+import { Viewport } from "pixi-viewport";
+import { Application } from "pixi.js";
+import { v4 as uuidv4 } from "uuid";
 
-// import { EventBus } from "@/appcore/models/core/EventBus";
-// import { TextureUtils } from "@/appcore/utils/TextureUtils";
+import { DefaultTilemapRenderer } from "@/appcore/default/renderer/defaultTilemapRenderer";
+import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
 
-// import { CommandManager } from "../command/CommandManager";
-// import { TilemapRenderer } from "../renderer/TilemapRenderer";
-// import { BaseTilemap } from "../tile/Tilemap";
-// import { BaseTileset } from "../tile/Tileset";
+export class TilemapSession {
+    public id: string;
+    private pixiApp: Application;
+    private tilemap: DefaultTilemap;
+    private tilemapRenderer: DefaultTilemapRenderer;
+    private resizeObserver: ResizeObserver;
 
-// export class TilemapSession {
-//     public readonly id: string;
-//     private readonly eventBus: EventBus;
-//     private readonly commandManager: CommandManager;
-//     private tilemap: BaseTilemap;
-//     private tilemapRenderer: TilemapRenderer;
-//     private pixiApp: Application;
-//     private viewport: Viewport;
+    constructor(tilemap: DefaultTilemap) {
+        this.id = uuidv4();
+        this.tilemap = tilemap;
+    }
 
-//     constructor(options: Exclude<TilemapSession, "state">) {
-//         this.id = uuidv4();
-//         this.eventBus = options.eventBus;
-//         this.commandManager = options.commandManager;
-//         this.tilemap = options.tilemap;
-//         // this.tilemapRenderer = new TilemapRenderer(this.tilemap, options.container);
-//     }
+    public static createTilemapSession(tilemap: DefaultTilemap): Promise<TilemapSession> {
+        return new Promise(async (resolve) => {
+            const tilemapSession = new TilemapSession(tilemap);
+            await tilemapSession.initializeSession();
+            resolve(tilemapSession);
+        });
+    }
 
-//     public serialize(): any {
-//         // TODO: Serialize tilemap session
-//     }
+    private async initializeSession(): Promise<void> {
+        this.tilemapRenderer = new DefaultTilemapRenderer({ tilemap: this.tilemap });
+        this.pixiApp = new Application();
+        await this.pixiApp.init({
+            backgroundAlpha: 0,
+            sharedTicker: true,
+            autoStart: true,
+        })
 
-//     public async initPixiApplication(pixiApp: Application) {
-//         this.pixiApp = pixiApp;
+        const viewport = new Viewport({
+            screenWidth: this.pixiApp.screen.width,
+            screenHeight: this.pixiApp.screen.height,
+            worldWidth: this.pixiApp.screen.width,
+            worldHeight: this.pixiApp.screen.height,
+            passiveWheel: true,
+            stopPropagation: true,
+            allowPreserveDragOutside: true,
+            events: this.pixiApp.renderer.events,
+        });
+        viewport.drag({ mouseButtons: "middle" }).wheel().decelerate({ friction: 0 });
+        viewport.eventMode = "static";
+        viewport.hitArea = this.pixiApp.screen;
+        this.pixiApp.stage.addChild(viewport);
 
-//         this.viewport = new Viewport({
-//             screenWidth: this.pixiApp.screen.width,
-//             screenHeight: this.pixiApp.screen.height,
-//             worldWidth: this.pixiApp.screen.width,
-//             worldHeight: this.pixiApp.screen.height,
-//             passiveWheel: true,
-//             stopPropagation: true,
-//             allowPreserveDragOutside: true,
-//             events: this.pixiApp.renderer.events,
-//         })
+        this.tilemapRenderer.initRenderer(viewport);
+    }
 
-//         this.viewport.drag({ mouseButtons: "middle" }).wheel().decelerate({ friction: 0 });
-//         this.pixiApp.stage.addChild(this.viewport);
+    public uninitalizeSession(): void {
+        
+    }
 
-//         await this.initRenderer();
-//     }
+    public setContainer(container: HTMLElement): void {
+        container.appendChild(this.pixiApp.canvas);
+        this.resize(container);
+        this.resizeObserver = new ResizeObserver(() => {
+            this.resize(container);
+        });
+        this.resizeObserver.observe(container);
+    }
 
-//     async initRenderer() {
-//         const imagePath = "C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\json\\Grass.png"
-//         const imageTexture = await TextureUtils.loadTextureFromFile(imagePath);
-//         const tileset = new BaseTileset({
-//             tilesetName: "Grass",
-//             tilesetId: 1,
-//             tileWidth: 16,
-//             tileHeight: 16,
-//             image: {
-//                 path: imagePath,
-//                 texture: imageTexture
-//             }
-//         })
-//         const tilelayer = new BaseTilelayer({
-//             layerName: "Tile Layer 1",
-//             layerId: "1",
-//             width: 64,
-//             height: 64,
-//             layerData: Array(64).fill(0).map(() => Array(64).fill(0).map(() => ({ tileId: 2, tilesetId: 1 })))
-//         })
-//         const tilemap = new BaseTilemap({
-//             orientation: "orthogonal",
-//             renderOrder: "right-down",
-//             tileWidth: 16,
-//             tileHeight: 16,
-//             width: 64,
-//             height: 64,
-//             infinite: false,
-//             nextLayerId: 2,
-//             nextObjectId: 1,
-//             tilesets: [tileset],
-//             layers: [tilelayer]
-//         })
-//         this.tilemapRenderer = new TilemapRenderer(tilemap, this.viewport);
-//     }
-// }
+    private resize(container: HTMLElement) {
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        this.pixiApp.renderer.resize(width, height);
+    }
+}

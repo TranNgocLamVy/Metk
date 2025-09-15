@@ -1,7 +1,7 @@
 import { CaseSensitive, Eye, Grid3x3, Lock, RectangleHorizontal, RotateCcw, Scan, Search, ZoomIn, ZoomOut } from "lucide-react";
 
-import { ShowObjectNamesTypes, SnappingModeTypes, useDrawingViewOptions } from "@/stores/ui/DrawingViewStore";
-import { useUIViewOptions } from "@/stores/ui/UIViewStore";
+import { ShowObjectNamesTypes, SnappingModeTypes, useDrawingViewOptions } from "@/stores/menu/DrawingViewStore";
+import { useUIViewOptions } from "@/stores/menu/UIViewStore";
 
 const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 	{

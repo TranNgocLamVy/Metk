@@ -1,11 +1,15 @@
 import EventEmitter from "eventemitter3";
 import { v4 as uuidv4 } from "uuid";
 
+import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
+import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
 import { DialogService } from "@/appcore/services/DialogService";
 import { exists } from "@tauri-apps/plugin-fs";
 
 import { ProjectData, ProjectMetaData } from "../../schemas/projectSchema";
 import { ProjectStorageService } from "../../services/ProjectStorageService";
+import { TilemapManager } from "../manager/TilemapManager";
+import { TilesetManager } from "../manager/TilesetManager";
 
 export class Project extends EventEmitter {
     public readonly id: string;
@@ -15,8 +19,11 @@ export class Project extends EventEmitter {
     public description: string;
     public createdAt: string;
     public updatedAt: string;
-    public tilemapPath: string[] = []
-    public tilesetPath: string[] = []
+    public tilemapPaths: string[] = []
+    public tilesetPaths: string[] = []
+
+    public tilesetManager: TilesetManager = new TilesetManager();
+    public tilemapManager: TilemapManager = new TilemapManager();
 
     constructor(data: ProjectData & { directory: string }) {
         super();
@@ -27,12 +34,29 @@ export class Project extends EventEmitter {
         this.description = data.description;
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
-        this.tilemapPath = data.tilemapPath;
-        this.tilesetPath = data.tilesetPath;
+        this.tilemapPaths = data.tilemapPaths;
+        this.tilesetPaths = data.tilesetPaths;
     }
 
-    public load() {
-        // TODO: Load tilemap and tileset
+    public async load() {
+        await this.loadTilesets();
+        await this.loadTilemaps();
+    }
+
+    private async loadTilesets() {
+        await Promise.all(this.tilesetPaths.map(async (path) => {
+            const tileset = await DefaultTileset.loadTileset(path);
+            if (!tileset) return;
+            this.tilesetManager.loadTileset(path, tileset);
+        }))
+    }
+
+    private async loadTilemaps() {
+        await Promise.all(this.tilemapPaths.map(async (path) => {
+            const tilemap = await DefaultTilemap.loadTilemap(path, {tilesetManager: this.tilesetManager});
+            if (!tilemap) return;
+            this.tilemapManager.loadTilemap(path, tilemap);
+        }))
     }
 
     public async save() {
@@ -40,7 +64,7 @@ export class Project extends EventEmitter {
         await ProjectStorageService.saveProject(projectData, this.directory);
     }
 
-    public unload() {
+    public async unload() {
         // TODO: Unload tilemap and tileset
     }
 
@@ -52,8 +76,8 @@ export class Project extends EventEmitter {
             description: this.description,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
-            tilemapPath: [],
-            tilesetPath: []
+            tilemapPaths: [],
+            tilesetPaths: []
         };
     }
 
@@ -111,8 +135,8 @@ export class Project extends EventEmitter {
             description: "",
             createdAt: new Date().toDateString(),
             updatedAt: new Date().toDateString(),
-            tilemapPath: [],
-            tilesetPath: [],
+            tilemapPaths: [],
+            tilesetPaths: [],
         });
 
         await ProjectStorageService.createProject(project.serialize(), fullDirectory);

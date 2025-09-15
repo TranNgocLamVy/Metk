@@ -1,4 +1,5 @@
-import { useNavigationStore } from "@/stores/ui/NavigationStore";
+import { useDebugStore } from "@/stores/debug/DebugStore";
+import { useNavigationStore } from "@/stores/menu/NavigationStore";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -13,6 +14,13 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 		name: "Test",
         onClick() {
             useNavigationStore.getState().navigate?.("/test");
+        },
+	},
+	{
+		type: "option",
+		name: "Rerender",
+        onClick() {
+            useDebugStore.getState().rerender();
         },
 	},
 ];

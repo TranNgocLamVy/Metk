@@ -9,4 +9,5 @@ export type ResultStatus = keyof typeof ResultStatus;
 export type Result = {
     status: ResultStatus;
     message?: string;
+    data?: any;
 };

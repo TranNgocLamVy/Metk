@@ -17,7 +17,7 @@ export default function MainContainer({ children, ...props }: MainContainerProps
     }, [ref.current])
 
     return (
-        <main {...props} ref={ref} className="w-full h-screen flex flex-col">
+        <main {...props} ref={ref} className="w-full h-screen flex flex-col overflow-hidden">
             {children}
         </main>
     );

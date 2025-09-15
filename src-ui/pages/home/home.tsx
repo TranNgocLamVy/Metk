@@ -5,7 +5,7 @@ import { HStack, VStack } from "@/components/custom/Stack/Stack";
 import { Button } from "@/components/shadcn/button";
 import { Separator } from "@/components/shadcn/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip";
-import { useProjectStore } from "@/stores/ui/ProjectStore";
+import { useProjectStore } from "@/stores/menu/ProjectStore";
 
 export default function HomePage() {
 	const projects = useProjectStore((s) => s.projects);

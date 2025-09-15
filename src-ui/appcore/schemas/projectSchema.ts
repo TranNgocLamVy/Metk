@@ -7,8 +7,8 @@ export const ProjectSchema = type("string.json.parse").to({
     description: type("string").default(""),
     createdAt: type("string.date"),
     updatedAt: type("string.date"),
-    tilemapPath: type("string[]").default(() => []),
-    tilesetPath: type("string[]").default(() => []),
+    tilemapPaths: type("string[]").default(() => []),
+    tilesetPaths: type("string[]").default(() => []),
 })
 export type ProjectData = typeof ProjectSchema.infer
 

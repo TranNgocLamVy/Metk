@@ -19,19 +19,18 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	// <React.StrictMode>
 	// </React.StrictMode>
 	<ThemeProvider>
+		<MenuBar />
 		<Router>
-			<MenuBar />
 			<MainContainer>
 				<Toaster position="top-right" richColors closeButton />
 				<DialogContainer />
+				<AppcoreWrapper />
 				<ErrorBoundary fallbackRender={FallbackRender}>
-					<AppcoreWrapper>
-						<Routes>
-							{appRoutes.map(({ path, element }, index) => (
-								<Route key={index} path={path} element={element} />
-							))}
-						</Routes>
-					</AppcoreWrapper>
+					<Routes>
+						{appRoutes.map(({ path, element }, index) => (
+							<Route key={index} path={path} element={element} />
+						))}
+					</Routes>
 				</ErrorBoundary>
 			</MainContainer>
 		</Router>

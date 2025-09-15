@@ -2,7 +2,7 @@ import EventEmitter from "eventemitter3";
 
 import { DialogService } from "@/appcore/services/DialogService";
 import { ToastService } from "@/appcore/services/ToastService";
-import { useProjectStore } from "@/stores/ui/ProjectStore";
+import { useProjectStore } from "@/stores/menu/ProjectStore";
 
 import { ProjectManagerData, ProjectMetaData } from "../../schemas/projectSchema";
 import { ProjectStorageService } from "../../services/ProjectStorageService";
@@ -86,10 +86,10 @@ export class ProjectManager extends EventEmitter<ProjectEventType> {
             directory: projectMetaData.directory,
         });
         if (this.currentProject) {
-            this.currentProject.unload();
+            await this.currentProject.unload();
         }
         this.currentProject = project;
-        this.currentProject.load();
+        await this.currentProject.load();
         this.emit("projectOpen", project);
     }
 

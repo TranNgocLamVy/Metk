@@ -1,4 +1,4 @@
-import { useDialogStore } from "@/stores/ui/DialogStore";
+import { useDialogStore } from "@/stores/menu/DialogStore";
 import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/types/dialogs/formDialog";
 import { PermissionDialogOptions } from "@/types/dialogs/permissionDialog";
 

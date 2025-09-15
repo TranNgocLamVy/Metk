@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
 import { Appcore } from "@/appcore/core";
-import { useNavigationStore } from "@/stores/ui/NavigationStore";
+import { useNavigationStore } from "@/stores/menu/NavigationStore";
 
 interface AppcoreWrapperProps {
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 export default function AppcoreWrapper({ children }: AppcoreWrapperProps) {
@@ -19,9 +19,6 @@ export default function AppcoreWrapper({ children }: AppcoreWrapperProps) {
 
 	useEffect(() => {
 		Appcore.initializeAppcore();
-		return () => {
-			Appcore.uninitializeAppcore();
-		};
 	}, []);
 
 	return <Fragment>{children}</Fragment>;

@@ -1,85 +1,79 @@
-import { Viewport } from "pixi-viewport";
-import { Application, Container, Point, Sprite, Texture } from "pixi.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { DefaultTilemapRenderer } from "@/appcore/default/renderer/defaultTilemapRenderer";
-import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
-import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
-import { TilesetManager } from "@/appcore/models/manager/TilesetManager";
+import { Project } from "@/appcore/models/project/Project";
+import { ProjectData } from "@/appcore/schemas/projectSchema";
+import { TilemapEditorTab } from "@/appcore/ui/tab/TilemapEditorTab";
 import { HStack, VStack } from "@/components/custom/Stack/Stack";
-import Canvas from "@/components/drawing/Canvas/Canvas";
 import { Button } from "@/components/shadcn/button";
-import { useExtend } from "@pixi/react";
-import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { useTabStore } from "@/stores/tab/TabStore";
+
+import { TabNavigation } from "./tabnavigation";
 
 export default function TestPage() {
-	useExtend({ Sprite });
+	const [currentProject, setCurrentProject] = useState<Project | null>(null);
+	const { tabs, currentTabId } = useTabStore();
 
-	const [app, setApp] = useState<Application | null>(null);
-	const [viewport, setViewport] = useState<Viewport | null>(null);
-	const [tilesetManager, setTilesetManager] = useState<TilesetManager>(new TilesetManager());
-    const [tilemap, setTilemap] = useState<DefaultTilemap | null>(null);
-    const [tilemapRenderer, setTilemapRenderer] = useState<DefaultTilemapRenderer | null>(null);
-
-    useEffect(() => {
-
-    }, [])
-
-	const loadTilemap = async () => {
-		const filePath = await openDialog();
-		if (!filePath || !viewport) return;
-
-		const tilemap = await DefaultTilemap.loadTilemap(filePath, {
-            tilesetManager: tilesetManager,
-        });
-
-        if (!tilemap) return;
-        setTilemap(tilemap);
-        const tileRenderer = new DefaultTilemapRenderer({tilemap})
-        setTilemapRenderer(tileRenderer);
-        tileRenderer.initRenderer(viewport);
-		console.log(tilemap);
-	};
-
-    const loadTileset = async () => {
-        const filePath = await openDialog();
-        if (!filePath || !tilesetManager) return;
-
-        const tileset = await DefaultTileset.loadTileset(filePath);
-        if (!tileset) return;
-        tilesetManager.loadTileset(filePath, tileset);
-    }
-
-
-	const initApp = (app: Application) => {
-		setApp(app);
-		const viewport = new Viewport({
-			screenWidth: app.screen.width,
-			screenHeight: app.screen.height,
-			worldWidth: app.screen.width,
-			worldHeight: app.screen.height,
-			passiveWheel: true,
-			stopPropagation: true,
-			allowPreserveDragOutside: true,
-			events: app.renderer.events,
-		});
-
-		viewport.drag({ mouseButtons: "middle" }).wheel().decelerate({ friction: 0 });
-
-		viewport.eventMode = "static";
-		viewport.hitArea = app.screen;
-
-		app.stage.addChild(viewport);
-		setViewport(viewport);
-	};
+	useEffect(() => {
+		const loadProject = async () => {
+			const project = new Project({
+				...projectData,
+				directory: "C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\tmx\\project.json",
+			});
+			await project.load();
+			setCurrentProject(project);
+		};
+		loadProject();
+	}, []);
 
 	return (
-		<VStack className="h-full">
-			<HStack>
-				<Button onClick={loadTilemap}>Load Tilemap</Button>
-				<Button onClick={loadTileset}>Load Tileset</Button>
-			</HStack>
-			<Canvas initCanvas={(app) => initApp(app)} className="h-full" />
-		</VStack>
+		<HStack className="w-full h-full gap-2">
+			<VStack className="h-full w-40 p-4">
+				{currentProject &&
+					currentProject.tilemapManager.getTilemaps().map((tilemap, index) => {
+						return (
+							<Button
+								key={index}
+								onClick={async () => {
+									const tilemapEditorTab = await TilemapEditorTab.createTilemapTab({
+										title: tilemap.getName(),
+										tilemap,
+									});
+									useTabStore.getState().openTab({
+										tab: tilemapEditorTab,
+									});
+								}}>
+								{tilemap.getName()}
+							</Button>
+						);
+					})}
+			</VStack>
+			<VStack className="h-full w-full">
+				<TabNavigation />
+				<div className="h-full w-full items-center justify-center border-2">
+					{tabs.map((tab) => {
+						const TabComponent = tab.component;
+						const active = currentTabId === tab.getId();
+						if (!active) return null;
+						return (
+							<section key={tab.getId()} className={active ? "block h-full w-full" : "hidden"}>
+								<TabComponent />
+							</section>
+						);
+					})}
+					{!currentTabId && <p>No tab open</p>}
+				</div>
+			</VStack>
+		</HStack>
 	);
 }
+
+const projectData: ProjectData = {
+	id: "test",
+	name: "test",
+	version: "0.1.0",
+	description: "",
+	createdAt: new Date().toDateString(),
+	updatedAt: new Date().toDateString(),
+	tilemapPaths: ["C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\tmx\\TmxTilemap.tmx", "C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\tmx\\test.tmx"],
+	tilesetPaths: ["C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\tmx\\Dirt.tsx", "C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\tmx\\Grass2.tsx"],
+};

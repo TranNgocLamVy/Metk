@@ -11,7 +11,6 @@ import { TextureUtils } from "@/appcore/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";
 
-import { DefaultTilemapRenderer } from "../renderer/defaultTilemapRenderer";
 import { DefaultTileLayer } from "./defaultTilelayer";
 import { DefaultTile, DefaultTileset } from "./defaultTileset";
 

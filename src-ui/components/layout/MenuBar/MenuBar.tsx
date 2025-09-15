@@ -20,7 +20,6 @@ export default function MenuBar() {
 	return (
 		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-background dark:bg-foreground/5 shadow-md absolute" data-tauri-drag-region>
 			<HStack gap={0} className="text-foreground/70">
-				<MenuBarItem item={DebugDropdownOptions} />
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />
 				<MenuBarItem item={ViewDropdownOptions} />
@@ -28,6 +27,7 @@ export default function MenuBar() {
 				<MenuBarItem item={MapDropdownOptions} />
 				<MenuBarItem item={LayerDropdownOptions} />
 				<MenuBarItem item={ProjectDropdownOptions} />
+				<MenuBarItem item={DebugDropdownOptions} />
 				{/* <MenuBarItem item={HelpDropdownOptions} /> */}
 			</HStack>
 
