@@ -3,14 +3,14 @@ import { v4 as uuidv4 } from "uuid";
 
 import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
 import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
-import { DialogService } from "@/appcore/services/DialogService";
-import { useProjectStore } from "@/stores/project/ProjectStore";
+import { DialogService } from "@/appcore/services/dialogService";
+import { useProjectStore } from "@/stores/project/projectStore";
 import { exists } from "@tauri-apps/plugin-fs";
 
 import { ProjectData, ProjectMetaData } from "../../schemas/projectSchema";
-import { ProjectStorageService } from "../../services/ProjectStorageService";
-import { TilemapManager } from "../manager/TilemapManager";
-import { TilesetManager } from "../manager/TilesetManager";
+import { ProjectStorageService } from "../../services/projectStorageService";
+import { TilemapManager } from "../manager/tilemapManager";
+import { TilesetManager } from "../manager/tilesetManager";
 
 export class Project extends EventEmitter {
     public readonly id: string;

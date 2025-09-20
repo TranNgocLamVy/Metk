@@ -1,11 +1,11 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
 
 import { Appcore } from "@/appcore/core";
-import { HStack, VStack } from "@/components/custom/Stack/Stack";
+import { HStack, VStack } from "@/components/custom/stack/stack";
 import { Button } from "@/components/shadcn/button";
 import { Separator } from "@/components/shadcn/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip";
-import { useProjectManagerStore } from "@/stores/project/ProjectManagerStore";
+import { useProjectManagerStore } from "@/stores/project/projectManagerStore";
 
 export default function HomePage() {
 	const projects = useProjectManagerStore((s) => s.projects);

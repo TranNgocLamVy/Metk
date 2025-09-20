@@ -1,7 +1,7 @@
 import { DockviewApi, DockviewDefaultTab, IDockviewPanelHeaderProps } from "dockview";
 import { create } from "zustand";
 
-import { BasePanel, PanelWrapper } from "@/components/panel/BasePanel";
+import { BasePanel, PanelWrapper } from "@/components/panel/basePanel";
 
 export const editorComponents = {
     default: PanelWrapper,

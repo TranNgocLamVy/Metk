@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 
 import { Appcore } from "@/appcore/core";
-import { Project } from "@/appcore/models/project/Project";
+import { Project } from "@/appcore/models/project/project";
 import { ProjectData } from "@/appcore/schemas/projectSchema";
-import { SidebarContainer } from "@/components/layout/SidebarContainer/SidebarContainer";
-import { useProjectStore } from "@/stores/project/ProjectStore";
+import { useProjectStore } from "@/stores/project/projectStore";
 
 import TestDock from "./dock";
 
@@ -26,7 +25,6 @@ export default function TestPage() {
 
 	return (
 		<div className="w-full h-full flex flex-row">
-			<SidebarContainer />
 			<TestDock />
 		</div>
 	);

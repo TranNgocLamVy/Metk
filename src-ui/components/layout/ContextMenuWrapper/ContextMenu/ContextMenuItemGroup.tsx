@@ -2,7 +2,7 @@ import { Fragment } from "react/jsx-runtime";
 
 import { ContextMenuGroup, ContextMenuSeparator } from "@/components/shadcn/context-menu";
 
-import { ContextMenuItem } from "./ContextMenuItem";
+import { ContextMenuItem } from "./contextMenuItem";
 
 type ContextMenuItemGroupProps = {
 	groups: MenuDropDownGroupType[];

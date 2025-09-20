@@ -1,6 +1,6 @@
 import { ArrowBigLeft, ArrowBigRight, Crop, Grid2x2Plus, Map, Move, SquareArrowUpRight } from "lucide-react";
 
-import AutoGrid from "@/components/custom/icons/AutoGrid";
+import AutoGrid from "@/components/custom/icons/autoGrid";
 
 const MapDropdownOptionGroup1: MenuDropDownGroupType = [
 	{

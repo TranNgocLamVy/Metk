@@ -1,12 +1,12 @@
 import EventEmitter from "eventemitter3";
 
-import { DialogService } from "@/appcore/services/DialogService";
-import { ToastService } from "@/appcore/services/ToastService";
-import { useProjectManagerStore } from "@/stores/project/ProjectManagerStore";
+import { DialogService } from "@/appcore/services/dialogService";
+import { ToastService } from "@/appcore/services/toastService";
+import { useProjectManagerStore } from "@/stores/project/projectManagerStore";
 
 import { ProjectManagerData, ProjectMetaData } from "../../schemas/projectSchema";
-import { ProjectStorageService } from "../../services/ProjectStorageService";
-import { Project } from "../project/Project";
+import { ProjectStorageService } from "../../services/projectStorageService";
+import { Project } from "../project/project";
 
 export type ProjectEventType = {
     projectsUpdated: () => void;

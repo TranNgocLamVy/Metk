@@ -1,7 +1,7 @@
 import { Fragment } from "react/jsx-runtime";
 
-import { FormDialog } from "./FormDialog";
-import { PermissionDialog } from "./PermissionDialog";
+import { FormDialog } from "./formDialog";
+import { PermissionDialog } from "./permissionDialog";
 
 export function DialogContainer() {
 	return (

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
-import { VStack } from "@/components/custom/Stack/Stack";
-import { useProjectManagerStore } from "@/stores/project/ProjectManagerStore";
-import { useProjectStore } from "@/stores/project/ProjectStore";
+import { VStack } from "@/components/custom/stack/stack";
+import { useProjectManagerStore } from "@/stores/project/projectManagerStore";
+import { useProjectStore } from "@/stores/project/projectStore";
 
 export default function Project() {
     const { id } = useParams();

@@ -1,13 +1,13 @@
 import { Copy, Minus, SunMoon, X } from "lucide-react";
 
-import { HStack } from "@/components/custom/Stack/Stack";
-import { useTheme } from "@/components/providers/Theme/ThemeProvider";
+import { HStack } from "@/components/custom/stack/stack";
+import { useTheme } from "@/components/providers/theme/themeProvider";
 import { Button } from "@/components/shadcn/button";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { EditDropdownOptions, FileDropdownOptions, LayerDropdownOptions, MapDropdownOptions, ProjectDropdownOptions, ViewDropdownOptions, WorldDropdownOptions } from "./items";
 import { DebugDropdownOptions } from "./items/DebugDropDownOptions";
-import MenuBarItem from "./MenuBarItem/MenuBarItem";
+import MenuBarItem from "./menuBarItem/menuBarItem";
 
 export default function MenuBar() {
 	const { theme, setTheme } = useTheme();

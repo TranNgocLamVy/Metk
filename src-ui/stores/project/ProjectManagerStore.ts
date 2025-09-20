@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Project } from "@/appcore/models/project/Project";
+import { Project } from "@/appcore/models/project/project";
 
 type ProjectManagerState = {
     projects: Project[];

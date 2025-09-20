@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Fragment } from "react/jsx-runtime";
 
 import { Appcore } from "@/appcore/core";
-import { useNavigationStore } from "@/stores/menu/NavigationStore";
+import { useNavigationStore } from "@/stores/menu/navigationStore";
 
 interface AppcoreWrapperProps {
 	children?: React.ReactNode;

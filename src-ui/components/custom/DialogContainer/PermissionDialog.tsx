@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { Fragment } from "react/jsx-runtime";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/shadcn/alert-dialog";
-import { useDialogStore } from "@/stores/menu/DialogStore";
+import { useDialogStore } from "@/stores/menu/dialogStore";
 
 export function PermissionDialog() {
 	const permissionDialogs = useDialogStore((s) => s.permissionDialogs);

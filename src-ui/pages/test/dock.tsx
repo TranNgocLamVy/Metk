@@ -3,7 +3,7 @@ import "dockview/dist/styles/dockview.css";
 import { DockviewReact, DockviewReadyEvent, themeAbyss } from "dockview";
 import { useCallback } from "react";
 
-import { editorComponents, editorTabComponents, useEditorDockStore } from "@/stores/dock/EditorDockStore";
+import { editorComponents, editorTabComponents, useEditorDockStore } from "@/stores/dock/editorDockStore";
 
 export default function TestDock() {
 	const initDockViewApi = useEditorDockStore((state) => state.initDockViewApi);

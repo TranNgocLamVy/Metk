@@ -1,13 +1,10 @@
 import EventEmitter from "eventemitter3";
 
-import { ProjectManager } from "../models/manager/ProjectManager";
-
-// import { PluginRegistry } from "../registries/plugin-registry";
+import { ProjectManager } from "../models/manager/projectManager";
 
 export class Appcore extends EventEmitter {
     private static instance: Appcore;
     public readonly projectManager: ProjectManager;
-    // public readonly pluginRegistry: PluginRegistry;
     private constructor() {
         super();
         this.projectManager = new ProjectManager();

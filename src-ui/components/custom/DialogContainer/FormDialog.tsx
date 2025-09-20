@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Fragment } from "react/jsx-runtime";
 
-import { ToastService } from "@/appcore/services/ToastService";
+import { ToastService } from "@/appcore/services/toastService";
 import { Button } from "@/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/shadcn/dialog";
-import { useDialogStore } from "@/stores/menu/DialogStore";
+import { useDialogStore } from "@/stores/menu/dialogStore";
 import { Field } from "@/types/dialogs/formDialog";
 
-import FilePickerField from "../Input/FilePicker/FilePicker";
-import FolderPickerField from "../Input/FolderPicker/FolderPicker";
-import { NumberInputField } from "../Input/NumberInput/NumberInput";
-import { TextInputField } from "../Input/TextInput/TextInput";
+import FilePickerField from "../input/filePicker/filePicker";
+import FolderPickerField from "../input/folderPicker/folderPicker";
+import { NumberInputField } from "../input/numberInput/numberInput";
+import { TextInputField } from "../input/textInput/textInput";
 
 export function FormDialog() {
 	const [values, setValues] = useState<Record<string, any>>({});

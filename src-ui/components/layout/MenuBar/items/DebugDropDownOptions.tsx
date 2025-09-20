@@ -1,5 +1,5 @@
-import { useDebugStore } from "@/stores/debug/DebugStore";
-import { useNavigationStore } from "@/stores/menu/NavigationStore";
+import { useDebugStore } from "@/stores/debug/debugStore";
+import { useNavigationStore } from "@/stores/menu/navigationStore";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 	{

@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { ITile, ITileset } from "@/appcore/interface/tile/ITileset";
-import { BaseObject } from "@/appcore/models/core/BaseObject";
+import { BaseObject } from "@/appcore/models/core/baseObject";
 import { TileData, TilesetData, tilesetSchema } from "@/appcore/schemas/tilesetSchema";
 import { TextureUtils } from "@/appcore/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";

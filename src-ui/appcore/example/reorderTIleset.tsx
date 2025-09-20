@@ -3,8 +3,7 @@ import { Application, Container, Point, Sprite, Texture } from "pixi.js";
 import { useRef, useState } from "react";
 
 import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
-import { VStack } from "@/components/custom/Stack/Stack";
-import Canvas from "@/components/drawing/Canvas/Canvas";
+import { VStack } from "@/components/custom/stack/stack";
 import { Button } from "@/components/shadcn/button";
 import { useExtend } from "@pixi/react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
@@ -238,7 +237,7 @@ export default function TestPage() {
     return (
         <VStack className="h-full">
             <Button onClick={test}>Load & Test</Button>
-            <Canvas initCanvas={(app) => initApp(app)} className="h-full" />
+            {/* <Canvas initCanvas={(app) => initApp(app)} className="h-full" /> */}
         </VStack>
     );
 }

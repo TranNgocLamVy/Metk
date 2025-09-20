@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 
 import { ContextMenuCheckboxItem, ContextMenuItem as ShadContextMenuItem, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuShortcut, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger } from "@/components/shadcn/context-menu";
 
-import MenuBarDropdownGroup from "./ContextMenuItemGroup";
+import MenuBarDropdownGroup from "./contextMenuItemGroup";
 
 type ContextMenuItemProps = {
 	item: MenuDropDownItemType;

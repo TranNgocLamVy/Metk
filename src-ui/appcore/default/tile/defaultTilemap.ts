@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { ITilemap } from "@/appcore/interface/tile/ITilemap";
-import { BaseObject } from "@/appcore/models/core/BaseObject";
-import { TilesetManager } from "@/appcore/models/manager/TilesetManager";
+import { BaseObject } from "@/appcore/models/core/baseObject";
+import { TilesetManager } from "@/appcore/models/manager/tilesetManager";
 import { ExternalTileset, TilemapData, TilemapSchema } from "@/appcore/schemas/tilemapSchema";
 import { TilesetData } from "@/appcore/schemas/tilesetSchema";
 import { TextureUtils } from "@/appcore/utils/TextureUtils";

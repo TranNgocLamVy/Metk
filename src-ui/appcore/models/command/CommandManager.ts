@@ -1,8 +1,8 @@
 
 // import { CommandRegistry } from "@/appcore/registries/command-registry";
 
-import { EventBus } from "../core/EventBus";
-import { BaseCommand, CommandContext } from "./Command";
+import { EventBus } from "../core/eventBus";
+import { BaseCommand, CommandContext } from "./baseCommand";
 
 export class CommandManager {
     private currentCommand: BaseCommand;

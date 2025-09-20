@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/components/shadcn/context-menu";
 import { usePreventContextMenu } from "@/hooks/usePreventContextMenu/usePreventContextMenu";
 
-import ContextMenuItemGroup from "./ContextMenu/ContextMenuItemGroup";
+import ContextMenuItemGroup from "./contextMenu/contextMenuItemGroup";
 
 interface ContextMenuWrapperProps {
 	item: MenuItemType;

@@ -1,18 +1,17 @@
 import "./global.css";
 
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 
-import { DialogContainer } from "@/components/custom/DialogContainer/DialogContainer";
-import AppcoreWrapper from "@/components/layout/AppcoreWrapper/AppcoreWrapper";
-import { FallbackRender } from "@/components/layout/FallbackRenderer/FallbackRender";
-import MainContainer from "@/components/layout/MainContainer/MainContainer";
-import MenuBar from "@/components/layout/MenuBar/MenuBar";
-import { ThemeProvider } from "@/components/providers/Theme/ThemeProvider";
+import AppcoreWrapper from "@/components/layout/appcoreWrapper/appcoreWrapper";
+import { FallbackRender } from "@/components/layout/fallbackRenderer/fallbackRender";
+import MainContainer from "@/components/layout/mainContainer/mainContainer";
+import MenuBar from "@/components/layout/menuBar/menuBar";
+import { ThemeProvider } from "@/components/providers/theme/themeProvider";
 import { Toaster } from "@/components/shadcn/sonner";
 
+import { DialogContainer } from "./components/custom/dialogContainer/dialogContainer";
 import { appRoutes } from "./pages";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

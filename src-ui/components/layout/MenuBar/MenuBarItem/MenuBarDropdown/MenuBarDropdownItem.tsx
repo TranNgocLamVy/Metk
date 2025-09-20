@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 import { DropdownMenuCheckboxItem, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/shadcn/dropdown-menu";
 
-import MenuBarDropdownGroup from "./MenuBarDropdownGroup";
+import MenuBarDropdownGroup from "./menuBarDropdownGroup";
 
 type MenuBarDropdownItemProps = {
 	item: MenuDropDownItemType;

@@ -1,6 +1,6 @@
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { ITilelayer } from "@/appcore/interface/tile/ITilelayer";
-import { BaseObject } from "@/appcore/models/core/BaseObject";
+import { BaseObject } from "@/appcore/models/core/baseObject";
 import { TileLayerData } from "@/appcore/schemas/tilemapSchema";
 
 export class DefaultTileLayer extends BaseObject implements ITilelayer {

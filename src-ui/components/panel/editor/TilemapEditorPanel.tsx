@@ -7,7 +7,7 @@ import { DefaultTilemapRenderer } from "@/appcore/default/renderer/defaultTilema
 import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
 import { Application as PixiApplication } from "@pixi/react";
 
-import { BasePanel } from "../BasePanel";
+import { BasePanel } from "../basePanel";
 
 type CreateTilemapEditorDockOptions = {
 	tilemap: DefaultTilemap;

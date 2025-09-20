@@ -5,9 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { DefaultTilemapRenderer } from "@/appcore/default/renderer/defaultTilemapRenderer";
 import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
 import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
-import { TilesetManager } from "@/appcore/models/manager/TilesetManager";
-import { HStack, VStack } from "@/components/custom/Stack/Stack";
-import Canvas from "@/components/drawing/Canvas/Canvas";
+import { TilesetManager } from "@/appcore/models/manager/tilesetManager";
+import { HStack, VStack } from "@/components/custom/stack/stack";
 import { Button } from "@/components/shadcn/button";
 import { useExtend } from "@pixi/react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
@@ -79,7 +78,7 @@ export default function TestPage() {
                 <Button onClick={loadTilemap}>Load Tilemap</Button>
                 <Button onClick={loadTileset}>Load Tileset</Button>
             </HStack>
-            <Canvas initCanvas={(app) => initApp(app)} className="h-full" />
+            {/* <Canvas initCanvas={(app) => initApp(app)} className="h-full" /> */}
         </VStack>
     );
 }
