@@ -5,7 +5,7 @@ import { BaseTab } from "@/appcore/ui/tab/BaseTab";
 type TabState = {
     tabs: BaseTab[];
     tabOrders: string[];
-    currentTabId: string | null;
+    currentTab: BaseTab | null;
 
     openTab: (options: OpenTabOptions) => void;
     closeTab: (options: CloseTabOptions) => void;
@@ -32,15 +32,14 @@ export const useTabStore = create<TabState>((set, get) => {
     return {
         tabs: [],
         tabOrders: [],
-        currentTabId: null,
-
+        currentTab: null,
         openTab: (options) => {
             const { tab } = options;
             set((state) => {
-                const tabId = tab.getId();
+                const tabId = tab.id;
                 const tabs = [...state.tabs, tab];
                 const tabOrders = [...state.tabOrders, tabId];
-                return { tabs, tabOrders, currentTabId: tabId };
+                return { tabs, tabOrders, currentTab: tab };
             })
         },
 
@@ -48,26 +47,26 @@ export const useTabStore = create<TabState>((set, get) => {
             const { tabId } = options;
             if (!state.tabOrders.includes(tabId)) return state;
 
-            const orderIdx = state.tabOrders.indexOf(tabId);
             const newOrder = state.tabOrders.filter((tid) => tid !== tabId);
+            const tabs = state.tabs.filter((t) => t.id !== tabId);
 
-            const tabs = state.tabs.filter((t) => t.getId() !== tabId);
+            const index = state.tabOrders.indexOf(tabId);
+            const newFocusIndex = index === 0 ? index : index - 1;
 
-            let newCurrent = state.currentTabId;
-            if (tabId === state.currentTabId) {
-                const rightId = newOrder[orderIdx];
-                const leftId = newOrder[orderIdx - 1];
-                newCurrent = rightId ?? leftId ?? null;
+            if (state.currentTab?.id === tabId) {
+                const newCurrentId = state.tabOrders[newFocusIndex];
+                const newCurrent = state.tabs.find((t) => t.id === newCurrentId);
+                return { tabs, tabsOrder: newOrder, currentTab: newCurrent };
             }
-
-            return { tabs, tabsOrder: newOrder, currentId: newCurrent };
+            return { tabs, tabsOrder: newOrder };
         }),
 
         changeCurrentTab: (options) => {
             const { tabId } = options;
             set((state) => {
-                if (!state.tabOrders.includes(tabId)) return state;
-                return { currentTabId: tabId };
+                const tab = state.tabs.find((t) => t.id === tabId);
+                if (!tab) return state;
+                return { currentTab: tab };
             })
         },
 

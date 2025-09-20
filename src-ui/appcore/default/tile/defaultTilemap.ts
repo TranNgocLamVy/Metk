@@ -1,5 +1,6 @@
 import { type } from "arktype";
 import { XMLParser } from "fast-xml-parser";
+import { v4 as uuidv4 } from "uuid";
 
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { ITilemap } from "@/appcore/interface/tile/ITilemap";
@@ -78,6 +79,7 @@ export class DefaultTilemap extends BaseObject implements ITilemap {
         this.metaData = { basePath };
 
         const name = filePath.split("\\").slice(-1)[0].split(".")[0];
+        this.id = uuidv4();
         this.name = name;
         this.version = tilemapData.version ?? "1.0";
         this.orientation = tilemapData.orientation;

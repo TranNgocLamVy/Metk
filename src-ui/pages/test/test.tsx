@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
+import { Appcore } from "@/appcore/core";
 import { Project } from "@/appcore/models/project/Project";
 import { ProjectData } from "@/appcore/schemas/projectSchema";
-import { TilemapEditorTab } from "@/appcore/ui/tab/TilemapEditorTab";
-import { HStack, VStack } from "@/components/custom/Stack/Stack";
-import { Button } from "@/components/shadcn/button";
-import { useTabStore } from "@/stores/tab/TabStore";
+import { SidebarContainer } from "@/components/layout/SidebarContainer/SidebarContainer";
+import { useProjectStore } from "@/stores/project/ProjectStore";
 
-import { TabNavigation } from "./tabnavigation";
+import TestDock from "./dock";
 
 export default function TestPage() {
-	const [currentProject, setCurrentProject] = useState<Project | null>(null);
-	const { tabs, currentTabId } = useTabStore();
+	const { setCurrentProject } = useProjectStore();
 
 	useEffect(() => {
 		const loadProject = async () => {
@@ -20,50 +18,17 @@ export default function TestPage() {
 				directory: "C:\\Users\\Tran Ngoc Lam Vy\\Desktop\\Project\\AutoTile\\tilemaps\\tmx\\project.json",
 			});
 			await project.load();
+			Appcore.getInstance().projectManager.addProject(project);
 			setCurrentProject(project);
 		};
 		loadProject();
 	}, []);
 
 	return (
-		<HStack className="w-full h-full gap-2">
-			<VStack className="h-full w-40 p-4">
-				{currentProject &&
-					currentProject.tilemapManager.getTilemaps().map((tilemap, index) => {
-						return (
-							<Button
-								key={index}
-								onClick={async () => {
-									const tilemapEditorTab = await TilemapEditorTab.createTilemapTab({
-										title: tilemap.getName(),
-										tilemap,
-									});
-									useTabStore.getState().openTab({
-										tab: tilemapEditorTab,
-									});
-								}}>
-								{tilemap.getName()}
-							</Button>
-						);
-					})}
-			</VStack>
-			<VStack className="h-full w-full">
-				<TabNavigation />
-				<div className="h-full w-full items-center justify-center border-2">
-					{tabs.map((tab) => {
-						const TabComponent = tab.component;
-						const active = currentTabId === tab.getId();
-						if (!active) return null;
-						return (
-							<section key={tab.getId()} className={active ? "block h-full w-full" : "hidden"}>
-								<TabComponent />
-							</section>
-						);
-					})}
-					{!currentTabId && <p>No tab open</p>}
-				</div>
-			</VStack>
-		</HStack>
+		<div className="w-full h-full flex flex-row">
+			<SidebarContainer />
+			<TestDock />
+		</div>
 	);
 }
 

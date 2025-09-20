@@ -1,7 +1,7 @@
 ﻿import { EventEmitter } from "eventemitter3";
 
 import { Result } from "@/appcore/interface/common/result";
-import { Type } from "@/plugin-api";
+import { Type } from "@/scratch/propterties";
 
 export abstract class BaseObject extends EventEmitter {
     public properties: Map<string, Type>;

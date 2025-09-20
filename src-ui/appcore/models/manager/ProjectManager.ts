@@ -2,7 +2,7 @@ import EventEmitter from "eventemitter3";
 
 import { DialogService } from "@/appcore/services/DialogService";
 import { ToastService } from "@/appcore/services/ToastService";
-import { useProjectStore } from "@/stores/menu/ProjectStore";
+import { useProjectManagerStore } from "@/stores/project/ProjectManagerStore";
 
 import { ProjectManagerData, ProjectMetaData } from "../../schemas/projectSchema";
 import { ProjectStorageService } from "../../services/ProjectStorageService";
@@ -17,40 +17,42 @@ export class ProjectManager extends EventEmitter<ProjectEventType> {
     public currentProject: Project | null = null;
     public tilemaps: any[]
     public tilesets: any[]
-    public projectMataDatas: ProjectMetaData[] = [];
+    public projects: Project[] = [];
     public constructor() {
         super();
         this.load();
-        this.on("projectsUpdated", () => {
-            useProjectStore.getState().setProjects([...this.projectMataDatas]);
-        });
     }
 
     private async load() {
         const data = await ProjectStorageService.loadProjectManager();
-        this.projectMataDatas = data.projectMetaDatas;
+        // this.projectMetaDatas = data.projectMetaDatas;
         this.save();
     }
 
+    public async addProject(project: Project) {
+        this.projects.push(project);
+        useProjectManagerStore.getState().addProject(project);
+    }
+
     public async save() {
-        this.projectMataDatas = this.projectMataDatas.map((p) => {
-            if (p.id === this.currentProject?.id) {
-                return {
-                    ...this.currentProject.serialize(),
-                    directory: this.currentProject.directory,
-                    updatedAt: new Date().toDateString(),
-                }
-            }
-            return {
-                ...p,
-                updatedAt: new Date().toDateString(),
-            }
-        })
-        const data = this.serialize();
-        await ProjectStorageService.saveProjectManager(data);
-        setTimeout(() => {
-            this.emit("projectsUpdated");
-        }, 100)
+        // this.projectMetaDatas = this.projectMetaDatas.map((p) => {
+        //     if (p.id === this.currentProject?.id) {
+        //         return {
+        //             ...this.currentProject.serialize(),
+        //             directory: this.currentProject.directory,
+        //             updatedAt: new Date().toDateString(),
+        //         }
+        //     }
+        //     return {
+        //         ...p,
+        //         updatedAt: new Date().toDateString(),
+        //     }
+        // })
+        // const data = this.serialize();
+        // await ProjectStorageService.saveProjectManager(data);
+        // setTimeout(() => {
+        //     this.emit("projectsUpdated");
+        // }, 100)
     }
 
     public async createProject() {
@@ -58,7 +60,7 @@ export class ProjectManager extends EventEmitter<ProjectEventType> {
 
         if (!projectMetaData) return;
 
-        this.projectMataDatas.push(projectMetaData);
+        // this.projectMetaDatas.push(projectMetaData);
 
         ToastService.success({ message: `Successfully created ${projectMetaData.name} project` })
 
@@ -77,25 +79,25 @@ export class ProjectManager extends EventEmitter<ProjectEventType> {
     }
 
     public async openProject(id: string) {
-        const projectMetaData = this.projectMataDatas.find((p) => p.id === id);
-        if (!projectMetaData) return;
-        const projectData = await ProjectStorageService.loadProject(projectMetaData.directory);
-        if (!projectData) return;
-        const project = new Project({
-            ...projectData,
-            directory: projectMetaData.directory,
-        });
-        if (this.currentProject) {
-            await this.currentProject.unload();
-        }
-        this.currentProject = project;
-        await this.currentProject.load();
-        this.emit("projectOpen", project);
+        // const projectMetaData = this.projectMetaDatas.find((p) => p.id === id);
+        // if (!projectMetaData) return;
+        // const projectData = await ProjectStorageService.loadProject(projectMetaData.directory);
+        // if (!projectData) return;
+        // const project = new Project({
+        //     ...projectData,
+        //     directory: projectMetaData.directory,
+        // });
+        // if (this.currentProject) {
+        //     await this.currentProject.unload();
+        // }
+        // this.currentProject = project;
+        // await this.currentProject.load();
+        // this.emit("projectOpen", project);
     }
 
-    private serialize(): ProjectManagerData {
-        return {
-            projectMetaDatas: this.projectMataDatas,
-        };
-    }
+    // private serialize(): ProjectManagerData {
+    //     return {
+    //         projectMetaDatas: this.projectMetaDatas,
+    //     };
+    // }
 }

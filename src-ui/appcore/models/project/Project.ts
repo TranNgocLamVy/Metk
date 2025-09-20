@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
 import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
 import { DialogService } from "@/appcore/services/DialogService";
+import { useProjectStore } from "@/stores/project/ProjectStore";
 import { exists } from "@tauri-apps/plugin-fs";
 
 import { ProjectData, ProjectMetaData } from "../../schemas/projectSchema";
@@ -41,6 +42,10 @@ export class Project extends EventEmitter {
     public async load() {
         await this.loadTilesets();
         await this.loadTilemaps();
+
+        useProjectStore.getState().setCurrentProject(this.serialize());
+        useProjectStore.getState().setTilemaps(this.tilemapManager.getTilemaps());
+        useProjectStore.getState().setTilesets(this.tilesetManager.getTilesets());
     }
 
     private async loadTilesets() {

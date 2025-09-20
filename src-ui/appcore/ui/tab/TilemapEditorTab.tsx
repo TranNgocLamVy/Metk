@@ -9,21 +9,21 @@ import { VStack } from "@/components/custom/Stack/Stack";
 import { BaseTab } from "./BaseTab";
 
 type TilemapEditorTabProps = {
-	title: string;
+	name: string;
 	tilemap: DefaultTilemap;
 };
 
 export class TilemapEditorTab extends BaseTab {
+	public id: string;
 	public component: React.FC;
-	private id: string;
-	private title: string;
+	public name: string;
 	private tilemap: DefaultTilemap;
 	private tilemapSession: TilemapSession;
 
 	constructor(props: TilemapEditorTabProps) {
 		super();
 		this.tilemap = props.tilemap;
-		this.title = props.title;
+		this.name = props.name;
 		this.id = uuidv4();
 	}
 
@@ -52,18 +52,9 @@ export class TilemapEditorTab extends BaseTab {
 				};
 			}, []);
 
-			return <div ref={containerRef} className="w-full h-full overflow-hidden border-black" />;
+			return <div ref={containerRef} className="w-full h-full" />;
 		};
 	}
-
-	public getId(): string {
-		return this.id;
-	}
-
-	public getTitle(): string {
-		return this.title;
-	}
-
 	public async close(): Promise<Result> {
 		return { status: "Success" };
 	}

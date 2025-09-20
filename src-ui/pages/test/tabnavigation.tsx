@@ -1,29 +1,31 @@
 import { X } from "lucide-react";
 import { useRef, useState } from "react";
 
+import { Button } from "@/components/shadcn/button";
 import { useTabStore } from "@/stores/tab/TabStore";
 
 export function TabNavigation() {
-	const { tabOrders, tabs, currentTabId, reorderTabs, changeCurrentTab, closeTab, openTab } = useTabStore((s) => s);
+	const { tabOrders, tabs, currentTab, reorderTabs, changeCurrentTab, closeTab, openTab } = useTabStore((s) => s);
 	const dragItemIndex = useRef<number | null>(null);
 	const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 	const [dropPosition, setDropPosition] = useState<"left" | "right" | null>(null);
 	return (
-		<div className="flex flex-row">
+		<div className="flex flex-row min-h-9 bg-foreground/10">
 			{tabOrders.map((tabId, index) => {
-                const tab = tabs.find((t) => t.getId() === tabId);
+                const tab = tabs.find((t) => t.id === tabId);
                 if (!tab) return null;
-				const isActive = currentTabId === tab.getId();
+				const isActive = currentTab?.id === tab.id;
 				const showLeft = dragOverIndex === index && dropPosition === "left";
 				const showRight = dragOverIndex === index && dropPosition === "right";
 
 				return (
-					<div
+					<Button
 						key={tabId}
 						draggable
 						onDragStart={() => {
 							dragItemIndex.current = index;
 						}}
+                        onClick={() => changeCurrentTab({tabId: tab.id})}
 						onDragOver={(e) => {
 							e.preventDefault();
 							const rect = (e.target as HTMLElement).getBoundingClientRect();
@@ -50,15 +52,14 @@ export function TabNavigation() {
 							setDragOverIndex(null);
 							setDropPosition(null);
 						}}
-						className={`flex flex-row gap-2 py-1 px-2 border-b-2 text-sm ${isActive ? "bg-foreground/30" : "bg-foreground/20 border-transparent"} relative`}>
+						className={`flex flex-row gap-2 py-1 px-2 border-b text-sm ${isActive ? "bg-foreground/20" : "bg-foreground/10 border-foreground/1o"} relative`}>
 						{showLeft && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-500"></div>}
 						{showRight && <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-blue-500"></div>}
-
-						<button onClick={() => changeCurrentTab({tabId: tab.getId()})}>{tab.getTitle()}</button>
-						<button onClick={() => closeTab({tabId: tab.getId()})}>
+						{tab.name}
+						<span onClick={() => closeTab({tabId: tab.id})}>
 							<X size={14} />
-						</button>
-					</div>
+						</span>
+					</Button>
 				);
 			})}
 		</div>

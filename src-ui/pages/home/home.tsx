@@ -5,10 +5,10 @@ import { HStack, VStack } from "@/components/custom/Stack/Stack";
 import { Button } from "@/components/shadcn/button";
 import { Separator } from "@/components/shadcn/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip";
-import { useProjectStore } from "@/stores/menu/ProjectStore";
+import { useProjectManagerStore } from "@/stores/project/ProjectManagerStore";
 
 export default function HomePage() {
-	const projects = useProjectStore((s) => s.projects);
+	const projects = useProjectManagerStore((s) => s.projects);
 
 	const createProject = () => {
         Appcore.getInstance().projectManager.createProject();

@@ -2,17 +2,21 @@ import { useEffect } from "react";
 import { useParams } from "react-router";
 
 import { VStack } from "@/components/custom/Stack/Stack";
-import { useProjectStore } from "@/stores/menu/ProjectStore";
+import { useProjectManagerStore } from "@/stores/project/ProjectManagerStore";
+import { useProjectStore } from "@/stores/project/ProjectStore";
 
 export default function Project() {
     const { id } = useParams();
 
-    const currentProject = useProjectStore((s) => s.currentProject);
-    const setCurrentProject = useProjectStore((s) => s.setCurrentProject);
+    const { currentProject, setCurrentProject } = useProjectStore();
+    const { projects } = useProjectManagerStore();
 
     useEffect(() => {
         if (id) {
-            setCurrentProject(id);
+            const project = projects.find((p) => p.id === id);
+            if (project) {
+                setCurrentProject(project);
+            }
         }
     }, [id])
 

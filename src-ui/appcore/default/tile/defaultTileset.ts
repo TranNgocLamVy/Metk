@@ -1,6 +1,7 @@
 import { type } from "arktype";
 import { XMLParser } from "fast-xml-parser";
 import { Texture } from "pixi.js";
+import { v4 as uuidv4 } from "uuid";
 
 import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { ITile, ITileset } from "@/appcore/interface/tile/ITileset";
@@ -15,6 +16,8 @@ const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
 });
 
 export class DefaultTileset extends BaseObject implements ITileset {
+    public id: string;
+
     public name: string;
     public texture: Texture | null;
     public columns: number;
@@ -36,6 +39,7 @@ export class DefaultTileset extends BaseObject implements ITileset {
 
     constructor(tilesetData: TilesetData, texture: Texture | null) {
         super();
+        this.id = uuidv4();
         this.texture = texture;
         this.name = tilesetData.name;
         this.columns = tilesetData.columns;

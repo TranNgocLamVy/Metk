@@ -11,4 +11,8 @@ export class TilesetManager {
         const tileset = this.tilesetMap.get(filePath);
         return tileset ? tileset : null;
     }
+
+    public getTilesets(): DefaultTileset[] {
+        return Array.from(this.tilesetMap.values());
+    }
 }
