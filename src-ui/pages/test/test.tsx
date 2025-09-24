@@ -1,13 +1,17 @@
-import { useEffect } from "react";
+import { DockviewReact, DockviewReadyEvent } from "dockview";
+import { useCallback, useEffect } from "react";
 
 import { Appcore } from "@/appcore/core";
 import { Project } from "@/appcore/models/project/project";
 import { ProjectData } from "@/appcore/schemas/projectSchema";
+import { editorComponents, useEditorDockStore } from "@/stores/dock/editorDockStore";
 import { useProjectStore } from "@/stores/project/projectStore";
 
-import TestDock from "./dock";
-
 export default function TestPage() {
+	const initDockViewApi = useEditorDockStore((state) => state.initDockViewApi);
+	const onReady = useCallback((event: DockviewReadyEvent) => {
+		initDockViewApi(event.api);
+	}, []);
 	const { setCurrentProject } = useProjectStore();
 
 	useEffect(() => {
@@ -24,8 +28,9 @@ export default function TestPage() {
 	}, []);
 
 	return (
-		<div className="w-full h-full flex flex-row">
-			<TestDock />
+		<div className="w-full h-full flex flex-col">
+			<DockviewReact onReady={onReady} components={editorComponents} hideBorders disableDnd />
+			<div className="w-full h-10 bg-background border-t-1" />
 		</div>
 	);
 }

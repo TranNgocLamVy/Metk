@@ -27,8 +27,8 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 	return (
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
 			<DropdownMenuTrigger disabled={disabled}>
-				<Button size={"sm"} variant={"ghost"} className="px-4 rounded-none" asChild>
-					<p>{name}</p>
+				<Button size={"sm"} variant={"ghost"} className="px-2 rounded-none" asChild>
+					<p className="text-xs">{name}</p>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={className} side="bottom" align="start" >

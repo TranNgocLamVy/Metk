@@ -5,6 +5,7 @@ import { FC, useEffect } from "react";
 
 import { DefaultTilemapRenderer } from "@/appcore/default/renderer/defaultTilemapRenderer";
 import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
+import { useSidebarDockStore } from "@/stores/dock/sidebarDockStore";
 import { Application as PixiApplication } from "@pixi/react";
 
 import { BasePanel } from "../basePanel";
@@ -58,7 +59,7 @@ export class TilemapEditorPanel extends BasePanel {
 				self.initialize(app);
 			};
 
-			return <PixiApplication onInit={onInit} autoStart sharedTicker backgroundAlpha={0} />;
+			return <PixiApplication onInit={onInit} autoStart sharedTicker backgroundAlpha={0} className="bg-background" />;
 		};
 	}
 
@@ -88,6 +89,10 @@ export class TilemapEditorPanel extends BasePanel {
 		});
 
 		this.tilemapRenderer.initRenderer(this.viewport);
+
+        this.tilemap.tilesets.forEach(tileset => {
+            useSidebarDockStore.getState().openTilesetSelectPanel(tileset.tileset)
+        })
 	}
 
 	public uninitialize(): void {

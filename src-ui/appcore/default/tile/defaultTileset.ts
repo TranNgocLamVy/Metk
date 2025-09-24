@@ -7,7 +7,7 @@ import { Result, ResultStatus } from "@/appcore/interface/common/result";
 import { ITile, ITileset } from "@/appcore/interface/tile/ITileset";
 import { BaseObject } from "@/appcore/models/core/baseObject";
 import { TileData, TilesetData, tilesetSchema } from "@/appcore/schemas/tilesetSchema";
-import { TextureUtils } from "@/appcore/utils/TextureUtils";
+import { TextureUtils } from "@/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";
 

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Fragment } from "react/jsx-runtime";
 
-import { ToastService } from "@/appcore/services/toastService";
 import { Button } from "@/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/shadcn/dialog";
+import { ToastService } from "@/services/toastService";
 import { useDialogStore } from "@/stores/menu/dialogStore";
 import { Field } from "@/types/dialogs/formDialog";
 

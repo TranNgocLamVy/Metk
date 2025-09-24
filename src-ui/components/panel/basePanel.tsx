@@ -18,3 +18,7 @@ export function PanelWrapper(props: IDockviewPanelProps<PanelWrapperProps>) {
 		</div>
 	);
 }
+
+export const PanelComponents = {
+    default: PanelWrapper,
+} as const;

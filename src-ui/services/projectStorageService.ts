@@ -1,10 +1,10 @@
 import { type } from "arktype";
 
+import { FileUtils } from "@/utils/FileUtils";
 import { BaseDirectory } from "@tauri-apps/api/path";
 import { mkdir, writeTextFile } from "@tauri-apps/plugin-fs";
 
-import { ProjectData, ProjectManagerData, ProjectManagerSchema, ProjectSchema } from "../schemas/projectSchema";
-import { FileUtils } from "../utils/FileUtils";
+import { ProjectData, ProjectManagerData, ProjectManagerSchema, ProjectSchema } from "../appcore/schemas/projectSchema";
 
 const PROJECTS_FILE_NAME = "projects.json";
 const PROJECT_FILE_NAME = "project.json";

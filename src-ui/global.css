@@ -72,6 +72,7 @@
 	/* Default Shadcn Variables */
 	--radius: 0.25rem;
 	--background: oklch(1 0 0);
+    --secondary-background: oklch(1 0 0);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
@@ -118,7 +119,8 @@
 }
 
 .dark {
-	--background: oklch(0.145 0 0);
+	--background: rgb(35, 39, 46);
+    --secondary-background: rgb(30, 34, 39);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);
 	--card-foreground: oklch(0.985 0 0);
@@ -161,6 +163,43 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+
+.dockview-sidebar {
+    --dv-group-view-background-color: var(--secondary-background);
+    --dv-background-color: var(--secondary-background);
+
+    --dv-activegroup-visiblepanel-tab-background-color: var(--secondary-background);
+    --dv-activegroup-hiddenpanel-tab-background-color: var(--secondary-background);
+
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(--secondary-background);
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--secondary-background);
+
+    --dv-tabs-and-actions-container-background-color: var(--secondary-background);
+
+    --dv-activegroup-visiblepanel-tab-color: var(--foreground);
+    --dv-activegroup-hiddenpanel-tab-color: var(--foreground);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--foreground);
+    --dv-inactivegroup-hiddenpanel-tab-color: var(--foreground);
+}
+
+.dockview-tilemap {
+    --dv-group-view-background-color: var(--background);
+    --dv-background-color: var(--background);
+
+    --dv-activegroup-visiblepanel-tab-background-color: var(--background);
+    --dv-activegroup-hiddenpanel-tab-background-color: var(--secondary-background);
+
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(--background);
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--secondary-background);
+
+    --dv-tabs-and-actions-container-background-color: var(--secondary-background);
+
+    --dv-activegroup-visiblepanel-tab-color: var(--foreground);
+    --dv-activegroup-hiddenpanel-tab-color: var(--foreground);
+    --dv-inactivegroup-visiblepanel-tab-color: var(--foreground);
+    --dv-inactivegroup-hiddenpanel-tab-color: var(--foreground);
 }
 
 

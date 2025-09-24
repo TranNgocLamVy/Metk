@@ -1,16 +1,14 @@
 import { Container, Sprite } from "pixi.js";
 
-import { CreateTilemapRendererContext, ITilemapRenderer, ITilemapRendererContructor } from "@/appcore/interface/renderer/ITilemapRenderer";
+import { ITilemap } from "@/appcore/interface/tile/ITilemap";
 
 import { DefaultTilemap } from "../tile/defaultTilemap";
 
-export class TilemapRendererFactory implements ITilemapRendererContructor {
-    public createTilemapRenderer(context: CreateTilemapRendererContext): ITilemapRenderer {
-        return new DefaultTilemapRenderer(context);
-    }
+export type CreateTilemapRendererContext = {
+    tilemap: ITilemap;
 }
 
-export class DefaultTilemapRenderer implements ITilemapRenderer {
+export class DefaultTilemapRenderer {
     protected mainContainer: Container;
     protected tilemap: DefaultTilemap;
     
