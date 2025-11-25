@@ -1,0 +1,25 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Fragment } from "react/jsx-runtime";
+
+import { Appcore } from "@/core/appcore";
+import { useNavigationStore } from "@/view/stores/menu/navigationStore";
+
+interface AppcoreWrapperProps {
+	children?: React.ReactNode;
+}
+
+export default function AppcoreWrapper({ children }: AppcoreWrapperProps) {
+	const navigate = useNavigate();
+	const setNavigate = useNavigationStore((s) => s.setNavigate);
+
+	useEffect(() => {
+		setNavigate(navigate);
+	}, [navigate, setNavigate]);
+
+	useEffect(() => {
+		Appcore.initializeAppcore();
+	}, []);
+
+	return <Fragment>{children}</Fragment>;
+}

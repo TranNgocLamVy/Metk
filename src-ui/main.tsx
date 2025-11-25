@@ -4,15 +4,15 @@ import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 
-import AppcoreWrapper from "@/components/layout/appcoreWrapper/appcoreWrapper";
-import { FallbackRender } from "@/components/layout/fallbackRenderer/fallbackRender";
-import MainContainer from "@/components/layout/mainContainer/mainContainer";
-import MenuBar from "@/components/layout/menuBar/menuBar";
-import { ThemeProvider } from "@/components/providers/theme/themeProvider";
-import { Toaster } from "@/components/shadcn/sonner";
+import AppcoreWrapper from "@/view/components/layout/appcoreWrapper/appcoreWrapper";
+import { FallbackRender } from "@/view/components/layout/fallbackRenderer/fallbackRender";
+import MainContainer from "@/view/components/layout/mainContainer/mainContainer";
+import MenuBar from "@/view/components/layout/menuBar/menuBar";
+import { ThemeProvider } from "@/view/components/providers/theme/themeProvider";
+import { Toaster } from "@/view/components/shadcn/sonner";
 
-import { DialogContainer } from "./components/custom/dialogContainer/dialogContainer";
-import { appRoutes } from "./pages";
+import { DialogContainer } from "./view/components/custom/dialogContainer/dialogContainer";
+import { appRoutes } from "./view/pages";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	// <React.StrictMode>

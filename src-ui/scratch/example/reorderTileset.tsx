@@ -2,9 +2,9 @@ import { Viewport } from "pixi-viewport";
 import { Application, Container, Point, Sprite, Texture } from "pixi.js";
 import { useRef, useState } from "react";
 
-import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
-import { VStack } from "@/components/custom/stack/stack";
-import { Button } from "@/components/shadcn/button";
+import { DefaultTileset } from "@/core/default/tile/defaultTileset";
+import { VStack } from "@/view/components/custom/stack/stack";
+import { Button } from "@/view/components/shadcn/button";
 import { useExtend } from "@pixi/react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 
