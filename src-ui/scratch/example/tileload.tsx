@@ -2,12 +2,12 @@ import { Viewport } from "pixi-viewport";
 import { Application, Container, Point, Sprite, Texture } from "pixi.js";
 import { useEffect, useRef, useState } from "react";
 
-import { DefaultTilemapRenderer } from "@/appcore/default/renderer/defaultTilemapRenderer";
-import { DefaultTilemap } from "@/appcore/default/tile/defaultTilemap";
-import { DefaultTileset } from "@/appcore/default/tile/defaultTileset";
-import { TilesetManager } from "@/appcore/models/manager/tilesetManager";
-import { HStack, VStack } from "@/components/custom/stack/stack";
-import { Button } from "@/components/shadcn/button";
+import { TilesetManager } from "@/core/application/tilesetManager";
+import { DefaultTilemapRenderer } from "@/core/default/renderer/defaultTilemapRenderer";
+import { DefaultTilemap } from "@/core/default/tile/defaultTilemap";
+import { DefaultTileset } from "@/core/default/tile/defaultTileset";
+import { HStack, VStack } from "@/view/components/custom/stack/stack";
+import { Button } from "@/view/components/shadcn/button";
 import { useExtend } from "@pixi/react";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 

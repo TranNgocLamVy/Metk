@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "AutoTile",
+  "productName": "MapEditorToolkit",
   "version": "0.1.0",
-  "identifier": "AutoTile",
+  "identifier": "MapEditorToolkit",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "AutoTile",
+        "title": "Map Editor Toolkit",
         "width": 1000,
         "minWidth": 600,
         "height": 600,

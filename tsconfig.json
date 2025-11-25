@@ -24,9 +24,8 @@
 
     /* Paths */
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src-ui/*"],
+      "@/*": ["./src-ui/*"],
     },
 
   },

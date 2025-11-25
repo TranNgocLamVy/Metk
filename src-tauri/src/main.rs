@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    auto_tile_lib::run()
+    map_editor_toolkit_lib::run()
 }
