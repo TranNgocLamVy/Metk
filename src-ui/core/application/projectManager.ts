@@ -1,8 +1,8 @@
 import EventEmitter from "eventemitter3";
 import { v4 as uuidv4 } from "uuid";
 
-import { Result, ResultStatus } from "@/core/constance/common/result";
 import { DialogService } from "@/shared/services/dialogService";
+import { Result, ResultStatus } from "@/shared/types/result";
 import { useProjectManagerStore } from "@/view/stores/project/projectManagerStore";
 import { exists, mkdir } from "@tauri-apps/plugin-fs";
 

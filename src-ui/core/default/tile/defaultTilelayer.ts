@@ -1,7 +1,7 @@
-import { Result, ResultStatus } from "@/core/constance/common/result";
 import { ITilelayer } from "@/core/interface/tile/ITilelayer";
 import { BaseObject } from "@/core/models/core/baseObject";
 import { TileLayerData } from "@/core/schema/tilemapSchema";
+import { Result, ResultStatus } from "@/shared/types/result";
 
 export class DefaultTileLayer extends BaseObject implements ITilelayer {
     public id: string;

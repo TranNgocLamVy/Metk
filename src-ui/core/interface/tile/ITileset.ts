@@ -1,6 +1,6 @@
 import { Texture } from "pixi.js";
 
-import { Result } from "@/core/constance/common/result";
+import { Result } from "@/shared/types/result";
 
 export interface ITileset {
     getName(): string;
