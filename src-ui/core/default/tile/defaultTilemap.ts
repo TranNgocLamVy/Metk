@@ -3,11 +3,11 @@ import { XMLParser } from "fast-xml-parser";
 import { v4 as uuidv4 } from "uuid";
 
 import { TilesetManager } from "@/core/application/tilesetManager";
-import { Result, ResultStatus } from "@/core/constance/common/result";
 import { ITilemap } from "@/core/interface/tile/ITilemap";
 import { BaseObject } from "@/core/models/core/baseObject";
 import { ExternalTileset, TilemapData, TilemapSchema } from "@/core/schema/tilemapSchema";
 import { TilesetData } from "@/core/schema/tilesetSchema";
+import { Result, ResultStatus } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";

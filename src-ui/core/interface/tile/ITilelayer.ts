@@ -1,4 +1,4 @@
-import { Result } from "@/core/constance/common/result";
+import { Result } from "@/shared/types/result";
 
 export interface ITilelayer {
     getName(): string;

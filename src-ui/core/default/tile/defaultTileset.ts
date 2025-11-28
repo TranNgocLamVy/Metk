@@ -3,10 +3,10 @@ import { XMLParser } from "fast-xml-parser";
 import { Texture } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { Result, ResultStatus } from "@/core/constance/common/result";
 import { ITile, ITileset } from "@/core/interface/tile/ITileset";
 import { BaseObject } from "@/core/models/core/baseObject";
 import { TileData, TilesetData, tilesetSchema } from "@/core/schema/tilesetSchema";
+import { Result, ResultStatus } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";

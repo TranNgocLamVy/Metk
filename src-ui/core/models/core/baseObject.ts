@@ -1,7 +1,7 @@
 ﻿import { EventEmitter } from "eventemitter3";
 
-import { Result } from "@/core/constance/common/result";
 import { Type } from "@/scratch/propterties";
+import { Result } from "@/shared/types/result";
 
 export abstract class BaseObject extends EventEmitter {
     public properties: Map<string, Type>;
