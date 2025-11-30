@@ -1,3 +1,4 @@
+import { Appcore } from "@/core/appcore";
 import { useDebugStore } from "@/view/stores/debug/debugStore";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
@@ -11,18 +12,18 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		name: "Test",
-        onClick() {
-            useNavigationStore.getState().navigate?.("/test");
-        },
+		name: "Clear Local Storage",
+		onClick() {
+			localStorage.clear();
+		}
 	},
-	{
-		type: "option",
-		name: "Rerender",
+    {
+        type: "option",
+        name: "Create Tilemap",
         onClick() {
-            useDebugStore.getState().rerender();
-        },
-	},
+            Appcore.getInstance().projectManager.currentProject?.tilemapManager.createTilemap();
+        }
+    }
 ];
 
 export const DebugDropdownOptions: MenuItemType = {

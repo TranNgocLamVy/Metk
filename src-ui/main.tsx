@@ -4,11 +4,11 @@ import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 
-import AppcoreWrapper from "@/view/components/layout/appcoreWrapper/appcoreWrapper";
-import { FallbackRender } from "@/view/components/layout/fallbackRenderer/fallbackRender";
-import MainContainer from "@/view/components/layout/mainContainer/mainContainer";
+import AppcoreWrapper from "@/view/components/layout/appcoreWrapper";
+import { FallbackRender } from "@/view/components/layout/fallbackRender";
+import MainContainer from "@/view/components/layout/mainContainer";
 import MenuBar from "@/view/components/layout/menuBar/menuBar";
-import { ThemeProvider } from "@/view/components/providers/theme/themeProvider";
+import { ThemeProvider } from "@/view/components/providers/themeProvider";
 import { Toaster } from "@/view/components/shadcn/sonner";
 
 import { DialogContainer } from "./view/components/custom/dialogContainer/dialogContainer";

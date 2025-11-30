@@ -186,7 +186,7 @@
 }
 
 
-.dockview-sidebar {
+/* .dockview-sidebar {
     --dv-group-view-background-color: var(--background);
     --dv-background-color: var(--secondary-background);
 
@@ -220,4 +220,4 @@
     --dv-activegroup-hiddenpanel-tab-color: var(--foreground);
     --dv-inactivegroup-visiblepanel-tab-color: var(--foreground);
     --dv-inactivegroup-hiddenpanel-tab-color: var(--foreground);
-}
+} */

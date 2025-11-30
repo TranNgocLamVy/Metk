@@ -1,6 +1,6 @@
 import { FileHandle, open } from "@tauri-apps/plugin-fs";
 
-import { Result } from "../interface/common/result";
+import { Result } from "../types/result";
 
 export class ProjectFileUtils {
     constructor() { }

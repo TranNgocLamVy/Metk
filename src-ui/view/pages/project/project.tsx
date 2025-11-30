@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 
 import { Appcore } from "@/core/appcore";
 import { HStack, VStack } from "@/view/components/custom/stack/stack";
-import Workspace from "@/view/components/layout/workspace/workspace";
+import Workspace from "@/view/components/workspace/workspace";
 import { useAppcore } from "@/view/stores/appCoreStore";
 import { useProjectStore } from "@/view/stores/project/projectStore";
 
@@ -12,7 +12,7 @@ export default function Project() {
 	const navigate = useNavigate();
 
 	const { isLoading } = useAppcore();
-	const { currentProject } = useProjectStore();
+	const { currentProject, tilemaps, tilesets } = useProjectStore();
 
 	useEffect(() => {
 		const ensureCurrentProject = async () => {
@@ -27,17 +27,8 @@ export default function Project() {
 				}
 			}
 		};
-		if (!isLoading) {
-			ensureCurrentProject();
-		}
+		if (!isLoading) ensureCurrentProject();
 	}, [id, isLoading]);
 
-	return (
-		<HStack className="w-full h-full">
-			<VStack className="w-full h-full">
-				<Workspace />
-				<div className="w-full h-10 bg-background border" />
-			</VStack>
-		</HStack>
-	);
+	return <Workspace />;
 }

@@ -1,45 +1,182 @@
-import { DefaultTilemap } from "@/core/default/tile/defaultTilemap";
+import { Tilemap } from "@/core/domain/tilemap";
+import { DialogService } from "@/shared/services/dialogService";
+import { LocalStorageService } from "@/shared/services/localStorageService";
+import { Result } from "@/shared/types/result";
+import { useProjectStore } from "@/view/stores/project/projectStore";
 
+import { ITilemapStorageService } from "../interface/ITilemapStorageService";
+import { TilemapData } from "../schema/tilemapSchema";
 import { TilesetManager } from "./tilesetManager";
 
 export class TilemapManager {
-    private tilesetManager: TilesetManager;
-    private tilemapMap: Map<string, DefaultTilemap | null> = new Map<string, DefaultTilemap | null>();
+    private directory: string;
 
-    public constructor(tilesetManager: TilesetManager) {
+    private tilesetManager: TilesetManager;
+    private tilemapStorageService: ITilemapStorageService;
+
+    private tilemapPathmap: Map<string, string | null> = new Map<string, string>();
+    private tilemapMap: Map<string, Tilemap | null> = new Map<string, Tilemap | null>();
+
+    public constructor(directory: string, tilesetManager: TilesetManager, tilemapStorageService: ITilemapStorageService) {
+        this.directory = directory;
         this.tilesetManager = tilesetManager;
+        this.tilemapStorageService = tilemapStorageService;
     }
 
     public getTilemapPaths(): string[] {
         return Array.from(this.tilemapMap.keys());
     }
 
-    public addTilemapPath(filePath: string) {
-        this.tilemapMap.set(filePath, null);
-    }
-
-    public addTilemapPaths(filePath: string[]) {
+    public loadTilemapPaths(filePath: string[]): void {
         filePath.forEach((path) => {
-            this.tilemapMap.set(path, null);
+            this.tilemapPathmap.set(path, null);
         });
     }
 
-    public async getTilemap(filePath: string): Promise<DefaultTilemap | null> {
-        const tilemap = this.tilemapMap.get(filePath);
+    public async loadTilemap(filePath: string): Promise<Result<Tilemap | null>> {
+        const tilemapId = this.tilemapPathmap.get(filePath);
+        if (tilemapId == undefined) return { status: "Error", message: "Tilemap not found", data: null };
 
+        const tilemap = await this.getTilemap(tilemapId);
+        if (tilemap === null) return { status: "Error", message: "Tilemap not found", data: null };
+
+        return { status: "Success", data: tilemap };
+    }
+
+    public async saveTilemap(id: string): Promise<Result> {
+        const tilemap = this.tilemapMap.get(id);
+        if (tilemap === null) return { status: "Error", message: "Tilemap not found" };
+
+        return { status: "Success" };
+    }
+
+    public async getTilemap(id: string): Promise<Tilemap | null> {
+        const tilemap = this.tilemapMap.get(id);
         if (tilemap === undefined) return null;
         if (tilemap === null) {
-            const loadedTilemap = await DefaultTilemap.loadTilemap(filePath, { tilesetManager: this.tilesetManager });
-            this.tilemapMap.set(filePath, loadedTilemap);
+            const loadedTilemap = await Tilemap.loadTilemap(id, { tilesetManager: this.tilesetManager });
+            this.tilemapMap.set(id, loadedTilemap);
             return loadedTilemap;
         }
         return tilemap;
     }
 
-    public async getTilemaps(): Promise<DefaultTilemap[]> {
+    public async getTilemaps(): Promise<Tilemap[]> {
         const filePaths = Array.from(this.tilemapMap.keys());
         const tilemapPromises = filePaths.map(path => this.getTilemap(path));
         const results = await Promise.all(tilemapPromises);
-        return results.filter((tm): tm is DefaultTilemap => tm !== null);
+        return results.filter((tm): tm is Tilemap => tm !== null);
+    }
+
+    public async createTilemap(): Promise<Result> {
+        const form = await DialogService.openFormDialog({
+            title: "Create new Project",
+            okText: "Create",
+            cancelText: "Cancel",
+            size: "md",
+            inputs: [
+                {
+                    id: "name",
+                    name: "name",
+                    type: "text",
+                    label: "Map Name",
+                    placeholder: "Your Tile Project",
+                    required: true,
+                },
+                {
+                    id: "options",
+                    name: "options",
+                    type: "group",
+                    label: "Map Options",
+                    orientation: "horizontal",
+                    visible: false,
+                    inputs: [
+                        {
+                            id: "map",
+                            name: "map",
+                            type: "group",
+                            label: "Map Size",
+                            inputs: [
+                                {
+                                    id: "mapwidth",
+                                    name: "mapwidth",
+                                    type: "number",
+                                    label: "Width",
+                                    defaultValue: LocalStorageService.getItem("tilemap.mapwidth", 64),
+                                    required: true,
+                                },
+                                {
+                                    id: "mapheight",
+                                    name: "mapheight",
+                                    type: "number",
+                                    label: "Height",
+                                    defaultValue: LocalStorageService.getItem("tilemap.mapheight", 64),
+                                    required: true,
+                                },
+                                {
+                                    id: "infinite",
+                                    name: "infinite",
+                                    type: "checkbox",
+                                    label: "Infinite",
+                                    required: false,
+                                },
+                            ]
+                        },
+                        {
+                            id: "tile",
+                            name: "tile",
+                            type: "group",
+                            label: "Tile Size",
+                            inputs: [
+                                {
+                                    id: "tilewidth",
+                                    name: "tilewidth",
+                                    type: "number",
+                                    label: "Width",
+                                    defaultValue: LocalStorageService.getItem("tilemap.tilewidth", 16),
+                                    required: true,
+                                },
+                                {
+                                    id: "tileheight",
+                                    name: "tileheight",
+                                    type: "number",
+                                    label: "Height",
+                                    defaultValue: LocalStorageService.getItem("tilemap.tileheight", 16),
+                                    required: true,
+                                },
+                            ]
+                        },
+                    ]
+                },
+            ]
+        })
+        if (!form) return { status: "Cancel" };
+
+        LocalStorageService.setItem("tilemap.mapwidth", form.options.map.mapwidth);
+        LocalStorageService.setItem("tilemap.mapheight", form.options.map.mapheight);
+        LocalStorageService.setItem("tilemap.tilewidth", form.options.tile.tilewidth);
+        LocalStorageService.setItem("tilemap.tileheight", form.options.tile.tileheight);
+
+        const tilemapData: TilemapData = {
+            name: form.name,
+            height: form.options.map.mapheight,
+            width: form.options.map.mapwidth,
+            tilewidth: form.options.tile.tilewidth,
+            tileheight: form.options.tile.tileheight,
+            infinite: form.options.map.infinite,
+            tileset: [],
+            layer: [],
+        }
+
+        const fullPath = this.directory + "\\" + form.name + "tm.json";
+
+        const newTilemap = new Tilemap(fullPath, tilemapData, { tilesetManager: this.tilesetManager })
+
+        this.tilemapPathmap.set(fullPath, newTilemap.id);
+        this.tilemapMap.set(newTilemap.id, newTilemap);
+
+        useProjectStore.getState().addTilemap(newTilemap);
+
+        return { status: "Success" };
     }
 }

@@ -4,6 +4,7 @@ export interface FieldTypeMap {
     checkbox: boolean;
     filePath: string[];
     folderPath: string;
+    group: Record<string, any>;
 }
 
 export type FieldType = keyof FieldTypeMap;
@@ -11,7 +12,9 @@ export type FieldType = keyof FieldTypeMap;
 export type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 export type ShapeFromInputs<I extends readonly Field[]> = {
-    [K in I[number]as K["name"]]: FieldTypeMap[K["type"]];
+    [K in I[number] as K["name"]]: K extends GroupFieldInput
+        ? Simplify<ShapeFromInputs<K["inputs"]>> // <--- RECURSIVE MAGIC
+        : FieldTypeMap[K["type"]];
 };
 
 export type FormDialogOptions<I extends readonly Field[] = readonly Field[]> = {
@@ -19,6 +22,7 @@ export type FormDialogOptions<I extends readonly Field[] = readonly Field[]> = {
     description?: string;
     okText?: string;
     cancelText?: string;
+    size?: "sm" | "md" | "lg" | "xl" | "2xl";
     inputs: I;
     validateBeforeSubmit?: (values: Simplify<ShapeFromInputs<I>>) => Promise<ValidateResult>;
 };
@@ -82,4 +86,19 @@ export type FolderPathFieldInput = BaseField & {
     defaultValue?: string;
 };
 
-export type Field = TextFieldInput | NumberFieldInput | CheckboxFieldInput | FilePathFieldInput | FolderPathFieldInput;
+export type GroupFieldInput = BaseField & {
+    type: "group";
+    inputs: readonly Field[];
+    orientation?: "vertical" | "horizontal";
+    visible?: boolean;
+    validate?: (value: Record<string, any>) => Promise<ValidateResult>;
+};
+
+// Update the main Union Type
+export type Field = 
+    | TextFieldInput 
+    | NumberFieldInput 
+    | CheckboxFieldInput 
+    | FilePathFieldInput 
+    | FolderPathFieldInput 
+    | GroupFieldInput;

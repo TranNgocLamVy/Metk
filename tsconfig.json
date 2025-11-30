@@ -29,7 +29,7 @@
     },
 
   },
-  "include": ["src-ui"],
+  "include": ["src-ui", "scratch"],
   "references": [
     {
       "path": "./tsconfig.node.json"

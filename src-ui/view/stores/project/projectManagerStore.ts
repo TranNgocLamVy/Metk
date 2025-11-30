@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Project } from "@/core/domain/project";
+import { Project } from "@/core/models/project";
 
 type ProjectManagerState = {
     projects: Project[];

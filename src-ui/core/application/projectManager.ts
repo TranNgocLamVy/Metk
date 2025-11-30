@@ -6,9 +6,9 @@ import { Result, ResultStatus } from "@/shared/types/result";
 import { useProjectManagerStore } from "@/view/stores/project/projectManagerStore";
 import { exists, mkdir } from "@tauri-apps/plugin-fs";
 
-import { Project } from "../domain/project";
-import { IProjectRepository } from "../interface/domain/IProjectRepository";
-import { IProjectStorageService } from "../interface/domain/IProjectStorageService";
+import { IProjectRepository } from "../interface/IProjectRepository";
+import { IProjectStorageService } from "../interface/IProjectStorageService";
+import { Project } from "../models/project";
 import { ProjectMetaData } from "../schema/projectSchema";
 
 export type ProjectEventType = {

@@ -6,8 +6,8 @@ export const ResultStatus = {
 } as const;
 export type ResultStatus = keyof typeof ResultStatus;
 
-export type Result = {
+export type Result<T = any> = {
     status: ResultStatus;
     message?: string;
-    data?: any;
+    data?: T;
 };
