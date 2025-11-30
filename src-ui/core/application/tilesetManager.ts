@@ -1,7 +1,7 @@
-import { DefaultTileset } from "@/core/default/tile/defaultTileset";
+import { Tileset } from "@/core/domain/tileset";
 
 export class TilesetManager {
-    private tilesetMap: Map<string, DefaultTileset | null> = new Map<string, DefaultTileset | null>();
+    private tilesetMap: Map<string, Tileset | null> = new Map<string, Tileset | null>();
 
     public getTilemapPaths(): string[] {
         return Array.from(this.tilesetMap.keys());
@@ -17,21 +17,21 @@ export class TilesetManager {
         });
     }
 
-    public async getTileset(filePath: string): Promise<DefaultTileset | null> {
+    public async getTileset(filePath: string): Promise<Tileset | null> {
         const tileset = this.tilesetMap.get(filePath);
         if (tileset === undefined) return null;
         if (tileset === null) {
-            const loadedTileset = await DefaultTileset.loadTileset(filePath);
+            const loadedTileset = await Tileset.loadTileset(filePath);
             this.tilesetMap.set(filePath, loadedTileset);
             return loadedTileset;
         }
         return tileset;
     }
 
-    public async getTilesets(): Promise<DefaultTileset[]> {
+    public async getTilesets(): Promise<Tileset[]> {
         const filePaths = Array.from(this.tilesetMap.keys());
         const tilesetPromises = filePaths.map(path => this.getTileset(path));
         const results = await Promise.all(tilesetPromises);
-        return results.filter((ts): ts is DefaultTileset => ts !== null);
+        return results.filter((ts): ts is Tileset => ts !== null);
     }
 }

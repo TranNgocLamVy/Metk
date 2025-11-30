@@ -1,7 +1,7 @@
 import { Copy, Minus, SunMoon, X } from "lucide-react";
 
 import { HStack } from "@/view/components/custom/stack/stack";
-import { useTheme } from "@/view/components/providers/theme/themeProvider";
+import { useTheme } from "@/view/components/providers/themeProvider";
 import { Button } from "@/view/components/shadcn/button";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 

@@ -1,6 +1,4 @@
-import { ArkErrors, type } from "arktype";
-
-import { TilesetData, tilesetDataSchema } from "./tilesetSchema";
+import { type } from "arktype";
 
 const TilemapMetadataSchema = type({
     version: type("string"),
@@ -40,45 +38,23 @@ const externalTilesetDataSchema = type({
 })
 export type ExternalTileset = typeof externalTilesetDataSchema.infer;
 
-const unionTilesetSchema = type("object | object[]").pipe((tileset) => {
-    const processTilset = (tileset: any) => {
-        if ((tileset as any).source) {
-            return externalTilesetDataSchema(tileset);
-        }
-        return tilesetDataSchema(tileset);
-    }
-
-    const tilesets: (TilesetData | ExternalTileset | ArkErrors)[] = [];
-    if (Array.isArray(tileset)) {
-        tileset.forEach(tileset => {
-            tilesets.push(processTilset(tileset));
-        })
-    } else {
-        tilesets.push(processTilset(tileset));
-    }
-    return tilesets;
-}).default(() => []);
-export type UnionTilesetData = typeof unionTilesetSchema;
-
-const TilemapDataSchema = type({
+export const TilemapDataSchema = type({
+    name: type("string"),
     height: type("string.numeric.parse"),
     width: type("string.numeric.parse"),
-    version: type("string").optional(),
     tilewidth: type("string.numeric.parse"),
     tileheight: type("string.numeric.parse"),
-    infinite: type("string.numeric.parse").optional(),
+    infinite: type("boolean").optional(),
     backgroundcolor: type("string").optional(),
     nextlayerid: type("string.numeric.parse").optional(),
     nextobjectid: type("string.numeric.parse").optional(),
-    orientation: type("'orthogonal' | 'isometric'"),
-    renderorder: type("'right-down' | 'right-up' | 'left-down' | 'left-up'").default("right-down"),
     staggeraxis: type("string").optional(),
     staggerindex: type("string").optional(),
     compressionlevel: type("string.numeric.parse").optional(),
     hexsidelength: type("string.numeric.parse").optional(),
     parallaxoriginx: type("string.numeric.parse").optional(),
     parallaxoriginy: type("string.numeric.parse").optional(),
-    tileset: unionTilesetSchema,
+    tileset: externalTilesetDataSchema.array().default(() => []),
     layer: type("object | object[]").pipe((layer) => {
         if (Array.isArray(layer)) {
             return layer.map(layerData => {

@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-import { IProjectRepository } from "@/core/interface/domain/IProjectRepository";
+import { IProjectRepository } from "@/core/interface/IProjectRepository";
 import { ProjectMetaData, ProjectRepoSchema } from "@/core/schema/projectSchema";
 import { FileUtils } from "@/shared/utils/FileUtils";
 import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
