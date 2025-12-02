@@ -1,44 +1,23 @@
-import { DockviewApi, DockviewReact, DockviewReadyEvent } from "dockview";
-import { useEffect, useRef, useState } from "react";
+import "@/assets/style/flexLayout/workspace.css";
 
-import { Event } from "@tauri-apps/api/event";
-import { getCurrentWindow, PhysicalSize } from "@tauri-apps/api/window";
+import { Layout } from "flexlayout-react";
+import { useRef } from "react";
 
-import Editor from "./editor";
-import Sidebar from "./sidebar";
+import { useRelativeFlexLayout } from "@/view/hooks/useRelativeFlexLayout";
+import { useWorkspaceDockStore } from "@/view/stores/flexlayout/workspaceDockStore";
+
+import { VStack } from "../custom/stack/stack";
 
 export default function Workspace() {
-    const workSpaceContainerRef = useRef<HTMLDivElement>(null);
-    const [splitViewApi, setSplitViewApi] = useState<DockviewApi | null>(null);
+	const layoutRef = useRef<Layout | null>(null);
 
-    useEffect(() => {
-		if (!splitViewApi) return;
+    const { model, factory, onRenderTab } = useWorkspaceDockStore();
 
-        const window = getCurrentWindow()
+    useRelativeFlexLayout(layoutRef);
 
-		const resize = (event: Event<PhysicalSize>) => {
-			if (!workSpaceContainerRef.current) return;
-			requestAnimationFrame(() => {
-				splitViewApi.layout(event.payload.width, event.payload.height);
-			});
-		};
-		const dispose = window.onResized(resize);
-		return () => {
-            dispose.then(fn => fn());
-        }
-	}, [splitViewApi]);
-
-    const onReady = (event: DockviewReadyEvent) => {
-        setSplitViewApi(event.api);
-        event.api.addPanel({ id: "sidebar", component: "sidebar" });
-    }
-    
-    return (
-        <DockviewReact components={components} onReady={onReady} />
-    )
-
-}
-
-const components = {
-  sidebar: Sidebar
+	return (
+		<VStack className="workspace w-full h-full">
+			<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} />
+		</VStack>
+	);
 }

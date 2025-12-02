@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/view/components/shadcn/context-menu";
-import { usePreventContextMenu } from "@/view/hooks/usePreventContextMenu/usePreventContextMenu";
+import { usePreventContextMenu } from "@/view/hooks/usePreventContextMenu";
 
 import ContextMenuItemGroup from "./contextMenu/contextMenuItemGroup";
 
