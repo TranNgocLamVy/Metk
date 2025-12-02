@@ -1,0 +1,73 @@
+.workspace .flexlayout__layout {
+	--color-text: var(--foreground);
+	--color-background: var(--background);
+	--color-base: black;
+	--color-1: var(--secondary-background);
+	--color-2: var(--background);
+	--color-3: var(--background);
+	--color-4: var(--secondary-background);
+	--color-5: var(--background);
+	--color-6: var(--background);
+	--color-drag1: rgb(207, 232, 255);
+	--color-drag2: rgb(183, 209, 181);
+	--color-drag1-background: rgba(128, 128, 128, 0.15);
+	--color-drag2-background: rgba(128, 128, 128, 0.15);
+	--font-size: medium;
+	--color-overflow: gray;
+	--color-icon: gray;
+	--color-tabset-background: var(--color-1);
+	--color-tabset-background-selected: var(--color-1);
+	--color-tabset-background-maximized: var(--color-6);
+	--color-tabset-divider-line: var(--color-4);
+	--color-tabset-header-background: var(--color-1);
+	--color-tabset-header: var(--color-text);
+	--color-border-tab-content: var(--color-background);
+	--color-border-background: var(--color-1);
+	--color-border-divider-line: var(--color-4);
+	--color-tab-content: var(--color-background);
+	--color-tab-selected: var(--color-text);
+	--color-tab-selected-background: var(--color-4);
+	--color-tab-unselected: gray;
+	--color-tab-unselected-background: transparent;
+	--color-tab-textbox: var(--color-text);
+	--color-tab-textbox-background: var(--color-3);
+	--color-border-tab-selected: var(--color-text);
+	--color-border-tab-selected-background: var(--color-4);
+	--color-border-tab-unselected: gray;
+	--color-border-tab-unselected-background: var(--color-2);
+	--color-drag-rect-border: var(--color-4);
+	--color-drag-rect-background: var(--color-1);
+	--color-drag-rect: var(--color-text);
+	--color-popup-border: var(--color-6);
+	--color-popup-unselected: var(--color-text);
+	--color-popup-unselected-background: var(--color-background);
+	--color-popup-selected: var(--color-text);
+	--color-popup-selected-background: var(--color-4);
+	--color-edge-marker: gray;
+	--color-edge-icon: #eee;
+	--color-mini-scroll-indicator: rgba(128, 128, 128, 0.5);
+	--color-mini-scroll-indicator-hovered: rgba(128, 128, 128, 0.8);
+	--size-mini-scroll-indicator: 3px;
+	--color-toolbar-button-hover: var(--color-4);
+}
+
+.workspace .flexlayout__border_bottom {
+	padding: 2px;
+	height: fit-content;
+	background-color: var(--secondary-background);
+	border-color: transparent;
+}
+
+.workspace .flexlayout__splitter_horz {
+	--color-splitter: rgba(0, 0, 0, 0);
+}
+
+.workspace .flexlayout__tab_button--selected::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--foreground);
+}

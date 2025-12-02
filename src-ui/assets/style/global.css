@@ -9,12 +9,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+	--font-family: "JetBrains Mono";
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--color-menu-bar-background: var(--menu-bar-background);
 	--color-background: var(--background);
-    --color-secondary-background: var(--secondary-background);
+	--color-secondary-background: var(--secondary-background);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
 	--color-card-foreground: var(--card-foreground);
@@ -47,6 +49,16 @@
 	--color-sidebar-ring: var(--sidebar-ring);
 }
 
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+		@apply overflow-hidden;
+	}
+}
+
 @layer utilities {
 	.h-context-menu {
 		height: var(--context-menu-height);
@@ -70,10 +82,12 @@
 :root {
 	font-family: "JetBrains Mono";
 
+	--menu-bar-background: rgb(229, 229, 229);
+
 	/* Default Shadcn Variables */
 	--radius: 0.25rem;
 	--background: oklch(1 0 0);
-    --secondary-background: oklch(1 0 0);
+	--secondary-background: rgb(243, 243, 243);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
@@ -115,44 +129,31 @@
 	--dropdown-menu-font-size: 0.75rem;
 	--dropdown-menu-line-height: 1.125rem;
 
-    --canvas-background-color: #ffffff;
-    --canvas-grid-color: #000000;
+	--canvas-background-color: #ffffff;
+	--canvas-grid-color: #000000;
 
-
-    /* DockView */
-    --dv-group-view-background-color: var(--background);
-    --dv-background-color: var(--background);
-
-    --dv-activegroup-visiblepanel-tab-background-color: var(--background);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--secondary-background);
-
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--background);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--secondary-background);
-
-    --dv-tabs-and-actions-container-background-color: var(--secondary-background);
-
-    --dv-activegroup-visiblepanel-tab-color: var(--foreground);
-    --dv-activegroup-hiddenpanel-tab-color: var(--foreground);
-    --dv-inactivegroup-visiblepanel-tab-color: var(--foreground);
-    --dv-inactivegroup-hiddenpanel-tab-color: var(--foreground);
+    /*Flex Layout*/
+    --color-splitter: rgb(211, 211, 211);
+    --color-splitter-hover: rgb(0, 144, 241);
+    --color-splitter-drag: rgb(0, 144, 241);
 }
 
 .dark {
 	--background: rgb(35, 39, 46);
-    --secondary-background: rgb(30, 34, 39);
+	--secondary-background: rgb(30, 34, 39);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);
 	--card-foreground: oklch(0.985 0 0);
-	--popover: oklch(0.205 0 0);
-	--popover-foreground: oklch(0.985 0 0);
+	--popover: var(--background);
+	--popover-foreground: var(--foreground);
 	--primary: oklch(0.922 0 0);
 	--primary-foreground: oklch(0.205 0 0);
 	--secondary: oklch(0.269 0 0);
 	--secondary-foreground: oklch(0.985 0 0);
 	--muted: oklch(0.269 0 0);
 	--muted-foreground: oklch(0.708 0 0);
-	--accent: oklch(0.269 0 0);
-	--accent-foreground: oklch(0.985 0 0);
+	--accent: var(--secondary-background);
+	--accent-foreground: var(--foreground);
 	--destructive: oklch(0.704 0.191 22.216);
 	--border: oklch(1 0 0 / 10%);
 	--input: oklch(1 0 0 / 15%);
@@ -171,53 +172,22 @@
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
 
-    --canvas-background-color: #000000;
-    --canvas-grid-color: #ffffff;
+	--canvas-background-color: #000000;
+	--canvas-grid-color: #ffffff;
+
+	--menu-bar-background: var(--background);
+
+    /*Flex Layout*/
+    --color-splitter: rgb(58, 63, 76);
+    --color-splitter-hover: rgb(62, 68, 82);
+    --color-splitter-drag: rgb(62, 68, 82);
 }
 
-@layer base {
-	* {
-		@apply border-border outline-ring/50;
-	}
-	body {
-		@apply bg-background text-foreground;
-        @apply overflow-hidden
-	}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
-
-/* .dockview-sidebar {
-    --dv-group-view-background-color: var(--background);
-    --dv-background-color: var(--secondary-background);
-
-    --dv-activegroup-visiblepanel-tab-background-color: var(--background);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--background);
-
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--secondary-background);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--secondary-background);
-
-    --dv-tabs-and-actions-container-background-color: var(--secondary-background);
-
-    --dv-activegroup-visiblepanel-tab-color: var(--foreground);
-    --dv-activegroup-hiddenpanel-tab-color: var(--foreground);
-    --dv-inactivegroup-visiblepanel-tab-color: var(--foreground);
-    --dv-inactivegroup-hiddenpanel-tab-color: var(--foreground);
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
-
-.dockview-tilemap {
-    --dv-group-view-background-color: var(--secondary-background);
-    --dv-background-color: var(--background);
-
-    --dv-activegroup-visiblepanel-tab-background-color: var(--background);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--secondary-background);
-
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--background);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--secondary-background);
-
-    --dv-tabs-and-actions-container-background-color: var(--secondary-background);
-
-    --dv-activegroup-visiblepanel-tab-color: var(--foreground);
-    --dv-activegroup-hiddenpanel-tab-color: var(--foreground);
-    --dv-inactivegroup-visiblepanel-tab-color: var(--foreground);
-    --dv-inactivegroup-hiddenpanel-tab-color: var(--foreground);
-} */
