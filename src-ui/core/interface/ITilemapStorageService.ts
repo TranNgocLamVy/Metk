@@ -1,6 +1,6 @@
 import { Result } from "@/shared/types/result";
 
-import { TilemapData } from "../schema/tilemapSchema";
+import { TilemapData } from "../../shared/schema/tilemapSchema";
 
 export interface ITilemapStorageService {
     

@@ -3,11 +3,9 @@ import { XMLParser } from "fast-xml-parser";
 import { v4 as uuidv4 } from "uuid";
 
 import { TilesetManager } from "@/core/application/tilesetManager";
-import { BaseObject } from "@/core/models/baseObject";
-import { ExternalTileset, TilemapData, TilemapSchema } from "@/core/schema/tilemapSchema";
-import { TilesetData } from "@/core/schema/tilesetSchema";
+import { BaseObject } from "@/core/model/baseObject";
+import { ExternalTileset, TilemapData, TilemapSchema } from "@/shared/schema/tilemapSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
-import { TextureUtils } from "@/shared/utils/TextureUtils";
 import { join } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-fs";
 
@@ -38,7 +36,7 @@ export class Tilemap extends BaseObject {
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.emit(BaseObject.event.UpdateProperty);
-        return { status: ResultStatus.Success };
+        return { status: ResultStatus.Success, data: null };
     }
 
     // public version: string;
@@ -103,24 +101,24 @@ export class Tilemap extends BaseObject {
     public async loadAssets(tilesets: any[], tilelayers: any[]): Promise<Result> {
         await this.loadTileset(this.metaData.basePath, tilesets);
         await this.loadTilelayer(tilelayers);
-        return { status: ResultStatus.Success };
+        return { status: ResultStatus.Success, data: null };
     }
 
     public async loadTileset(basePath: string, tilesets: any[]): Promise<Result> {
-        for (const tilesetData of tilesets) {
-            if (tilesetData instanceof type.errors) {
-                console.error(tilesetData.summary)
-                continue;
-            }
-            const externalTilesetData = tilesetData as ExternalTileset;
-            const tilesetFullPath = await join(basePath, externalTilesetData.source);
-            const tileset = await this.context.tilesetManager.getTileset(tilesetFullPath);
-            if (!tileset) continue;
-            this.tilesets.push(tileset);
-            continue;
+        // for (const tilesetData of tilesets) {
+        //     if (tilesetData instanceof type.errors) {
+        //         console.error(tilesetData.summary)
+        //         continue;
+        //     }
+        //     const externalTilesetData = tilesetData as ExternalTileset;
+        //     const tilesetFullPath = await join(basePath, externalTilesetData.source);
+        //     const tileset = await this.context.tilesetManager.getTilesetByFilePath(tilesetFullPath);
+        //     if (!tileset) continue;
+        //     this.tilesets.push(tileset);
+        //     continue;
 
-        }
-        return { status: ResultStatus.Success };
+        // }
+        return { status: ResultStatus.Success, data: null };
     }
 
     public async loadTilelayer(tilelayers: any[]): Promise<Result> {
@@ -132,17 +130,17 @@ export class Tilemap extends BaseObject {
             const tilelayer = new TileLayer(tilelayerData);
             this.tilelayers.push(tilelayer);
         }
-        return { status: ResultStatus.Success };
+        return { status: ResultStatus.Success, data: null };
     }
 
     public async addTilelayer(): Promise<Result> {
         this.emit(Tilemap.event.TilelayerAdded);
-        return { status: "Success" };
+        return { status: "Success", data: null };
     }
 
     public async removeTilelayer(id: string): Promise<Result> {
         this.emit(Tilemap.event.TilelayerRemoved);
-        return { status: "Success" };
+        return { status: "Success", data: null };
     }
 
     public async reorderTilelayer(id: string, newIndex: number): Promise<Result> {
@@ -162,7 +160,7 @@ export class Tilemap extends BaseObject {
             newIndex: targetIndex,
         });
 
-        return { status: "Success" };
+        return { status: "Success", data: null };
     }
 
 

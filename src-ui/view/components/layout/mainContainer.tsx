@@ -1,23 +1,33 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
 interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: React.ReactNode;
 }
 
 export default function MainContainer({ children, ...props }: MainContainerProps) {
-	const ref = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+    const navigate = useNavigate();
+	const setNavigate = useNavigationStore((s) => s.setNavigate);
 
 	useLayoutEffect(() => {
-		if (ref.current) {
+		setNavigate(navigate);
+	}, [navigate, setNavigate]);
+
+	useLayoutEffect(() => {
+		if (containerRef.current) {
 			const menuBar = document.getElementById("menu-bar");
 			if (menuBar) {
-				ref.current.style.paddingTop = `${menuBar.clientHeight}px`;
+				containerRef.current.style.paddingTop = `${menuBar.clientHeight}px`;
 			}
 		}
-	}, [ref.current]);
+	}, [containerRef.current]);
 
 	return (
-		<main {...props} ref={ref} className="w-full cursor-default h-dvh bg-background">
+		<main {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-background">
 			{children}
 		</main>
 	);

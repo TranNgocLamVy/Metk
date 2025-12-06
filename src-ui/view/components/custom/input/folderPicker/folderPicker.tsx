@@ -1,8 +1,8 @@
+import { FileDialogUtils } from "@/shared/utils/fileDialogUtils";
 import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
 import { Tooltip, TooltipContent } from "@/view/components/shadcn/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
-import { open } from "@tauri-apps/plugin-dialog";
 
 type FolderPickerProps = {
 	id: string;
@@ -19,7 +19,7 @@ export default function FolderPickerField(props: FolderPickerProps) {
 	const { id, name, label, placeholder, defaultValue, required, value, handleChange } = props;
 
 	const selectFolder = async () => {
-		const path = await open({
+		const path = await FileDialogUtils.open({
 			directory: true, // Only allow selecting directories
 			multiple: false, // Prevent multiple selection
 		});
@@ -48,7 +48,7 @@ export default function FolderPickerField(props: FolderPickerProps) {
 			<Label htmlFor={id}>{label}</Label>
 			<Tooltip delayDuration={500}>
 				<TooltipTrigger asChild>
-					<Input id={id} name={name} type="text" placeholder={placeholder} defaultValue={value ?? ""} required={required} className="w-full cursor-pointer" onClick={selectFolder} onKeyDown={onKeyDown} />
+					<Input id={id} name={name} type="text" placeholder={placeholder} defaultValue={value ?? ""} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFolder} onKeyDown={onKeyDown} />
 				</TooltipTrigger>
 				{value && (
 					<TooltipContent side="bottom">

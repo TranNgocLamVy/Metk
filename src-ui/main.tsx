@@ -5,7 +5,6 @@ import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 
-import AppcoreWrapper from "@/view/components/layout/appcoreWrapper";
 import { FallbackRender } from "@/view/components/layout/fallbackRender";
 import MainContainer from "@/view/components/layout/mainContainer";
 import MenuBar from "@/view/components/layout/menuBar/menuBar";
@@ -22,9 +21,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<MenuBar />
 		<Router>
 			<MainContainer>
-				<Toaster position="top-right" richColors closeButton />
+				<Toaster position="top-center" richColors closeButton={false} />
 				<DialogContainer />
-				<AppcoreWrapper />
 				<ErrorBoundary fallbackRender={FallbackRender}>
 					<Routes>
 						{appRoutes.map(({ path, element }, index) => (

@@ -1,40 +1,47 @@
-import EventEmitter from "eventemitter3";
 
-import { JsonProjectRepository } from "@/infrastructure/ProjectRepository";
-import { JsonProjectStorageService } from "@/infrastructure/ProjectStorageService";
-import { useAppcore } from "@/view/stores/appCoreStore";
-import { BaseDirectory } from "@tauri-apps/plugin-fs";
 
+import { JsonProjectRepository } from "@/infrastructure/projectRepository";
+import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
+
+import { Project } from "./application/project";
 import { ProjectManager } from "./application/projectManager";
 
-const PROJECT_REPO_FILE_NAME = "projects.json";
-
-export class Appcore extends EventEmitter {
-    private static instance: Appcore;
+export class AppCore {
+    private static _instance: AppCore;
     public readonly projectManager: ProjectManager;
 
     private constructor() {
-        super();
-        const projectRepo = new JsonProjectRepository(PROJECT_REPO_FILE_NAME, BaseDirectory.AppData);
-        const projectStorageService = new JsonProjectStorageService(BaseDirectory.AppData);
+        const projectRepo = new JsonProjectRepository();
+        const projectStorageService = new JsonProjectStorageService();
         this.projectManager = new ProjectManager(projectRepo, projectStorageService);
-        this.load();
     }
 
-    private async load() {
+    public async load() {
         await this.projectManager.load();
-        useAppcore.getState().setIsLoading(false);
     }
 
-    public static initializeAppcore() {
-        if (this.instance) {
-            console.log("Appcore already initialized");
+    public static initialize() {
+        if (AppCore._instance) return;
+        const global = globalThis as any;
+        if (import.meta.env.DEV && global.__APP_CORE_INSTANCE__) {
+            AppCore._instance = global.__APP_CORE_INSTANCE__;
             return;
         }
-        this.instance = new Appcore();
+        AppCore._instance = new AppCore();
+        if (import.meta.env.DEV) global.__APP_CORE_INSTANCE__ = AppCore._instance;
     }
 
-    public static getInstance(): Appcore {
-        return this.instance;
+    public static getIns(): AppCore {
+        if (!this._instance) {
+            this.initialize();
+        }
+        return this._instance;
+    }
+
+
+    public getCurrentProject(): Project {
+        const currentProject = this.projectManager.currentProject;
+        if (!currentProject) throw new Error("Current project not found");
+        return currentProject;
     }
 }

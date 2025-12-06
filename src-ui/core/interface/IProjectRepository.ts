@@ -1,4 +1,4 @@
-import { ProjectMetaData } from "@/core/schema/projectSchema";
+import { ProjectMetaData } from "@/shared/schema/projectSchema";
 
 export interface IProjectRepository {
     loadAll(): Promise<ProjectMetaData[]>;

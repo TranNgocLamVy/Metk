@@ -1,4 +1,4 @@
-import { Appcore } from "@/core/appcore";
+import { AppCore } from "@/core/appcore";
 import { useDebugStore } from "@/view/stores/debug/debugStore";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
@@ -21,7 +21,7 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
         type: "option",
         name: "Create Tilemap",
         onClick() {
-            Appcore.getInstance().projectManager.currentProject?.tilemapManager.createTilemap();
+            AppCore.getIns().projectManager.currentProject?.tilemapManager.createTilemap();
         }
     }
 ];

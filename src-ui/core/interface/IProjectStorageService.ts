@@ -1,6 +1,6 @@
-import { ProjectData } from "../schema/projectSchema";
+import { ProjectData } from "../../shared/schema/projectSchema";
 
 export interface IProjectStorageService {
     loadProject(filePath: string): Promise<ProjectData | null>;
-    saveProject(filePath: string, content: any): Promise<void>;
+    saveProject(filePath: string, content: ProjectData): Promise<void>;
 }

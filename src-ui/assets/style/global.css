@@ -191,3 +191,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.tab-hightlight::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--foreground);
+}

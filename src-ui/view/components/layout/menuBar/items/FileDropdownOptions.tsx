@@ -1,6 +1,6 @@
 import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquareArrowOutUpRight, SquarePlus, SquareX, X } from "lucide-react";
 
-import { Appcore } from "@/core/appcore";
+import { ProjectService } from "@/shared/services/projectService";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -14,7 +14,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					name: "New Project",
 					startIcon: <FolderPlus />,
                     onClick() {
-                        Appcore.getInstance().projectManager.createProject();
+                        ProjectService.createProject();
                     },
 				},
 			],

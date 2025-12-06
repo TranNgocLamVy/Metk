@@ -1,5 +1,5 @@
-import { BaseObject } from "@/core/models/baseObject";
-import { TileLayerData } from "@/core/schema/tilemapSchema";
+import { BaseObject } from "@/core/model/baseObject";
+import { TileLayerData } from "@/shared/schema/tilemapSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
 
 export class TileLayer extends BaseObject {
@@ -67,7 +67,7 @@ export class TileLayer extends BaseObject {
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.emit(BaseObject.event.UpdateProperty);
-        return { status: "Success" };
+        return { status: "Success", data: null };
     }
 
     public getTileAt(position: { x: number, y: number }): TileData | null {
@@ -103,6 +103,6 @@ export class TileData {
     }
     public setId(id: number): Result {
         this.id = id;
-        return { status: ResultStatus.Success };
+        return { status: "Success", data: null };
     }
 }

@@ -1,16 +1,15 @@
 import { type } from "arktype";
 
-const TilemapMetadataSchema = type({
-    version: type("string"),
-    encoding: type("string"),
+export const TilemapMetaDataSchema = type({
+    name: type("string"),
+    tilemapRelPath: type("string"),
 })
-export type TilemapMetadata = typeof TilemapMetadataSchema.infer;
+export type TilemapMetaData = typeof TilemapMetaDataSchema.infer
 
 const TileDataSchema = type({
     encoding: type("'csv'"),
     "#text": type("string"),
 })
-
 const TilelayerDataSchema = type({
     id: type("string"),
     name: type("string"),
@@ -66,8 +65,9 @@ export const TilemapDataSchema = type({
 })
 export type TilemapData = typeof TilemapDataSchema.infer;
 
+
+
 export const TilemapSchema = type({
-    "?xml": TilemapMetadataSchema,
     "map": TilemapDataSchema
 })
 export type Tilemap = typeof TilemapSchema.infer;
