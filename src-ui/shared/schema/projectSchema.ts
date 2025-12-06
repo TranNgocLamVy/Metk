@@ -1,5 +1,8 @@
 import { type } from "arktype";
 
+import { TilemapMetaDataSchema } from "./tilemapSchema";
+import { TilesetMetaDataSchema } from "./tilesetSchema";
+
 export const ProjectDataSchema = type("string.json.parse").to({
     id: type("string"),
     name: type("string"),
@@ -7,8 +10,8 @@ export const ProjectDataSchema = type("string.json.parse").to({
     description: type("string").default(""),
     createdAt: type("string.date"),
     updatedAt: type("string.date"),
-    tilemapPaths: type("string[]").default(() => []),
-    tilesetPaths: type("string[]").default(() => []),
+    tilemaps: TilemapMetaDataSchema.array().default(() => []),
+    tilesets: TilesetMetaDataSchema.array().default(() => []),
 })
 export type ProjectData = typeof ProjectDataSchema.infer
 

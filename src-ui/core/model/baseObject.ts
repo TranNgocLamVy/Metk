@@ -21,7 +21,7 @@ export abstract class BaseObject extends EventEmitter {
         try {
             (this as any)[key] = value;
             this.emit(BaseObject.event.UpdateProperty);
-            return { status: "Success" };
+            return { status: "Success", data: null };
         } catch (error) {
             return { status: "Error", message: error as any };
         }

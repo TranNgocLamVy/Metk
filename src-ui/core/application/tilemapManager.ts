@@ -1,11 +1,9 @@
 import { Tilemap } from "@/core/domain/tilemap";
 import { DialogService } from "@/shared/services/dialogService";
-import { LocalStorageService } from "@/shared/services/localStorageService";
 import { Result } from "@/shared/types/result";
-import { useProjectStore } from "@/view/stores/project/projectStore";
 
+import { TilemapData } from "../../shared/schema/tilemapSchema";
 import { ITilemapStorageService } from "../interface/ITilemapStorageService";
-import { TilemapData } from "../schema/tilemapSchema";
 import { TilesetManager } from "./tilesetManager";
 
 export class TilemapManager {
@@ -14,8 +12,8 @@ export class TilemapManager {
     private tilesetManager: TilesetManager;
     private tilemapStorageService: ITilemapStorageService;
 
-    private tilemapPathmap: Map<string, string | null> = new Map<string, string>();
-    private tilemapMap: Map<string, Tilemap | null> = new Map<string, Tilemap | null>();
+    private tilemapPathMap: Map<string, string | null> = new Map<string, string | null>(); // filePath -> id
+    private tilemapMap: Map<string, Tilemap | null> = new Map<string, Tilemap | null>(); // id -> tilemap
 
     public constructor(directory: string, tilesetManager: TilesetManager, tilemapStorageService: ITilemapStorageService) {
         this.directory = directory;
@@ -29,12 +27,12 @@ export class TilemapManager {
 
     public loadTilemapPaths(filePath: string[]): void {
         filePath.forEach((path) => {
-            this.tilemapPathmap.set(path, null);
+            this.tilemapPathMap.set(path, null);
         });
     }
 
     public async loadTilemap(filePath: string): Promise<Result<Tilemap | null>> {
-        const tilemapId = this.tilemapPathmap.get(filePath);
+        const tilemapId = this.tilemapPathMap.get(filePath);
         if (tilemapId == undefined) return { status: "Error", message: "Tilemap not found", data: null };
 
         const tilemap = await this.getTilemap(tilemapId);
@@ -46,17 +44,17 @@ export class TilemapManager {
     public async saveTilemap(id: string): Promise<Result> {
         const tilemap = this.tilemapMap.get(id);
         if (tilemap === null) return { status: "Error", message: "Tilemap not found" };
-
-        return { status: "Success" };
+        // TODO: Save tilemap
+        return { status: "Success", data: null };
     }
 
     public async getTilemap(id: string): Promise<Tilemap | null> {
         const tilemap = this.tilemapMap.get(id);
         if (tilemap === undefined) return null;
         if (tilemap === null) {
-            const loadedTilemap = await Tilemap.loadTilemap(id, { tilesetManager: this.tilesetManager });
-            this.tilemapMap.set(id, loadedTilemap);
-            return loadedTilemap;
+            // const loadedTilemap = await Tilemap.loadTilemap(id, { tilesetManager: this.tilesetManager });
+            // this.tilemapMap.set(id, loadedTilemap);
+            // return loadedTilemap;
         }
         return tilemap;
     }
@@ -70,7 +68,7 @@ export class TilemapManager {
 
     public async createTilemap(): Promise<Result> {
         const form = await DialogService.openFormDialog({
-            title: "Create new Project",
+            title: "Create new Tilemap",
             okText: "Create",
             cancelText: "Cancel",
             size: "md",
@@ -80,7 +78,7 @@ export class TilemapManager {
                     name: "name",
                     type: "text",
                     label: "Map Name",
-                    placeholder: "Your Tile Project",
+                    placeholder: "Your Tile Map",
                     required: true,
                 },
                 {
@@ -102,7 +100,7 @@ export class TilemapManager {
                                     name: "mapwidth",
                                     type: "number",
                                     label: "Width",
-                                    defaultValue: LocalStorageService.getItem("tilemap.mapwidth", 64),
+                                    defaultValue: 64,
                                     required: true,
                                 },
                                 {
@@ -110,7 +108,7 @@ export class TilemapManager {
                                     name: "mapheight",
                                     type: "number",
                                     label: "Height",
-                                    defaultValue: LocalStorageService.getItem("tilemap.mapheight", 64),
+                                    defaultValue: 64,
                                     required: true,
                                 },
                                 {
@@ -133,7 +131,7 @@ export class TilemapManager {
                                     name: "tilewidth",
                                     type: "number",
                                     label: "Width",
-                                    defaultValue: LocalStorageService.getItem("tilemap.tilewidth", 16),
+                                    defaultValue: 16,
                                     required: true,
                                 },
                                 {
@@ -141,7 +139,7 @@ export class TilemapManager {
                                     name: "tileheight",
                                     type: "number",
                                     label: "Height",
-                                    defaultValue: LocalStorageService.getItem("tilemap.tileheight", 16),
+                                    defaultValue: 16,
                                     required: true,
                                 },
                             ]
@@ -151,11 +149,6 @@ export class TilemapManager {
             ]
         })
         if (!form) return { status: "Cancel" };
-
-        LocalStorageService.setItem("tilemap.mapwidth", form.options.map.mapwidth);
-        LocalStorageService.setItem("tilemap.mapheight", form.options.map.mapheight);
-        LocalStorageService.setItem("tilemap.tilewidth", form.options.tile.tilewidth);
-        LocalStorageService.setItem("tilemap.tileheight", form.options.tile.tileheight);
 
         const tilemapData: TilemapData = {
             name: form.name,
@@ -168,15 +161,13 @@ export class TilemapManager {
             layer: [],
         }
 
-        const fullPath = this.directory + "\\" + form.name + "tm.json";
+        const fullPath = this.directory + "\\" + form.name + ".tm.json";
 
         const newTilemap = new Tilemap(fullPath, tilemapData, { tilesetManager: this.tilesetManager })
 
-        this.tilemapPathmap.set(fullPath, newTilemap.id);
+        this.tilemapPathMap.set(fullPath, newTilemap.id);
         this.tilemapMap.set(newTilemap.id, newTilemap);
 
-        useProjectStore.getState().addTilemap(newTilemap);
-
-        return { status: "Success" };
+        return { status: "Success", data: null };
     }
 }

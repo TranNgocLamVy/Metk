@@ -2,6 +2,7 @@ import { ITabRenderValues, Model, TabNode } from "flexlayout-react";
 import { Terminal } from "lucide-react";
 import { create } from "zustand";
 
+import Debug from "@/view/components/workspace/debug";
 import LayerManager from "@/view/components/workspace/layerManager";
 import TilemapEditor from "@/view/components/workspace/tilemapEditor";
 import TilesetView from "@/view/components/workspace/tilesetView";
@@ -34,6 +35,8 @@ export const useWorkspaceDockStore = create<WorkspaceState>((set, get) => {
 					return <LayerManager />;
                 case "tilemapEditor":
                     return <TilemapEditor />
+                case "debug":
+                    return <Debug />
 				default:
 					return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 			}

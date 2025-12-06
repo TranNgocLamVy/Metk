@@ -1,61 +1,49 @@
-import EventEmitter from "eventemitter3";
 import { v4 as uuidv4 } from "uuid";
 
-import { DialogService } from "@/shared/services/dialogService";
+import { ToastService } from "@/shared/services/toastService";
 import { Result, ResultStatus } from "@/shared/types/result";
-import { useProjectManagerStore } from "@/view/stores/project/projectManagerStore";
-import { exists, mkdir } from "@tauri-apps/plugin-fs";
+import { mkdir } from "@tauri-apps/plugin-fs";
 
+import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
+import { PROJECT_FILE_NAME } from "../constance/project";
 import { IProjectRepository } from "../interface/IProjectRepository";
 import { IProjectStorageService } from "../interface/IProjectStorageService";
-import { Project } from "../models/project";
-import { ProjectMetaData } from "../schema/projectSchema";
+import { Project } from "./project";
 
-export type ProjectEventType = {
-    projectsUpdated: () => void;
-    projectOpen: (project: ProjectMetaData) => void;
-}
-
-const PROJECT_FILE_NAME = "project.json";
-
-export class ProjectManager extends EventEmitter<ProjectEventType> {
-    private projectRepo: IProjectRepository;
-    private projectStorageService: IProjectStorageService;
-
+export class ProjectManager {
     public currentProject: Project | null = null;
-    public projects: Project[] = [];
 
-    public constructor(projectRepo: IProjectRepository, projectStorageService: IProjectStorageService) {
-        super();
-        this.projectRepo = projectRepo;
-        this.projectStorageService = projectStorageService;
+    public projectMetaDataMap: Map<string, ProjectMetaData> = new Map<string, ProjectMetaData>(); // id -> metaData
+    public get projectMetaData (): ProjectMetaData[] {
+        return Array.from(this.projectMetaDataMap.values()).map((metaData) => {
+            const project = this.projectMap.get(metaData.id);
+            if (!project) return metaData;
+            return project.metaData;
+        });
     }
+    public projectMap: Map<string, Project> = new Map<string, Project>(); // id -> project
+
+    public constructor(
+        private readonly projectRepo: IProjectRepository, 
+        private readonly projectStorageService: IProjectStorageService
+    ) {}
 
     public async load() {
         const projectsMetaData = await this.projectRepo.loadAll();
-        const projects = await Promise.all(projectsMetaData.map(async (metaData) => {
+        await Promise.all(projectsMetaData.map(async (metaData) => {
             const projectData = await this.projectStorageService.loadProject(metaData.directory + "\\" + PROJECT_FILE_NAME);
-            if (!projectData) return null;
-            const project = new Project(projectData, metaData.directory);
-            return project;
-        }));
-        projects.forEach((p) => { 
-            if (p) {
-                this.projects.push(p)
-                useProjectManagerStore.getState().addProject(p);
+            if (!projectData) {
+                this.projectMetaDataMap.set(metaData.id, metaData);
+            } else {
+                const project = new Project(projectData, metaData.directory, this.projectStorageService);
+                this.projectMetaDataMap.set(project.metaData.id, project.metaData);
+                this.projectMap.set(project.metaData.id, project);
             }
-        })
-        this.save();
-    }
-
-    public async addProject(project: Project) {
-        this.projects.push(project);
-        this.save();
-        useProjectManagerStore.getState().addProject(project);
+        }));
     }
 
     public async save() {
-        this.projectRepo.saveAll(this.projects.map((p) => p.metaData));
+        this.projectRepo.saveAll(Array.from(this.projectMetaDataMap.values()));
     }
 
     public async saveCurrrentProject() {
@@ -65,78 +53,55 @@ export class ProjectManager extends EventEmitter<ProjectEventType> {
         await this.projectStorageService.saveProject(project.metaData.directory + "\\" + PROJECT_FILE_NAME, projectData);
     }
 
-    public async createProject(): Promise<Result> {
-        const form = await DialogService.openFormDialog({
-            title: "Create new Project",
-            okText: "Create",
-            cancelText: "Cancel",
-            inputs: [
-                {
-                    id: "name",
-                    name: "name",
-                    type: "text",
-                    label: "Project Name",
-                    placeholder: "Your Tile Project",
-                    required: true,
-                },
-                {
-                    id: "destination",
-                    name: "destination",
-                    type: "folderPath",
-                    label: "Destination",
-                    placeholder: "Select a folder",
-                    required: true,
-                }
-            ],
-            async validateBeforeSubmit(values) {
-                const path = values.destination + "\\" + values.name;
-                const isExists = await exists(path);
+    public async createProject(name: string, destination: string): Promise<Result<Project>> {
+        const fullDirectory = destination + "\\" + name;
 
-                if (isExists) {
-                    return { valid: false, message: `Folder with name "${values.name}" already exists at "${values.destination}"` }
-                }
-
-                return { valid: true }
-            },
-        })
-        if (!form) return { status: ResultStatus.Cancel };
-
-        const fullDirectory = form.destination + "\\" + form.name;
-        await mkdir(fullDirectory);
-        const project = new Project({
+        try {   
+            await mkdir(fullDirectory);
+        } catch (error) {
+            return { status: ResultStatus.Error, message: "Failed to create project" };
+        }
+        
+        const projectData: ProjectData = {
             id: uuidv4(),
-            name: form.name,
+            name: name,
             version: "0.1.0",
             description: "",
             createdAt: new Date().toDateString(),
             updatedAt: new Date().toDateString(),
-            tilemapPaths: [],
-            tilesetPaths: [],
-        }, fullDirectory);
+            tilemaps: [],
+            tilesets: [],
+        };
 
+        const project = new Project(projectData, fullDirectory, this.projectStorageService);
         await this.projectStorageService.saveProject(fullDirectory + "\\" + PROJECT_FILE_NAME, project.serialize());
-        this.addProject(project);
-        return { status: ResultStatus.Success };
+
+        this.projectMetaDataMap.set(project.metaData.id, project.metaData);
+        this.projectMap.set(project.metaData.id, project);
+        this.save();
+
+        return { status: ResultStatus.Success, data: project };
     }
 
-    public async openProject(filePath: string): Promise<Result> {
-        const projectData = await this.projectStorageService.loadProject(filePath);
-        if (!projectData) return { status: ResultStatus.Cancel };
-        const directory = filePath.split("\\").slice(0, -1).join("\\");
-        const project = new Project(projectData, directory);
-        this.addProject(project);
-        return await this.setCurrentProject(project.metaData.id);
-    }
+    // public async openProject(filePath: string): Promise<Result<any>> {
+    //     const projectData = await this.projectStorageService.loadProject(filePath);
+    //     if (!projectData) return { status: ResultStatus.Cancel };
+    //     const directory = filePath.split("\\").slice(0, -1).join("\\");
+    //     const project = new Project(projectData, directory, this.projectStorageService);
+    //     return await this.loadProject(project.metaData.id);
+    // }
 
-    public async setCurrentProject(id: string): Promise<Result> {
-        const project = this.projects.find((p) => p.metaData.id === id);
-        if (!project) return { status: ResultStatus.Cancel };
-        if (this.currentProject) {
-            await this.currentProject.unload();
+    public async loadProject(id: string): Promise<Result<Project>> {
+        const project = this.projectMap.get(id);
+        if (project) {
+            if (this.currentProject) {
+                await this.currentProject.unload();
+            }
+            this.currentProject = project;
+            await this.currentProject.load();
+            return { status: ResultStatus.Success, data: this.currentProject };
         }
-        this.currentProject = project;
-        await this.currentProject.load();
-        this.emit("projectOpen", project.metaData);
-        return { status: ResultStatus.Success };
+        ToastService.error({ message: "Project not found" });
+        return { status: ResultStatus.Cancel };
     }
 }

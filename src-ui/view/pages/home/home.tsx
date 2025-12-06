@@ -1,43 +1,26 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-import { Appcore } from "@/core/appcore";
+import { AppCore } from "@/core/appcore";
+import { ProjectService } from "@/shared/services/projectService";
 import { HStack, VStack } from "@/view/components/custom/stack/stack";
 import { Button } from "@/view/components/shadcn/button";
 import { Separator } from "@/view/components/shadcn/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/view/components/shadcn/tooltip";
-import { useProjectManagerStore } from "@/view/stores/project/projectManagerStore";
+import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
 
 export default function HomePage() {
-    const navigate = useNavigate();
-
-	const projects = useProjectManagerStore((s) => s.projects);
-
-	const createProject = () => {
-        Appcore.getInstance().projectManager.createProject();
-	};
-
-    const setCurrentProject = async (id: string) => {
-        const result = await Appcore.getInstance().projectManager.setCurrentProject(id);
-        if (result.status == "Success") {
-            navigate("/project/" + id);
-        }
-    }
-
-    const openProject = () => {
-        
-    }
+	const projects = useProjectManagerStore((s) => s.projects).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
 	return (
 		<VStack align="start" justify="start" className="w-full h-full p-16 gap-8">
 			<h1 className="text-3xl font-bold">Welcome to MEtk</h1>
 			<Separator />
 			<HStack className="w-full h-fit gap-8">
-				<Button variant={"outline"}>
+				<Button variant={"outline"} >
 					<SquareArrowOutUpRight />
 					Open Project
 				</Button>
-				<Button variant={"outline"} onClick={createProject}>
+				<Button variant={"outline"} onClick={ProjectService.createProject}>
 					<FolderPlus />
 					New Project
 				</Button>
@@ -48,23 +31,24 @@ export default function HomePage() {
 			</VStack>
 			<VStack className="gap-4">
 				{projects.map((project) => {
+                    const notFound = AppCore.getIns().projectManager.projectMap.get(project.id) ? false : true;
 					return (
-						<HStack align="center" justify="start" key={project.metaData.id} className="gap-4">
+						<HStack align="center" justify="start" key={project.id} className="gap-4">
 							<Tooltip>
 								<TooltipTrigger asChild>
-                                    <Button onClick={() => setCurrentProject(project.metaData.id)}>
+                                    <Button onClick={() => ProjectService.loadProject(project.id)}>
                                         <SquareArrowOutUpRight size={20} />
-										{project.metaData.name}
+										{project.name}
                                     </Button>
 								</TooltipTrigger>
                                 <TooltipContent side="left">
-                                    {project.metaData.description ? <p>{`Description: ${project.metaData.description}`}</p> : null}
-                                    <p>{`Version: ${project.metaData.version}`}</p>
-                                    <p>{`Created At: ${new Date(project.metaData.createdAt).toLocaleString()}`}</p>
-                                    <p>{`Updated At: ${new Date(project.metaData.updatedAt).toLocaleString()}`}</p>
+                                    {project.description ? <p>{`Description: ${project.description}`}</p> : null}
+                                    <p>{`Version: ${project.version}`}</p>
+                                    <p>{`Created At: ${new Date(project.createdAt).toLocaleString()}`}</p>
+                                    <p>{`Updated At: ${new Date(project.updatedAt).toLocaleString()}`}</p>
                                 </TooltipContent>
 							</Tooltip>
-							<h3 className="text-xs cursor-default">{project.metaData.directory}</h3>
+							<h3 className={`text-xs cursor-default ${notFound ? "line-through" : ""}`}>{project.directory}</h3>
 						</HStack>
 					);
 				})}

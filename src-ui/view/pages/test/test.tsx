@@ -1,6 +1,6 @@
 // import { useEffect } from "react";
 
-// import { Appcore } from "@/core/appcore";
+// import { AppCore } from "@/core/appcore";
 // import { Project } from "@/core/models/project";
 // import { ProjectData } from "@/core/schema/projectSchema";
 // import { HStack, VStack } from "@/view/components/custom/stack/stack";

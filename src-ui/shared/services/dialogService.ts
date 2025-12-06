@@ -10,4 +10,8 @@ export class DialogService {
     public static async openFormDialog<const I extends readonly Field[]>(opts: FormDialogOptions<I>): Promise<Simplify<ShapeFromInputs<I>> | null> {
         return useDialogStore.getState().openFormDialog(opts);
     }
+
+    public static createForm<const I extends readonly Field[]>(opts: FormDialogOptions<I>) {
+        return opts;
+    }
 }

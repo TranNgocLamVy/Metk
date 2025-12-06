@@ -61,7 +61,7 @@ const workspaceBorderNodes: IJsonBorderNode[] = [
                 type: "tab",
                 name: "Debug",
                 id: "Debug",
-                component: "Debug",
+                component: "debug",
                 enableDrag: false,
                 enableClose: false,
                 helpText: "Debug",
