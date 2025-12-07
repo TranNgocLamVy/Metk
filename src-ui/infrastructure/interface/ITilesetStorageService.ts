@@ -12,8 +12,8 @@ export interface ITilesetStorageService {
 
     /**
      * Save Tileset to file using filePath
-     * @param tilsetRelPath relative path from projectDir
+     * @param tilesetRelPath relative path from projectDir
      * @param content Tileset data
      */
-    saveTileset(tilesetRelPath: string, content: any): Promise<Result>;
+    saveTileset(tilesetRelPath: string, content: TilesetData): Promise<Result>;
 }

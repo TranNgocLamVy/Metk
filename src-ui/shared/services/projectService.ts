@@ -5,7 +5,7 @@ import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 import { exists } from "@tauri-apps/plugin-fs";
 
 import { Result } from "../types/result";
-import { DialogService } from "./dialogService";
+import { FormService } from "./formService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
 
@@ -27,7 +27,7 @@ export class ProjectService {
     }
 
     public static async createProject(): Promise<void> {
-        const form = await DialogService.openFormDialog(createProjectForm);
+        const form = await FormService.openFormDialog(createProjectForm);
 
         if (!form) return;
 

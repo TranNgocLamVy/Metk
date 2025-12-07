@@ -1,8 +1,8 @@
-import { DialogService } from "@/shared/services/dialogService";
+import { FormService } from "@/shared/services/formService";
 
-export const createTilesetForm = DialogService.createForm({
+export const createTilesetForm = FormService.createForm({
     title: "Create new Tileset",
-    okText: "Create",
+    okText: "Save As",
     cancelText: "Cancel",
     size: "md",
     inputs: [
@@ -18,13 +18,6 @@ export const createTilesetForm = DialogService.createForm({
                     type: "text",
                     label: "Map Name",
                     placeholder: "Your Tileset",
-                    required: true,
-                },
-                {
-                    id: "destination",
-                    name: "destination",
-                    type: "folderPath",
-                    label: "Destination",
                     required: true,
                 }
             ]

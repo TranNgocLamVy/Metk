@@ -1,7 +1,7 @@
-import { DialogService } from "@/shared/services/dialogService";
+import { FormService } from "@/shared/services/formService";
 import { exists } from "@tauri-apps/plugin-fs";
 
-export const createProjectForm = DialogService.createForm({
+export const createProjectForm = FormService.createForm({
     title: "Create new Project",
     okText: "Create",
     cancelText: "Cancel",

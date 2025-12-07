@@ -1,4 +1,5 @@
 import { type } from "arktype";
+import stringify from "json-stringify-pretty-compact";
 
 import { IProjectRepository } from "@/infrastructure/interface/IProjectRepository";
 import { ProjectMetaData, ProjectRepoSchema } from "@/shared/schema/projectSchema";
@@ -33,6 +34,7 @@ export class JsonProjectRepository implements IProjectRepository {
     }
 
     public async saveAll(content: ProjectMetaData[]): Promise<void> {
-        await writeTextFile(this.filename, JSON.stringify(content), { baseDir: this.baseDir });
+        const stringContext = stringify(content, { maxLength: 80, indent: 2 })
+        await writeTextFile(this.filename, stringContext, { baseDir: this.baseDir });
     }
 }

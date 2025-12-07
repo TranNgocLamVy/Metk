@@ -1,15 +1,15 @@
 import { ImageSource, Texture } from "pixi.js";
 
 import { Result } from "@/shared/types/result";
-import { join } from "@tauri-apps/api/path";
 import { exists, readFile } from "@tauri-apps/plugin-fs";
 
-export class TextureService {
+import { PathUtils } from "../shared/utils/pathUtils";
 
+export class TextureService {
     constructor(public tilesetDir: string) { }
 
     public async loadTexture(textureRelPath: string): Promise<Result<Texture | null>> {
-        const textureAbsPath = await join(this.tilesetDir, textureRelPath);
+        const textureAbsPath = PathUtils.join(this.tilesetDir, textureRelPath);
         const exist = await exists(textureAbsPath);
         if (!exist) return { status: "Error", message: `Texture file not found at ${textureAbsPath}`, data: null };
         try {

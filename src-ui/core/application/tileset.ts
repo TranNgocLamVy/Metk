@@ -1,6 +1,6 @@
 import { Texture } from "pixi.js";
 
-import { BaseObject } from "@/core/application/baseObject";
+import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
 import { TextureService } from "@/infrastructure/textureService";
 import { TileData, TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
@@ -10,18 +10,17 @@ const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
     texture.destroy();
 });
 
-export class Tileset extends BaseObject {
+interface TilesetEvent extends BaseObjectEvents {
+
+}
+
+export class Tileset extends BaseObject<TilesetEvent> {
     public id: string;
     public name: string;
     public columns: number;
     public rows: number;
     public tilewidth: number;
     public tileheight: number;
-    public grid?: {
-        orientation: "orthogonal" | "isometric";
-        width: number;
-        height: number;
-    }
     public tiles: Tile[] = [];
 
     public image: {
@@ -32,7 +31,7 @@ export class Tileset extends BaseObject {
     public texture: Texture;
     public isTextureLoaded: boolean = false;
 
-    constructor(tilesetData: TilesetData, private textureService: TextureService) {
+    constructor(tilesetData: TilesetData, public readonly textureService: TextureService) {
         super();
         this.id = tilesetData.id;
         this.name = tilesetData.name;
@@ -41,16 +40,15 @@ export class Tileset extends BaseObject {
         this.tilewidth = tilesetData.tilewidth;
         this.tileheight = tilesetData.tileheight;
         this.image = tilesetData.image;
-        this.grid = tilesetData.grid;
 
         const numberOfTiles = this.columns * this.rows;
-        if (tilesetData.tile.length > 0) {
-            this.tiles = tilesetData.tile.map(tileData => {
-                return new Tile(tileData);
+        if (tilesetData.tiles.length > 0) {
+            this.tiles = tilesetData.tiles.map(tileData => {
+                return new Tile(tileData, this);
             });
         } else {
             this.tiles = Array.from({ length: numberOfTiles }, (_, index) => {
-                return new Tile({ id: index });
+                return new Tile({ id: index }, this);
             });
         }
     }
@@ -64,7 +62,7 @@ export class Tileset extends BaseObject {
             tilewidth: this.tilewidth,
             tileheight: this.tileheight,
             image: this.image,
-            tile: this.tiles.map(tile => tile.serialize()),
+            tiles: this.tiles.map(tile => tile.serialize()),
         }
     }
 
@@ -74,7 +72,7 @@ export class Tileset extends BaseObject {
 
     public async rename(name: string): Promise<Result> {
         this.name = name;
-        this.emit(BaseObject.event.UpdateProperty);
+        this.eventEmitter.emit("updateProperty", "name", this.name);
         return { status: ResultStatus.Success, data: null };
     }
 
@@ -123,19 +121,17 @@ export class Tile extends BaseObject {
     public id: number;
     protected texture: Texture;
     public isTextureLoaded: boolean = false;
+    public tileset: Tileset;
 
-    constructor(tileData: TileData) {
+    constructor(tileData: TileData, tileset: Tileset) {
         super();
         this.id = tileData.id;
+        this.tileset = tileset;
     }
 
     public serialize(): TileData {
         return {
             id: this.id,
-            // x: this.x,
-            // y: this.y,
-            // width: this.width,
-            // height: this.height,
         }
     }
 

@@ -2,7 +2,7 @@ import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/ty
 import { PermissionDialogOptions } from "@/shared/types/dialogs/permissionDialog";
 import { useDialogStore } from "@/view/stores/menu/dialogStore";
 
-export class DialogService {
+export class FormService {
     public static async openPermissionDialog(opts: PermissionDialogOptions): Promise<boolean> {
         return useDialogStore.getState().openPermissionDialog(opts);
     }

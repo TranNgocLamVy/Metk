@@ -2,13 +2,14 @@
 
 import { Result } from "@/shared/types/result";
 
-export abstract class BaseObject extends EventEmitter {
+export interface BaseObjectEvents {
+    updateProperty: (key: string, value: any) => void
+}
+
+export abstract class BaseObject<T extends BaseObjectEvents = BaseObjectEvents> {
     public properties: Map<string, any>;
-    public static event = {
-        UpdateProperty: "UpdateProperty"
-    }
+    public eventEmitter: EventEmitter<T> = new EventEmitter<T>();
     constructor() {
-        super();
         const cls = this.constructor as any;
         this.properties = cls.properties ? new Map(cls.properties) : new Map();
     }
@@ -18,12 +19,12 @@ export abstract class BaseObject extends EventEmitter {
     }
 
     public async setProperty(key: string, value: any): Promise<Result> {
-        try {
-            (this as any)[key] = value;
-            this.emit(BaseObject.event.UpdateProperty);
-            return { status: "Success", data: null };
-        } catch (error) {
-            return { status: "Error", message: error as any };
-        }
+    try {
+        (this as any)[key] = value;
+        (this.eventEmitter as any).emit("updateProperty", { key, value });
+        return { status: "Success", data: null };
+    } catch (error) {
+        return { status: "Error", message: error as any };
     }
+}
 }
