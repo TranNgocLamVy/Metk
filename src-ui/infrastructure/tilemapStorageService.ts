@@ -1,9 +1,9 @@
 import { type } from "arktype";
-import stringify from "json-stringify-pretty-compact";
 
 import { ITilemapStorageService } from "@/infrastructure/interface/ITilemapStorageService";
 import { TilemapData, TilemapDataSchema } from "@/shared/schema/tilemapSchema";
 import { Result } from "@/shared/types/result";
+import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { PathUtils } from "@/shared/utils/pathUtils";
 import { create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
@@ -29,7 +29,8 @@ export class JsonTilemapStorageService implements ITilemapStorageService {
 
     public async saveTilemap(tilemapRelPath: string, content: TilemapData): Promise<Result> {
         const tilemapAbsPath = PathUtils.join(this.projectDir, tilemapRelPath);
-        const stringContent = stringify(content, { maxLength: 80, indent: 2 })
+        const stringContent = JsonFormatter.format(content);
+        if (!stringContent) return { status: "Error", message: "Error while formatting json" };
         const exist = await exists(tilemapAbsPath);
         if (exist) {
             await writeTextFile(tilemapAbsPath, stringContent);
