@@ -2,8 +2,8 @@ import { type } from "arktype";
 import { XMLParser } from "fast-xml-parser";
 import { v4 as uuidv4 } from "uuid";
 
-import { TilesetManager } from "@/core/application/tilesetManager";
-import { BaseObject } from "@/core/model/baseObject";
+import { BaseObject } from "@/core/application/baseObject";
+import { TilesetManager } from "@/core/manager/tilesetManager";
 import { ExternalTileset, TilemapData, TilemapSchema } from "@/shared/schema/tilemapSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
 import { join } from "@tauri-apps/api/path";

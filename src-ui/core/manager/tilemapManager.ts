@@ -1,9 +1,9 @@
-import { Tilemap } from "@/core/domain/tilemap";
 import { DialogService } from "@/shared/services/dialogService";
 import { Result } from "@/shared/types/result";
 
+import { ITilemapStorageService } from "../../infrastructure/interface/ITilemapStorageService";
 import { TilemapData } from "../../shared/schema/tilemapSchema";
-import { ITilemapStorageService } from "../interface/ITilemapStorageService";
+import { Tilemap } from "../application/tilemap";
 import { TilesetManager } from "./tilesetManager";
 
 export class TilemapManager {

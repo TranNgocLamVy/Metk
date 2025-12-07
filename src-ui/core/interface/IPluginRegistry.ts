@@ -1,4 +1,4 @@
-import { BaseCommand } from "../model/baseCommand";
+import { BaseCommand } from "../application/baseCommand";
 
 export interface IPluginRegistry {
     // registerTileMap(tileMap: typeof BaseTilemap): void;

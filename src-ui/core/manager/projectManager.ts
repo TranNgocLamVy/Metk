@@ -4,11 +4,11 @@ import { ToastService } from "@/shared/services/toastService";
 import { Result, ResultStatus } from "@/shared/types/result";
 import { mkdir } from "@tauri-apps/plugin-fs";
 
+import { IProjectRepository } from "../../infrastructure/interface/IProjectRepository";
+import { IProjectStorageService } from "../../infrastructure/interface/IProjectStorageService";
 import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
+import { Project } from "../application/project";
 import { PROJECT_FILE_NAME } from "../constance/project";
-import { IProjectRepository } from "../interface/IProjectRepository";
-import { IProjectStorageService } from "../interface/IProjectStorageService";
-import { Project } from "./project";
 
 export class ProjectManager {
     public currentProject: Project | null = null;

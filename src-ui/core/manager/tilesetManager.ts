@@ -1,11 +1,11 @@
-import { Tileset } from "@/core/domain/tileset";
 import { TextureService } from "@/infrastructure/textureService";
 import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
+import { ITilesetStorageService } from "../../infrastructure/interface/ITilesetStorageService";
 import { TilesetData, TilesetMetaData } from "../../shared/schema/tilesetSchema";
-import { ITilesetStorageService } from "../interface/ITilesetStorageService";
+import { Tileset } from "../application/tileset";
 
 export class TilesetManager {
     private tilesetMap: Map<string, Tileset> = new Map<string, Tileset>(); // id -> tileset

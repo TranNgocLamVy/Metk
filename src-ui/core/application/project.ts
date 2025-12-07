@@ -6,12 +6,12 @@ import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
+import { IProjectStorageService } from "../../infrastructure/interface/IProjectStorageService";
 import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
 import { PROJECT_FILE_NAME } from "../constance/project";
-import { Tileset } from "../domain/tileset";
-import { IProjectStorageService } from "../interface/IProjectStorageService";
-import { TilemapManager } from "./tilemapManager";
-import { TilesetManager } from "./tilesetManager";
+import { TilemapManager } from "../manager/tilemapManager";
+import { TilesetManager } from "../manager/tilesetManager";
+import { Tileset } from "./tileset";
 
 export class Project {
     public metaData: ProjectMetaData;

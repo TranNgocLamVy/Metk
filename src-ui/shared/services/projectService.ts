@@ -1,5 +1,5 @@
 import { AppCore } from "@/core/appcore";
-import { createProjectForm } from "@/view/form/projectForm";
+import { createProjectForm } from "@/view/components/form/projectForm";
 import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 import { exists } from "@tauri-apps/plugin-fs";
