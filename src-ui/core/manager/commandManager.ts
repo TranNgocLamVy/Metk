@@ -1,7 +1,7 @@
 
 // import { CommandRegistry } from "@/appcore/registries/command-registry";
 
-import { BaseCommand, CommandContext } from "../model/baseCommand";
+import { BaseCommand, CommandContext } from "../application/baseCommand";
 
 export class CommandManager {
     private currentCommand: BaseCommand;

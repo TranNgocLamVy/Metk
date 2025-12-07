@@ -4,7 +4,7 @@ import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
 
 import { Project } from "./application/project";
-import { ProjectManager } from "./application/projectManager";
+import { ProjectManager } from "./manager/projectManager";
 
 export class AppCore {
     private static _instance: AppCore;

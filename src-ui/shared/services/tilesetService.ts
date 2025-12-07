@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { AppCore } from "@/core/appcore";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
-import { createTilesetForm } from "@/view/form/tilesetForm";
+import { createTilesetForm } from "@/view/components/form/tilesetForm";
 import { useTilesetViewStore } from "@/view/stores/application/tilesetViewStore";
 
 import { PathUtils } from "../utils/pathUtils";

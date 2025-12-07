@@ -1,11 +1,9 @@
 import { Texture } from "pixi.js";
-import { v4 as uuidv4 } from "uuid";
 
-import { BaseObject } from "@/core/model/baseObject";
+import { BaseObject } from "@/core/application/baseObject";
 import { TextureService } from "@/infrastructure/textureService";
 import { TileData, TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
-import { PathUtils } from "@/shared/utils/pathUtils";
 import { TextureUtils } from "@/shared/utils/textureUtils";
 
 const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {

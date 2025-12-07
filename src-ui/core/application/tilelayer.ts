@@ -1,4 +1,4 @@
-import { BaseObject } from "@/core/model/baseObject";
+import { BaseObject } from "@/core/application/baseObject";
 import { TileLayerData } from "@/shared/schema/tilemapSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
 

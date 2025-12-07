@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-import { ITilesetStorageService } from "@/core/interface/ITilesetStorageService";
+import { ITilesetStorageService } from "@/infrastructure/interface/ITilesetStorageService";
 import { TilesetData, tilesetDataSchema } from "@/shared/schema/tilesetSchema";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";

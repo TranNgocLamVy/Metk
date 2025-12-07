@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-import { ITilemapStorageService } from "@/core/interface/ITilemapStorageService";
+import { ITilemapStorageService } from "@/infrastructure/interface/ITilemapStorageService";
 import { TilemapData, TilemapDataSchema } from "@/shared/schema/tilemapSchema";
 import { Result } from "@/shared/types/result";
 import { exists, readTextFile } from "@tauri-apps/plugin-fs";

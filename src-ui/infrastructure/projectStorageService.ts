@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-import { IProjectStorageService } from "@/core/interface/IProjectStorageService";
+import { IProjectStorageService } from "@/infrastructure/interface/IProjectStorageService";
 import { ProjectData, ProjectDataSchema } from "@/shared/schema/projectSchema";
 import { create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
