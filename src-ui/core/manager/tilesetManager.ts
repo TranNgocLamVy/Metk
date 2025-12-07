@@ -12,10 +12,10 @@ export class TilesetManager {
 
     public constructor(
         private readonly tilesetStorageService: ITilesetStorageService,
-        private tilesetsMetaData: TilesetMetaData[] = []
+        private tilesetsMetaData: TilesetMetaData[]
     ) { }
 
-    public gettilesetsMetaData(): TilesetMetaData[] {
+    public getTilesetsMetaData(): TilesetMetaData[] {
         return this.tilesetsMetaData.map((metaData) => {
             const tileset = this.tilesetMap.get(metaData.id);
             if (!tileset) return metaData;
@@ -28,13 +28,15 @@ export class TilesetManager {
             const loadTilesetResult = await this.tilesetStorageService.loadTileset(metaData.tilesetRelPath);
             if (loadTilesetResult.status === "Success") {
                 const tilesetData = loadTilesetResult.data;
+
                 const tilesetAbsPath = PathUtils.join(this.tilesetStorageService.projectDir, metaData.tilesetRelPath);
                 const tilesetDir = PathUtils.dirname(tilesetAbsPath);
                 const textureService = new TextureService(tilesetDir)
+
                 const newTileset = new Tileset(tilesetData, textureService);
                 await newTileset.loadTexture();
                 this.tilesetMap.set(tilesetData.id, newTileset);
-                this.tilesetsMetaData.push(metaData);
+                
                 await this.saveTileset(newTileset.id);
             } else if (loadTilesetResult.status === "Error") {
                 ToastService.error({ message: loadTilesetResult.message });
@@ -44,7 +46,6 @@ export class TilesetManager {
 
     public async saveTileset(id: string): Promise<Result> {
         const tileset = this.tilesetMap.get(id);
-        if (tileset == null) return { status: "Error", message: "Tileset not loaded" };
         if (tileset == undefined) return { status: "Error", message: "Tileset not found" };
 
         const tilesetRelPath = this.tilesetsMetaData.find(metaData => metaData.id === id)?.tilesetRelPath;
@@ -59,14 +60,28 @@ export class TilesetManager {
         }
     }
 
-    public async getTileset(id: string): Promise<Tileset | null> {
+    public getTilesetById(id: string): Result<Tileset> {
         const tileset = this.tilesetMap.get(id);
-        if (tileset === undefined) return null;
-        return tileset;
+        if (tileset === undefined) return { status: "Error", message: "Tileset not found" };
+        return { status: "Success", data: tileset };
     }
 
-    public async getAllTilesets(): Promise<Tileset[]> {
+    public getTilesetByRelPath(relPath: string): Result<Tileset> {
+        const tilesetMetaData = this.tilesetsMetaData.find(metaData => metaData.tilesetRelPath === relPath);
+        if (!tilesetMetaData) return { status: "Error", message: "Tileset meta data not found" };
+        const tileset = this.tilesetMap.get(tilesetMetaData.id);
+        if (tileset === undefined) return { status: "Error", message: "Tileset not found" };
+        return { status: "Success", data: tileset };
+    }
+
+    public getAllTilesets(): Tileset[] {
         return Array.from(this.tilesetMap.values());
+    }
+
+    public getTilesetPathById(id: string): string | null {
+        const tilesetMetaData = this.tilesetsMetaData.find(metaData => metaData.id === id);
+        if (!tilesetMetaData) return null;
+        return tilesetMetaData.tilesetRelPath;
     }
 
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {

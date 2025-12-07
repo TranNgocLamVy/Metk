@@ -1,73 +1,53 @@
 import { type } from "arktype";
 
+const tileRefDataSchema = type({
+    tileId: type("number"),
+    tilesetId: type("string"),
+})
+export type TileRefData = typeof tileRefDataSchema.infer;
+
+const TilelayerDataSchema = type({
+    id: type("string"),
+    name: type("string"),
+    x: type("number").optional(),
+    y: type("number").optional(),
+    width: type("number"),
+    height: type("number"),
+    opacity: type("number").default(1),
+    visible: type("boolean").default(true),
+    locked: type("boolean").default(false),
+    offsetx: type("number").default(0),
+    offsety: type("number").default(0),
+    tilesData: tileRefDataSchema.array().default(() => []),
+})
+export type TileLayerData = typeof TilelayerDataSchema.infer;
+
 export const TilemapMetaDataSchema = type({
+    id: type("string"),
     name: type("string"),
     tilemapRelPath: type("string"),
 })
 export type TilemapMetaData = typeof TilemapMetaDataSchema.infer
 
-const TileDataSchema = type({
-    encoding: type("'csv'"),
-    "#text": type("string"),
-})
-const TilelayerDataSchema = type({
+export const TilesetRefDataSchema = type({
+    source: type("string"),
     id: type("string"),
     name: type("string"),
-    class: type("string").optional(),
-    x: type("string.numeric.parse").optional(),
-    y: type("string.numeric.parse").optional(),
-    width: type("string.numeric.parse"),
-    height: type("string.numeric.parse"),
-    opacity: type("string.numeric.parse").default("1"),
-    visible: type("string.numeric.parse").default("1"),
-    locked: type("string.numeric.parse").default("0"),
-    offsetx: type("string.numeric.parse").default("0"),
-    offsety: type("string.numeric.parse").default("0"),
-
-    // For hexagonal maps (Unused at the moment)
-    parallaxx: type("string.numeric.parse").optional(),
-    parallaxy: type("string.numeric.parse").optional(),
-
-    data: TileDataSchema,
 })
-export type TileLayerData = typeof TilelayerDataSchema.infer;
+export type TilesetRefData = typeof TilesetRefDataSchema.infer
 
-const externalTilesetDataSchema = type({
-    source: type("string"),
-})
-export type ExternalTileset = typeof externalTilesetDataSchema.infer;
-
-export const TilemapDataSchema = type({
+export const TilemapDataSchema = type("string.json.parse").to({
+    id: type("string"),
     name: type("string"),
-    height: type("string.numeric.parse"),
-    width: type("string.numeric.parse"),
-    tilewidth: type("string.numeric.parse"),
-    tileheight: type("string.numeric.parse"),
+    height: type("number"),
+    width: type("number"),
+    tilewidth: type("number"),
+    tileheight: type("number"),
     infinite: type("boolean").optional(),
     backgroundcolor: type("string").optional(),
-    nextlayerid: type("string.numeric.parse").optional(),
-    nextobjectid: type("string.numeric.parse").optional(),
-    staggeraxis: type("string").optional(),
-    staggerindex: type("string").optional(),
-    compressionlevel: type("string.numeric.parse").optional(),
-    hexsidelength: type("string.numeric.parse").optional(),
-    parallaxoriginx: type("string.numeric.parse").optional(),
-    parallaxoriginy: type("string.numeric.parse").optional(),
-    tileset: externalTilesetDataSchema.array().default(() => []),
-    layer: type("object | object[]").pipe((layer) => {
-        if (Array.isArray(layer)) {
-            return layer.map(layerData => {
-                return TilelayerDataSchema(layerData);
-            })
-        }
-        return [TilelayerDataSchema(layer)];
-    }).default(() => []),
+    nextlayerid: type("number").optional(),
+    nextobjectid: type("number").optional(),
+    tileset: TilesetRefDataSchema.array().default(() => []),
+    layers: TilelayerDataSchema.array().default(() => []),
 })
 export type TilemapData = typeof TilemapDataSchema.infer;
-
-
-
-export const TilemapSchema = type({
-    "map": TilemapDataSchema
-})
-export type Tilemap = typeof TilemapSchema.infer;

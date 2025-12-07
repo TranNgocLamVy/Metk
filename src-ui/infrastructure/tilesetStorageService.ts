@@ -1,4 +1,5 @@
 import { type } from "arktype";
+import stringify from "json-stringify-pretty-compact";
 
 import { ITilesetStorageService } from "@/infrastructure/interface/ITilesetStorageService";
 import { TilesetData, tilesetDataSchema } from "@/shared/schema/tilesetSchema";
@@ -7,7 +8,7 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 import { create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 export class JsonTilesetStorageService implements ITilesetStorageService {
-    constructor(public readonly projectDir: string) { }
+    constructor(public projectDir: string) { }
 
     public async loadTileset(tilesetRelPath: string): Promise<Result<TilesetData>> {
         const tilesetAbsPath = await PathUtils.join(this.projectDir, tilesetRelPath);
@@ -26,14 +27,15 @@ export class JsonTilesetStorageService implements ITilesetStorageService {
         return { status: "Success", data: tilesetData };
     }
 
-    public async saveTileset(tilesetRelPath: string, content: any): Promise<Result> {
-        const fullTilesetPath = await PathUtils.join(this.projectDir, tilesetRelPath);
-        const exist = await exists(fullTilesetPath);
+    public async saveTileset(tilesetRelPath: string, content: TilesetData): Promise<Result> {
+        const tilesetAbsPath = await PathUtils.join(this.projectDir, tilesetRelPath);
+        const stringContent = stringify(content, { maxLength: 80, indent: 2 })
+        const exist = await exists(tilesetAbsPath);
         if (exist) {
-            await writeTextFile(fullTilesetPath, JSON.stringify(content));
+            await writeTextFile(tilesetAbsPath, stringContent);
         } else {
-            const file = await create(fullTilesetPath);
-            await file.write(new TextEncoder().encode(JSON.stringify(content)));
+            const file = await create(tilesetAbsPath);
+            await file.write(new TextEncoder().encode(stringContent));
             await file.close();
         }
 

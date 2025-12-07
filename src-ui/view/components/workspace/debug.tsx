@@ -1,18 +1,16 @@
+
+import { v1 as uuidv1 } from "uuid";
+
+import { AppCore } from "@/core/appcore";
 import { ToastService } from "@/shared/services/toastService";
-import { FileDialogUtils } from "@/shared/utils/fileDialogUtils";
-import { PathUtils } from "@/shared/utils/pathUtils";
-import { readTextFile } from "@tauri-apps/plugin-fs";
 
 import { HStack, VStack } from "../custom/stack/stack";
 import { Button } from "../shadcn/button";
 
 export default function Debug() {
 	const testPath = async () => {
-		const path1 = "C:/Users/Project/maps";
-        const path2 = "test"
-        const extension = ".json"
-		const result = PathUtils.join(path1, path2)
-        ToastService.success({ message: result });
+        const project = AppCore.getIns().getCurrentProject();
+        console.log(project)
 	};
 
 	return (

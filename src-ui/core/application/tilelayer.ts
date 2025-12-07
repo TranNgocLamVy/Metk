@@ -1,12 +1,16 @@
-import { BaseObject } from "@/core/application/baseObject";
-import { TileLayerData } from "@/shared/schema/tilemapSchema";
+import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
+import { TileLayerData, TileRefData } from "@/shared/schema/tilemapSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
 
-export class TileLayer extends BaseObject {
+interface TilelayerEvents extends BaseObjectEvents {
+    tileChanged: (x: number, y: number) => void
+}
+
+export class TileLayer extends BaseObject<TilelayerEvents> {
     public id: string;
     protected name: string;
 
-    public tiles: TileData[][] = [];
+    public tilesRef: TileRef[] = [];
 
     public layerClass: string;
     public coordinate: { x: number, y: number } = { x: 0, y: 0 };
@@ -15,11 +19,6 @@ export class TileLayer extends BaseObject {
     public opacity: number = 1;
     public visible: boolean = true;
     public locked: boolean = false;
-
-    public static event = {
-        ...BaseObject.event,
-        TileChanged: "TileChanged"
-    }
 
     constructor(tileLayerData: TileLayerData) {
         super();
@@ -30,33 +29,31 @@ export class TileLayer extends BaseObject {
         this.size.width = tileLayerData.width;
         this.size.height = tileLayerData.height;
         this.opacity = tileLayerData.opacity ?? 1;
-        this.visible = tileLayerData.visible != 0 ? true : false;
-        this.locked = tileLayerData.locked != 0 ? true : false;
+        this.visible = tileLayerData.visible;
+        this.locked = tileLayerData.locked;
         this.offset.x = tileLayerData.offsetx ?? 0;
         this.offset.y = tileLayerData.offsety ?? 0;
 
-        if (tileLayerData.data.encoding === "csv") {
-            const total = this.size.width * this.size.height;
+        tileLayerData.tilesData.forEach((tileRefData) => {
+            const tileRef = new TileRef(tileRefData);
+            this.tilesRef.push(tileRef);
+        })
+    }
 
-            const raw = tileLayerData.data["#text"] ?? "";
-            const flat: number[] = raw.split(",").map(v => v.trim()).filter(v => v.length > 0).map(v => {
-                const n = Number(v);
-                return Number.isFinite(n) ? n : 0;
-            });
-
-            if (flat.length < total) {
-                flat.push(...Array(total - flat.length).fill(0));
-            }
-            const gids = flat.slice(0, total);
-            this.tiles = Array.from({ length: this.size.width }, () => new Array<TileData>(this.size.height));
-            for (let y = 0; y < this.size.height; y++) {
-                for (let x = 0; x < this.size.width; x++) {
-                    const i = y * this.size.width + x;
-                    const gid = gids[i] ?? 0;
-                    const tile = new TileData({ x, y }, gid);
-                    this.tiles[x][y] = tile;
-                }
-            }
+    public serialize(): TileLayerData {
+        return {
+            id: this.id,
+            name: this.name,
+            x: this.coordinate.x,
+            y: this.coordinate.y,
+            width: this.size.width,
+            height: this.size.height,
+            opacity: this.opacity,
+            visible: this.visible,
+            locked: this.locked,
+            offsetx: this.offset.x,
+            offsety: this.offset.y,
+            tilesData: this.tilesRef.map((tileRef) => tileRef.serialize()),
         }
     }
 
@@ -66,43 +63,63 @@ export class TileLayer extends BaseObject {
 
     public async rename(name: string): Promise<Result> {
         this.name = name;
-        this.emit(BaseObject.event.UpdateProperty);
+        this.eventEmitter.emit("updateProperty", "name", this.name);
         return { status: "Success", data: null };
     }
 
-    public getTileAt(position: { x: number, y: number }): TileData | null {
-        if (!this.tiles[position.x]) return null;
-        if (!this.tiles[position.x][position.y]) return null;
-        return this.tiles[position.x][position.y];
+    public getTileRefAt(coordinate: { x: number, y: number }): Result<TileRef> {
+        const tileRefIndex = coordinate.x * coordinate.y;
+        if (tileRefIndex >= this.tilesRef.length) return { status: "Error", message: "Tile not found, x is out of range" };
+        return { status: "Success", data: this.tilesRef[tileRefIndex] };
     }
 
-    public async setTileAt(coordinate: { x: number, y: number }, id: number): Promise<Result> {
-        const result = this.tiles[coordinate.x][coordinate.y].setId(id);
+    /**
+     * Get TileRefData at coordinate
+     * @param coordinate Coordinate of tileRef
+     * @param tile New Tile
+     * @returns Previous Tile in that coordinate, null mean empty
+     */
+    public setTileRefAt(coordinate: { x: number, y: number }, tile: TileRefData): Result<TileRefData> {
+        const tileRefIndex = coordinate.x * coordinate.y;
+        if (tileRefIndex >= this.tilesRef.length) return { status: "Error", message: "Tile not found, x is out of range" };
+        const result = this.tilesRef[tileRefIndex].setTile(tile);
         if (result.status === ResultStatus.Success) {
-            this.emit("TileChanged", { x: coordinate.x, y: coordinate.y });
+            this.eventEmitter.emit("tileChanged", coordinate.x, coordinate.y);
             return result;
         }
-        return { status: ResultStatus.Cancel };
+        return result;
     }
 }
 
-export class TileData {
-    private id: number;
-    private coordinate: { x: number, y: number };
+export class TileRef {
+    private tileId: number;
+    private tilesetId: string;
 
-    constructor(coordinate: { x: number, y: number }, id: number) {
-        this.coordinate = coordinate;
-        this.id = id;
-    }
+    constructor(tileData: TileRefData) {
+        this.tileId = tileData.tileId;
+        this.tilesetId = tileData.tilesetId;
 
-    public getCoordinate(): { x: number, y: number } {
-        return this.coordinate;
     }
-    public getId(): number {
-        return this.id;
+    public serialize(): TileRefData {
+        return {
+            tileId: this.tileId,
+            tilesetId: this.tilesetId,
+        }
     }
-    public setId(id: number): Result {
-        this.id = id;
-        return { status: "Success", data: null };
+    public setTile(newTileRefData: TileRefData): Result<TileRefData> {
+        const preTileRefData: TileRefData = {
+            tileId: this.tileId,
+            tilesetId: this.tilesetId,
+        }
+        this.tileId = newTileRefData.tileId;
+        this.tilesetId = newTileRefData.tilesetId;
+        return { status: "Success", data: preTileRefData };
+
+    }
+    public getTile(): TileRefData {
+        return {
+            tileId: this.tileId,
+            tilesetId: this.tilesetId,
+        }
     }
 }

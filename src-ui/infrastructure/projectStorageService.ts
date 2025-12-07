@@ -1,4 +1,5 @@
 import { type } from "arktype";
+import stringify from "json-stringify-pretty-compact";
 
 import { IProjectStorageService } from "@/infrastructure/interface/IProjectStorageService";
 import { ProjectData, ProjectDataSchema } from "@/shared/schema/projectSchema";
@@ -23,12 +24,12 @@ export class JsonProjectStorageService implements IProjectStorageService {
 
     public async saveProject(projectAbsPath: string, content: ProjectData): Promise<void> {
         const exist = await exists(projectAbsPath);
-        const projectFileData = JSON.stringify(content);
+        const stringContent = stringify(content, { maxLength: 80, indent: 2 })
         if (exist) {   
-            await writeTextFile(projectAbsPath, projectFileData);
+            await writeTextFile(projectAbsPath, stringContent);
         } else {
             const file = await create(projectAbsPath);
-            await file.write(new TextEncoder().encode(projectFileData));
+            await file.write(new TextEncoder().encode(stringContent));
             await file.close();
         }
 

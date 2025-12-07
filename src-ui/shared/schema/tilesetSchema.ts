@@ -21,16 +21,7 @@ export const tilesetDataSchema = type("string.json.parse").to({
         width: type("number"),
         height: type("number"),
     }),
-    tileOffset: type({
-        x: type("number"),
-        y: type("number"),
-    }).optional(),
-    grid: type({
-        orientation: type("'orthogonal' | 'isometric'"),
-        width: type("number"),
-        height: type("number"),
-    }).optional(),
-    tile: tileData.array().default(() => []),
+    tiles: tileData.array(),
 })
 export type TilesetData = typeof tilesetDataSchema.infer;
 

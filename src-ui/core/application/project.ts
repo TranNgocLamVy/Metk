@@ -2,6 +2,7 @@ import EventEmitter from "eventemitter3";
 
 import { JsonTilemapStorageService } from "@/infrastructure/tilemapStorageService";
 import { JsonTilesetStorageService } from "@/infrastructure/tilesetStorageService";
+import { TilemapData } from "@/shared/schema/tilemapSchema";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
@@ -11,6 +12,7 @@ import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema"
 import { PROJECT_FILE_NAME } from "../constance/project";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilesetManager } from "../manager/tilesetManager";
+import { Tilemap } from "./tilemap";
 import { Tileset } from "./tileset";
 
 export class Project {
@@ -35,12 +37,13 @@ export class Project {
         const tilesetStorageService = new JsonTilesetStorageService(this.metaData.directory);
         this.tilesetManager = new TilesetManager(tilesetStorageService, data.tilesets);
 
-        const tilemapStorageService = new JsonTilemapStorageService();
-        this.tilemapManager = new TilemapManager(this.metaData.directory, this.tilesetManager, tilemapStorageService);
+        const tilemapStorageService = new JsonTilemapStorageService(this.metaData.directory);
+        this.tilemapManager = new TilemapManager(tilemapStorageService, this.tilesetManager, data.tilemaps);
     }
 
     public async load() {
         await this.tilesetManager.loadAll();
+        await this.tilemapManager.loadAll();
     }
 
     public async unload() {
@@ -55,8 +58,8 @@ export class Project {
             description: this.metaData.description,
             createdAt: this.metaData.createdAt,
             updatedAt: this.metaData.updatedAt,
-            tilemaps: [],
-            tilesets: this.tilesetManager.gettilesetsMetaData(),
+            tilemaps: this.tilemapManager.getTilemapsMetaData(),
+            tilesets: this.tilesetManager.getTilesetsMetaData(),
         };
     }
 
@@ -68,6 +71,14 @@ export class Project {
 
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
         const result = await this.tilesetManager.createTileset(tilesetData, tilesetAbsPath);
+        if (result.status === "Success") {
+            this.save();
+        }
+        return result;
+    }
+
+    public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
+        const result = await this.tilemapManager.createTilemap(tilemapData, tilemapAbsPath);
         if (result.status === "Success") {
             this.save();
         }
