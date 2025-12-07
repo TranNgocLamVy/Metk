@@ -1,9 +1,9 @@
 import { type } from "arktype";
-import stringify from "json-stringify-pretty-compact";
 
 import { ITilesetStorageService } from "@/infrastructure/interface/ITilesetStorageService";
 import { TilesetData, tilesetDataSchema } from "@/shared/schema/tilesetSchema";
 import { Result } from "@/shared/types/result";
+import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { PathUtils } from "@/shared/utils/pathUtils";
 import { create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
@@ -28,8 +28,9 @@ export class JsonTilesetStorageService implements ITilesetStorageService {
     }
 
     public async saveTileset(tilesetRelPath: string, content: TilesetData): Promise<Result> {
-        const tilesetAbsPath = await PathUtils.join(this.projectDir, tilesetRelPath);
-        const stringContent = stringify(content, { maxLength: 80, indent: 2 })
+        const tilesetAbsPath = PathUtils.join(this.projectDir, tilesetRelPath);
+        const stringContent = JsonFormatter.format(content);
+        if (!stringContent) return { status: "Error", message: "Error while formatting json" };
         const exist = await exists(tilesetAbsPath);
         if (exist) {
             await writeTextFile(tilesetAbsPath, stringContent);

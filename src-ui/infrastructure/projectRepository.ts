@@ -1,9 +1,9 @@
 import { type } from "arktype";
-import stringify from "json-stringify-pretty-compact";
 
 import { IProjectRepository } from "@/infrastructure/interface/IProjectRepository";
 import { ProjectMetaData, ProjectRepoSchema } from "@/shared/schema/projectSchema";
 import { FileUtils } from "@/shared/utils/fileUtils";
+import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { BaseDirectory, create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 const PROJECT_REPO_FILE_NAME = "projects.json";
@@ -34,7 +34,8 @@ export class JsonProjectRepository implements IProjectRepository {
     }
 
     public async saveAll(content: ProjectMetaData[]): Promise<void> {
-        const stringContext = stringify(content, { maxLength: 80, indent: 2 })
+        const stringContext = JsonFormatter.format(content);
+        if (!stringContext) return;
         await writeTextFile(this.filename, stringContext, { baseDir: this.baseDir });
     }
 }

@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { ToastService } from "@/shared/services/toastService";
 import { Result, ResultStatus } from "@/shared/types/result";
 import { mkdir } from "@tauri-apps/plugin-fs";
 
@@ -14,7 +13,7 @@ export class ProjectManager {
     public currentProject: Project | null = null;
 
     public projectMetaDataMap: Map<string, ProjectMetaData> = new Map<string, ProjectMetaData>(); // id -> metaData
-    public get projectMetaData (): ProjectMetaData[] {
+    public get projectMetaData(): ProjectMetaData[] {
         return Array.from(this.projectMetaDataMap.values()).map((metaData) => {
             const project = this.projectMap.get(metaData.id);
             if (!project) return metaData;
@@ -24,9 +23,9 @@ export class ProjectManager {
     public projectMap: Map<string, Project> = new Map<string, Project>(); // id -> project
 
     public constructor(
-        private readonly projectRepo: IProjectRepository, 
+        private readonly projectRepo: IProjectRepository,
         private readonly projectStorageService: IProjectStorageService
-    ) {}
+    ) { }
 
     public async load() {
         const projectsMetaData = await this.projectRepo.loadAll();
@@ -46,22 +45,22 @@ export class ProjectManager {
         this.projectRepo.saveAll(Array.from(this.projectMetaDataMap.values()));
     }
 
-    public async saveCurrrentProject() {
+    public async saveCurrrentProject(): Promise<Result> {
         const project = this.currentProject;
-        if (!project) return;
+        if (!project) return { status: "Error", message: "No project selected" };
         const projectData = project.serialize();
-        await this.projectStorageService.saveProject(project.metaData.directory + "\\" + PROJECT_FILE_NAME, projectData);
+        return await this.projectStorageService.saveProject(project.metaData.directory + "\\" + PROJECT_FILE_NAME, projectData);
     }
 
     public async createProject(name: string, destination: string): Promise<Result<Project>> {
         const fullDirectory = destination + "\\" + name;
 
-        try {   
+        try {
             await mkdir(fullDirectory);
         } catch (error) {
-            return { status: ResultStatus.Error, message: "Failed to create project" };
+            return { status: ResultStatus.Error, message: "Failed to create project while make dir, error: " + error };
         }
-        
+
         const projectData: ProjectData = {
             id: uuidv4(),
             name: name,
@@ -74,7 +73,11 @@ export class ProjectManager {
         };
 
         const project = new Project(projectData, fullDirectory, this.projectStorageService);
-        await this.projectStorageService.saveProject(fullDirectory + "\\" + PROJECT_FILE_NAME, project.serialize());
+        const saveResult = await this.projectStorageService.saveProject(fullDirectory + "\\" + PROJECT_FILE_NAME, project.serialize());
+
+        if (saveResult.status == "Error") {
+            return { status: ResultStatus.Error, message: "Failed to create project while saving: " + saveResult.message };
+        }
 
         this.projectMetaDataMap.set(project.metaData.id, project.metaData);
         this.projectMap.set(project.metaData.id, project);
@@ -93,15 +96,17 @@ export class ProjectManager {
 
     public async loadProject(id: string): Promise<Result<Project>> {
         const project = this.projectMap.get(id);
-        if (project) {
-            if (this.currentProject) {
-                await this.currentProject.unload();
-            }
-            this.currentProject = project;
-            await this.currentProject.load();
-            return { status: ResultStatus.Success, data: this.currentProject };
+        if (!project) {
+            return { status: ResultStatus.Error, message: "Project not found" };
         }
-        ToastService.error({ message: "Project not found" });
-        return { status: ResultStatus.Cancel };
+        if (this.currentProject) {
+            const saveResult = await this.saveCurrrentProject();
+            if (saveResult.status == "Error") return { status: ResultStatus.Error, message: saveResult.message };
+            await this.currentProject.unload();
+        }
+
+        this.currentProject = project;
+        await this.currentProject.load();
+        return { status: ResultStatus.Success, data: this.currentProject };
     }
 }

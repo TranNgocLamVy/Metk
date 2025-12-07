@@ -4,6 +4,7 @@ import { JsonTilemapStorageService } from "@/infrastructure/tilemapStorageServic
 import { JsonTilesetStorageService } from "@/infrastructure/tilesetStorageService";
 import { TilemapData } from "@/shared/schema/tilemapSchema";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
+import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
@@ -66,7 +67,10 @@ export class Project {
     private async save(): Promise<void> {
         const projectData = this.serialize();
         const filePath = PathUtils.join(this.metaData.directory, PROJECT_FILE_NAME);
-        await this.projectStorageService.saveProject(filePath, projectData);
+        const result = await this.projectStorageService.saveProject(filePath, projectData);
+        if (result.status == "Error") {
+            ToastService.error({ message: `Error while saving project: ${result.message}` });
+        }
     }
 
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
