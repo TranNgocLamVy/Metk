@@ -8,8 +8,8 @@ export const ProjectDataSchema = type("string.json.parse").to({
     name: type("string"),
     version: type("string").default("0.1.0"),
     description: type("string").default(""),
-    createdAt: type("string.date"),
-    updatedAt: type("string.date"),
+    createdAt: type("string.date").default(() => new Date().toDateString()),
+    updatedAt: type("string.date").default(() => new Date().toDateString()),
     tilemaps: TilemapMetaDataSchema.array().default(() => []),
     tilesets: TilesetMetaDataSchema.array().default(() => []),
 })
@@ -23,6 +23,7 @@ const ProjectMetaDataBase = type({
     createdAt: "string.date",
     updatedAt: "string.date",
     directory: "string",
+    found: type("boolean").optional(),
 })
 export const ProjectMetaDataSchema = type("string.json.parse").to(ProjectMetaDataBase)
 export type ProjectMetaData = typeof ProjectMetaDataSchema.infer

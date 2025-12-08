@@ -2,9 +2,9 @@ import { AppCore } from "@/core/appcore";
 import { createProjectForm } from "@/view/components/form/projectForm";
 import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
-import { exists } from "@tauri-apps/plugin-fs";
 
 import { Result } from "../types/result";
+import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { FormService } from "./formService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
@@ -23,7 +23,12 @@ export class ProjectService {
     }
 
     public static async openProject(): Promise<void> {
-
+        const projectAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Project", extensions: ["json"] }] });
+        if (!projectAbsPath) return;
+        const result = await AppCore.getIns().projectManager.openProject(projectAbsPath);
+        if (result.status == "Success") {
+            ProjectService.loadProject(result.data.metaData.id);
+        }
     }
 
     public static async createProject(): Promise<void> {

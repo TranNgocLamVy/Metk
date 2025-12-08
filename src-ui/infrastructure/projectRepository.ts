@@ -2,6 +2,7 @@ import { type } from "arktype";
 
 import { IProjectRepository } from "@/infrastructure/interface/IProjectRepository";
 import { ProjectMetaData, ProjectRepoSchema } from "@/shared/schema/projectSchema";
+import { Result } from "@/shared/types/result";
 import { FileUtils } from "@/shared/utils/fileUtils";
 import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { BaseDirectory, create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
@@ -33,9 +34,10 @@ export class JsonProjectRepository implements IProjectRepository {
         return projectRepoData;
     }
 
-    public async saveAll(content: ProjectMetaData[]): Promise<void> {
+    public async saveAll(content: ProjectMetaData[]): Promise<Result> {
         const stringContext = JsonFormatter.format(content);
-        if (!stringContext) return;
+        if (!stringContext) return { status: "Error", message: "Failed to format project repo" };
         await writeTextFile(this.filename, stringContext, { baseDir: this.baseDir });
+        return { status: "Success", data: null };
     }
 }

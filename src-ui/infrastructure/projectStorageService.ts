@@ -7,19 +7,17 @@ import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 export class JsonProjectStorageService implements IProjectStorageService {
-    public async loadProject(projectAbsPath: string): Promise<ProjectData | null> {
+    public async loadProject(projectAbsPath: string): Promise<Result<ProjectData>> {
         const exist = await exists(projectAbsPath);
-        if (!exist) return null;
+        if (!exist) return { status: "Error", message: "Project file not found" };
         const projectFileData = await readTextFile(projectAbsPath);
-        if (!projectFileData) return null;
-        return JSON.parse(projectFileData);
-
-        // const projectData = ProjectDataSchema(projectFileData);
-        // if (projectData instanceof type.errors) {
-        //     console.error(projectData.summary);
-        //     return null;
-        // }
-        // return projectData;
+        if (!projectFileData) return { status: "Error", message: "Failed to read project file" };
+        const projectData = ProjectDataSchema(projectFileData);
+        if (projectData instanceof type.errors) {
+            console.error(projectData.summary);
+            return { status: "Error", message: "Failed to parse project file" };
+        }
+        return { status: "Success", data: projectData };
     }
 
     public async saveProject(projectAbsPath: string, content: ProjectData): Promise<Result> {
