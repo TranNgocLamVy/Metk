@@ -3,6 +3,8 @@ import { basename, dirname, extname, join, normalize, relative } from "pathe";
 import { sep } from "@tauri-apps/api/path";
 
 export class PathUtils {
+    public static separator: string = sep();
+    
     /**
      * 
      * @param pathStr 

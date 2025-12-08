@@ -1,4 +1,5 @@
 import { FormService } from "@/shared/services/formService";
+import { PathUtils } from "@/shared/utils/pathUtils";
 import { exists } from "@tauri-apps/plugin-fs";
 
 export const createProjectForm = FormService.createForm({
@@ -24,7 +25,7 @@ export const createProjectForm = FormService.createForm({
         }
     ],
     async validateBeforeSubmit(values) {
-        const path = values.destination + "\\" + values.name;
+        const path = PathUtils.join(values.destination, values.name);
         const isExists = await exists(path);
         if (isExists) {
             return { valid: false, message: `Folder "${values.name}" already exists.` }

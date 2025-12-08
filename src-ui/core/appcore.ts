@@ -2,12 +2,14 @@
 
 import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
+import { Result } from "@/shared/types/result";
 
 import { Project } from "./application/project";
 import { ProjectManager } from "./manager/projectManager";
 
 export class AppCore {
     private static _instance: AppCore;
+    private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
 
     private constructor() {
@@ -16,8 +18,11 @@ export class AppCore {
         this.projectManager = new ProjectManager(projectRepo, projectStorageService);
     }
 
-    public async load() {
+    public async load(): Promise<Result> {
+        if (this.isLoaded) return { status: "Error", message: "AppCore already loaded" };
         await this.projectManager.load();
+        this.isLoaded = true;
+        return { status: "Success", data: null };
     }
 
     public static initialize() {

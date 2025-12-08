@@ -66,10 +66,10 @@ export class TilemapManager {
         const newTilemap = new Tilemap(tilemapData, tilesetSelector);
         await newTilemap.load();
         const tilemapRelPath = PathUtils.relative(this.tilemapStorageService.projectDir, tilemapAbsPath);
-        this.tilemapsMetaData.push({ name: newTilemap.name, id: newTilemap.id, tilemapRelPath: tilemapRelPath });
-        this.tilemapMap.set(newTilemap.id, newTilemap);
         const result = await this.saveTilemap(newTilemap.id);
         if (result.status === "Success") {
+            this.tilemapsMetaData.push({ name: newTilemap.name, id: newTilemap.id, tilemapRelPath: tilemapRelPath });
+            this.tilemapMap.set(newTilemap.id, newTilemap);
             return { status: "Success", data: newTilemap };
         } else {
             return { status: "Error", message: result.message };

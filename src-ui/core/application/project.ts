@@ -17,7 +17,10 @@ import { Tilemap } from "./tilemap";
 import { Tileset } from "./tileset";
 
 export class Project {
-    public metaData: ProjectMetaData;
+    private _metaData: ProjectMetaData;
+    public get metaData(): ProjectMetaData { return { ...this._metaData, updatedAt: new Date().toDateString() } }
+    private set metaData(value: ProjectMetaData) { this._metaData = value }
+    
     private projectStorageService: IProjectStorageService;
     public tilesetManager: TilesetManager;
     public tilemapManager: TilemapManager;
@@ -58,7 +61,7 @@ export class Project {
             version: this.metaData.version,
             description: this.metaData.description,
             createdAt: this.metaData.createdAt,
-            updatedAt: this.metaData.updatedAt,
+            updatedAt: new Date().toDateString(),
             tilemaps: this.tilemapManager.getTilemapsMetaData(),
             tilesets: this.tilesetManager.getTilesetsMetaData(),
         };

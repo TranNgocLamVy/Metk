@@ -16,7 +16,7 @@ export default function HomePage() {
 			<h1 className="text-3xl font-bold">Welcome to MEtk</h1>
 			<Separator />
 			<HStack className="w-full h-fit gap-8">
-				<Button variant={"outline"} >
+				<Button variant={"outline"} onClick={ProjectService.openProject}>
 					<SquareArrowOutUpRight />
 					Open Project
 				</Button>
@@ -31,7 +31,6 @@ export default function HomePage() {
 			</VStack>
 			<VStack className="gap-4">
 				{projects.map((project) => {
-                    const notFound = AppCore.getIns().projectManager.projectMap.get(project.id) ? false : true;
 					return (
 						<HStack align="center" justify="start" key={project.id} className="gap-4">
 							<Tooltip>
@@ -48,7 +47,7 @@ export default function HomePage() {
                                     <p>{`Updated At: ${new Date(project.updatedAt).toLocaleString()}`}</p>
                                 </TooltipContent>
 							</Tooltip>
-							<h3 className={`text-xs cursor-default ${notFound ? "line-through" : ""}`}>{project.directory}</h3>
+							<h3 className={`text-xs cursor-default ${!project.found ? "line-through" : ""}`}>{project.directory}</h3>
 						</HStack>
 					);
 				})}

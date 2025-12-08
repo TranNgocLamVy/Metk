@@ -36,7 +36,7 @@ export class TilesetManager {
                 const newTileset = new Tileset(tilesetData, textureService);
                 await newTileset.loadTexture();
                 this.tilesetMap.set(tilesetData.id, newTileset);
-                
+
                 await this.saveTileset(newTileset.id);
             } else if (loadTilesetResult.status === "Error") {
                 ToastService.error({ message: loadTilesetResult.message });
@@ -90,10 +90,10 @@ export class TilesetManager {
         const newTileset = new Tileset(tilesetData, textureService)
         await newTileset.loadTexture();
         const tilesetRelPath = PathUtils.relative(this.tilesetStorageService.projectDir, tilesetAbsPath);
-        this.tilesetsMetaData.push({ name: newTileset.name, id: newTileset.id, tilesetRelPath: tilesetRelPath });
-        this.tilesetMap.set(newTileset.id, newTileset);
         const result = await this.saveTileset(newTileset.id);
         if (result.status === "Success") {
+            this.tilesetsMetaData.push({ name: newTileset.name, id: newTileset.id, tilesetRelPath: tilesetRelPath });
+            this.tilesetMap.set(newTileset.id, newTileset);
             return { status: "Success", data: newTileset };
         } else {
             return { status: "Error", message: result.message };
