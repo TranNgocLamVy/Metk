@@ -4,7 +4,7 @@ import { AppCore } from "@/core/appcore";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { createTilesetForm } from "@/view/components/form/tilesetForm";
 import { useExplorerStore } from "@/view/stores/application/explorerStore";
-import { useTilesetViewStore } from "@/view/stores/application/tilesetViewStore";
+import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
@@ -66,7 +66,7 @@ export class TilesetService {
         if (createTilesetResult.status === "Success") {
             const newTileset = createTilesetResult.data;
             useExplorerStore.getState().addTileset({ name: newTileset.name, id: newTileset.id });
-            WorkspaceService.createTilesetViewSession(newTileset.id);
+            WorkspaceService.createTilesetSession(newTileset.id);
             ToastService.success({ message: "Tileset created successfully" });
         } else if (createTilesetResult.status === "Error") {
             ToastService.error({ message: createTilesetResult.message });

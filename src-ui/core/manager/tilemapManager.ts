@@ -5,7 +5,7 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 import { ITilemapStorageService } from "../../infrastructure/interface/ITilemapStorageService";
 import { TilemapData, TilemapMetaData } from "../../shared/schema/tilemapSchema";
 import { Tilemap } from "../application/tile/tilemap";
-import { TilesetSelector } from "./tilemapSelector";
+import { TilesetGetter } from "./tilemapGetter";
 import { TilesetManager } from "./tilesetManager";
 
 export class TilemapManager {
@@ -31,7 +31,7 @@ export class TilemapManager {
             if (loadTilemapResult.status === "Success") {
                 const tilemapData = loadTilemapResult.data;
                 const tilemapAbsPath = PathUtils.join(this.tilemapStorageService.projectDir, metaData.tilemapRelPath);
-                const tilesetSelector = new TilesetSelector(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
+                const tilesetSelector = new TilesetGetter(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
                 const tilemap = new Tilemap(tilemapData, tilesetSelector);
                 await tilemap.load();
                 this.tilemapMap.set(tilemapData.id, tilemap);
@@ -62,7 +62,7 @@ export class TilemapManager {
     }
 
     public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result> {
-        const tilesetSelector = new TilesetSelector(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
+        const tilesetSelector = new TilesetGetter(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
         const newTilemap = new Tilemap(tilemapData, tilesetSelector);
         await newTilemap.load();
         const tilemapRelPath = PathUtils.relative(this.tilemapStorageService.projectDir, tilemapAbsPath);

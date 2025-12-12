@@ -1,5 +1,5 @@
 import { type } from "arktype";
 
-export type TilesetViewSessionData = {
+export type TilesetSessionData = {
     id: string;
 }

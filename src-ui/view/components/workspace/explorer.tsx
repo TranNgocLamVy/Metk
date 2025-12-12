@@ -12,7 +12,7 @@ export default function Explorer() {
             <VStack className="w-full h-full p-4 gap-2">
                 {tilesets.map((tileset) => {
                     return (
-                        <Button key={tileset.id} onClick={() => WorkspaceService.createTilesetViewSession(tileset.id)}>
+                        <Button key={tileset.id} onClick={() => WorkspaceService.createTilesetSession(tileset.id)}>
                             {tileset.name}
                         </Button>
                     );

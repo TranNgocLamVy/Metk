@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { AppCoreService } from "@/shared/services/appcoreService";
+import { AppCoreService } from "@/shared/services/appCoreService";
 
 export type AppcoreState = {
     isAppcoreLoaded: boolean;

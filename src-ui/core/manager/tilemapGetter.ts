@@ -5,7 +5,7 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 import { Tile, Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 
-export class TilesetSelector {
+export class TilesetGetter {
     constructor(
         public readonly tilesetManager: TilesetManager,
         public readonly projectDir: string,
