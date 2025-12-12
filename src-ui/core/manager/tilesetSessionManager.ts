@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { TilesetViewSessionData } from "@/shared/schema/session";
+import { TilesetSessionData } from "@/shared/schema/session";
 import { Result } from "@/shared/types/result";
 
-import { AppCore } from "../appcore";
-import { TilesetViewSession } from "../application/session/tilesetViewSession";
+import { TilesetSession } from "../application/session/tilesetSession";
+import { Tileset } from "../application/tile/tileset";
 
 export class TilesetSessionManager {
-    public currentTilesetSession: TilesetViewSession | null = null;
-    private tilesetSessionMap: Map<string, TilesetViewSession> = new Map<string, TilesetViewSession>(); // sessionId -> session
+    public currentTilesetSession: TilesetSession | null = null;
+    private tilesetSessionMap: Map<string, TilesetSession> = new Map<string, TilesetSession>(); // sessionId -> session
     private tilesetMap: Map<string, string> = new Map<string, string>(); // tilesetId -> sessionId
-    public tilesetsSession(): TilesetViewSession[] {
+    public tilesetsSession(): TilesetSession[] {
         return Array.from(this.tilesetSessionMap.values());
     }
 
@@ -18,33 +18,27 @@ export class TilesetSessionManager {
 
     }
 
-    public async createTilesetViewSession(tilesetId: string): Promise<Result<TilesetViewSession>> {
-        const sessionId = this.tilesetMap.get(tilesetId);
+    public async createTilesetSession(tileset: Tileset): Promise<Result<TilesetSession>> {
+        const sessionId = this.tilesetMap.get(tileset.id);
         if (sessionId) {
-            return await this.openTilesetViewSession(sessionId);
+            return await this.openTilesetSession(sessionId);
         }
 
-        const result = AppCore.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
-        if (result.status !== "Success" || !result.data) {
-            console.error("Tileset not found");
-            return { status: "Error", message: "Tileset not found" };
-        }
-
-        const newTilesetSessionData: TilesetViewSessionData = {
+        const newTilesetSessionData: TilesetSessionData = {
             id: uuidv4(),
         }
 
-        const newTilesetSession = new TilesetViewSession(result.data, newTilesetSessionData);
+        const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData);
         
         this.tilesetSessionMap.set(newTilesetSession.id, newTilesetSession);
-        this.tilesetMap.set(tilesetId, newTilesetSession.id);
+        this.tilesetMap.set(tileset.id, newTilesetSession.id);
 
-        this.openTilesetViewSession(newTilesetSession.id);
+        this.openTilesetSession(newTilesetSession.id);
 
         return { status: "Success", data: newTilesetSession };
     }
 
-    public async openTilesetViewSession(sessionId: string): Promise<Result<TilesetViewSession>> {
+    public async openTilesetSession(sessionId: string): Promise<Result<TilesetSession>> {
         const tilesetSession = this.tilesetSessionMap.get(sessionId);
         if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
         this.currentTilesetSession = tilesetSession;

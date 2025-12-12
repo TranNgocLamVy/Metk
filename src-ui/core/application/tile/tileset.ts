@@ -101,6 +101,14 @@ export class Tileset extends BaseObject<TilesetEvent> {
         this.rows = Math.ceil(this.image.height / this.tileheight);
 
         this.isTextureLoaded = true;
+
+        const expectedTileCount = this.columns * this.rows;
+        if (this.tiles.length === 0 && expectedTileCount > 0) {
+            this.tiles = Array.from({ length: expectedTileCount }, (_, index) => {
+                return new Tile({ id: index }, this);
+            });
+        }
+
         const tileTextureList = TextureUtils.sliceTexture(this.texture, this.tilewidth, this.tileheight);
 
         const sortedTiles = Array.from(this.tiles).sort((a, b) => a.id - b.id);

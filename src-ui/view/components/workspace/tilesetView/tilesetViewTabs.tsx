@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
-import { useTilesetViewStore } from "@/view/stores/application/tilesetViewStore";
+import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
 import TilesetViewDropDownMenu from "../../contextMenu/tilesetViewContextMenu";
 import { HStack } from "../../custom/stack/stack";
@@ -13,14 +13,14 @@ export default function TilesetViewTabs() {
 
 	useHorizontalScroll(ref);
 
-	const { tilesetsViewSession, currentTilesetViewSession } = useTilesetViewStore();
+	const { tilesetsSession, currentTilesetSession } = useTilesetSessionStore();
 
 	return (
 		<HStack className="w-full h-fit bg-background" justify="start" align="center">
 			<TilesetViewDropDownMenu />
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
-				{tilesetsViewSession.map((tilesetSession) => {
-					const isCurrent = currentTilesetViewSession?.id === tilesetSession.sessionId;
+				{tilesetsSession.map((tilesetSession) => {
+					const isCurrent = currentTilesetSession?.id === tilesetSession.sessionId;
 					const onClick = () => {
 						if (isCurrent) return;
 						WorkspaceService.openTilesetViewSesion(tilesetSession.sessionId);

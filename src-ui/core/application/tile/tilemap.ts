@@ -4,7 +4,7 @@ import { TilemapData, TileRefData, TilesetRefData } from "@/shared/schema/tilema
 import { Result, ResultStatus } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { TilesetSelector } from "../../manager/tilemapSelector";
+import { TilesetGetter } from "../../manager/tilemapGetter";
 import { TileLayer } from "./tilelayer";
 import { Tile } from "./tileset";
 
@@ -34,7 +34,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     constructor(
         tilemapData: TilemapData,
-        public readonly tilesetSelector: TilesetSelector,
+        public readonly tilesetSelector: TilesetGetter,
     ) {
         super();
 

@@ -1,6 +1,6 @@
 import { AppCore } from "@/core/appcore";
 import { Project } from "@/core/application/project";
-import { useTilesetViewStore } from "@/view/stores/application/tilesetViewStore";
+import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
 import { ToastService } from "./toastService";
 
@@ -18,27 +18,28 @@ export class WorkspaceService {
     }
 
     public static async openTilesetViewSesion(sessionId: string): Promise<void> {
-        const result = await AppCore.getCurrentWorkspace().openTilesetViewSession(sessionId);
+        const result = await AppCore.getCurrentWorkspace().openTilesetSession(sessionId);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
         }
-        useTilesetViewStore.getState().setCurrentTilesetViewSesison(result.data);
+        useTilesetSessionStore.getState().setCurrentTilesetViewSesison(result.data);
     }
 
-    public static async createTilesetViewSession(tilesetId: string): Promise<void> {
-        const tileset = await AppCore.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
-        if (tileset.status !== "Success" || !tileset.data) {
-            console.error(tileset.message);
-            ToastService.error({ message: tileset.message });
+    public static async createTilesetSession(tilesetId: string): Promise<void> {
+        const tilesetResult = await AppCore.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
+        if (tilesetResult.status !== "Success" || !tilesetResult.data) {
+            console.error(tilesetResult.message);
+            ToastService.error({ message: tilesetResult.message });
             return;
         }
-        const result = await AppCore.getCurrentWorkspace().createTilesetViewSession(tilesetId);
+        const tileset = tilesetResult.data;
+        const result = await AppCore.getCurrentWorkspace().createTilesetSession(tileset);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
         }
-        useTilesetViewStore.getState().addTilesetViewSession({ name: result.data.tileset.name, sessionId: result.data.id });
-        useTilesetViewStore.getState().setCurrentTilesetViewSesison(result.data);
+        useTilesetSessionStore.getState().addTilesetSession({ name: tileset.name, sessionId: result.data.id });
+        useTilesetSessionStore.getState().setCurrentTilesetViewSesison(result.data);
     }
 }
