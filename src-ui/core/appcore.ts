@@ -2,20 +2,27 @@
 
 import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
+import { JsonWorkspaceStorageService } from "@/infrastructure/workspaceStorageService";
 import { Result } from "@/shared/types/result";
 
 import { Project } from "./application/project";
+import { Workspace } from "./application/workspace";
 import { ProjectManager } from "./manager/projectManager";
+import { WorkspaceManager } from "./manager/workspaceManager";
 
 export class AppCore {
     private static _instance: AppCore;
     private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
+    public readonly workspaceManager: WorkspaceManager;
 
     private constructor() {
         const projectRepo = new JsonProjectRepository();
         const projectStorageService = new JsonProjectStorageService();
         this.projectManager = new ProjectManager(projectRepo, projectStorageService);
+
+        const workspaceStorageService = new JsonWorkspaceStorageService();
+        this.workspaceManager = new WorkspaceManager(workspaceStorageService);
     }
 
     public async load(): Promise<Result> {
@@ -43,10 +50,15 @@ export class AppCore {
         return this._instance;
     }
 
-
-    public getCurrentProject(): Project {
-        const currentProject = this.projectManager.currentProject;
+    public static getCurrentProject(): Project {
+        const currentProject = AppCore.getIns().projectManager.currentProject;
         if (!currentProject) throw new Error("Current project not found");
         return currentProject;
+    }
+
+    public static getCurrentWorkspace(): Workspace {
+        const currentWorkspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!currentWorkspace) throw new Error("Current workspace not found");
+        return currentWorkspace;
     }
 }

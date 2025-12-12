@@ -14,10 +14,13 @@ export class JsonTilesetStorageService implements ITilesetStorageService {
         const tilesetAbsPath = await PathUtils.join(this.projectDir, tilesetRelPath);
 
         const exist = await exists(tilesetAbsPath);
-        if (!exist) return { status: "Error", message: "File not found" };
+        if (!exist) {
+            console.error("Tileset not found");
+            return { status: "Error", message: `Tileset not found at ${tilesetAbsPath}` };
+        }
 
         const tilesetRawData = await readTextFile(tilesetAbsPath);
-        if (!tilesetRawData) return { status: "Error", message: "Error while reading file" };
+        if (!tilesetRawData) return { status: "Error", message: "Error while reading file at " + tilesetAbsPath };
 
         const tilesetData = tilesetDataSchema(tilesetRawData);
         if (tilesetData instanceof type.errors) {

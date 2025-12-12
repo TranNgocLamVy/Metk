@@ -5,7 +5,7 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { ITilesetStorageService } from "../../infrastructure/interface/ITilesetStorageService";
 import { TilesetData, TilesetMetaData } from "../../shared/schema/tilesetSchema";
-import { Tileset } from "../application/tileset";
+import { Tileset } from "../application/tile/tileset";
 
 export class TilesetManager {
     private tilesetMap: Map<string, Tileset> = new Map<string, Tileset>(); // id -> tileset
@@ -46,7 +46,10 @@ export class TilesetManager {
 
     public async saveTileset(id: string): Promise<Result> {
         const tileset = this.tilesetMap.get(id);
-        if (tileset == undefined) return { status: "Error", message: "Tileset not found" };
+        if (tileset == undefined) {
+            console.error("Tileset not found");
+            return { status: "Error", message: "Tileset not found" }
+        }
 
         const tilesetRelPath = this.tilesetsMetaData.find(metaData => metaData.id === id)?.tilesetRelPath;
         if (!tilesetRelPath) return { status: "Error", message: "Tileset path not found" };
@@ -62,7 +65,10 @@ export class TilesetManager {
 
     public getTilesetById(id: string): Result<Tileset> {
         const tileset = this.tilesetMap.get(id);
-        if (tileset === undefined) return { status: "Error", message: "Tileset not found" };
+        if (tileset === undefined) {
+            console.error("Tileset not found");
+            return { status: "Error", message: "Tileset not found" };
+        }
         return { status: "Success", data: tileset };
     }
 
@@ -70,7 +76,10 @@ export class TilesetManager {
         const tilesetMetaData = this.tilesetsMetaData.find(metaData => metaData.tilesetRelPath === relPath);
         if (!tilesetMetaData) return { status: "Error", message: "Tileset meta data not found" };
         const tileset = this.tilesetMap.get(tilesetMetaData.id);
-        if (tileset === undefined) return { status: "Error", message: "Tileset not found" };
+        if (tileset === undefined) {
+            console.error("Tileset not found");
+            return { status: "Error", message: "Tileset not found" };
+        }
         return { status: "Success", data: tileset };
     }
 
@@ -90,12 +99,14 @@ export class TilesetManager {
         const newTileset = new Tileset(tilesetData, textureService)
         await newTileset.loadTexture();
         const tilesetRelPath = PathUtils.relative(this.tilesetStorageService.projectDir, tilesetAbsPath);
+        this.tilesetsMetaData.push({ name: newTileset.name, id: newTileset.id, tilesetRelPath: tilesetRelPath });
+        this.tilesetMap.set(newTileset.id, newTileset);
         const result = await this.saveTileset(newTileset.id);
         if (result.status === "Success") {
-            this.tilesetsMetaData.push({ name: newTileset.name, id: newTileset.id, tilesetRelPath: tilesetRelPath });
-            this.tilesetMap.set(newTileset.id, newTileset);
             return { status: "Success", data: newTileset };
         } else {
+            this.tilesetsMetaData = this.tilesetsMetaData.filter(metaData => metaData.id !== newTileset.id);
+            this.tilesetMap.delete(newTileset.id);
             return { status: "Error", message: result.message };
         }
     }

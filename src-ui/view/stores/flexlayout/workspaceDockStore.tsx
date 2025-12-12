@@ -3,9 +3,10 @@ import { Terminal } from "lucide-react";
 import { create } from "zustand";
 
 import Debug from "@/view/components/workspace/debug";
+import Explorer from "@/view/components/workspace/explorer";
 import LayerManager from "@/view/components/workspace/layerManager";
 import TilemapEditor from "@/view/components/workspace/tilemapEditor";
-import TilesetView from "@/view/components/workspace/tilesetView";
+import TilesetView from "@/view/components/workspace/tilesetView/tilesetView";
 
 import { workspaceLayout } from "./jsonModel/workspaceJsonModel";
 
@@ -35,6 +36,8 @@ export const useWorkspaceDockStore = create<WorkspaceState>((set, get) => {
 					return <LayerManager />;
                 case "tilemapEditor":
                     return <TilemapEditor />
+                case "explorer":
+                    return <Explorer />
                 case "debug":
                     return <Debug />
 				default:

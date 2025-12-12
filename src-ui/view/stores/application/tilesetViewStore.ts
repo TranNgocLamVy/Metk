@@ -1,26 +1,31 @@
 import { create } from "zustand";
 
-export type TilesetDisplayData = {
+import { TilesetViewSession } from "@/core/application/session/tilesetViewSession";
+
+type TilesetSessionDisplayData = {
     name: string;
-    id: string;
+    sessionId: string;
 }
 
 type TilesetViewStore = {
-    currentTileset: TilesetDisplayData | null;
-    tilesets: TilesetDisplayData[];
-    setCurrentTileset: (tileset: TilesetDisplayData) => void;
-    setTilesets: (tilesets: TilesetDisplayData[]) => void;
-    addTileset: (tileset: TilesetDisplayData) => void;
+    currentTilesetViewSession: TilesetViewSession | null;
+    tilesetsViewSession: TilesetSessionDisplayData[];
+    setCurrentTilesetViewSesison: (tilesetSession: TilesetViewSession) => void;
+    setTilesetsViewSession: (tilesetsViewSession: TilesetSessionDisplayData[]) => void;
+    addTilesetViewSession: (tileset: TilesetSessionDisplayData) => void;
 }
 
-export const useTilesetViewStore = create<TilesetViewStore>((set, get) => ({
-    currentTileset: null,
-    setCurrentTileset: (tileset: TilesetDisplayData) => set({ currentTileset: tileset }),
-    tilesets: [],
-    setTilesets: (tilesets: TilesetDisplayData[]) => set({ tilesets }),
-    addTileset: (tileset: TilesetDisplayData) => {
-        set((state) => {
-            return { tilesets: [...state.tilesets, tileset] };
-        })
-    }
-}));
+export const useTilesetViewStore = create<TilesetViewStore>((set, get) => {
+    return {
+        currentTilesetViewSession: null,
+        setCurrentTilesetViewSesison: (tileset: TilesetViewSession) => set({ currentTilesetViewSession: tileset }),
+        tilesetsViewSession: [],
+        setTilesetsViewSession: (tilesetsViewSession: TilesetSessionDisplayData[]) => set({ tilesetsViewSession }),
+        addTilesetViewSession: (tileset: TilesetSessionDisplayData) => {
+            if (get().tilesetsViewSession.find((tilesetViewSession) => tilesetViewSession.sessionId === tileset.sessionId)) return;
+            set((state) => {
+                return { tilesetsViewSession: [...state.tilesetsViewSession, tileset] };
+            })
+        }
+    };
+});

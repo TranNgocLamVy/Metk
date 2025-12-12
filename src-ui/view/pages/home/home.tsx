@@ -1,4 +1,5 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { AppCore } from "@/core/appcore";
 import { ProjectService } from "@/shared/services/projectService";
@@ -9,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/view/components/shadc
 import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
 
 export default function HomePage() {
+    const navigate = useNavigate();
 	const projects = useProjectManagerStore((s) => s.projects).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
 	return (
@@ -35,7 +37,7 @@ export default function HomePage() {
 						<HStack align="center" justify="start" key={project.id} className="gap-4">
 							<Tooltip>
 								<TooltipTrigger asChild>
-                                    <Button onClick={() => ProjectService.loadProject(project.id)}>
+                                    <Button onClick={() => navigate("/project/" + project.id)}>
                                         <SquareArrowOutUpRight size={20} />
 										{project.name}
                                     </Button>

@@ -3,18 +3,20 @@ import { v4 as uuidv4 } from "uuid";
 import { AppCore } from "@/core/appcore";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { createTilesetForm } from "@/view/components/form/tilesetForm";
+import { useExplorerStore } from "@/view/stores/application/explorerStore";
 import { useTilesetViewStore } from "@/view/stores/application/tilesetViewStore";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
 import { FormService } from "./formService";
 import { ToastService } from "./toastService";
+import { WorkspaceService } from "./workspaceService";
 
 export class TilesetService {
     public static async loadTilesetView(): Promise<void> {
-        const project = AppCore.getIns().getCurrentProject();
+        const project = AppCore.getCurrentProject();
         const tilesets = project.tilesetManager.getAllTilesets();
-        useTilesetViewStore.getState().setTilesets(tilesets.map((tileset) => {
+        useExplorerStore.getState().setTilesets(tilesets.map((tileset) => {
             return {
                 id: tileset.id,
                 name: tileset.name,
@@ -23,18 +25,17 @@ export class TilesetService {
     }
 
     public static async openTilesetView(id: string): Promise<void> {
-        const project = AppCore.getIns().getCurrentProject();
+        const project = AppCore.getCurrentProject();
         const tilesetFindResult = await project.tilesetManager.getTilesetById(id)
         if (tilesetFindResult.status == "Success") {
             const tileset = tilesetFindResult.data;
-            useTilesetViewStore.getState().setCurrentTileset(tileset);
         } else {
             ToastService.error({ message: tilesetFindResult.message });
         }
     }
 
     public static async createTileset(): Promise<void> {
-        const currentProject = AppCore.getIns().getCurrentProject();
+        const currentProject = AppCore.getCurrentProject();
         const form = await FormService.openFormDialog(createTilesetForm)
         if (!form) return;
 
@@ -64,8 +65,8 @@ export class TilesetService {
 
         if (createTilesetResult.status === "Success") {
             const newTileset = createTilesetResult.data;
-            useTilesetViewStore.getState().addTileset({ name: newTileset.name, id: newTileset.id });
-            TilesetService.openTilesetView(newTileset.id);
+            useExplorerStore.getState().addTileset({ name: newTileset.name, id: newTileset.id });
+            WorkspaceService.createTilesetViewSession(newTileset.id);
             ToastService.success({ message: "Tileset created successfully" });
         } else if (createTilesetResult.status === "Error") {
             ToastService.error({ message: createTilesetResult.message });
