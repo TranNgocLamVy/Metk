@@ -14,15 +14,15 @@ export class JsonTilemapStorageService implements ITilemapStorageService {
         const tilemapAbsPath = PathUtils.join(this.projectDir, tilemapRelPath);
 
         const exist = await exists(tilemapAbsPath);
-        if (!exist) return { status: "Error", message: "File not found" };
+        if (!exist) return { status: "Error", message: `Tilemap not found at ${tilemapAbsPath}` };
 
         const tilemapRawData = await readTextFile(tilemapAbsPath);
-        if (!tilemapRawData) return { status: "Error", message: "File not found" };
+        if (!tilemapRawData) return { status: "Error", message: `Error while reading tilemap file at ${tilemapAbsPath}` };
 
         const projectData = TilemapDataSchema(tilemapRawData);
         if (projectData instanceof type.errors) {
             console.error(projectData.summary);
-            return { status: "Error", message: "Invalid tilemap format" };
+            return { status: "Error", message: "Invalid tilemap format at file " + tilemapAbsPath };
         }
         return { status: "Success", data: projectData };
     }

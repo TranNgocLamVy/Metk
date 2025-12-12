@@ -4,7 +4,7 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { ITilemapStorageService } from "../../infrastructure/interface/ITilemapStorageService";
 import { TilemapData, TilemapMetaData } from "../../shared/schema/tilemapSchema";
-import { Tilemap } from "../application/tilemap";
+import { Tilemap } from "../application/tile/tilemap";
 import { TilesetSelector } from "./tilemapSelector";
 import { TilesetManager } from "./tilesetManager";
 

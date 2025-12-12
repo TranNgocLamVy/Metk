@@ -1,35 +1,39 @@
-import { useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { AppCore } from "@/core/appcore";
 import { ProjectService } from "@/shared/services/projectService";
+import LoadingOverlay from "@/view/components/layout/loadingOverlay";
 import Workspace from "@/view/components/workspace/workspace";
 import { useAppcore } from "@/view/stores/appCoreStore";
-import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
 
 export default function Project() {
+    const [isLoading, setIsLoading] = useState(true);
+
 	const { id } = useParams();
 	const navigate = useNavigate();
-    
 	const { isAppcoreLoaded } = useAppcore();
-    const { currentProject } = useProjectManagerStore();
-    
-    if (!id) {
-        navigate("/")
-        return null;
-    }
-    
+
+	if (!id) {
+		navigate("/");
+		return null;
+	}
+
 	useEffect(() => {
-		const ensureCurrentProject = async () => {
-			if (!currentProject || currentProject.metaData.id !== id) {
-				const result = await ProjectService.loadProject(id);
-				if (result.status !== "Success") {
-					navigate("/");
-				}
+		const loadProject = async () => {
+			const result = await ProjectService.loadProject(id);
+			if (result.status !== "Success") {
+				navigate("/");
+                return;
 			}
+            setIsLoading(false);
 		};
-		if (isAppcoreLoaded) ensureCurrentProject();
+		if (isAppcoreLoaded) loadProject();
 	}, [id, isAppcoreLoaded]);
 
-	return <Workspace />;
+	return (
+		<div className="w-full h-full relative">
+            <LoadingOverlay isLoading={isLoading} />
+			<Workspace />
+		</div>
+	);
 }

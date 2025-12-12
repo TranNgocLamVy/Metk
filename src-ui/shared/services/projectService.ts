@@ -1,24 +1,27 @@
 import { AppCore } from "@/core/appcore";
 import { createProjectForm } from "@/view/components/form/projectForm";
 import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
-import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
 import { Result } from "../types/result";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { FormService } from "./formService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
+import { WorkspaceService } from "./workspaceService";
 
 export class ProjectService {
     public static async loadProject(id: string): Promise<Result> {
         const result = await AppCore.getIns().projectManager.loadProject(id);
-        if (result.status == "Success") {
-            await TilesetService.loadTilesetView();
-            useProjectManagerStore.getState().setCurrentProject(result.data);
-            useNavigationStore.getState().navigate?.("/project/" + id);
-        } else {
+        if (result.status !== "Success") {
             ToastService.error({ message: result.message });
+            return result;
         }
+        useProjectManagerStore.getState().setCurrentProject(result.data)
+
+        await TilesetService.loadTilesetView();
+
+        await WorkspaceService.loadWorkspace(result.data);
+
         return result;
     }
 

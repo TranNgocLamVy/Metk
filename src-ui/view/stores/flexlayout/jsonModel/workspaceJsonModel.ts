@@ -19,6 +19,12 @@ const workspaceRowNode: IJsonRowNode = {
                     component: "layerManager",
                     enableClose: false,
                 },
+                {
+                    type: "tab",
+                    name: "Explorer",
+                    component: "explorer",
+                    enableClose: false,
+                },
             ],
         },
         {

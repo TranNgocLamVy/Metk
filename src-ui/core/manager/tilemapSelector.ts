@@ -2,7 +2,7 @@
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { Tile, Tileset } from "../application/tileset";
+import { Tile, Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 
 export class TilesetSelector {
@@ -28,6 +28,7 @@ export class TilesetSelector {
             const tileset = tilesetResult.data;
             return { status: "Success", data: tileset.getTile(tileId) };
         }
+        console.error("Tileset not found");
         return { status: "Error", message: "Tileset not found" };
     }
 }

@@ -13,8 +13,8 @@ import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema"
 import { PROJECT_FILE_NAME } from "../constance/project";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilesetManager } from "../manager/tilesetManager";
-import { Tilemap } from "./tilemap";
-import { Tileset } from "./tileset";
+import { Tilemap } from "./tile/tilemap";
+import { Tileset } from "./tile/tileset";
 
 export class Project {
     private _metaData: ProjectMetaData;

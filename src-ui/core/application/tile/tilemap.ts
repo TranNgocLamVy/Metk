@@ -4,9 +4,9 @@ import { TilemapData, TileRefData, TilesetRefData } from "@/shared/schema/tilema
 import { Result, ResultStatus } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { TilesetSelector } from "../manager/tilemapSelector";
+import { TilesetSelector } from "../../manager/tilemapSelector";
 import { TileLayer } from "./tilelayer";
-import { Tile, Tileset } from "./tileset";
+import { Tile } from "./tileset";
 
 interface TilemapEvent extends BaseObjectEvents {
     tilelayerAdded: (layerId: string) => void
@@ -112,7 +112,10 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         if (!this.tilesets.find(tileset => tileset.id === tile.tileset.id)) {
             const projectDir = this.tilesetSelector.projectDir;
             const tilesetRelPathFromProject = this.tilesetSelector.tilesetManager.getTilesetPathById(tile.tileset.id);
-            if (!tilesetRelPathFromProject) return { status: "Error", message: "Tileset not found" };
+            if (!tilesetRelPathFromProject) {
+                console.error("Tileset not found");
+                return { status: "Error", message: "Tileset not found" };
+            }
             const tilesetAbsPath = PathUtils.join(projectDir, tilesetRelPathFromProject);
             const tilesetRefPathFromTilemap = PathUtils.relative(this.tilesetSelector.tilemapAbsPath, tilesetAbsPath);
             this.tilesets.push({ id: tile.tileset.id, name: tile.tileset.name, source: tilesetRefPathFromTilemap });

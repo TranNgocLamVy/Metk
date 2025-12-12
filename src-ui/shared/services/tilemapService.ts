@@ -10,16 +10,8 @@ import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 
 export class TilemapService {
-    public static async loadTilemapEditor(): Promise<void> {
-
-    }
-
-    public static async openTilemapEditor(id: string): Promise<void> {
-        const project = AppCore.getIns().getCurrentProject();
-    }
-
     public static async createTilemap(): Promise<void> {
-        const currentProject = AppCore.getIns().getCurrentProject();
+        const currentProject = AppCore.getCurrentProject();
         const form = await FormService.openFormDialog(createTilemapForm);
         if (!form) return;
 
@@ -43,7 +35,6 @@ export class TilemapService {
         if (createTilesetResult.status === "Success") {
             const newTilemap = createTilesetResult.data;
             useTilemapEditorStore.getState().addTilemap({ name: newTilemap.name, id: newTilemap.id });
-            TilemapService.openTilemapEditor(newTilemap.id);
             ToastService.success({ message: "Tilemap created successfully" });
         } else if (createTilesetResult.status === "Error") {
             ToastService.error({ message: createTilesetResult.message });
