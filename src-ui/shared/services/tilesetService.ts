@@ -4,7 +4,6 @@ import { AppCore } from "@/core/appcore";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { createTilesetForm } from "@/view/components/form/tilesetForm";
 import { useExplorerStore } from "@/view/stores/application/explorerStore";
-import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";

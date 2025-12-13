@@ -27,7 +27,7 @@ export class AppCore {
 
     public async load(): Promise<Result> {
         if (this.isLoaded) return { status: "Error", message: "AppCore already loaded" };
-        await this.projectManager.load();
+        await AppCore.getIns().projectManager.load();
         this.isLoaded = true;
         return { status: "Success", data: null };
     }

@@ -11,6 +11,16 @@ export class WorkspaceService {
             ToastService.error({ message: result.message });
             return;
         }
+
+        // Load tileset session
+        const tilesetsSession = AppCore.getCurrentWorkspace().tilesetSessionManager.tilesetsSession;
+        useTilesetSessionStore.getState().setSessions(tilesetsSession);
+        const currentTilesetSession = AppCore.getCurrentWorkspace().tilesetSessionManager.currentTilesetSession;
+        if (currentTilesetSession) {
+            useTilesetSessionStore.getState().openSession(currentTilesetSession)
+        }
+
+        // Load tilemap session
     }
 
     public static async saveWorkspace(project: Project): Promise<void> {
@@ -23,7 +33,7 @@ export class WorkspaceService {
             ToastService.error({ message: result.message });
             return;
         }
-        useTilesetSessionStore.getState().setCurrentTilesetViewSesison(result.data);
+        useTilesetSessionStore.getState().openSession(result.data);
     }
 
     public static async createTilesetSession(tilesetId: string): Promise<void> {
@@ -39,7 +49,6 @@ export class WorkspaceService {
             ToastService.error({ message: result.message });
             return;
         }
-        useTilesetSessionStore.getState().addTilesetSession({ name: tileset.name, sessionId: result.data.id });
-        useTilesetSessionStore.getState().setCurrentTilesetViewSesison(result.data);
+        useTilesetSessionStore.getState().openSession(result.data);
     }
 }
