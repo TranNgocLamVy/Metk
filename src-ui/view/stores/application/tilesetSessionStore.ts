@@ -2,7 +2,8 @@ import { Application } from "pixi.js";
 import { create } from "zustand";
 
 import { TilesetSession } from "@/core/application/session/tilesetSession";
-import { TilesetSessionView } from "@/view/manager/tilesetSessionView";
+import { WorkspaceService } from "@/shared/services/workspaceService";
+import { TilesetSessionView } from "@/view/models/tilesetSessionView";
 
 type TilesetSessionDisplayData = {
     name: string;
@@ -15,8 +16,8 @@ type TilesetViewStore = {
     tilesetsSession: TilesetSessionDisplayData[];
     currentSession: TilesetSessionView | null;
     setPixiApp: (pixiApp: Application) => void;
-    setSessions:(session: TilesetSession[]) => void;
-    openSession:(session: TilesetSession) => TilesetSessionView | null;
+    setSessions: (session: TilesetSession[]) => void;
+    openSession: (session: TilesetSession) => TilesetSessionView | null;
     closeSession(sessionId: string): void;
     clear(): void;
 }
@@ -41,6 +42,7 @@ export const useTilesetSessionStore = create<TilesetViewStore>((set, get) => {
                 get().tilesetSessionMap.set(session.id, sessionView);
                 set({ tilesetsSession: [...get().tilesetsSession, { name: session.tileset.name, sessionId: session.id }], currentSession: sessionView });
             });
+            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         },
         openSession: (session: TilesetSession) => {
             let sessionView: TilesetSessionView;
@@ -49,15 +51,21 @@ export const useTilesetSessionStore = create<TilesetViewStore>((set, get) => {
             } else {
                 sessionView = new TilesetSessionView(session);
                 get().tilesetSessionMap.set(session.id, sessionView);
-                set({ tilesetsSession: [...get().tilesetsSession, { name: session.tileset.name, sessionId: session.id }], currentSession: sessionView });
+                set({ tilesetsSession: [...get().tilesetsSession, { name: session.tileset.name, sessionId: session.id }] });
             }
             const currentSession = get().currentSession;
-            if (currentSession) currentSession.unActivateSession();
-            
+
+            if (currentSession && currentSession !== sessionView) {
+                currentSession.unActivateSession();
+            } else if (currentSession) {
+                currentSession.unActivateSession();
+            }
+
             const pixiApp = get().pixiApp;
             if (pixiApp) sessionView.activateSession(pixiApp);
 
             set({ currentSession: sessionView });
+            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
             return sessionView;
         },
         closeSession: (sessionId: string) => {
@@ -74,11 +82,12 @@ export const useTilesetSessionStore = create<TilesetViewStore>((set, get) => {
                     return { tilesetsSession: [...state.tilesetsSession.filter((tilesetSession) => tilesetSession.sessionId !== sessionId)] };
                 });
             }
+            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         },
         clear: () => {
             get().tilesetSessionMap.forEach(sessionView => sessionView.destroy());
             get().tilesetSessionMap.clear();
-            get().tilesetsSession = [];
+            set({ currentSession: null, tilesetsSession: [] });
         }
     }
 });

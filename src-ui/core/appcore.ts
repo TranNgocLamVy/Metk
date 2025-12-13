@@ -21,8 +21,7 @@ export class AppCore {
         const projectStorageService = new JsonProjectStorageService();
         this.projectManager = new ProjectManager(projectRepo, projectStorageService);
 
-        const workspaceStorageService = new JsonWorkspaceStorageService();
-        this.workspaceManager = new WorkspaceManager(workspaceStorageService);
+        this.workspaceManager = new WorkspaceManager();
     }
 
     public async load(): Promise<Result> {

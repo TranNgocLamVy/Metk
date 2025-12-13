@@ -5,6 +5,8 @@ import { useTilesetSessionStore } from "@/view/stores/application/tilesetSession
 import { ToastService } from "./toastService";
 
 export class WorkspaceService {
+    private static saveWorkspaceTimeout: NodeJS.Timeout | null = null;
+
     public static async loadWorkspace(project: Project): Promise<void> {
         const result = await AppCore.getIns().workspaceManager.loadProjectWorkspace(project);
         if (result.status !== "Success") {
@@ -12,19 +14,34 @@ export class WorkspaceService {
             return;
         }
 
-        // Load tileset session
+        useTilesetSessionStore.getState().clear();
+        
         const tilesetsSession = AppCore.getCurrentWorkspace().tilesetSessionManager.tilesetsSession;
         useTilesetSessionStore.getState().setSessions(tilesetsSession);
         const currentTilesetSession = AppCore.getCurrentWorkspace().tilesetSessionManager.currentTilesetSession;
         if (currentTilesetSession) {
             useTilesetSessionStore.getState().openSession(currentTilesetSession)
         }
-
-        // Load tilemap session
     }
 
-    public static async saveWorkspace(project: Project): Promise<void> {
+    public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
+        if (!waitForTimeout) {
+            await AppCore.getIns().workspaceManager.saveCurrentWorkspace();
+            return;
+        }
 
+        if (WorkspaceService.saveWorkspaceTimeout) {
+            clearTimeout(WorkspaceService.saveWorkspaceTimeout)
+            WorkspaceService.saveWorkspaceTimeout = null;
+        }
+        WorkspaceService.saveWorkspaceTimeout = setTimeout(async () => {
+            const result = await AppCore.getIns().workspaceManager.saveCurrentWorkspace();
+            if (result.status !== "Success") {
+                ToastService.error({ message: result.message });
+                return;
+            }
+            WorkspaceService.saveWorkspaceTimeout = null;
+        }, 1000);
     }
 
     public static async openTilesetViewSesion(sessionId: string): Promise<void> {
@@ -37,7 +54,7 @@ export class WorkspaceService {
     }
 
     public static async createTilesetSession(tilesetId: string): Promise<void> {
-        const tilesetResult = await AppCore.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
+        const tilesetResult = AppCore.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
         if (tilesetResult.status !== "Success" || !tilesetResult.data) {
             console.error(tilesetResult.message);
             ToastService.error({ message: tilesetResult.message });
@@ -50,5 +67,14 @@ export class WorkspaceService {
             return;
         }
         useTilesetSessionStore.getState().openSession(result.data);
+    }
+
+    public static async closeTilesetSession(sessionId: string): Promise<void> {
+        const result = await AppCore.getCurrentWorkspace().closeTilesetSession(sessionId);
+        if (result.status !== "Success" || !result.data) {
+            ToastService.error({ message: result.message });
+            return;
+        }
+        useTilesetSessionStore.getState().closeSession(sessionId);
     }
 }

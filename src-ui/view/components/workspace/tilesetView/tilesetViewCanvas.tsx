@@ -1,5 +1,4 @@
 import { Application } from "pixi.js";
-import { useEffect, useState } from "react";
 
 import useResizeObserver from "@/view/hooks/useResizeObserver";
 import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
@@ -21,7 +20,7 @@ export default function TilesetViewCanvas() {
 
     return (
         <div ref={containerRef} className="bg-secondary-background w-full h-full overflow-hidden border-4 rounded-lg">
-            <PixiApplication resizeTo={containerRef} onInit={onInit} autoStart backgroundAlpha={0} />
+            <PixiApplication onInit={onInit} autoStart backgroundAlpha={0} />
         </div>
     );
 }

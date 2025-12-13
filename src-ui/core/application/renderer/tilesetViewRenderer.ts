@@ -15,19 +15,14 @@ export class TilesetRenderer {
         this.tileset = context.tileset as Tileset;
 
         this.container = new Container();
+        context.parent.addChild(this.container);
+        this.container.position.set(0, 0);
 
         this.tileset.tiles.forEach((tile, index) => {
-            const tex = tile.getTexture(); // fixed typo
+            const tex = tile.getTexture();
             const sprite = this.makeTileSprite(tex, index, this.container);
             this.container.addChild(sprite);
         })
-
-        context.parent.addChild(this.container);
-    }
-
-    public setParent(parent: Container) {
-        this.container.removeFromParent();
-        parent.addChild(this.container);
     }
 
     private makeTileSprite(texture: Texture, index: number, gridContainer: Container): Sprite {

@@ -1,6 +1,7 @@
 import { Result } from "@/shared/types/result";
 
 export interface IWorkspacetorageService {
-    loadWorkspace(workspaceAbsPath: string): Promise<Result<any>>;
-    saveWorkspace(workspaceAbsPath: string, content: any): Promise<Result>;
+    projectDir: string;
+    loadWorkspace(): Promise<Result<any>>;
+    saveWorkspace(content: any): Promise<Result>;
 }
