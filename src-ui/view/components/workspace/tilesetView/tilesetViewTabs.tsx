@@ -13,14 +13,14 @@ export default function TilesetViewTabs() {
 
 	useHorizontalScroll(ref);
 
-	const { tilesetsSession, currentTilesetSession } = useTilesetSessionStore();
+	const { tilesetsSession, currentSession } = useTilesetSessionStore();
 
 	return (
 		<HStack className="w-full h-fit bg-background" justify="start" align="center">
 			<TilesetViewDropDownMenu />
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
 				{tilesetsSession.map((tilesetSession) => {
-					const isCurrent = currentTilesetSession?.id === tilesetSession.sessionId;
+					const isCurrent = currentSession?.session.id === tilesetSession.sessionId;
 					const onClick = () => {
 						if (isCurrent) return;
 						WorkspaceService.openTilesetViewSesion(tilesetSession.sessionId);

@@ -6,7 +6,7 @@ import { Button } from "../shadcn/button";
 
 export default function Debug() {
 	const testPath = async () => {
-        const project = AppCore.getCurrentWorkspace();
+        const project = AppCore.getCurrentWorkspace().serialize();
         console.log(project)
 	};
 

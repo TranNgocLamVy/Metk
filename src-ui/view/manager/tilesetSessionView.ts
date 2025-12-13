@@ -7,17 +7,17 @@ import { TilesetSession } from "@/core/application/session/tilesetSession";
 export class TilesetSessionView {
     public session: TilesetSession;
     public viewport: Viewport;
+    private pixiApp: Application;
     private renderer: TilesetRenderer;
-    private pixiApp: Application; // Need to store this to remove global listeners later
+    private isInit: boolean = false;
 
-    private bindMovedEnd: () => void;
-    private bindZoomedEnd: () => void;
-    private bindResize: () => void;
-
-    constructor(session: TilesetSession, pixiApp: Application) {
+    constructor(session: TilesetSession) {
         this.session = session;
-        this.pixiApp = pixiApp;
+    }
 
+    private initSession(pixiApp: Application) {
+        this.pixiApp = pixiApp;
+        
         this.viewport = new Viewport({
             screenWidth: pixiApp.screen.width,
             screenHeight: pixiApp.screen.height,
@@ -25,57 +25,63 @@ export class TilesetSessionView {
             stopPropagation: true,
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
+            disableOnContextMenu: true,
         });
-        this.viewport.drag({ mouseButtons: "middle" }).wheel().decelerate({ friction: 0 });
-        this.viewport.eventMode = "static";
-        
-        this.renderer = new TilesetRenderer({ tileset: session.tileset, parent: this.viewport });
 
-        this.bindMovedEnd = this.onMovedEnd.bind(this);
-        this.bindZoomedEnd = this.onZoomedEnd.bind(this);
-        this.bindResize = this.onResize.bind(this);
+        this.viewport
+            .drag({ mouseButtons: "left", keyToPress: ["Space"] })
+            .wheel({ smooth: 15 })
+            .decelerate({ friction: 0 })
+
+        this.viewport.eventMode = 'none';
+        this.viewport.plugins.pause('drag');
+        this.viewport.plugins.pause('wheel');
+        this.viewport.plugins.pause('decelerate');
+        
+        this.renderer = new TilesetRenderer({ tileset: this.session.tileset, parent: this.viewport });
+
+        this.pixiApp.renderer.on("resize", () => {
+            const w = this.pixiApp.renderer.width;
+            const h = this.pixiApp.renderer.height;
+            this.viewport.resize(w, h);
+        });
+
+        this.viewport.on("moved-end", () => {
+            this.session.updateViewState({
+                x: this.viewport.center.x,
+                y: this.viewport.center.y,
+            });
+        });
+        
+        this.viewport.on("zoomed-end", () => {
+            this.session.updateViewState({
+                zoom: this.viewport.scaled
+            });
+        });
     }
 
-    private onMovedEnd = () => {
-        this.session.updateViewState({
-            x: this.viewport.center.x,
-            y: this.viewport.center.y,
-        });
-    };
+    public activateSession(pixiApp: Application) {
+        if (!this.isInit || this.pixiApp !== pixiApp) {
+            this.initSession(pixiApp);
+        }
 
-    private onZoomedEnd = () => {
-        this.session.updateViewState({
-            zoom: this.viewport.scaled
-        });
-    };
-
-    private onResize = () => {
-        const w = this.pixiApp.renderer.width;
-        const h = this.pixiApp.renderer.height;
-        this.viewport.resize(w, h);
-    };
-    // ---------------------------------------------
-
-    public activateSession() {
         this.pixiApp.stage.addChild(this.viewport);
-        const center = this.viewport.center;
-        
-        // Restore view state
-        this.viewport.moveCenter(this.session.viewState.x ?? center.x, this.session.viewState.y ?? center.y);
-        const targetZoom = this.session.viewState.zoom || 1;
-        this.viewport.setZoom(targetZoom);
 
-        // Add Listeners
-        this.viewport.on("moved-end", this.bindMovedEnd);
-        this.viewport.on("zoomed-end", this.bindZoomedEnd);
-        this.pixiApp.renderer.on("resize", this.bindResize);
+        this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);
+        this.viewport.setZoom(this.session.viewState.zoom);
+
+        this.viewport.eventMode = 'static';
+        this.viewport.plugins.resume('drag');
+        this.viewport.plugins.resume('wheel');
+        this.viewport.plugins.resume('decelerate');
     }
 
     public unActivateSession() {
-        this.pixiApp.stage.removeChild(this.viewport);
-        this.viewport.off("moved-end", this.bindMovedEnd);
-        this.viewport.off("zoomed-end", this.bindZoomedEnd);
-        this.pixiApp.renderer.off("resize", this.bindResize);
+        this.viewport.eventMode = 'none';
+        this.viewport.plugins.pause('drag');
+        this.viewport.plugins.pause('wheel');
+        this.viewport.plugins.pause('decelerate');
+        this.viewport.removeFromParent();
     }
 
     public destroy() {

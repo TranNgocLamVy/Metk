@@ -25,6 +25,11 @@ export class TilesetRenderer {
         context.parent.addChild(this.container);
     }
 
+    public setParent(parent: Container) {
+        this.container.removeFromParent();
+        parent.addChild(this.container);
+    }
+
     private makeTileSprite(texture: Texture, index: number, gridContainer: Container): Sprite {
         const s = new Sprite(texture);
         s.zIndex = 0;
