@@ -46,7 +46,7 @@ export class TilesetSessionManager {
         const newTilesetSessionData: TilesetSessionData = {
             id: uuidv4(),
             tilesetId: tileset.id,
-            viewState: { x: tileset.image.width, y: tileset.image.height, zoom: 1.5 },
+            viewState: { x: null, y: null, zoom: 1 },
         }
 
         const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData);
@@ -66,15 +66,11 @@ export class TilesetSessionManager {
         return { status: "Success", data: tilesetSession };
     }
 
-    public async removeSession(tilesetId: string): Promise<Result<string>> {
-        if (!this.tilesetMap.has(tilesetId)) {
-            console.error("Tileset not found");
-            return { status: "Error", message: "Tileset not found" };
-        }
-        const sessionId = this.tilesetMap.get(tilesetId);
-        this.tilesetMap.delete(tilesetId);
-        if (!sessionId) return { status: "Error", message: "Tileset session not found" };
+    public async closeTilesetSession(sessionId: string): Promise<Result<string>> {
+        const tilesetSession = this.tilesetSessionMap.get(sessionId);
+        if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
         this.tilesetSessionMap.delete(sessionId);
+        this.tilesetMap.delete(tilesetSession.tileset.id);
         return { status: "Success", data: sessionId };
     }
 

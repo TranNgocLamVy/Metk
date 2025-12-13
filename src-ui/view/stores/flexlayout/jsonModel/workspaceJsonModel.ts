@@ -82,6 +82,8 @@ export const workspaceLayout: IJsonModel = {
         borderEnableDrop: false,
         tabSetEnableMaximize: false,
         splitterEnableHandle: true,
+        tabEnableRename: false,
+        tabEnableRenderOnDemand: false,
     },
     borders: workspaceBorderNodes,
     layout: workspaceRowNode,
