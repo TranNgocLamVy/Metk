@@ -1,15 +1,18 @@
 import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
-import { TilesetRenderer } from "@/core/application/renderer/tilesetViewRenderer";
 import { TilesetSession } from "@/core/application/session/tilesetSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
+import { TilesetRenderer } from "@/view/models/tilesetViewRenderer";
+
+import { TilesetViewSelector } from "./tilesetViewSelector";
 
 export class TilesetSessionView {
     public session: TilesetSession;
     public viewport: Viewport;
     private pixiApp: Application;
     private renderer: TilesetRenderer;
+    private selector: TilesetViewSelector;
     private isInit: boolean = false;
 
     constructor(session: TilesetSession) {
@@ -30,7 +33,7 @@ export class TilesetSessionView {
         });
 
         this.viewport
-            .drag({ mouseButtons: "left", keyToPress: ["Space"] })
+            .drag({ mouseButtons: "middle " })
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
 
@@ -59,7 +62,16 @@ export class TilesetSessionView {
             WorkspaceService.saveCurrentWorkspace();
         });
 
+        this.viewport.on("drag-start", () => {
+            this.viewport.cursor = "grabbing";
+        });
+
+        this.viewport.on("drag-end", () => {
+            this.viewport.cursor = "default";
+        });
+
         this.renderer = new TilesetRenderer({ tileset: this.session.tileset, parent: this.viewport });
+        this.selector = new TilesetViewSelector({ tileset: this.session.tileset, parent: this.viewport });
     }
 
     public activateSession(pixiApp: Application) {
