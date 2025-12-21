@@ -34,7 +34,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     constructor(
         tilemapData: TilemapData,
-        public readonly tilesetSelector: TilesetGetter,
+        public readonly tilesetGetter: TilesetGetter,
     ) {
         super();
 
@@ -110,14 +110,14 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         const tileRefData: TileRefData = { tileId: tile.id, tilesetId: tile.tileset.id }
 
         if (!this.tilesets.find(tileset => tileset.id === tile.tileset.id)) {
-            const projectDir = this.tilesetSelector.projectDir;
-            const tilesetRelPathFromProject = this.tilesetSelector.tilesetManager.getTilesetPathById(tile.tileset.id);
+            const projectDir = this.tilesetGetter.projectDir;
+            const tilesetRelPathFromProject = this.tilesetGetter.tilesetManager.getTilesetPathById(tile.tileset.id);
             if (!tilesetRelPathFromProject) {
                 console.error("Tileset not found");
                 return { status: "Error", message: "Tileset not found" };
             }
             const tilesetAbsPath = PathUtils.join(projectDir, tilesetRelPathFromProject);
-            const tilesetRefPathFromTilemap = PathUtils.relative(this.tilesetSelector.tilemapAbsPath, tilesetAbsPath);
+            const tilesetRefPathFromTilemap = PathUtils.relative(this.tilesetGetter.tilemapAbsPath, tilesetAbsPath);
             this.tilesets.push({ id: tile.tileset.id, name: tile.tileset.name, source: tilesetRefPathFromTilemap });
         }
 
@@ -125,7 +125,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         if (!setResult.data) return { status: "Error", message: setResult.message };
 
         const preTileRefData = setResult.data;
-        const preTile = this.tilesetSelector.getTile(preTileRefData.tileId, preTileRefData.tilesetId);
+        const preTile = this.tilesetGetter.getTile(preTileRefData.tileId, preTileRefData.tilesetId);
         if (!preTile.data) return { status: "Error", message: preTile.message };
 
         return { status: "Success", data: preTile.data };

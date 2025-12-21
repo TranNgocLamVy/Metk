@@ -1,6 +1,6 @@
 import { Container, Sprite, Texture } from "pixi.js";
 
-import { Tileset } from "../tile/tileset";
+import { Tileset } from "@/core/application/tile/tileset";
 
 export type CreateTilesetRendererContext = {
     tileset: Tileset;
@@ -8,8 +8,8 @@ export type CreateTilesetRendererContext = {
 }
 
 export class TilesetRenderer {
-    protected container: Container;
-    protected tileset: Tileset;
+    private container: Container;
+    private tileset: Tileset;
 
     constructor(context: CreateTilesetRendererContext) {
         this.tileset = context.tileset as Tileset;
