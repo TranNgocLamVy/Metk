@@ -61,6 +61,14 @@ export class TilemapManager {
         return Array.from(this.tilemapMap.values());
     }
 
+    public getTilemapById(id: string): Result<Tilemap> {
+        const tilemap = this.tilemapMap.get(id);
+        if (!tilemap) {
+            return { status: "Error", message: "Tilemap not found" };
+        }
+        return { status: "Success", data: tilemap };
+    }
+
     public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result> {
         const tilesetSelector = new TilesetGetter(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
         const newTilemap = new Tilemap(tilemapData, tilesetSelector);
