@@ -1,10 +1,12 @@
-import { SelectionState, TilesetSessionData, ViewState } from "@/shared/schema/tilesetSession";
+import { SelectionState } from "@/shared/schema/common/selectionState";
+import { ViewState } from "@/shared/schema/common/viewState";
+import { TilesetSessionData } from "@/shared/schema/tilesetSession";
 
 import { Tileset } from "../tile/tileset";
 
 export class TilesetSession {
-    public id: string;
-    public tileset: Tileset;
+    public readonly id: string;
+    public readonly tileset: Tileset;
     public viewState: ViewState;
     public selectionState: SelectionState;
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData) {

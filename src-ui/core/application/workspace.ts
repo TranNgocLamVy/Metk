@@ -2,6 +2,7 @@ import { IWorkspacetorageService } from "@/infrastructure/interface/IWorkspaceSt
 import { WorkpsaceData } from "@/shared/schema/workspace";
 import { Result } from "@/shared/types/result";
 
+import { TilemapSessionManager } from "../manager/tilemapSessionManager";
 import { TilesetManager } from "../manager/tilesetManager";
 import { TilesetSessionManager } from "../manager/tilesetSessionManager";
 import { TilesetSession } from "./session/tilesetSession";
@@ -9,10 +10,12 @@ import { Tileset } from "./tile/tileset";
 
 export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;
+    public tilemapSessionManager: TilemapSessionManager;
     private workspaceStorageService: IWorkspacetorageService;
     private tilesetManager: TilesetManager;
     constructor (workspaceData: WorkpsaceData, tilesetManager: TilesetManager, workspaceStorageService: IWorkspacetorageService) {
         this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets);
+        this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps);
         this.tilesetManager = tilesetManager;
         this.workspaceStorageService = workspaceStorageService;
     }
@@ -46,6 +49,7 @@ export class Workspace {
     public serialize(): WorkpsaceData {
         return {
             tilesets: this.tilesetSessionManager.serialize(),
+            tilemaps: this.tilemapSessionManager.serialize(),
         }
     }
 }

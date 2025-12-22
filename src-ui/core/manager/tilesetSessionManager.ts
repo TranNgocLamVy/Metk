@@ -9,8 +9,8 @@ import { TilesetManager } from "./tilesetManager";
 
 export class TilesetSessionManager {
     public currentTilesetSession: TilesetSession | null = null;
-    private tilesetSessionMap: Map<string, TilesetSession> = new Map<string, TilesetSession>(); // sessionId -> session
-    private tilesetMap: Map<string, string> = new Map<string, string>(); // tilesetId -> sessionId
+    private tilesetSessionMap: Map<string, TilesetSession> = new Map<string, TilesetSession>();
+    private tilesetMap: Map<string, string> = new Map<string, string>();
     public get tilesetsSession(): TilesetSession[] {
         return Array.from(this.tilesetSessionMap.values());
     }
@@ -47,6 +47,7 @@ export class TilesetSessionManager {
             id: uuidv4(),
             tilesetId: tileset.id,
             viewState: { x: null, y: null, zoom: 1 },
+            selectionState: { selectedTiles: [] },
         }
 
         const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData);
