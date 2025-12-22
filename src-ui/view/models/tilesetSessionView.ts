@@ -71,7 +71,7 @@ export class TilesetSessionView {
         });
 
         this.renderer = new TilesetRenderer({ tileset: this.session.tileset, parent: this.viewport });
-        this.selector = new TilesetViewSelector({ tileset: this.session.tileset, parent: this.viewport });
+        this.selector = new TilesetViewSelector({ tileset: this.session.tileset, tilesetSession: this.session, parent: this.viewport });
     }
 
     public activateSession(pixiApp: Application) {
