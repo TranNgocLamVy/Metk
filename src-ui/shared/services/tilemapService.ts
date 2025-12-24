@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { AppCore } from "@/core/appcore";
 import { createTilemapForm } from "@/view/components/form/tilemapForm";
-import { useTilemapEditorStore } from "@/view/stores/application/tilemapEditorStore";
+import { useExplorerStore } from "@/view/stores/application/explorerStore";
 
 import { TilemapData } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
@@ -10,6 +10,17 @@ import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 
 export class TilemapService {
+    public static async loadTilemapView(): Promise<void> {
+        const project = AppCore.getCurrentProject();
+        const tilemaps = project.tilemapManager.getAllTilemaps();
+        useExplorerStore.getState().setTilemaps(tilemaps.map((tilemap) => {
+            return {
+                id: tilemap.id,
+                name: tilemap.name,
+            }
+        }));
+    }
+
     public static async createTilemap(): Promise<void> {
         const currentProject = AppCore.getCurrentProject();
         const form = await FormService.openFormDialog(createTilemapForm);
@@ -34,7 +45,7 @@ export class TilemapService {
 
         if (createTilesetResult.status === "Success") {
             const newTilemap = createTilesetResult.data;
-            useTilemapEditorStore.getState().addTilemap({ name: newTilemap.name, id: newTilemap.id });
+            useExplorerStore.getState().addTilemap({ name: newTilemap.name, id: newTilemap.id });
             ToastService.success({ message: "Tilemap created successfully" });
         } else if (createTilesetResult.status === "Error") {
             ToastService.error({ message: createTilesetResult.message });

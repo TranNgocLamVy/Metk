@@ -57,7 +57,7 @@ export class TilemapManager {
         }
     }
 
-    public async getAllTilemaps(): Promise<Tilemap[]> {
+    public getAllTilemaps(): Tilemap[] {
         return Array.from(this.tilemapMap.values());
     }
 

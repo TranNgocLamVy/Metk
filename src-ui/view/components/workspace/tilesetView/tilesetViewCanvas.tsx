@@ -19,7 +19,7 @@ export default function TilesetViewCanvas() {
     }
 
     return (
-        <div ref={containerRef} className="bg-secondary-background w-full h-full overflow-hidden border-4 rounded-lg">
+        <div ref={containerRef} className="bg-secondary-background w-full h-full overflow-hidden border-1 rounded-lg">
             <PixiApplication onInit={onInit} autoStart backgroundAlpha={0} />
         </div>
     );

@@ -1,11 +1,14 @@
 
+import { v4 as uuidv4 } from "uuid";
+
 import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
-import { TilemapData, TileRefData, TilesetRefData } from "@/shared/schema/tilemapSchema";
-import { Result, ResultStatus } from "@/shared/types/result";
+import { TilemapData, TilesetRefData } from "@/shared/schema/tilemapSchema";
+import { ErrorResult, Result, ResultStatus } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { TilesetGetter } from "../../manager/tilemapGetter";
-import { TileLayer } from "./tilelayer";
+import { RootLayer } from "./layer/rootLayer";
+import { TileLayer } from "./layer/tileLayer";
 import { Tile } from "./tileset";
 
 interface TilemapEvent extends BaseObjectEvents {
@@ -25,12 +28,10 @@ export class Tilemap extends BaseObject<TilemapEvent> {
     public tilewidth: number;
     public tileheight: number;
 
-    public nextlayerid: number;
-    public nextobjectid: number;
+    public rootLayer: RootLayer;
 
-    public tilesets: TilesetRefData[] = []
-
-    public tilelayers: TileLayer[] = [];
+    public tilesets: TilesetRefData[];
+    private nextTilesetIndex: number;
 
     constructor(
         tilemapData: TilemapData,
@@ -38,6 +39,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
     ) {
         super();
 
+        
         this.id = tilemapData.id;
         this.name = tilemapData.name;
         this.infinite = tilemapData.infinite ?? false;
@@ -47,14 +49,14 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.height = tilemapData.height;
         this.tilewidth = tilemapData.tilewidth;
         this.tileheight = tilemapData.tileheight;
-
-        this.nextlayerid = tilemapData.nextlayerid ?? 1;
-        this.nextobjectid = tilemapData.nextobjectid ?? 1;
-
-        tilemapData.layers.forEach((tilelayerData) => {
-            const tilelayer = new TileLayer(tilelayerData);
-            this.tilelayers.push(tilelayer);
-        })
+        
+        this.rootLayer = new RootLayer(tilemapData.layers);
+        
+        this.tilesets = tilemapData.tileset;
+        
+        const maxIndex = Math.max(...this.tilesets.map(tileset => tileset.index)) ?? 0;
+        this.nextTilesetIndex = tilemapData.nextTilesetIndex ?? maxIndex + 1;
+        console.log(this);
     }
 
     public serialize(): TilemapData {
@@ -67,10 +69,8 @@ export class Tilemap extends BaseObject<TilemapEvent> {
             tileheight: this.tileheight,
             infinite: this.infinite,
             backgroundcolor: this.backgroundcolor,
-            nextlayerid: this.nextlayerid,
-            nextobjectid: this.nextobjectid,
             tileset: this.tilesets,
-            layers: this.tilelayers.map(tilelayer => tilelayer.serialize()),
+            layers: this.rootLayer.serialize(),
         }
     }
 
@@ -80,34 +80,50 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     // ------------------------------ Layer Operations ------------------------------
     public getAllLayers(): TileLayer[] {
-        return Array.from(this.tilelayers);
+        return []
     }
+
     public getLayerById(id: string): Result<TileLayer> {
-        const tilelayer = this.tilelayers.find(tilelayer => tilelayer.id === id);
-        if (tilelayer === undefined) return { status: "Error", message: "Tilelayer not found" };
-        return { status: "Success", data: tilelayer };
+        return ErrorResult("Not implemented yet!");
+        // const tilelayer = this.tilelayers.find(tilelayer => tilelayer.id === id);
+        // if (tilelayer === undefined) return { status: "Error", message: "Tilelayer not found" };
+        // return { status: "Success", data: tilelayer };
     }
-    public async addTilelayer(): Promise<Result> {
-        // TODO:
-        this.eventEmitter.emit("tilelayerAdded", "");
-        return { status: "Success", data: null };
+
+    public async addTilelayer(name: string): Promise<Result<TileLayer>> {
+        return ErrorResult("Not implemented yet!");
+        // const newLayerId = uuidv4();
+        // const newTilelayer = new TileLayer({
+        //     id: newLayerId,
+        //     name: name,
+        //     width: this.width,
+        //     height: this.height,
+        //     visible: true,
+        //     opacity: 1,
+        //     locked: false,
+        //     tilesData: Array.from({ length: this.height }, () => Array.from({ length: this.width }, () => null)),
+        // }, this.rootLayer);
+        // this.tilelayers.push(newTilelayer);
+        // this.eventEmitter.emit("tilelayerAdded", "");
+        // return { status: "Success", data: newTilelayer };
     }
+
     public async removeTilelayer(id: string): Promise<Result> {
         // TODO:
         this.eventEmitter.emit("tilelayerRemoved", "");
         return { status: "Success", data: null };
     }
+
     public async reorderTilelayer(id: string, newIndex: number): Promise<Result> {
         // TODO: 
         // this.eventEmitter.emit("tilelayerReordered", "", oldIndex, newIndex);
         return { status: "Success", data: null };
     }
-    public setTileAtLayer(coordinate: { x: number, y: number }, tile: Tile, layerId: string): Result<Tile> {
+
+    public setTileAtLayer(coordinate: { x: number, y: number }, tile: Tile, layerId: string): Result {
         const getLayerResult = this.getLayerById(layerId);
         if (!getLayerResult.data) return { status: "Error", message: getLayerResult.message };
         const layer = getLayerResult.data;
-
-        const tileRefData: TileRefData = { tileId: tile.id, tilesetId: tile.tileset.id }
 
         if (!this.tilesets.find(tileset => tileset.id === tile.tileset.id)) {
             const projectDir = this.tilesetGetter.projectDir;
@@ -118,23 +134,27 @@ export class Tilemap extends BaseObject<TilemapEvent> {
             }
             const tilesetAbsPath = PathUtils.join(projectDir, tilesetRelPathFromProject);
             const tilesetRefPathFromTilemap = PathUtils.relative(this.tilesetGetter.tilemapAbsPath, tilesetAbsPath);
-            this.tilesets.push({ id: tile.tileset.id, name: tile.tileset.name, source: tilesetRefPathFromTilemap });
+
+            const newIndex = this.nextTilesetIndex;
+            this.nextTilesetIndex += 1;
+            this.tilesets.push({ id: tile.tileset.id, name: tile.tileset.name, source: tilesetRefPathFromTilemap, index: newIndex });
         }
 
-        const setResult = layer.setTileRefAt(coordinate, tileRefData);
-        if (!setResult.data) return { status: "Error", message: setResult.message };
+        const tilesetIndex = this.tilesets.find(tileset => tileset.id === tile.tileset.id)?.index;
+        if (tilesetIndex === undefined) {
+            console.error("Tileset index not found");
+            return { status: "Error", message: "Tileset index not found" };
+        }
 
-        const preTileRefData = setResult.data;
-        const preTile = this.tilesetGetter.getTile(preTileRefData.tileId, preTileRefData.tilesetId);
-        if (!preTile.data) return { status: "Error", message: preTile.message };
-
-        return { status: "Success", data: preTile.data };
+        const setResult = layer.setTileRefAt(coordinate, tile.id, tilesetIndex);
+        return setResult;
     }
 
     // ------------------------------ Properties Operations ------------------------------
     public getName(): string {
         return this.name;
     }
+
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.eventEmitter.emit("updateProperty", "name", this.name);

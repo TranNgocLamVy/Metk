@@ -5,6 +5,7 @@ import { useProjectManagerStore } from "@/view/stores/application/projectManager
 import { Result } from "../types/result";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { FormService } from "./formService";
+import { TilemapService } from "./tilemapService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
 import { WorkspaceService } from "./workspaceService";
@@ -19,6 +20,7 @@ export class ProjectService {
         useProjectManagerStore.getState().setCurrentProject(result.data)
 
         await TilesetService.loadTilesetView();
+        await TilemapService.loadTilemapView();
 
         await WorkspaceService.loadWorkspace(result.data);
 

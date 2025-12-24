@@ -5,7 +5,7 @@ import { create } from "zustand";
 import Debug from "@/view/components/workspace/debug";
 import Explorer from "@/view/components/workspace/explorer";
 import LayerManager from "@/view/components/workspace/layerManager";
-import TilemapEditor from "@/view/components/workspace/tilemapEditor";
+import TilemapEditor from "@/view/components/workspace/tilemapEditor/tilemapEditor";
 import TilesetView from "@/view/components/workspace/tilesetView/tilesetView";
 
 import { workspaceLayout } from "./jsonModel/workspaceJsonModel";
@@ -18,6 +18,14 @@ type WorkspaceState = {
 };
 
 const getModel = () => {
+    const localStorageLayout = localStorage.getItem("workspaceLayout");
+    if (localStorageLayout) {
+        try {
+            return Model.fromJson(JSON.parse(localStorageLayout));
+        } catch (e) {
+            console.error("Failed to parse workspace layout from localStorage", e);
+        }
+    }
 	return Model.fromJson(workspaceLayout);
 };
 

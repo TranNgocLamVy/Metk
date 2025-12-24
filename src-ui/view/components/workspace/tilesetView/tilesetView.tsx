@@ -5,9 +5,10 @@ import TilesetViewTabs from "./tilesetViewTabs";
 
 export default function TilesetView() {
 	return (
-		<VStack className="tilesetview w-full h-full">
-			<TilesetViewCanvas />
+		<VStack className="tilesetView w-full h-full">
+            <span className="font-bold text-sm p-1 uppercase">Tilesets</span>
 			<TilesetViewTabs />
+			<TilesetViewCanvas />
 		</VStack>
 	);
 }

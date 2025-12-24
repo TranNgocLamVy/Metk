@@ -1,6 +1,6 @@
 ﻿import { EventEmitter } from "eventemitter3";
 
-import { Result } from "@/shared/types/result";
+import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 
 export interface BaseObjectEvents {
     updateProperty: (key: string, value: any) => void
@@ -22,9 +22,9 @@ export abstract class BaseObject<T extends BaseObjectEvents = BaseObjectEvents> 
     try {
         (this as any)[key] = value;
         (this.eventEmitter as any).emit("updateProperty", { key, value });
-        return { status: "Success", data: null };
+        return SuccessResult();
     } catch (error) {
-        return { status: "Error", message: error as any };
+        return ErrorResult("Failed to set property: " + (error as any).toString());
     }
 }
 }

@@ -32,16 +32,16 @@ export default function MenuBar() {
 			</HStack>
 
 			<HStack className="ml-auto">
-				<Button title="Change Theme" size={"icon_sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
+				<Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
 					<SunMoon className="size-4" />
 				</Button>
-				<Button title="Minimize" size={"icon_sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().minimize()}>
+				<Button title="Minimize" size={"icon-sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().minimize()}>
 					<Minus className="size-4" />
 				</Button>
-				<Button title="Toggle Maximize" size={"icon_sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().toggleMaximize()}>
+				<Button title="Toggle Maximize" size={"icon-sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().toggleMaximize()}>
 					<Copy className="size-3" style={{ transform: "scaleX(-1)" }} />
 				</Button>
-				<Button title="Close" size={"icon_sm"} variant={"pseudo_destructive"} className="px-6 rounded-none" onClick={() => getCurrentWindow().close()}>
+				<Button title="Close" size={"icon-sm"} variant={"pseudo_destructive"} className="px-6 rounded-none" onClick={() => getCurrentWindow().close()}>
 					<X className="size-4" />
 				</Button>
 			</HStack>

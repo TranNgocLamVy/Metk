@@ -13,7 +13,7 @@ export default function TilesetViewDropDownMenu() {
     return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="default" size={"icon_sm"}>
+				<Button variant="default" size={"icon-sm"}>
 					<Ellipsis />
 				</Button>
 			</DropdownMenuTrigger>
