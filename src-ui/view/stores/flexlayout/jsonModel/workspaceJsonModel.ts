@@ -84,6 +84,7 @@ export const workspaceLayout: IJsonModel = {
         splitterEnableHandle: true,
         tabEnableRename: false,
         tabEnableRenderOnDemand: false,
+        tabSetTabLocation: "bottom",
     },
     borders: workspaceBorderNodes,
     layout: workspaceRowNode,

@@ -23,16 +23,6 @@ export class TilesetService {
         }));
     }
 
-    public static async openTilesetView(id: string): Promise<void> {
-        const project = AppCore.getCurrentProject();
-        const tilesetFindResult = await project.tilesetManager.getTilesetById(id)
-        if (tilesetFindResult.status == "Success") {
-            const tileset = tilesetFindResult.data;
-        } else {
-            ToastService.error({ message: tilesetFindResult.message });
-        }
-    }
-
     public static async createTileset(): Promise<void> {
         const currentProject = AppCore.getCurrentProject();
         const form = await FormService.openFormDialog(createTilesetForm)

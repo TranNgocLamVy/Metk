@@ -2,10 +2,13 @@ import { IWorkspacetorageService } from "@/infrastructure/interface/IWorkspaceSt
 import { WorkpsaceData } from "@/shared/schema/workspace";
 import { Result } from "@/shared/types/result";
 
+import { TilemapManager } from "../manager/tilemapManager";
 import { TilemapSessionManager } from "../manager/tilemapSessionManager";
 import { TilesetManager } from "../manager/tilesetManager";
 import { TilesetSessionManager } from "../manager/tilesetSessionManager";
+import { TilemapSession } from "./session/tilemapSession";
 import { TilesetSession } from "./session/tilesetSession";
+import { Tilemap } from "./tile/tilemap";
 import { Tileset } from "./tile/tileset";
 
 export class Workspace {
@@ -13,15 +16,18 @@ export class Workspace {
     public tilemapSessionManager: TilemapSessionManager;
     private workspaceStorageService: IWorkspacetorageService;
     private tilesetManager: TilesetManager;
-    constructor (workspaceData: WorkpsaceData, tilesetManager: TilesetManager, workspaceStorageService: IWorkspacetorageService) {
+    private tilemapManager: TilemapManager;
+    constructor (workspaceData: WorkpsaceData, tilesetManager: TilesetManager, tilemapManager: TilemapManager, workspaceStorageService: IWorkspacetorageService) {
         this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets);
         this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps);
         this.tilesetManager = tilesetManager;
+        this.tilemapManager = tilemapManager;
         this.workspaceStorageService = workspaceStorageService;
     }
 
     public async load(): Promise<Result> {
         await this.tilesetSessionManager.loadAll(this.tilesetManager);
+        await this.tilemapSessionManager.loadAll(this.tilemapManager);
         return { status: "Success", data: null };
     }
 
@@ -37,6 +43,21 @@ export class Workspace {
 
     public async closeTilesetSession(sessionId: string): Promise<Result> {
         const result = await this.tilesetSessionManager.closeTilesetSession(sessionId);
+        return result;
+    }
+
+    public async createTilemapSession(tilemap: Tilemap): Promise<Result<TilemapSession>> {
+        const result = await this.tilemapSessionManager.createTilemapSession(tilemap);
+        return result;
+    }
+
+    public async openTilemapSession(sessionId: string): Promise<Result<TilemapSession>> {
+        const result = await this.tilemapSessionManager.openTilemapSession(sessionId);
+        return result;
+    }
+
+    public async closeTilemapSession(sessionId: string): Promise<Result> {
+        const result = await this.tilemapSessionManager.closeTilemapSession(sessionId);
         return result;
     }
 

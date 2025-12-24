@@ -1,21 +1,20 @@
+// src-ui/view/models/tilemapSessionView.ts
 import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
-import { TilesetSession } from "@/core/application/session/tilesetSession";
+import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
-import { TilesetRenderer } from "@/view/models/tilesetViewRenderer";
 
-import { TilesetViewSelector } from "./tilesetViewSelector";
+import { TilemapRenderer } from "./tilemapEditorRenderer";
 
-export class TilesetSessionView {
-    public session: TilesetSession;
+export class TilemapSessionView {
+    public session: TilemapSession;
     public viewport: Viewport;
     private pixiApp: Application;
-    private renderer: TilesetRenderer;
-    private selector: TilesetViewSelector;
+    private renderer: TilemapRenderer;
     private isInit: boolean = false;
 
-    constructor(session: TilesetSession) {
+    constructor(session: TilemapSession) {
         this.session = session;
     }
 
@@ -25,26 +24,28 @@ export class TilesetSessionView {
         this.viewport = new Viewport({
             screenWidth: pixiApp.screen.width,
             screenHeight: pixiApp.screen.height,
+            worldWidth: this.session.tilemap.width * this.session.tilemap.tilewidth,
+            worldHeight: this.session.tilemap.height * this.session.tilemap.tileheight,
             passiveWheel: true,
             stopPropagation: true,
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
             disableOnContextMenu: true,
         });
+        // this.viewport.isRenderGroup = true;
 
         this.viewport
-            .drag({ mouseButtons: "middle " })
+            .drag({ mouseButtons: "middle" }) // Kéo bằng chuột giữa
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 1, maxScale: 5 })
+            .clampZoom({ minScale: 0.1, maxScale: 5 })
 
-        setTimeout(() => this.updateViewport(), 0)
+        setTimeout(() => this.updateViewport(), 0);
 
         this.pixiApp.renderer.on("resize", () => {
             const w = this.pixiApp.renderer.width;
             const h = this.pixiApp.renderer.height;
             this.viewport.resize(w, h);
-
             this.updateViewport();
         });
 
@@ -71,8 +72,10 @@ export class TilesetSessionView {
             this.viewport.cursor = "default";
         });
 
-        this.renderer = new TilesetRenderer({ tileset: this.session.tileset, parent: this.viewport });
-        this.selector = new TilesetViewSelector({ tileset: this.session.tileset, tilesetSession: this.session, parent: this.viewport });
+        this.renderer = new TilemapRenderer({ 
+            tilemap: this.session.tilemap, 
+            parent: this.viewport 
+        });
     }
 
     public activateSession(pixiApp: Application) {
@@ -102,6 +105,7 @@ export class TilesetSessionView {
     public destroy() {
         if (!this.isInit) return;
         this.unActivateSession();
+        this.renderer.destroy();
         this.viewport.destroy({ children: true });
     }
 
@@ -110,5 +114,9 @@ export class TilesetSessionView {
             this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);
         }
         this.viewport.setZoom(this.session.viewState.zoom);
+    }
+
+    public toggleGrid() {
+        this.renderer?.toggleGrid();
     }
 }

@@ -18,15 +18,19 @@ export class WorkspaceManager {
         const workspaceStorageService = new JsonWorkspaceStorageService(project.metaData.directory);
         const loadSessionResult = await workspaceStorageService.loadWorkspace();
         if (loadSessionResult.status === "Success") {
-            this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, workspaceStorageService);
+            this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, workspaceStorageService);
         } else {
             const defaultWorkspaceData: WorkpsaceData = {
                 tilesets: {
                     tilesetSessions: [],
                     currentTilesetSessionId: null,
-                }
+                },
+                tilemaps: {
+                    tilemapSessions: [],
+                    currentTilemapSessionId: null,
+                },
             }
-            this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, workspaceStorageService);
+            this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, workspaceStorageService);
         }
         await this.currentWorkspace.load();
         return { status: "Success", data: null };
