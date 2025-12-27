@@ -48,7 +48,7 @@ export function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 					{name}
 					{wrapIcon(item.endIcon, false)}
 				</DropdownMenuSubTrigger>
-				<DropdownMenuSubContent className={subMenusClassName} sideOffset={7} alignOffset={-5}>
+				<DropdownMenuSubContent className={subMenusClassName} sideOffset={5}>
 					<MenuBarDropdownGroup groups={item.subMenus} />
 				</DropdownMenuSubContent>
 			</DropdownMenuSub>

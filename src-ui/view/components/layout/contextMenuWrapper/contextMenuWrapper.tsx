@@ -13,9 +13,9 @@ interface ContextMenuWrapperProps {
 export default function ContextMenuWrapper({ item, children }: ContextMenuWrapperProps) {
 	usePreventContextMenu();
 
-    const className = twMerge("w-40", item.className);
+    const className = twMerge("w-40 bg-secondary-background", item.className);
 	return (
-		<ContextMenu modal={false}>
+		<ContextMenu modal={true}>
 			<ContextMenuTrigger className="w-full h-full">
 				{children}
 			</ContextMenuTrigger>

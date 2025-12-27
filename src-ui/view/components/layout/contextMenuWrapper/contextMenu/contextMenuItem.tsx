@@ -37,7 +37,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 	}
 
 	if (item.type === "subMenu") {
-		const subMenusClassName = twMerge("w-70", item.subMenusClassName);
+		const subMenusClassName = twMerge("w-70 bg-secondary-background", item.subMenusClassName);
 		return (
 			<ContextMenuSub>
 				<ContextMenuSubTrigger className="gap-2 h-6 text-xs" disabled={disabled}>
@@ -45,7 +45,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 					{name}
 					{wrapIcon(item.endIcon, false)}
 				</ContextMenuSubTrigger>
-				<ContextMenuSubContent className={subMenusClassName} sideOffset={7} alignOffset={-5}>
+				<ContextMenuSubContent className={subMenusClassName} sideOffset={4} alignOffset={-1}>
 					<MenuBarDropdownGroup groups={item.subMenus} />
 				</ContextMenuSubContent>
 			</ContextMenuSub>

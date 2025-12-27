@@ -6,7 +6,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
 		name: "New",
-		startIcon: <FolderPlus className=" stroke-1" />,
+		startIcon: <FolderPlus className=" stroke-2" />,
 		subMenus: [
 			[
 				{
@@ -49,7 +49,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
 		name: "Recent Files",
-		startIcon: <FileClock className=" stroke-1" />,
+		startIcon: <FileClock className=" stroke-2" />,
 		subMenus: [
 			[
 				{
@@ -72,7 +72,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
 		name: "Recent Project",
-		startIcon: <FolderClock className=" stroke-1" />,
+		startIcon: <FolderClock className=" stroke-2" />,
 		subMenus: [
 			[
 				{

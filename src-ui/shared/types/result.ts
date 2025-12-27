@@ -29,12 +29,12 @@ type SuccessResult<T = any> = {
     data: T;
 };
 
-export function ErrorResult<T = any>(message: string): ErrorResult<T> {
-    console.error(message);
+export function ErrorResult<T = any>(message: string | undefined): ErrorResult<T> {
+    console.trace(message);
     return { status: "Error", message };
 }
 
-export function SuccessResult<T = any>(data?: T, message?: string): SuccessResult<T> {
+export function SuccessResult<T = any>(data?: T, message?: string | undefined): SuccessResult<T> {
     return { status: "Success", message, data: data as any};
 }
 

@@ -29,7 +29,6 @@ export class TilesetSessionView {
             stopPropagation: true,
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
-            disableOnContextMenu: true,
         });
 
         this.viewport

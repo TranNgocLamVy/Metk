@@ -246,7 +246,11 @@ export class TilesetViewSelector {
                 }
             }
         } else {
-            this.graphics.beginFill(this.selectedColor, this.selectedTransparency);
+            // this.graphics.fill(this.selectedColor, this.selectedTransparency);
+            this.graphics.fill({
+                color: this.selectedColor,
+                alpha: this.selectedTransparency
+            });
             for (let r = 0; r < rowsCount; r++) {
                 for (let c = 0; c < colsCount; c++) {
                     if (!grid[r][c] || processed[r][c]) continue;
@@ -273,10 +277,10 @@ export class TilesetViewSelector {
                     const w = run * (tilewidth + this.gap) - this.gap;
                     const h = height * (tileheight + this.gap) - this.gap;
 
-                    this.graphics.drawRect(x, y, w, h);
+                    this.graphics.rect(x, y, w, h);
                 }
             }
-            this.graphics.endFill();
+            this.graphics.fill();
         }
         try { (this.parent as any).sortChildren(); } catch (e) { }
     }

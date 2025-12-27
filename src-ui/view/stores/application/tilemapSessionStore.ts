@@ -7,6 +7,8 @@ import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { TilemapSessionView } from "@/view/models/tilemapSessionView";
 
+import { useLayerManagerStore } from "./layerManagerStore";
+
 type TilemapSessionDisplayData = {
     name: string;
     sessionId: string;
@@ -79,7 +81,7 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
             if (pixiApp) sessionView.activateSession(pixiApp);
             
             set({ currentSession: sessionView });
-            TilemapLayerService.setLayersFromTilemap(session.tilemap);
+            useLayerManagerStore.getState().setRoot(session.tilemap.rootLayer);
             WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
             return sessionView;
         },
@@ -98,7 +100,7 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
                     return { tilemapsSession: [...state.tilemapsSession.filter((s) => s.sessionId !== sessionId)] };
                 });
             }
-            TilemapLayerService.clearLayers();
+            useLayerManagerStore.getState().setRoot(null);
             WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         },
 

@@ -115,7 +115,7 @@ const BrushGroup: MenuDropDownGroupType = [
 	},
 ];
 
-export const MainContextMenu: MenuItemType = {
+export const TilemapEditorContextMenu: MenuItemType = {
 	name: "Edit",
 	className: "w-60",
 	groups: [UndoRedoGroup, EditGroup, BrushGroup, SnappingGroup],
