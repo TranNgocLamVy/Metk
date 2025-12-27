@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Fragment } from "react/jsx-runtime";
 
@@ -179,7 +179,7 @@ export function FormDialog() {
 		return true;
 	};
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: MouseEvent) => {
 		e.preventDefault();
 
 		// 1. Run per-field validation (Recursive)
@@ -202,7 +202,7 @@ export function FormDialog() {
 		<Fragment>
 			{createPortal(
 				<Dialog defaultOpen onOpenChange={() => cancelFormDialog()}>
-					<form onSubmit={handleSubmit} autoComplete="off">
+					<form autoComplete="off">
 						{/* Apply the size class dynamically here.
                            We merge it with max-h and overflow settings to handle tall content gracefully.
                         */}
@@ -224,7 +224,7 @@ export function FormDialog() {
 										{cancelText}
 									</Button>
 								</DialogClose>
-								<Button type="submit">{okText}</Button>
+								<Button type="button" onClick={handleSubmit}>{okText}</Button>
 							</DialogFooter>
 						</DialogContent>
 					</form>

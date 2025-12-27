@@ -1,8 +1,11 @@
+import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { RootLayerData } from "@/shared/schema/layerSchema";
 import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
+import { Tilemap } from "../tilemap";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
+import { GroupLayer } from "./groupLayer";
 
 interface RootLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -11,28 +14,41 @@ interface RootLayerEvents extends BaseLayerEvents {
 }
 
 export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer {
-    private layers: BaseLayer[] = [];
+    public layers: BaseLayer[] = [];
 
-    constructor(layersData: RootLayerData) {
-        super("root");
+    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
+        super("root", tilesetRefManager);
 
         layersData.forEach((layerData) => {
-            const layer = LayerUtils.createLayeFromData(layerData, this);
+            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager);
             if (layer) this.layers.push(layer);
         });
     }
 
-    public getLayers(): BaseLayer[] {
-        return this.layers;
-    }
-
-    public override serialize(): any {
+    public override serialize(): RootLayerData {
         return this.layers.map((layer) => layer.serialize());
     }
 
-    public addLayer(newLayer: BaseLayer<any>, index: number): Result {
+    public getLayers(): BaseLayer<any>[] {
+        return this.layers;
+    }
+
+    public getLayerIndex(layerId: string): number {
+        return this.layers.findIndex(layer => layer.id === layerId);
+    }
+
+    public addLayer(newLayer: BaseLayer<any>): Result {
+        newLayer.parentLayer = this;
+        this.layers.unshift(newLayer);
+        this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
+
+        return SuccessResult();
+    }
+
+    public insertLayer(newLayer: BaseLayer<any>, index: number): Result {
         if (index < 0) return ErrorResult("Invalid layer's index: " + index);
 
+        newLayer.parentLayer = this;
         this.layers.splice(index, 0, newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, index);
 
@@ -47,5 +63,51 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         this.eventEmitter.emit("layerRemoved", layerId, index);
 
         return SuccessResult();
+    }
+
+    public moveChild(id: string, offset: number) {
+        const index = this.layers.findIndex(c => c.id === id);
+        if (index === -1) return;
+
+        const newIndex = index + offset;
+        if (newIndex < 0 || newIndex >= this.layers.length) return;
+
+        const [child] = this.layers.splice(index, 1);
+        this.layers.splice(newIndex, 0, child);
+    }
+
+    public override traverse(cb: (layer: BaseLayer<any>) => void) {
+        cb(this);
+        this.layers.forEach(c => c.traverse(cb));
+    }
+
+    // public findLayer(id: string): BaseLayer<any> | null {
+    //     let found: BaseLayer | null = null;
+    //     const search = (layer: BaseLayer) => {
+    //         if (found) return;
+    //         if (layer.id === id) found = layer;
+    //         if (layer instanceof GroupLayer) layer.layers.forEach(search);
+    //     };
+    //     this.layers.forEach(search);
+    //     return found;
+    // }
+
+    public findLayer(id: string): BaseLayer<any> | null {
+        if (this.id === id) return this;
+
+        let found: BaseLayer | null = null;
+        const search = (layer: BaseLayer) => {
+            if (found) return;
+            if (layer.id === id) found = layer;
+            if (layer instanceof GroupLayer) layer.layers.forEach(search);
+        };
+        this.layers.forEach(search);
+        return found;
+    }
+
+    getAllIds(): Set<string> {
+        const ids = new Set<string>();
+        this.traverse((layer) => { if (layer !== this) ids.add(layer.id) });
+        return ids;
     }
 }

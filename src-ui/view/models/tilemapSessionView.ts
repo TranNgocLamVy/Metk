@@ -30,7 +30,6 @@ export class TilemapSessionView {
             stopPropagation: true,
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
-            disableOnContextMenu: true,
         });
         // this.viewport.isRenderGroup = true;
 

@@ -1,4 +1,3 @@
-import EventEmitter from "eventemitter3";
 
 import { JsonTilemapStorageService } from "@/infrastructure/tilemapStorageService";
 import { JsonTilesetStorageService } from "@/infrastructure/tilesetStorageService";

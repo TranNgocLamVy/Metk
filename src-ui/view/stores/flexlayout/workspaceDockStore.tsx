@@ -4,7 +4,7 @@ import { create } from "zustand";
 
 import Debug from "@/view/components/workspace/debug";
 import Explorer from "@/view/components/workspace/explorer";
-import LayerManager from "@/view/components/workspace/layerManager";
+import LayerManager from "@/view/components/workspace/layerManager/layerManager";
 import TilemapEditor from "@/view/components/workspace/tilemapEditor/tilemapEditor";
 import TilesetView from "@/view/components/workspace/tilesetView/tilesetView";
 

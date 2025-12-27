@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useDisableDefaultEvent } from "@/view/hooks/useDisableDefaultEvent";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
 interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,6 +26,8 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 			}
 		}
 	}, [containerRef.current]);
+
+    useDisableDefaultEvent();
 
 	return (
 		<main {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-background">

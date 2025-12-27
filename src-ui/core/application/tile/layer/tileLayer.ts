@@ -1,6 +1,10 @@
+import { v4 as uuidv4 } from "uuid";
+
+import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { TileLayerData, TileRefData } from "@/shared/schema/layerSchema";
 import { ErrorResult, Result, ResultStatus, SuccessResult } from "@/shared/types/result";
 
+import { Tile } from "../tileset";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 
 interface TileLayerEvents extends BaseLayerEvents {
@@ -8,19 +12,16 @@ interface TileLayerEvents extends BaseLayerEvents {
 }
 
 export class TileLayer extends BaseLayer<TileLayerEvents> {
-    public parentLayer: IGroupLayer;
     public tilesRef: (TileRef | null)[][] = [];
     public coordinate: { x: number, y: number } = { x: 0, y: 0 };
     public offset: { x: number, y: number } = { x: 0, y: 0 };
     public size: { width: number, height: number } = { width: 0, height: 0 }
-    public opacity: number = 1;
-    public visible: boolean = true;
-    public locked: boolean = false;
 
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer) {
-        super(tileLayerData.id);
 
-        this.parentLayer = parentLayer;
+    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager) {
+        super(tileLayerData.id, tilesetRefManager);
+
+        if (parentLayer) this.parentLayer = parentLayer;
 
         this.name = tileLayerData.name;
 
@@ -54,9 +55,13 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return SuccessResult(tileRef);
     }
 
-    public setTileRefAt(coordinate: { x: number, y: number }, tileId: number, tilesetIndex: number): Result<TileRefData> {
+    public setTileRefAt(coordinate: { x: number, y: number }, tile: Tile): Result<TileRefData> {
         if (coordinate.x < 0 || coordinate.x >= this.size.width) return ErrorResult("Tile not found, x is out of range");
         if (coordinate.y < 0 || coordinate.y >= this.size.height) return ErrorResult("Tile not found, y is out of range");
+
+        const tileId = tile.id;
+        const tilesetIndex = this.tilesetRefManager.getTilesetIndex(tile.tileset);
+        if (tilesetIndex === -1) return ErrorResult("Tile not found, tileset not found");
 
         const tileRef = this.tilesRef[coordinate.y][coordinate.x];
         if (tileRef === undefined) return ErrorResult("Tile not found");
@@ -89,6 +94,16 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             offsety: this.offset.y,
             tilesData: this.tilesRef.map((tileRefRow) => tileRefRow.map(tileRef => tileRef ? tileRef.serialize() : null)),
         }
+    }
+
+    public override clone(): TileLayer {
+        const layerData = this.serialize();
+        layerData.id = uuidv4();
+        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager);
+    }
+
+    public override traverse(cb: (layer: BaseLayer<any>) => void): void {
+        cb(this);
     }
 }
 

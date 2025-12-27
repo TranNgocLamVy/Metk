@@ -22,6 +22,7 @@
 	--color-menu-bar-background: var(--menu-bar-background);
 	--color-background: var(--background);
 	--color-secondary-background: var(--secondary-background);
+    --color-select-color: var(--select-color);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
 	--color-card-foreground: var(--card-foreground);
@@ -142,6 +143,9 @@
 	--color-splitter: rgb(211, 211, 211);
 	--color-splitter-hover: rgb(0, 144, 241);
 	--color-splitter-drag: rgb(0, 144, 241);
+
+    /*Editing color */
+    --select-color: rgb(0, 144, 241);
 }
 
 .dark {

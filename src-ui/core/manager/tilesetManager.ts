@@ -1,6 +1,6 @@
 import { TextureService } from "@/infrastructure/textureService";
 import { ToastService } from "@/shared/services/toastService";
-import { Result } from "@/shared/types/result";
+import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { ITilesetStorageService } from "../../infrastructure/interface/ITilesetStorageService";
@@ -46,51 +46,46 @@ export class TilesetManager {
 
     public async saveTileset(id: string): Promise<Result> {
         const tileset = this.tilesetMap.get(id);
-        if (tileset == undefined) {
-            console.error("Tileset not found");
-            return { status: "Error", message: "Tileset not found" }
-        }
-
+        if (tileset == undefined) return ErrorResult("Tileset not found");
         const tilesetRelPath = this.tilesetsMetaData.find(metaData => metaData.id === id)?.tilesetRelPath;
-        if (!tilesetRelPath) return { status: "Error", message: "Tileset path not found" };
+        if (!tilesetRelPath) return ErrorResult("Tileset meta data not found");
 
         try {
             const tilesetData = tileset.serialize();
             await this.tilesetStorageService.saveTileset(tilesetRelPath, tilesetData);
-            return { status: "Success", data: null };
+            return SuccessResult();
         } catch (error) {
-            return { status: "Error", message: `Failed to save tileset, error: ${error}` };
+            return ErrorResult(`Failed to save tileset, error: ${error}`);
         }
     }
 
     public getTilesetById(id: string): Result<Tileset> {
         const tileset = this.tilesetMap.get(id);
         if (tileset === undefined) {
-            console.error("Tileset not found");
-            return { status: "Error", message: "Tileset not found" };
+            return ErrorResult("Tileset not found");
         }
-        return { status: "Success", data: tileset };
+        return SuccessResult(tileset);
     }
 
     public getTilesetByRelPath(relPath: string): Result<Tileset> {
         const tilesetMetaData = this.tilesetsMetaData.find(metaData => metaData.tilesetRelPath === relPath);
-        if (!tilesetMetaData) return { status: "Error", message: "Tileset meta data not found" };
+        if (!tilesetMetaData) return ErrorResult("Tileset meta data not found");
+
         const tileset = this.tilesetMap.get(tilesetMetaData.id);
-        if (tileset === undefined) {
-            console.error("Tileset not found");
-            return { status: "Error", message: "Tileset not found" };
-        }
-        return { status: "Success", data: tileset };
+        if (tileset === undefined) return ErrorResult("Tileset not found");
+
+        return SuccessResult(tileset);
     }
 
     public getAllTilesets(): Tileset[] {
         return Array.from(this.tilesetMap.values());
     }
 
-    public getTilesetPathById(id: string): string | null {
+    public getTilesetAbsById(id: string): Result<string> {
         const tilesetMetaData = this.tilesetsMetaData.find(metaData => metaData.id === id);
-        if (!tilesetMetaData) return null;
-        return tilesetMetaData.tilesetRelPath;
+        if (!tilesetMetaData) return ErrorResult("Tileset meta data not found");
+        const tilesetAbsPath = PathUtils.join(this.tilesetStorageService.projectDir, tilesetMetaData.tilesetRelPath);
+        return SuccessResult(tilesetAbsPath);
     }
 
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
@@ -103,11 +98,11 @@ export class TilesetManager {
         this.tilesetMap.set(newTileset.id, newTileset);
         const result = await this.saveTileset(newTileset.id);
         if (result.status === "Success") {
-            return { status: "Success", data: newTileset };
+            return SuccessResult(newTileset);
         } else {
             this.tilesetsMetaData = this.tilesetsMetaData.filter(metaData => metaData.id !== newTileset.id);
             this.tilesetMap.delete(newTileset.id);
-            return { status: "Error", message: result.message };
+            return ErrorResult(result.message);
         }
     }
 }

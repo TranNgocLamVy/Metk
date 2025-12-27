@@ -1,35 +1,59 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { Tilemap } from "@/core/application/tile/tilemap";
-import { useTilemapLayerStore } from "@/view/stores/application/tilemapLayerStore";
+import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 export class TilemapLayerService {
-    public static async setLayersFromTilemap(tilemap: Tilemap) {
-        const layers = tilemap.rootLayer.getLayers();
-        useTilemapLayerStore.getState().setLayers(layers.map(layer => ({ id: layer.id, name: layer.getName() })));
-    }
+    public static async createNewTileLayer() {
+        const root = useLayerManagerStore.getState().root;
+        if (!root) return;
 
-    public static async clearLayers() {
-        useTilemapLayerStore.getState().setLayers([]);
-        useTilemapLayerStore.getState().setActiveLayer(null);
-    }
+        const targetLayer = useLayerManagerStore.getState().targetLayer;
 
-    public static async createLayer(name: string, tilemap: Tilemap) {
-        const newTilelayer = new TileLayer({
+        const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
+
+        const newTileLayer = new TileLayer({
             id: uuidv4(),
+            name: "New Tile Layer",
             layerType: "tile",
-            name: name,
-            width: tilemap.width,
-            height: tilemap.height,
-            visible: true,
+            width: root.tilemap.width,
+            height: root.tilemap.height,
             opacity: 1,
+            visible: true,
             locked: false,
-            tilesData: Array.from({ length: tilemap.height }, () => Array.from({ length: tilemap.width }, () => null)),
-        }, tilemap.rootLayer);
+            tilesData: []
+        }, parent, parent.tilesetRefManager)
 
-        const result = tilemap.rootLayer.addLayer(newTilelayer, 0);
-        if (result.status != "Success" || !result.data) return;
-        useTilemapLayerStore.getState().addLayer({ id: newTilelayer.id, name: newTilelayer.getName() });
+        parent.addLayer(newTileLayer);
+        if (parent instanceof GroupLayer) parent.toggleOpen(true);
+
+        useLayerManagerStore.getState().setEditingId(newTileLayer.id);
+        useLayerManagerStore.getState().refresh()
+    }
+
+    public static async createNewGroupLayer() {
+        const root = useLayerManagerStore.getState().root;
+        if (!root) return;
+
+        const targetLayer = useLayerManagerStore.getState().targetLayer;
+
+        const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
+
+        const newGroupLayer = new GroupLayer({
+            id: uuidv4(),
+            name: "New Group Layer",
+            layerType: "group",
+            opacity: 1,
+            visible: true,
+            locked: false,
+            layers: []
+        }, parent, parent.tilesetRefManager)
+
+        parent.addLayer(newGroupLayer);
+        if (parent instanceof GroupLayer) parent.toggleOpen(true);
+
+        useLayerManagerStore.getState().setEditingId(newGroupLayer.id);
+        useLayerManagerStore.getState().refresh()
     }
 }

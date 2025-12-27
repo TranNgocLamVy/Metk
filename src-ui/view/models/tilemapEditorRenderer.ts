@@ -46,36 +46,36 @@ export class TilemapRenderer {
                 const tilesetMap = new Map<string, Tileset>();
 
                 const size = tilelayer.size;
-                for (let y = 0; y < size.height; y++) {
-                    for (let x = 0; x < size.width; x++) {
-                        const tileResult = tilelayer.getTileRefAt({ x, y });
-                        if (!tileResult.data) continue;
+                // for (let y = 0; y < size.height; y++) {
+                //     for (let x = 0; x < size.width; x++) {
+                //         const tileResult = tilelayer.getTileRefAt({ x, y });
+                //         if (!tileResult.data) continue;
 
-                        const tileRef = tileResult.data;
-                        const tileData = tileRef.getTile();
+                //         const tileRef = tileResult.data;
+                //         const tileData = tileRef.getTile();
 
-                        const tilesetId = this.tilemap.tilesets.find(tileset => tileset.index === tileData.tilesetIndex)?.id;
-                        if (!tilesetId) continue;
+                //         const tilesetId = this.tilemap.tilesets.find(tileset => tileset.index === tileData.tilesetIndex)?.id;
+                //         if (!tilesetId) continue;
 
-                        let tile: Tile | null;
-                        if (tilesetMap.has(tilesetId)) {
-                            const tileset = tilesetMap.get(tilesetId)!;
-                            tile = tileset.getTile(tileData.tileId);
-                        } else {
-                            const tilesetResult = this.tilemap.tilesetGetter.getTilesetById(tilesetId);
-                            const tileset = tilesetResult.data;
-                            if (!tileset) return;
-                            tilesetMap.set(tileset.id, tileset);
-                            tile = tileset.getTile(tileData.tileId);
-                        }
-                        if (!tile) continue;
+                //         let tile: Tile | null;
+                //         if (tilesetMap.has(tilesetId)) {
+                //             const tileset = tilesetMap.get(tilesetId)!;
+                //             tile = tileset.getTile(tileData.tileId);
+                //         } else {
+                //             const tilesetResult = this.tilemap.tilesetGetter.getTilesetById(tilesetId);
+                //             const tileset = tilesetResult.data;
+                //             if (!tileset) return;
+                //             tilesetMap.set(tileset.id, tileset);
+                //             tile = tileset.getTile(tileData.tileId);
+                //         }
+                //         if (!tile) continue;
 
-                        const sprite = new Sprite(tile.getTexture());
-                        sprite.x = x * this.tilemap.tilewidth;
-                        sprite.y = y * this.tilemap.tileheight;
-                        layerContainer.addChild(sprite);
-                    }
-                }
+                //         const sprite = new Sprite(tile.getTexture());
+                //         sprite.x = x * this.tilemap.tilewidth;
+                //         sprite.y = y * this.tilemap.tileheight;
+                //         layerContainer.addChild(sprite);
+                //     }
+                // }
             }
         }
     }

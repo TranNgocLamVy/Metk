@@ -4,6 +4,9 @@ import useResizeObserver from "@/view/hooks/useResizeObserver";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 import { Application as PixiApplication } from "@pixi/react";
 
+import ContextMenuWrapper from "../../layout/contextMenuWrapper/contextMenuWrapper";
+import { TilemapEditorContextMenu } from "../../layout/contextMenuWrapper/items/tilemapEditorContextMenu";
+
 export default function TilemapEditorCanvas() {
 	const { pixiApp, setPixiApp } = useTilemapSessionStore();
 	const containerRef = useResizeObserver<HTMLDivElement>(
@@ -22,7 +25,9 @@ export default function TilemapEditorCanvas() {
 
 	return (
 		<div ref={containerRef} className="bg-secondary-background/40 w-full h-full overflow-hidden rounded-lg">
-			<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} />
+			<ContextMenuWrapper item={TilemapEditorContextMenu}>
+				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} />
+			</ContextMenuWrapper>
 		</div>
 	);
 }
