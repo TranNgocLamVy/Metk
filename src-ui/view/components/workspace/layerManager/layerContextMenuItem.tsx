@@ -63,7 +63,13 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		name: "Remove layer",
 		startIcon: <Trash2 />,
-		onClick() {},
+        disabled: () => {
+            const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+            return numberOfLayers < 1;
+        },
+		onClick() {
+            TilemapLayerService.deleteLayer();
+        },
 	},
 ];
 

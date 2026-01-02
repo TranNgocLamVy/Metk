@@ -97,36 +97,55 @@ export const useLayerManagerStore = create<LayerManagerState>((set, get) => ({
         const { root } = get();
         if (!root) return;
 
-        const targetLayer = root.findLayer(targetId);
-        if (!targetLayer) return
+        // FIX 1: Explicitly handle if target is the Root Layer itself
+        // (root.findLayer searches children, so we must check root.id manually first if findLayer implementation excludes it)
+        const targetLayer = root.id === targetId ? root : root.findLayer(targetId);
+        
+        if (!targetLayer) return;
 
         // Filter valid layers to move
         const layersToMove = draggedIds
             .map(id => root.findLayer(id))
-            .filter((l): l is BaseLayer =>
-                !!l &&
-                l.id !== targetId &&
-                !l.isAncestorOf(targetLayer) // Prevent cycle
-            );
+            .filter((l): l is BaseLayer => {
+                if (!l) return false;
+                if (l.id === targetId) return false; // Cannot drop on self
+                
+                // Prevent cycle: Cannot move a parent into its own child
+                // If target is root, it can't be a child of 'l' (unless 'l' is root, which is impossible here)
+                if (targetLayer === root) return true;
+                return !l.isAncestorOf(targetLayer as any);
+            });
 
         if (layersToMove.length === 0) return;
 
-        // Remove all first
+        // 1. Remove all dragged layers from their current parents
         layersToMove.forEach(l => l.removeFromParent());
 
-        // Insert all at new position
+        // 2. Insert at new position
         if (position === 'inside' && (targetLayer instanceof GroupLayer || targetLayer instanceof RootLayer)) {
-            // Add to top of group in order
-            [...layersToMove].reverse().forEach(l => targetLayer.addLayer(l));
+            // FIX 2: When dropping 'inside' (e.g. on Root background), APPEND to the end.
+            // Original code used 'addLayer' which 'unsifted' (prepended) to the top.
+            layersToMove.forEach(l => {
+                targetLayer.insertLayer(l, targetLayer.layers.length);
+            });
+            // Ensure group is open if we drop inside it
+            if (targetLayer instanceof GroupLayer && !targetLayer.isOpen) {
+                targetLayer.toggleOpen(true);
+            }
         } else {
+            // Standard reordering (Top/Bottom) relative to a sibling
             const parent = targetLayer.parentLayer || root;
-            let targetIndex = parent.layers.findIndex(c => c.id === targetLayer.id);
-
-            if (targetIndex !== -1) {
-                const insertIndex = position === 'top' ? targetIndex : targetIndex + 1;
-                layersToMove.forEach((l, i) => parent.insertLayer(l, insertIndex + i));
+            
+            // Safety check: ensure parent exists (Root's parent is null, but we handled Root above)
+            if (parent) {
+                const targetIndex = parent.getLayerIndex(targetLayer.id);
+                if (targetIndex !== -1) {
+                    const insertIndex = position === 'top' ? targetIndex : targetIndex + 1;
+                    layersToMove.forEach((l, i) => parent.insertLayer(l, insertIndex + i));
+                }
             }
         }
+        
         set(state => ({ version: state.version + 1 }));
     },
 
