@@ -9,10 +9,9 @@ import { Button } from "../../shadcn/button";
 type LayerNodeRowProps = {
 	view: LayerView;
 	isSelected: boolean;
-	style: React.CSSProperties;
 };
 
-export default function LayerNodeRow({ view, isSelected, style }: LayerNodeRowProps) {
+export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	const store = useLayerManagerStore();
 	const editingId = useLayerManagerStore((s) => s.editingId);
 	const selectedIds = useLayerManagerStore((s) => s.selectedIds);
@@ -119,21 +118,23 @@ export default function LayerNodeRow({ view, isSelected, style }: LayerNodeRowPr
 
     const onContextMenu = (e: MouseEvent) => {
         store.setTargetLayer(layer);
-        store.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+        if (!selectedIds.has(layer.id)) {
+            store.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+        }
     };
 
 	// Styles for Drop Feedback
 	const getDropStyle = () => {
-		if (!dragOverPos) return {};
-		if (dragOverPos === "top") return { borderTop: "2px solid #3b82f6" };
-		if (dragOverPos === "bottom") return { borderBottom: "2px solid #3b82f6" };
-		if (dragOverPos === "inside") return { outline: "2px dashed #3b82f6", outlineOffset: "-2px" };
+		if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
+		if (dragOverPos === "top") return { borderTop: "2px solid #3b82f6", borderBottom: "2px solid transparent" };
+		if (dragOverPos === "bottom") return { borderBottom: "2px solid #3b82f6", borderTop: "2px solid transparent" };
+		if (dragOverPos === "inside") return { outline: "2px dashed #3b82f6", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent"  };
 		return {};
 	};
 
 	return (
 		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className="flex items-center">
-			<div style={{ ...style, paddingLeft: view.depth * 20 + 10, ...getDropStyle() }} className={`flex pr-1 items-center gap-2 w-full h-full py-1 ${isSelected ? "bg-select-color/50" : ""}`}>
+			<div style={{ paddingLeft: view.depth * 20 + 10, ...getDropStyle() }} className={`flex pr-1 items-center gap-2 w-full h-full py-1 ${isSelected ? "bg-select-color/50" : ""}`}>
 				{isGroup ? (
                     <div className="w-4 cursor-pointer" onClick={handleToggle}>
                         {(layer as GroupLayer).isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}

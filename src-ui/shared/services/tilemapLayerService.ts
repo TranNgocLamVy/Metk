@@ -56,4 +56,17 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().setEditingId(newGroupLayer.id);
         useLayerManagerStore.getState().refresh()
     }
+
+    public static async deleteLayer() {
+        const root = useLayerManagerStore.getState().root;
+        if (!root) return;
+    
+        const selectedIds = useLayerManagerStore.getState().selectedIds
+        selectedIds.forEach((id) => {
+            const layer = root.findLayer(id);
+            layer?.removeFromParent();
+        })
+    
+        useLayerManagerStore.getState().refresh();
+    }
 }

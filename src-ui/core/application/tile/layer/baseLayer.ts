@@ -62,9 +62,15 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     }
 
     public isAncestorOf(potentialChild: BaseLayer): boolean {
+        // If they are the same, it's technically an ancestor in this context (to prevent self-target)
         if (this.id === potentialChild.id) return true;
-        if ((potentialChild instanceof GroupLayer) || (potentialChild instanceof RootLayer)) {
-            return potentialChild.layers.some(c => this.isAncestorOf(c));
+
+        // Traverse up the parent chain of the potentialChild
+        let current = potentialChild.parentLayer;
+        while (current) {
+            if (current.id === this.id) return true;
+            if (!current.parentLayer) return false;
+            current = current.parentLayer;
         }
         return false;
     }
