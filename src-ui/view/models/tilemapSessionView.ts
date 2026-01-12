@@ -115,7 +115,7 @@ export class TilemapSessionView {
         this.viewport.setZoom(this.session.viewState.zoom);
     }
 
-    public toggleGrid() {
-        this.renderer?.toggleGrid();
-    }
+    // public toggleGrid() {
+    //     this.renderer?.toggleGrid();
+    // }
 }

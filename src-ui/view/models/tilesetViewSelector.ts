@@ -34,7 +34,7 @@ export class TilesetViewSelector {
     private startSelectedSnapshot: Set<number> | null = null;
 
     private graphics: Graphics;
-    private gap: number = 1;
+    private gap: number = 0;
 
     constructor(context: CreateTilesetViewSelectorContext) {
         this.tileset = context.tileset;
@@ -80,6 +80,9 @@ export class TilesetViewSelector {
     private onPointerDown(event: FederatedPointerEvent) {
         const world = new Point(event.globalX, event.globalY);
         const local = this.parent.toLocal(world);
+        
+        if (local.x < 0 || local.y < 0 || local.x > this.tileset.image.width || local.y > this.tileset.image.height) return;
+
         const idx = this.posToIndex(local.x, local.y);
         if (idx < 0) {
             this.clearSelection();
