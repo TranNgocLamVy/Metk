@@ -124,20 +124,28 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
     };
 
 	// Styles for Drop Feedback
-	const getDropStyle = () => {
+	const getOuterDropStyle = () => {
 		if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
-		if (dragOverPos === "top") return { borderTop: "2px solid #3b82f6", borderBottom: "2px solid transparent" };
-		if (dragOverPos === "bottom") return { borderBottom: "2px solid #3b82f6", borderTop: "2px solid transparent" };
+		if (dragOverPos === "top") return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
+		if (dragOverPos === "bottom") return { borderBottom: "2px solid transparent", borderTop: "2px solid transparent" };
 		if (dragOverPos === "inside") return { outline: "2px dashed #3b82f6", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent"  };
 		return {};
 	};
 
+    const getInnerDropStyle = () => {
+        if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
+		if (dragOverPos === "top") return { borderTop: "2px solid #3b82f6", borderBottom: "2px solid transparent" };
+		if (dragOverPos === "bottom") return { borderBottom: "2px solid #3b82f6", borderTop: "2px solid transparent" };
+		if (dragOverPos === "inside") return { outline: "2px dashed transparent", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent"  };
+		return {};
+    }
+
 	return (
-		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className="flex items-center">
-			<div style={{ paddingLeft: view.depth * 20 + 10, ...getDropStyle() }} className={`flex pr-1 items-center gap-2 w-full h-full py-1 ${isSelected ? "bg-select-color/50" : ""}`}>
+		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-1 w-full h-full ${isSelected ? "bg-select-color/50" : ""}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
+			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
                     <div className="w-4 cursor-pointer" onClick={handleToggle}>
-                        {(layer as GroupLayer).isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                        {(layer as GroupLayer).isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                     </div>
 				) : (
 					<div className="w-4" />
@@ -163,25 +171,25 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				)}
 				<Button
 					variant={"ghost"}
-					size={"icon-xs"}
+					size={"icon-sm"}
                     className="hover:bg-white/20"
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
 						store.toggleVisibility([layer.id]);
 					}}>
-					{layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+					{layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
 				</Button>
 				<Button
 					variant={"ghost"}
-					size={"icon-xs"}
+					size={"icon-sm"}
                     className="hover:bg-white/20"
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
 						store.toggleLock([layer.id]);
 					}}>
-					{layer.locked ? <LockKeyhole size={14} /> : <LockOpen size={14} />}
+					{layer.locked ? <LockKeyhole size={16} /> : <LockOpen size={16} />}
 				</Button>
 			</div>
 		</div>

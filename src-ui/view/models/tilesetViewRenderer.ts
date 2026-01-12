@@ -37,7 +37,7 @@ export class TilesetRenderer {
         const tilewidth = this.tileset.tilewidth;
         const tileheight = this.tileset.tileheight;
         const columns = this.tileset.columns;
-        const gap = 1;
+        const gap = 0;
         const x = (index % columns) * (tilewidth + gap);
         const y = Math.floor(index / columns) * (tileheight + gap);
         return { x, y };
