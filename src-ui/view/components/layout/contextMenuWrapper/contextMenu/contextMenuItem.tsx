@@ -54,7 +54,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 
 	if (item.type === "check") {
 		return (
-			<ContextMenuCheckboxItem className="gap-2 h-6 text-xs" onSelect={(e) => e.preventDefault()} checked={item.checked()} onCheckedChange={item.toggle} disabled={disabled}>
+			<ContextMenuCheckboxItem className="gap-2 h-6 text-xs" checked={item.checked()} onCheckedChange={item.toggle} disabled={disabled} >
 				{wrapIcon(item.startIcon, false)}
 				{name}
 				{wrapIcon(item.endIcon, false)}

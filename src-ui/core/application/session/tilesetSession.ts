@@ -25,7 +25,7 @@ export class TilesetSession {
 
     public serialize(): TilesetSessionData {
         const selectionState: SelectionState = {
-            selectedTiles: this.selectionState.selectedTiles,
+            selectedTilesSet: this.selectionState.selectedTilesSet,
             pivot: this.selectionState.pivot || undefined,
         }
         return {

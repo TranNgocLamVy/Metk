@@ -1,3 +1,4 @@
+import { Point } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
@@ -13,8 +14,8 @@ interface TileLayerEvents extends BaseLayerEvents {
 
 export class TileLayer extends BaseLayer<TileLayerEvents> {
     public tilesRef: (TileRef | null)[][] = [];
-    public coordinate: { x: number, y: number } = { x: 0, y: 0 };
-    public offset: { x: number, y: number } = { x: 0, y: 0 };
+    public coordinate: Coordinate = { col: 0, row: 0 };
+    public offset: Point = new Point(0, 0);
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
 
@@ -25,8 +26,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
 
         this.name = tileLayerData.name;
 
-        this.coordinate.x = tileLayerData.x ?? 0;
-        this.coordinate.y = tileLayerData.y ?? 0;
+        this.coordinate.col = tileLayerData.x ?? 0;
+        this.coordinate.row = tileLayerData.y ?? 0;
         this.offset.x = tileLayerData.offsetx ?? 0;
         this.offset.y = tileLayerData.offsety ?? 0;
         
@@ -49,7 +50,10 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         if (coordinate.x < 0 || coordinate.x >= this.size.width) return ErrorResult("Tile not found, x is out of range");
         if (coordinate.y < 0 || coordinate.y >= this.size.height) return ErrorResult("Tile not found, y is out of range");
 
-        const tileRef = this.tilesRef[coordinate.y][coordinate.x];
+        const row = this.tilesRef[coordinate.y];
+        if (!row) return ErrorResult("Tile row not found");
+
+        const tileRef = row[coordinate.x];
         if (tileRef === undefined) return ErrorResult("Tile not found");
 
         return SuccessResult(tileRef);
@@ -63,14 +67,19 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         const tilesetIndex = this.tilesetRefManager.getTilesetIndex(tile.tileset);
         if (tilesetIndex === -1) return ErrorResult("Tile not found, tileset not found");
 
-        const tileRef = this.tilesRef[coordinate.y][coordinate.x];
-        if (tileRef === undefined) return ErrorResult("Tile not found");
-
-        if (tileRef === null) {
-            const newTileRef = new TileRef({ tileId, tilesetIndex });
-            this.tilesRef[coordinate.y][coordinate.x] = newTileRef;
+        // Ensure row exists
+        if (!this.tilesRef[coordinate.y]) {
+            this.tilesRef[coordinate.y] = [];
         }
-        const result = tileRef!.setTile({ tileId, tilesetIndex });
+
+        let tileRef = this.tilesRef[coordinate.y][coordinate.x];
+
+        if (tileRef === null || tileRef === undefined) {
+            tileRef = new TileRef({ tileId, tilesetIndex });
+            this.tilesRef[coordinate.y][coordinate.x] = tileRef;
+        }
+        
+        const result = tileRef.setTile({ tileId, tilesetIndex });
         if (result.status === ResultStatus.Success) {
             this.eventEmitter.emit("tileChanged", coordinate.x, coordinate.y);
             return result;
@@ -83,8 +92,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             id: this.id,
             layerType: "tile",
             name: this.name,
-            x: this.coordinate.x,
-            y: this.coordinate.y,
+            x: this.coordinate.col,
+            y: this.coordinate.row,
             width: this.size.width,
             height: this.size.height,
             opacity: this.opacity,

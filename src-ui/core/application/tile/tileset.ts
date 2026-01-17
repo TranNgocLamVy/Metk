@@ -76,8 +76,21 @@ export class Tileset extends BaseObject<TilesetEvent> {
         return { status: ResultStatus.Success, data: null };
     }
 
-    public getTile(id: number): Tile | null {
+    public getTileFromId(id: number): Tile | null {
         return this.tiles.find(tile => tile.id === id) || null;
+    }
+
+    public getCoordinatesFromTile(id: number): Coordinate | null {
+        const tileIndex = this.tiles.findIndex(tile => tile.id === id);
+        if (tileIndex === -1) return null;
+        const row = Math.floor(tileIndex / this.columns);
+        const col = tileIndex % this.columns;
+        return { row, col };
+    }
+
+    public getTileFromCoordinates(row: number, col: number): Tile | null {
+        const tileIndex = row * this.columns + col;
+        return this.tiles[tileIndex] || null;
     }
 
     public getTileCount(): number {
