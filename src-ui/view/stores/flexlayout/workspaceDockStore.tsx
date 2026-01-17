@@ -5,6 +5,7 @@ import { create } from "zustand";
 import Debug from "@/view/components/workspace/debug";
 import Explorer from "@/view/components/workspace/explorer";
 import LayerManager from "@/view/components/workspace/layerManager/layerManager";
+import Log from "@/view/components/workspace/log";
 import TilemapEditor from "@/view/components/workspace/tilemapEditor/tilemapEditor";
 import TilesetView from "@/view/components/workspace/tilesetView/tilesetView";
 
@@ -48,6 +49,8 @@ export const useWorkspaceDockStore = create<WorkspaceState>((set, get) => {
                     return <Explorer />
                 case "debug":
                     return <Debug />
+                case "log":
+                    return <Log />;
 				default:
 					return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 			}

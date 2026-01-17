@@ -86,7 +86,7 @@ export const useTilesetSessionStore = create<TilesetViewStore>((set, get) => {
         },
         clear: () => {
             get().tilesetSessionMap.forEach(sessionView => sessionView.destroy());
-            get().tilesetSessionMap.clear();
+            get().tilesetSessionMap.clear(); 
             set({ currentSession: null, tilesetsSession: [] });
         }
     }

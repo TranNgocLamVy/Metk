@@ -63,7 +63,7 @@ export class Workspace {
 
     public async save(): Promise<Result> {
         const workspaceData = this.serialize();
-        console.log("Save workspace");
+        // console.log("Save workspace");
         return await this.workspaceStorageService.saveWorkspace(workspaceData);
     }
 

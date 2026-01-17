@@ -1,5 +1,7 @@
 import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, PaintBucket, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
+import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
+
 const UndoRedoGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
@@ -115,8 +117,26 @@ const BrushGroup: MenuDropDownGroupType = [
 	},
 ];
 
+const GridGroup: MenuDropDownGroupType = [
+    {
+        type: "check",
+        name: "Show Grid",
+        startIcon: <Grid3x3 className="stroke-1" />,
+        checked() {
+            const session = useTilemapSessionStore.getState().currentSession
+            if (!session) return false;
+            return session.grid.gridEnabled
+        },
+        toggle() {
+            const session = useTilemapSessionStore.getState().currentSession
+            if (!session) return;
+            session.toggleGrid();
+        },
+    }
+];
+
 export const TilemapEditorContextMenu: MenuItemType = {
 	name: "Edit",
 	className: "w-60",
-	groups: [UndoRedoGroup, EditGroup, BrushGroup, SnappingGroup],
+	groups: [GridGroup],
 };

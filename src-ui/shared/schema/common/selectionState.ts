@@ -1,7 +1,7 @@
 import { type } from "arktype";
 
 export const SelectionStateSchema = type({
-    selectedTiles: "(number | null)[][]",
+    selectedTilesSet: "number[]",
     pivot: type({
         row: "number",
         col: "number",

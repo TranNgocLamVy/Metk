@@ -1,17 +1,22 @@
-// src-ui/view/models/tilemapSessionView.ts
 import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
-import { TilemapRenderer } from "./tilemapEditorRenderer";
+import { TilemapGridRenderer } from "./renderer/tilemapGridRenderer";
+import { TilemapEventHub } from "./tilemapEventHub";
+import { TilemapRenderer } from "./tilemapRenderer";
 
 export class TilemapSessionView {
     public session: TilemapSession;
     public viewport: Viewport;
     private pixiApp: Application;
+    
     private renderer: TilemapRenderer;
+    public grid: TilemapGridRenderer;
+    private eventHub: TilemapEventHub;
+    
     private isInit: boolean = false;
 
     constructor(session: TilemapSession) {
@@ -31,13 +36,12 @@ export class TilemapSessionView {
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
         });
-        // this.viewport.isRenderGroup = true;
 
         this.viewport
-            .drag({ mouseButtons: "middle" }) // Kéo bằng chuột giữa
+            .drag({ mouseButtons: "middle" }) // Drag with middle mouse button
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.1, maxScale: 5 })
+            .clampZoom({ minScale: 0.05, maxScale: 5 });
 
         setTimeout(() => this.updateViewport(), 0);
 
@@ -46,6 +50,7 @@ export class TilemapSessionView {
             const h = this.pixiApp.renderer.height;
             this.viewport.resize(w, h);
             this.updateViewport();
+            this.viewport.emit("resize")
         });
 
         this.viewport.on("moved-end", () => {
@@ -71,10 +76,16 @@ export class TilemapSessionView {
             this.viewport.cursor = "default";
         });
 
-        this.renderer = new TilemapRenderer({ 
-            tilemap: this.session.tilemap, 
-            parent: this.viewport 
-        });
+        // Initialize Renderer
+        this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
+        this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap, gap: this.grid.gridGap });
+        
+        // Add Renderer
+        this.viewport.addChild(this.renderer.container);
+        this.viewport.addChild(this.grid.graphics);
+
+        // Initialize EventHub (Editing Logic)
+        this.eventHub = new TilemapEventHub(this.viewport, this.session.tilemap);
     }
 
     public activateSession(pixiApp: Application) {
@@ -88,8 +99,8 @@ export class TilemapSessionView {
         this.viewport.plugins.resume('wheel');
         this.viewport.plugins.resume('decelerate');
         
-        this.updateViewport();
         this.pixiApp.stage.addChild(this.viewport);
+        this.updateViewport();
     }
 
     public unActivateSession() {
@@ -104,7 +115,10 @@ export class TilemapSessionView {
     public destroy() {
         if (!this.isInit) return;
         this.unActivateSession();
-        this.renderer.destroy();
+        
+        if (this.eventHub) this.eventHub.destroy();
+        if (this.renderer) this.renderer.destroy();
+        
         this.viewport.destroy({ children: true });
     }
 
@@ -115,7 +129,13 @@ export class TilemapSessionView {
         this.viewport.setZoom(this.session.viewState.zoom);
     }
 
-    // public toggleGrid() {
-    //     this.renderer?.toggleGrid();
-    // }
+    public toggleGrid(): void {
+        if (this.grid.gridEnabled) {
+            this.grid.disableGrid();
+            this.renderer.setGap(0);
+        } else {
+            this.grid.enableGrid();
+            this.renderer.setGap(this.grid.gridGap);
+        }
+    }
 }

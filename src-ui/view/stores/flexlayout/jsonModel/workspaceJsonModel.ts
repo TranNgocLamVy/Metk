@@ -42,6 +42,19 @@ const workspaceRowNode: IJsonRowNode = {
                     enableClose: false,
                 },
             ],
+        },
+        {
+            type: "tabset",
+            weight: 20,
+            enableMaximize: false,
+            children: [
+                {
+                    type: "tab",
+                    name: "Log",
+                    component: "log",
+                    enableClose: false,
+                },
+            ],
         }
     ],
 };
