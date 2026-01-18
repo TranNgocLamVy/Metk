@@ -7,7 +7,6 @@ import { useRelativeFlexLayout } from "@/view/hooks/useRelativeFlexLayout";
 import { useWorkspaceDockStore } from "@/view/stores/flexlayout/workspaceDockStore";
 
 import { VStack } from "../custom/stack/stack";
-import TilemapEditorTabs from "./tilemapEditor/tilemapEditorTabs";
 
 export default function Workspace() {
 	const layoutRef = useRef<Layout | null>(null);
@@ -21,8 +20,7 @@ export default function Workspace() {
     }
 
 	return (
-		<VStack className="workspace w-full h-full">
-            <TilemapEditorTabs />
+		<VStack className="workspace w-full h-full p-1 bg-secondary-background">
 			<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
 		</VStack>
 	);

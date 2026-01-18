@@ -18,8 +18,8 @@ export default function TilemapEditorTabs() {
     const { tilemapsSession, currentSession } = useTilemapSessionStore();
 
     return (
-        <HStack className="w-full h-fit bg-background" justify="start" align="center">
-            <div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
+        <HStack className="w-full h-fit bg-secondary-background px-1" justify="start" align="center">
+            <div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar">
                 {tilemapsSession.map((tilemapSession) => {
                     const isCurrent = currentSession?.session.id === tilemapSession.sessionId;
                     const openTilemapSession = () => {
@@ -31,7 +31,7 @@ export default function TilemapEditorTabs() {
                         WorkspaceService.closeTilemapSession(tilemapSession.sessionId);
                     };
                     return (
-                        <Button key={tilemapSession.sessionId} onClick={openTilemapSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-secondary-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-secondary-background" : "bg-background"}`}>
+                        <Button key={tilemapSession.sessionId} onClick={openTilemapSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background" : "bg-secondary-background"}`}>
                             {tilemapSession.name}
                             <Tooltip delayDuration={500}>
                                 <TooltipTrigger asChild>

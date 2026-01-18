@@ -46,7 +46,7 @@ export const useWorkspaceDockStore = create<WorkspaceState>((set, get) => {
                 case "tilemapEditor":
                     return <TilemapEditor />
                 case "explorer":
-                    return <Explorer />
+                    return <Explorer node={node} />
                 case "debug":
                     return <Debug />
                 case "log":
