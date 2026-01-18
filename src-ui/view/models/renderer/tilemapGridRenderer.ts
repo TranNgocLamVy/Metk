@@ -59,20 +59,32 @@ export class TilemapGridRenderer {
         }
 
         const scaled = this.viewport.scaled;
-        const bigGridOption: DrawDashLineOption = { dash: [4 / scaled, 2 / scaled], color: 0xc9c9c9, alpha: 0.5, pixelLine: true }
+        const bigGridOption: DrawDashLineOption = { dash: [4 / scaled, 2 / scaled], color: 0xc9c9c9, alpha: 0.4, pixelLine: true }
         const smallGridOption: DrawLineOption = { color: 0xc9c9c9, alpha: 0.25, pixelLine: true }
 
         // Draw grid
         for (let x = minX; x <= maxX; x += stepX) {
             if (x % (stepX * 4) == 0) {
-                GraphicUtils.drawVerticelDashLine(this.graphics, x, minY, maxY, bigGridOption);
+                if (x % (stepX * 8) == 0) {
+                    GraphicUtils.drawVerticelDashLine(this.graphics, x, minY, maxY, { ...bigGridOption, alpha: 0.6 });
+                } else if (x % (stepX * 16) == 0) {
+                    GraphicUtils.drawVerticelDashLine(this.graphics, x, minY, maxY, { ...bigGridOption, alpha: 0.8 });
+                } else {
+                    GraphicUtils.drawVerticelDashLine(this.graphics, x, minY, maxY, bigGridOption);
+                }
             } else {
                 GraphicUtils.drawVerticelLine(this.graphics, x, minY, maxY, smallGridOption);
             }
         }
         for (let y = minY; y <= maxY; y += stepY) {
             if (y % (stepY * 4) == 0) {
-                GraphicUtils.drawHorizontalDashLine(this.graphics, y, minX, maxX, bigGridOption);
+                if (y % (stepY * 8) == 0) {
+                    GraphicUtils.drawHorizontalDashLine(this.graphics, y, minX, maxX, { ...bigGridOption, alpha: 0.6 });
+                } else if (y % (stepY * 16) == 0) {
+                    GraphicUtils.drawHorizontalDashLine(this.graphics, y, minX, maxX, { ...bigGridOption, alpha: 0.8 });
+                } else {
+                    GraphicUtils.drawHorizontalDashLine(this.graphics, y, minX, maxX, bigGridOption);
+                }
             } else {
                 GraphicUtils.drawHorizontalLine(this.graphics, y, minX, maxX, smallGridOption);
             }

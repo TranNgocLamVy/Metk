@@ -19,7 +19,7 @@ export default function TilesetViewTabs() {
 	const { tilesetsSession, currentSession } = useTilesetSessionStore();
 
 	return (
-		<HStack className="w-full h-fit bg-background" justify="start" align="center">
+		<HStack className="w-full h-fit px-1" justify="start" align="center">
 			<TilesetViewDropDownMenu />
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
 				{tilesetsSession.map((tilesetSession) => {
@@ -33,7 +33,7 @@ export default function TilesetViewTabs() {
                         WorkspaceService.closeTilesetSession(tilesetSession.sessionId);
                     };
 					return (
-						<Button key={tilesetSession.sessionId} onClick={openTilesetSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-secondary-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-secondary-background" : "bg-background"}`}>
+						<Button key={tilesetSession.sessionId} onClick={openTilesetSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background" : "bg-secondary-background"}`}>
 							{tilesetSession.name}
 							<Tooltip delayDuration={500}>
 								<TooltipTrigger asChild>

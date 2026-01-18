@@ -21,7 +21,7 @@ export default function Debug() {
     }
 
 	return (
-		<VStack className="w-full h-full ">
+		<VStack className="w-full h-full">
 			<HStack className="w-full h-full bg-secondary-background p-4 gap-2" justify="start" align="start">
 				<Button onClick={print}>Print</Button>
 				<Button onClick={saveCurrentTilemap}>Save current Tilemap</Button>

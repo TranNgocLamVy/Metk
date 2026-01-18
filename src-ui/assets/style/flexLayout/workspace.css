@@ -54,12 +54,8 @@
 .workspace .flexlayout__border_bottom {
 	padding: 2px;
 	height: fit-content;
-	background-color: var(--secondary-background);
+	background-color: var(--bg);
 	border-color: transparent;
-}
-
-.workspace .flexlayout__splitter_horz {
-	--color-splitter: rgba(0, 0, 0, 0);
 }
 
 .workspace .flexlayout__tab_button--selected::after {

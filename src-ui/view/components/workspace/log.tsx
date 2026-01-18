@@ -12,8 +12,8 @@ export default function Log() {
 	const { logs, clearLogs } = useLogStore();
 
 	return (
-		<VStack className="w-full h-full">
-			<ScrollArea ref={scrollAreaRef} className="h-full w-full">
+		<VStack className="w-full h-full p-1 bg-secondary-background">
+			<ScrollArea ref={scrollAreaRef} className="h-full w-full rounded-lg bg-background">
 				{logs.map((log, index) => (
 					<div key={index} className="p-2 border-b border-border text-xs font-mono">
 						{log}

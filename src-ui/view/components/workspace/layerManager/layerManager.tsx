@@ -67,8 +67,8 @@ export default function LayerManager() {
 	return (
 		<VStack className="w-full h-full rounded-md no-scrollbar" onDrop={handleContainerDrop} onDragOver={handleDragOver}>
 			<ContextMenu onOpenChange={onOpenChange}>
-				<ContextMenuTrigger className="w-full h-full no-scrollbar">
-					<ScrollArea className="w-full h-full pr-2 no-scrollbar">
+				<ContextMenuTrigger className="w-full h-full no-scrollbar p-1 bg-secondary-background">
+					<ScrollArea className="w-full h-full no-scrollbar bg-background rounded-lg border-2">
 						<div className="flex-1 h-2 transition-colors" />
 						<div className="flex flex-col w-full min-h-full pb-10">
 							{flatView.map((view, index) => (
