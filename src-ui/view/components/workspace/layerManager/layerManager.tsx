@@ -1,6 +1,6 @@
-import { Layers } from "lucide-react";
-import { DragEvent, MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { DragEvent, useEffect, useMemo, useState } from "react";
 
+import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { VStack } from "../../custom/stack/stack";
@@ -11,26 +11,34 @@ import { LayerManagerContextMenu } from "./layerContextMenuItem";
 import LayerNodeRow from "./layerNodeRow";
 
 export default function LayerManager() {
-	const store = useLayerManagerStore();
+	const { currentSession, version, getFlatView, setTargetLayer } = useLayerManagerStore();
 	useLayerManagerStore((s) => s.version);
 	const selectedIds = useLayerManagerStore((s) => s.selectedIds);
-	const root = store.root; // Get root reference
-
 	const [isMounted, setIsMounted] = useState(false);
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
 
+
 	const flatView = useMemo(() => {
-		return store.getFlatView();
-	}, [store.root, store.version]);
+		return getFlatView();
+	}, [currentSession, version]);
 
-	// FIX 3: Handle dropping on the container background
+
+    if (!isMounted || !currentSession) {
+		return (
+			<VStack className="w-full h-full" justify="center" align="center">
+				Select a tilemap
+			</VStack>
+		);
+	}
+
 	const handleContainerDrop = (e: DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation(); // Stop bubbling to prevent unexpected behavior
+        e.preventDefault();
+		e.stopPropagation();
 
-		if (!root) return;
+        if (!currentSession) return;
+        const root = currentSession.tilemap.rootLayer;
 
 		const data = e.dataTransfer.getData("application/json");
 		if (!data) return;
@@ -38,8 +46,7 @@ export default function LayerManager() {
 		try {
 			const { ids } = JSON.parse(data);
 			if (Array.isArray(ids) && ids.length > 0) {
-				// Move dragged layers "inside" the Root Layer (appended to bottom)
-				store.moveLayers(ids, root.id, "inside");
+				TilemapLayerService.moveLayers(ids, root.id, "inside");
 			}
 		} catch (err) {
 			console.error("Container drop error:", err);
@@ -48,31 +55,22 @@ export default function LayerManager() {
 
 	const handleDragOver = (e: DragEvent) => {
 		e.preventDefault();
-		// Essential: allow the drop effect
 		e.dataTransfer.dropEffect = "move";
 	};
 
-	if (!isMounted || !root) {
-		return (
-			<VStack className="w-full h-full" justify="center" align="center">
-				Select a tilemap
-			</VStack>
-		);
-	}
-
 	const onOpenChange = (open: boolean) => {
-		if (!open) store.setTargetLayer(null);
+		if (!open) setTargetLayer(null);
 	};
 
 	return (
 		<VStack className="w-full h-full rounded-md no-scrollbar" onDrop={handleContainerDrop} onDragOver={handleDragOver}>
 			<ContextMenu onOpenChange={onOpenChange}>
 				<ContextMenuTrigger className="w-full h-full no-scrollbar p-1 bg-secondary-background">
-					<ScrollArea className="w-full h-full no-scrollbar bg-background rounded-lg border-2">
+					<ScrollArea className="w-full h-full no-scrollbar bg-background rounded-lg border-2 shadow-sm">
 						<div className="flex-1 h-2 transition-colors" />
 						<div className="flex flex-col w-full min-h-full pb-10">
-							{flatView.map((view, index) => (
-								<LayerNodeRow key={view.id} view={view} isSelected={selectedIds.has(view.id)} />
+							{flatView.map((view) => (
+								<LayerNodeRow key={view.id} view={view} isSelected={selectedIds.includes(view.id)} />
 							))}
 						</div>
 						<div className="flex-1 min-h-[10px] h-full transition-colors" />

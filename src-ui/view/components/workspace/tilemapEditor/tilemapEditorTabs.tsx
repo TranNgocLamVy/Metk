@@ -24,14 +24,14 @@ export default function TilemapEditorTabs() {
                     const isCurrent = currentSession?.session.id === tilemapSession.sessionId;
                     const openTilemapSession = () => {
                         if (isCurrent) return;
-                        WorkspaceService.openTilemapViewSesion(tilemapSession.sessionId);
+                        WorkspaceService.openTilemapSession(tilemapSession.sessionId);
                     };
                     const closeTilemapSession = (e: any) => {
                         e.stopPropagation();
                         WorkspaceService.closeTilemapSession(tilemapSession.sessionId);
                     };
                     return (
-                        <Button key={tilemapSession.sessionId} onClick={openTilemapSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background" : "bg-secondary-background"}`}>
+                        <Button key={tilemapSession.sessionId} onClick={openTilemapSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
                             {tilemapSession.name}
                             <Tooltip delayDuration={500}>
                                 <TooltipTrigger asChild>

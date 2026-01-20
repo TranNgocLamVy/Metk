@@ -7,7 +7,6 @@ import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
 import { Tile } from "@/core/application/tile/tileset";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
-import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
 export class TilemapEventHub extends EventEmitter {
     private viewport: Viewport;
@@ -15,17 +14,18 @@ export class TilemapEventHub extends EventEmitter {
     
     private isDrawing: boolean = false;
 
-    private bindOnPointerDown = this.onPointerDown.bind(this);
-    private bindOnPointerMove = this.onPointerMove.bind(this);
-    private bindOnPointerUp = this.onPointerUp.bind(this);
+    private bindOnPointerDown: (event: FederatedPointerEvent) => void
+    private bindOnPointerMove: (event: FederatedPointerEvent) => void
+    private bindOnPointerUp: (event: FederatedPointerEvent) => void
 
-    constructor(
-        viewport: Viewport,
-        tilemap: Tilemap,
-    ) {
+    constructor(viewport: Viewport, tilemap: Tilemap) {
         super();
         this.viewport = viewport;
         this.tilemap = tilemap;
+
+        this.bindOnPointerDown = this.onPointerDown.bind(this);
+        this.bindOnPointerMove = this.onPointerMove.bind(this);
+        this.bindOnPointerUp = this.onPointerUp.bind(this);
 
         this.attachListeners();
     }
@@ -53,12 +53,13 @@ export class TilemapEventHub extends EventEmitter {
     }
 
     private getActiveTileLayer(): TileLayer | null {
-        const { selectedIds, root } = useLayerManagerStore.getState();
-        if (selectedIds.size === 0 || !root) return null;
+        const { selectedIds, currentSession } = useLayerManagerStore.getState();
+        if (selectedIds.length == 0 || !currentSession) return null;
 
         const activeId = selectedIds.values().next().value;
         if (!activeId) return null;
 
+        const root = currentSession.tilemap.rootLayer;
         const layer = root.findLayer(activeId);
 
         if (layer && layer instanceof TileLayer) {
@@ -73,20 +74,12 @@ export class TilemapEventHub extends EventEmitter {
 
         if (!tileSetSession || !tileSetSession.tileset) return null;
 
-        const { selectedTiles, pivot } = tileSetSession.selectionState;
-        if (!selectedTiles || selectedTiles.length === 0) return null;
+        const tiles = tileSetSession.getSelectedTiles();
+        const pivot = tileSetSession.getPivot();
 
-        const tileset = tileSetSession.tileset;
+        if (!tiles || !pivot) return null;
 
-        // Convert IDs back to Tile objects
-        const tiles = selectedTiles.map(row => 
-            row.map(id => (id !== null && id !== undefined) ? tileset.getTileFromId(id) : null)
-        );
-
-        return {
-            tiles,
-            pivot: pivot || { row: 0, col: 0 }
-        };
+        return { tiles, pivot };
     }
 
     private paint(globalX: number, globalY: number) {
@@ -143,6 +136,7 @@ export class TilemapEventHub extends EventEmitter {
 
                 if (tile) {
                     // TODO: Implement Command Manager for Undo/Redo
+                    console.log("paint", targetX, targetY, tile);
                     targetLayer.setTileRefAt({ x: targetX, y: targetY }, tile);
                 }
             }

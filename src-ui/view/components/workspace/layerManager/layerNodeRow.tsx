@@ -2,6 +2,7 @@ import { ChevronDown, ChevronRight, Eye, EyeOff, File, Folder, FolderOpen, Grid,
 import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
+import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
 import { DropPosition, LayerView, useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { Button } from "../../shadcn/button";
@@ -29,7 +30,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 
 	const handleClick = (e: MouseEvent) => {
 		e.stopPropagation();
-        store.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+        TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
 	};
 
 	const handleDoubleClick = (e: MouseEvent) => {
@@ -58,8 +59,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 		let idsToDrag = [layer.id];
 
 		if (!isSelected) {
-			// If dragging an unselected layer, select it exclusively
-			store.selectLayer(layer.id, false);
+			TilemapLayerService.selectLayer(layer.id, false);
 			idsToDrag = [layer.id];
 		} else {
 			// If dragging a selected layer, drag all selected layers
@@ -109,7 +109,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 		try {
 			const { ids } = JSON.parse(data); // Expect array of IDs
 			if (Array.isArray(ids) && ids.length > 0 && dragOverPos) {
-				store.moveLayers(ids, layer.id, dragOverPos);
+				TilemapLayerService.moveLayers(ids, layer.id, dragOverPos);
 			}
 		} catch (err) {
 			console.error("Drop error:", err);
@@ -118,8 +118,8 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 
     const onContextMenu = (e: MouseEvent) => {
         store.setTargetLayer(layer);
-        if (!selectedIds.has(layer.id)) {
-            store.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+        if (!selectedIds.includes(layer.id)) {
+            TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
         }
     };
 
@@ -176,7 +176,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-						store.toggleVisibility([layer.id]);
+                        TilemapLayerService.toggleVisibility([layer.id]);
 					}}>
 					{layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
 				</Button>
@@ -187,7 +187,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-						store.toggleLock([layer.id]);
+                        TilemapLayerService.toggleLock([layer.id]);
 					}}>
 					{layer.locked ? <LockKeyhole size={16} /> : <LockOpen size={16} />}
 				</Button>

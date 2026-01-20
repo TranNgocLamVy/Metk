@@ -11,7 +11,7 @@ const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
 });
 
 interface TilesetEvent extends BaseObjectEvents {
-
+    update(): void
 }
 
 export class Tileset extends BaseObject<TilesetEvent> {

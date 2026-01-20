@@ -16,7 +16,7 @@ export class TilemapGridRenderer {
     public readonly gridGap: number = 0;
     public gridEnabled: boolean = true;
 
-    private bindDrawGrid = this.drawGrid.bind(this);
+    private bindDrawGrid: () => void;
 
     constructor(context: CreateGridRendererContext) {
         this.viewport = context.viewport;
@@ -24,7 +24,9 @@ export class TilemapGridRenderer {
 
         this.graphics = new Graphics();
 
-         // wait for the viewport to be initialized
+        this.bindDrawGrid = this.drawGrid.bind(this);
+
+        // wait for the viewport to be initialized
         setTimeout(() => {
             this.viewport.on("moved", this.bindDrawGrid);
             this.viewport.on("zoomed", this.bindDrawGrid);

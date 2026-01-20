@@ -79,6 +79,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
 
         const [child] = this.layers.splice(index, 1);
         this.layers.splice(newIndex, 0, child);
+        this.eventEmitter.emit("layerReordered");
     }
 
     public toggleOpen(force?: boolean): void {

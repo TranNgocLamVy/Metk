@@ -47,6 +47,7 @@ export class TilemapSessionManager {
             id: uuidv4(),
             tilemapId: tilemap.id,
             viewState: { x: null, y: null, zoom: 1 },
+            layerState: { selectedLayers: [] },
         }
 
         const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData);

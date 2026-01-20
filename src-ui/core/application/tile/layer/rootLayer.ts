@@ -74,6 +74,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
 
         const [child] = this.layers.splice(index, 1);
         this.layers.splice(newIndex, 0, child);
+        this.eventEmitter.emit("layerReordered");
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void) {

@@ -38,7 +38,7 @@ export class TilesetSessionView {
             .drag({ mouseButtons: "middle " })
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 1, maxScale: 5 })
+            .clampZoom({ minScale: 0.5, maxScale: 50 })
 
         setTimeout(() => this.updateViewport(), 0)
 
@@ -108,19 +108,6 @@ export class TilesetSessionView {
         this.viewport.plugins.pause('decelerate');
     }
 
-    public destroy() {
-        if (!this.isInit) return;
-        this.unActivateSession();
-        this.viewport.destroy({ children: true });
-        this.viewport = null!;
-
-        this.renderer.destroy();
-        this.renderer = null!;
-
-        this.selector.destroy();
-        this.selector = null!;
-    }
-
     public updateViewport() {
         if (this.session.viewState.x != null && this.session.viewState.y != null) {
             this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);
@@ -138,5 +125,18 @@ export class TilesetSessionView {
             this.renderer.setGap(this.grid.gridGap);
             this.selector.setGap(this.grid.gridGap);
         }
+    }
+
+    public destroy() {
+        if (!this.isInit) return;
+        this.unActivateSession();
+        this.viewport.destroy({ children: true });
+        this.viewport = null!;
+
+        this.renderer.destroy();
+        this.renderer = null!;
+
+        this.selector.destroy();
+        this.selector = null!;
     }
 }

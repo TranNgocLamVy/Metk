@@ -3,11 +3,7 @@ import { Application } from "pixi.js";
 import { create } from "zustand";
 
 import { TilemapSession } from "@/core/application/session/tilemapSession";
-import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { WorkspaceService } from "@/shared/services/workspaceService";
 import { TilemapSessionView } from "@/view/models/tilemapSessionView";
-
-import { useLayerManagerStore } from "./layerManagerStore";
 
 type TilemapSessionDisplayData = {
     name: string;
@@ -18,13 +14,14 @@ type TilemapViewStore = {
     pixiApp: Application | null;
     tilemapSessionMap: Map<string, TilemapSessionView>;
     tilemapsSession: TilemapSessionDisplayData[];
+    tilemapSessionIdStack: string[];
     currentSession: TilemapSessionView | null;
 
     setPixiApp: (pixiApp: Application) => void;
-    setSessions: (session: TilemapSession[]) => void;
-    openSession: (session: TilemapSession) => TilemapSessionView | null;
-    closeSession(sessionId: string): void;
-    clear(): void;
+    setTilemapSessions: (session: TilemapSession[]) => void;
+    openTilemapSession: (session: TilemapSession) => TilemapSessionView | null;
+    closeTilemapSession(sessionId: string): void;
+    clearTilemapSessions(): void;
 }
 
 export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
@@ -32,6 +29,7 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
         pixiApp: null,
         tilemapSessionMap: new Map<string, TilemapSessionView>(),
         tilemapsSession: [],
+        tilemapSessionIdStack: [],
         currentSession: null,
 
         layers: [],
@@ -43,7 +41,7 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
             if (currentSession) currentSession.activateSession(pixiApp);
         },
 
-        setSessions: (session: TilemapSession[]) => {
+        setTilemapSessions: (session: TilemapSession[]) => {
             get().tilemapSessionMap.forEach(sessionView => sessionView.destroy());
             get().tilemapSessionMap.clear();
             set({ tilemapsSession: [], currentSession: null });
@@ -53,14 +51,13 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
                 get().tilemapSessionMap.set(session.id, sessionView);
                 set({ 
                     tilemapsSession: [...get().tilemapsSession, { name: session.tilemap.name, sessionId: session.id }], 
-                    currentSession: sessionView 
+                    currentSession: sessionView,
+                    tilemapSessionIdStack: [...get().tilemapSessionIdStack, session.id]
                 });
             });
-
-            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         },
 
-        openSession: (session: TilemapSession) => {
+        openTilemapSession: (session: TilemapSession) => {
             let sessionView: TilemapSessionView;
             if (get().tilemapSessionMap.has(session.id)) {
                 sessionView = get().tilemapSessionMap.get(session.id)!;
@@ -80,13 +77,11 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
             const pixiApp = get().pixiApp;
             if (pixiApp) sessionView.activateSession(pixiApp);
             
-            set({ currentSession: sessionView });
-            useLayerManagerStore.getState().setRoot(session.tilemap.rootLayer);
-            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            set({ currentSession: sessionView, tilemapSessionIdStack: [...get().tilemapSessionIdStack, session.id] });
             return sessionView;
         },
 
-        closeSession: (sessionId: string) => {
+        closeTilemapSession: (sessionId: string) => {
             const sessionView = get().tilemapSessionMap.get(sessionId);
             const currentSession = get().currentSession;
             if (sessionView) {
@@ -97,14 +92,12 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
                 sessionView.destroy();
                 get().tilemapSessionMap.delete(sessionId);
                 set((state) => {
-                    return { tilemapsSession: [...state.tilemapsSession.filter((s) => s.sessionId !== sessionId)] };
+                    return { tilemapsSession: [...state.tilemapsSession.filter((s) => s.sessionId !== sessionId)], tilemapSessionIdStack: state.tilemapSessionIdStack.filter((s) => s !== sessionId) };
                 });
             }
-            useLayerManagerStore.getState().setRoot(null);
-            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         },
 
-        clear: () => {
+        clearTilemapSessions: () => {
             get().tilemapSessionMap.forEach(sessionView => sessionView.destroy());
             get().tilemapSessionMap.clear();
             set({ currentSession: null, tilemapsSession: [] });

@@ -18,15 +18,23 @@ type CreateGroupRendererContext = {
 export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
     private childRenderers: Map<string, BaseLayerRenderer> = new Map();
 
+    private bindOnLayerAdded: (layerId: string) => void
+    private bindOnLayerRemoved: (layerId: string) => void
+    private bindOnLayerReordered: () => void
+
     constructor(context: CreateGroupRendererContext) {
         super(context.layer, context.tilemap);
         this.gap = context.gap;
 
         this.rebuildChildren();
 
-        (this.layer.eventEmitter as any).on("layerAdded", this.onLayerAdded);
-        (this.layer.eventEmitter as any).on("layerRemoved", this.onLayerRemoved);
-        (this.layer.eventEmitter as any).on("layerReordered", this.reorderChildren);
+        this.bindOnLayerAdded = this.onLayerAdded.bind(this);
+        this.bindOnLayerRemoved = this.onLayerRemoved.bind(this);
+        this.bindOnLayerReordered = this.reorderChildren.bind(this);
+
+        this.layer.eventEmitter.on("layerAdded", this.bindOnLayerAdded);
+        this.layer.eventEmitter.on("layerRemoved", this.bindOnLayerRemoved);
+        this.layer.eventEmitter.on("layerReordered", this.bindOnLayerReordered);
     }
 
     private rebuildChildren = () => {
@@ -56,7 +64,7 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
         return renderer;
     }
 
-    private onLayerAdded = (layerId: string) => {
+    private onLayerAdded(layerId: string) {
         const childLayer = (this.layer as unknown as IGroupLayer).layers.find(l => l.id === layerId);
         if (childLayer) {
             this.createChildRenderer(childLayer);
@@ -75,13 +83,13 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
 
     private reorderChildren = () => {
         const layers = this.layer.getLayers();
-        let currentIndex = 0;
+        let currentIndex = layers.length - 1;
 
         layers.forEach((l) => {
             const renderer = this.childRenderers.get(l.id);
             if (renderer) {
                 this.container.setChildIndex(renderer.container, currentIndex);
-                currentIndex++;
+                currentIndex--;
             }
         });
     }
@@ -92,9 +100,9 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
     }
 
     public override destroy(): void {
-        (this.layer.eventEmitter as any).off("layerAdded", this.onLayerAdded);
-        (this.layer.eventEmitter as any).off("layerRemoved", this.onLayerRemoved);
-        (this.layer.eventEmitter as any).off("layerReordered", this.reorderChildren);
+        this.layer.eventEmitter.off("layerAdded", this.bindOnLayerAdded);
+        this.layer.eventEmitter.off("layerRemoved", this.bindOnLayerRemoved);
+        this.layer.eventEmitter.off("layerReordered", this.bindOnLayerReordered);
 
         this.childRenderers.forEach(r => r.destroy());
         this.childRenderers.clear();

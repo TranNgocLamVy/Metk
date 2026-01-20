@@ -18,7 +18,7 @@ export default function Explorer({ node }: Props) {
 
 	return (
 		<VStack className="w-full h-full p-1 bg-secondary-background">
-			<ScrollArea className="w-full h-full p-2 gap-4 bg-background rounded-lg border-2">
+			<ScrollArea className="w-full h-full p-2 gap-4 bg-background rounded-lg border-2 shadow-sm">
 				<VStack className="gap-2">
 					<Label className="text-muted-foreground font-bold text-xs uppercase">Tilesets</Label>
 					{tilesets.length === 0 && <span className="text-xs text-muted-foreground italic pl-2">No tilesets</span>}

@@ -35,9 +35,9 @@ export class TilesetViewSelector {
     private selectedTransparency: number = 0.4;
 
 
-    private bindOnPointerDown = this.onPointerDown.bind(this);
-    private bindOnPointerMove = this.onPointerMove.bind(this);
-    private bindOnPointerUp = this.onPointerUp.bind(this);
+    private bindOnPointerDown: (event: FederatedPointerEvent) => void;
+    private bindOnPointerMove: (event: FederatedPointerEvent) => void;
+    private bindOnPointerUp: (event: FederatedPointerEvent) => void;
 
     constructor(context: CreateTilesetViewSelectorContext) {
         this.tileset = context.tileset;
@@ -47,6 +47,10 @@ export class TilesetViewSelector {
 
         this.graphics = new Graphics();
         this.parent.addChild(this.graphics);
+
+        this.bindOnPointerDown = this.onPointerDown.bind(this);
+        this.bindOnPointerMove = this.onPointerMove.bind(this);
+        this.bindOnPointerUp = this.onPointerUp.bind(this);
 
         this.parent.on("pointerdown", this.bindOnPointerDown);
 
@@ -63,7 +67,7 @@ export class TilesetViewSelector {
                 this.pivot = null;
                 this.topLeft = null;
             }
-            this.updateSelectedRect(); 
+            this.updateSelectedRect();
             this.drawRectShape();
         }
     }
@@ -174,10 +178,9 @@ export class TilesetViewSelector {
 
         this.drawRectShape();
 
-        this.tilesetSession.updateSelectionState({
-            selectedTilesSet: Array.from(this.selectedTilesSet),
-            pivot: this.pivot,
-        });
+        this.tilesetSession.updateSelectionState({ selectedTilesSet: Array.from(this.selectedTilesSet), pivot: this.pivot });
+        this.tilesetSession.updateSelectedTiles(this.selectedTilesShape);
+        this.tilesetSession.updatePivot(this.pivot);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
@@ -253,7 +256,9 @@ export class TilesetViewSelector {
             this.pivot = null;
             this.topLeft = null;
 
-            this.tilesetSession.updateSelectionState({ selectedTilesSet: [], pivot: undefined  });
+            this.tilesetSession.updateSelectionState({ selectedTilesSet: [], pivot: undefined });
+            this.tilesetSession.updateSelectedTiles(this.selectedTilesShape);
+            this.tilesetSession.updatePivot(this.pivot);
             WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
 
@@ -294,13 +299,10 @@ export class TilesetViewSelector {
         this.pivot = { row: Math.floor((minRow + maxRow) / 2), col: Math.floor((minCol + maxCol) / 2) };
 
         const mappedSelectedTiles = Array.from(this.selectedTilesSet);
-        this.tilesetSession.updateSelectionState({
-            selectedTilesSet: mappedSelectedTiles,
-            pivot: this.pivot,
-        });
+        this.tilesetSession.updateSelectionState({ selectedTilesSet: mappedSelectedTiles, pivot: this.pivot });
+        this.tilesetSession.updateSelectedTiles(this.selectedTilesShape);
+        this.tilesetSession.updatePivot(this.pivot);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-
-        // this.drawSelection();
     }
 
     private updatePreviewRect() {
@@ -415,7 +417,7 @@ export class TilesetViewSelector {
         if (tilewidth <= 0 || tileheight <= 0 || columns <= 0) return null;
         if (x < 0 || y < 0) return null;
 
-        
+
         const col = Math.floor(x / (tilewidth + this.gap));
         const row = Math.floor(y / (tileheight + this.gap));
         if (col < 0 || row < 0) return null;
