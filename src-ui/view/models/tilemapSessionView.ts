@@ -5,8 +5,8 @@ import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
 import { TilemapGridRenderer } from "./renderer/tilemapGridRenderer";
+import { TilemapRenderer } from "./renderer/tilemapRenderer";
 import { TilemapEventHub } from "./tilemapEventHub";
-import { TilemapRenderer } from "./tilemapRenderer";
 
 export class TilemapSessionView {
     public session: TilemapSession;
@@ -84,7 +84,6 @@ export class TilemapSessionView {
         this.viewport.addChild(this.renderer.container);
         this.viewport.addChild(this.grid.graphics);
 
-        // Initialize EventHub (Editing Logic)
         this.eventHub = new TilemapEventHub(this.viewport, this.session.tilemap);
     }
 

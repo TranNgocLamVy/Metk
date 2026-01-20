@@ -2,13 +2,17 @@ import { SelectionState } from "@/shared/schema/common/selectionState";
 import { ViewState } from "@/shared/schema/common/viewState";
 import { TilesetSessionData } from "@/shared/schema/tilesetSession";
 
-import { Tileset } from "../tile/tileset";
+import { Tile, Tileset } from "../tile/tileset";
 
 export class TilesetSession {
     public readonly id: string;
     public readonly tileset: Tileset;
     public viewState: ViewState;
     public selectionState: SelectionState;
+    private selectedTiles: (Tile | null)[][] = [];
+    private pivot: Coordinate | null = null;
+
+
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData) {
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
@@ -21,6 +25,22 @@ export class TilesetSession {
 
     public updateSelectionState(state: Partial<SelectionState>) {
         this.selectionState = { ...this.selectionState, ...state };
+    }
+
+    public updateSelectedTiles(selectedTiles: (Tile | null)[][]) {
+        this.selectedTiles = selectedTiles;
+    }
+
+    public getSelectedTiles(): (Tile | null)[][] | null {
+        return this.selectedTiles ? this.selectedTiles : null;
+    }
+
+    public updatePivot(pivot: Coordinate | null) {
+        this.pivot = pivot;
+    }
+
+    public getPivot(): Coordinate | null {
+        return this.pivot ? this.pivot : null;
     }
 
     public serialize(): TilesetSessionData {

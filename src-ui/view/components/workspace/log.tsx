@@ -13,7 +13,7 @@ export default function Log() {
 
 	return (
 		<VStack className="w-full h-full p-1 bg-secondary-background">
-			<ScrollArea ref={scrollAreaRef} className="h-full w-full rounded-lg bg-background">
+			<ScrollArea ref={scrollAreaRef} className="h-full w-full rounded-lg bg-background border-2 shadow-sm p-2">
 				{logs.map((log, index) => (
 					<div key={index} className="p-2 border-b border-border text-xs font-mono">
 						{log}

@@ -36,7 +36,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					type: "option",
 					name: "Group layer",
 					disabled: () => {
-						const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+						const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
 						return numberOfLayers < 1;
 					},
 					onClick() {},
@@ -45,7 +45,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					type: "option",
 					name: "Ungroup layer",
 					disabled: () => {
-						const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+						const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
 						return numberOfLayers < 1;
 					},
 					onClick() {},
@@ -57,14 +57,16 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		name: "Duplicate layer",
 		startIcon: <Copy />,
-		onClick() {},
+		onClick() {
+            TilemapLayerService.duplicateLayer();
+        },
 	},
 	{
 		type: "option",
 		name: "Remove layer",
 		startIcon: <Trash2 />,
         disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
             return numberOfLayers < 1;
         },
 		onClick() {
@@ -77,27 +79,40 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Select all layer",
-		onClick() {},
+		onClick() { TilemapLayerService.selectAllLayers() },
+	},
+    {
+		type: "option",
+		name: "Unselect all layer",
+        disabled: () => {
+            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+            return numberOfLayers < 1;
+        },
+		onClick() { TilemapLayerService.deselectAllLayers() },
 	},
 	{
 		type: "option",
 		name: "Raise layer",
 		startIcon: <ArrowUp />,
 		disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
 			return numberOfLayers != 1;
 		},
-		onClick() {},
+		onClick() {
+            TilemapLayerService.moveLayersUp();
+        },
 	},
 	{
 		type: "option",
 		name: "Lower layer",
 		startIcon: <ArrowDown />,
 		disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
 			return numberOfLayers != 1;
 		},
-		onClick() {},
+		onClick() {
+            TilemapLayerService.moveLayersDown();
+        },
 	},
 ];
 
@@ -105,20 +120,26 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Show/Hide layers",
-		onClick() {},
         disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
 			return numberOfLayers < 1;
 		},
+		onClick() {
+            const selectedLayers = useLayerManagerStore.getState().selectedIds
+            TilemapLayerService.toggleVisibility([...selectedLayers]);
+        },
 	},
 	{
 		type: "option",
 		name: "Lock/Unlock layers",
         disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.size;
+			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
 			return numberOfLayers < 1;
 		},
-		onClick() {},
+		onClick() {
+            const selectedLayers = useLayerManagerStore.getState().selectedIds
+            TilemapLayerService.toggleLock([...selectedLayers]);
+        },
 	},
 ];
 

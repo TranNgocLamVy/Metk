@@ -33,7 +33,7 @@ export default function TilesetViewTabs() {
                         WorkspaceService.closeTilesetSession(tilesetSession.sessionId);
                     };
 					return (
-						<Button key={tilesetSession.sessionId} onClick={openTilesetSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background" : "bg-secondary-background"}`}>
+						<Button key={tilesetSession.sessionId} onClick={openTilesetSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
 							{tilesetSession.name}
 							<Tooltip delayDuration={500}>
 								<TooltipTrigger asChild>

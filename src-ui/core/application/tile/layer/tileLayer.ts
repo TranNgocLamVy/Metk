@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { TileLayerData, TileRefData } from "@/shared/schema/layerSchema";
 import { ErrorResult, Result, ResultStatus, SuccessResult } from "@/shared/types/result";
+import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
 import { Tile } from "../tileset";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
@@ -38,12 +39,13 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         this.visible = tileLayerData.visible;
         this.locked = tileLayerData.locked;
 
-        this.tilesRef = tileLayerData.tilesData.map((tileRefRow) => {
+        const tilesRef = tileLayerData.tilesData.map((tileRefRow) => {
             return tileRefRow.map((tileRef) => {
                 if (tileRef === null) return null;
                 return new TileRef(tileRef);
             });
         });
+        this.tilesRef = MatrixUtils.ensureSize(tilesRef, this.size.height, this.size.width, null);
     }
 
     public getTileRefAt(coordinate: { x: number, y: number }): Result<TileRef | null> {
@@ -88,6 +90,10 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     }
 
     public override serialize(): TileLayerData {
+
+        // Check if tilesRef is all null
+        const allNull = this.tilesRef.every((row) => { return row.every((tileRef) => { return tileRef === null }) });
+
         return {
             id: this.id,
             layerType: "tile",
@@ -101,7 +107,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             locked: this.locked,
             offsetx: this.offset.x,
             offsety: this.offset.y,
-            tilesData: this.tilesRef.map((tileRefRow) => tileRefRow.map(tileRef => tileRef ? tileRef.serialize() : null)),
+            tilesData: allNull ? [] : this.tilesRef.map((tileRefRow) => tileRefRow.map(tileRef => tileRef ? tileRef.serialize() : null)),
         }
     }
 

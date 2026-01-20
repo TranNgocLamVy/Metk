@@ -1,8 +1,8 @@
-import { Container } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 import { Tilemap } from "@/core/application/tile/tilemap";
 
-import { GroupLayerRenderer } from "./renderer/groupLayerRenderer";
+import { GroupLayerRenderer } from "./groupLayerRenderer";
 
 type CreateTilemapRendererContext = {
     tilemap: Tilemap
@@ -12,6 +12,7 @@ type CreateTilemapRendererContext = {
 export class TilemapRenderer {
     public container: Container;
     public rootRenderer: GroupLayerRenderer;
+    private borderGraphic: Graphics;
     public tilemap: Tilemap
     private gap: number;
 
@@ -25,6 +26,23 @@ export class TilemapRenderer {
         // Pass tilemap to the root group renderer
         this.rootRenderer = new GroupLayerRenderer({ layer: this.tilemap.rootLayer, tilemap: this.tilemap, gap: this.gap });
         this.container.addChild(this.rootRenderer.container);
+
+        this.borderGraphic = new Graphics();
+        this.container.addChild(this.borderGraphic);
+        this.renderBorder();
+    }
+
+    private renderBorder(): void {
+        this.borderGraphic.clear();
+
+        const { width, height } = this.tilemap;
+        const { tilewidth , tileheight } = this.tilemap;
+
+        const minX = 0, maxX = width * tilewidth, minY = 0, maxY = height * tileheight;
+
+        this.borderGraphic.moveTo(minX, minY).lineTo(maxX, minY).lineTo(maxX, maxY).lineTo(minX, maxY).lineTo(minX, minY);
+
+        this.borderGraphic.stroke({ color: 0xffffff, pixelLine: true });
     }
 
     public setGap(gap: number): void {

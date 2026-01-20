@@ -47,7 +47,7 @@ export class TilesetSessionManager {
             id: uuidv4(),
             tilesetId: tileset.id,
             viewState: { x: null, y: null, zoom: 1 },
-            selectionState: { selectedTiles: [] },
+            selectionState: { selectedTilesSet: [] },
         }
 
         const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData);

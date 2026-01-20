@@ -14,13 +14,17 @@ type CreateTileLayerRendererContext = {
 export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     private sprites: Map<string, Sprite> = new Map(); // Id -> Sprite
 
+    private bindOnTileChanged: (x: number, y: number) => void
+
     constructor(context: CreateTileLayerRendererContext) {
         super(context.layer, context.tilemap);
         this.gap = context.gap;
         
+        this.bindOnTileChanged = this.onTileChanged.bind(this);
+
         // Initial render
         this.renderLayer();
-        this.layer.eventEmitter.on("tileChanged", this.onTileChanged);
+        this.layer.eventEmitter.on("tileChanged", this.bindOnTileChanged);
     }
 
     private renderLayer(): void {
@@ -32,13 +36,13 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         }
     }
 
-    private onTileChanged = (x: number, y: number) => {
+    private onTileChanged(x: number, y: number) {
         this.renderTile(x, y);
     };
 
     private renderTile(x: number, y: number): void {
-        const key = `${x},${y}`;
         const tileRefResult = this.layer.getTileRefAt({ x, y });
+        const key = `${x},${y}`;
         const currentSprite = this.sprites.get(key);
 
         if (tileRefResult.status !== "Success" || !tileRefResult.data) {
@@ -56,6 +60,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         if (!tilesetRefData) return;
 
         const tilesetResult = this.layer.tilesetRefManager.getTilesetById(tilesetRefData.id);
+
+        // TODO: Handle unfound tileset, render error texture
         if (tilesetResult.status !== "Success" || !tilesetResult.data) return;
 
         const tileset = tilesetResult.data;
@@ -95,7 +101,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     }
 
     public override destroy(): void {
-        (this.layer.eventEmitter as any).off("tileChanged", this.onTileChanged);
+        this.layer.eventEmitter.off("tileChanged", this.bindOnTileChanged);
         super.destroy();
         this.sprites.clear();
     }

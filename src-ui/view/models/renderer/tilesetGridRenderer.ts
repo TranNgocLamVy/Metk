@@ -16,11 +16,18 @@ export class TilesetGridRenderer {
     public gridGap: number = 0;
     public gridEnabled: boolean = true;
 
+    private bindOnTilesetUpdate: () => void;
+
     constructor(context: CreateGridRendererContext) {
         this.viewport = context.viewport;
         this.tileset = context.tileset;
         
         this.graphics = new Graphics();
+
+        this.bindOnTilesetUpdate = this.drawGrid.bind(this);
+
+        this.tileset.eventEmitter.on("update", this.bindOnTilesetUpdate);
+
         this.drawGrid();
     }
 
@@ -56,5 +63,9 @@ export class TilesetGridRenderer {
     public enableGrid(): void {
         this.gridEnabled = true;
         this.rerenderGrid();
+    }
+
+    public destroy(): void {
+        this.tileset.eventEmitter.off("update", this.bindOnTilesetUpdate);
     }
 }

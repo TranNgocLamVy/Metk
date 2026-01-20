@@ -1,5 +1,6 @@
 import { AppCore } from "@/core/appcore";
 import { Project } from "@/core/application/project";
+import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
@@ -19,17 +20,13 @@ export class WorkspaceService {
         const tilesetsSession = AppCore.getCurrentWorkspace().tilesetSessionManager.tilesetsSession;
         useTilesetSessionStore.getState().setSessions(tilesetsSession);
         const currentTilesetSession = AppCore.getCurrentWorkspace().tilesetSessionManager.currentTilesetSession;
-        if (currentTilesetSession) {
-            useTilesetSessionStore.getState().openSession(currentTilesetSession)
-        }
+        if (currentTilesetSession) useTilesetSessionStore.getState().openSession(currentTilesetSession)
 
-        useTilemapSessionStore.getState().clear();
+        WorkspaceService.clearTilemapSessions();
         const tilemapsSession = AppCore.getCurrentWorkspace().tilemapSessionManager.tilemapsSession;
-        useTilemapSessionStore.getState().setSessions(tilemapsSession);
+        useTilemapSessionStore.getState().setTilemapSessions(tilemapsSession);
         const currentTilemapSession = AppCore.getCurrentWorkspace().tilemapSessionManager.currentTilemapSession;
-        if (currentTilemapSession) {
-            useTilemapSessionStore.getState().openSession(currentTilemapSession)
-        }
+        if (currentTilemapSession) await WorkspaceService.openTilemapSession(currentTilemapSession.id)
     }
 
     public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
@@ -51,6 +48,8 @@ export class WorkspaceService {
             WorkspaceService.saveWorkspaceTimeout = null;
         }, 1000);
     }
+
+    //================ tileset ================
 
     public static async openTilesetViewSesion(sessionId: string): Promise<void> {
         const result = await AppCore.getCurrentWorkspace().openTilesetSession(sessionId);
@@ -86,14 +85,8 @@ export class WorkspaceService {
         useTilesetSessionStore.getState().closeSession(sessionId);
     }
 
-    public static async openTilemapViewSesion(sessionId: string): Promise<void> {
-        const result = await AppCore.getCurrentWorkspace().openTilemapSession(sessionId);
-        if (result.status !== "Success" || !result.data) {
-            ToastService.error({ message: result.message });
-            return;
-        }
-        useTilemapSessionStore.getState().openSession(result.data);
-    }
+
+    //================ tilemap ================
 
     public static async createTilemapSession(tilemapId: string) {
         const tilemapResult = AppCore.getCurrentProject().tilemapManager.getTilemapById(tilemapId);
@@ -108,7 +101,20 @@ export class WorkspaceService {
             ToastService.error({ message: result.message });
             return;
         }
-        useTilemapSessionStore.getState().openSession(result.data);
+        useTilemapSessionStore.getState().openTilemapSession(result.data);
+        useLayerManagerStore.getState().setSession(result.data);
+        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+    }
+
+    public static async openTilemapSession(sessionId: string): Promise<void> {
+        const result = await AppCore.getCurrentWorkspace().openTilemapSession(sessionId);
+        if (result.status !== "Success" || !result.data) {
+            ToastService.error({ message: result.message });
+            return;
+        }
+        useTilemapSessionStore.getState().openTilemapSession(result.data);
+        useLayerManagerStore.getState().setSession(result.data);
+        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
     public static async closeTilemapSession(sessionId: string): Promise<void> {
@@ -117,6 +123,15 @@ export class WorkspaceService {
             ToastService.error({ message: result.message });
             return;
         }
-        useTilemapSessionStore.getState().closeSession(sessionId);
+        useTilemapSessionStore.getState().closeTilemapSession(sessionId);
+        useLayerManagerStore.getState().setSession(null);
+        const tilemapSessionIdStack = useTilemapSessionStore.getState().tilemapSessionIdStack
+        const lastSessionId = tilemapSessionIdStack[tilemapSessionIdStack.length - 1];
+        if (lastSessionId) WorkspaceService.openTilemapSession(lastSessionId);
+        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+    }
+
+    public static clearTilemapSessions() {
+        useTilemapSessionStore.getState().clearTilemapSessions();
     }
 }

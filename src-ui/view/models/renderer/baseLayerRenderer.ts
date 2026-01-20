@@ -9,6 +9,8 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
     public tilemap: Tilemap;
     protected gap: number;
 
+    private bindOnPropertyUpdate: (property: keyof BaseLayerEvents, value: any) => void
+
     constructor(layer: T, tilemap: Tilemap) {
         this.layer = layer;
         this.tilemap = tilemap;
@@ -18,13 +20,11 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
         // Initial properties
         this.updateProperties();
 
-        // Listen for property changes
-        (this.layer.eventEmitter as any).on("updateProperty", this.onPropertyUpdate);
-    }
+        this.bindOnPropertyUpdate = this.updateProperties.bind(this);
 
-    private onPropertyUpdate = (property: keyof BaseLayerEvents, value: any) => {
-        this.updateProperties();
-    };
+        // Listen for property changes
+        (this.layer.eventEmitter as any).on("updateProperty", this.bindOnPropertyUpdate);
+    }
 
     protected updateProperties(): void {
         this.container.visible = this.layer.visible;
@@ -37,7 +37,7 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
     }
 
     public destroy(): void {
-        (this.layer.eventEmitter as any).off("updateProperty", this.onPropertyUpdate);
+        (this.layer.eventEmitter as any).off("updateProperty", this.bindOnPropertyUpdate);
         this.container.destroy({ children: true, texture: false });
     }
 }

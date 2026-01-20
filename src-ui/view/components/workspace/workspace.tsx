@@ -20,7 +20,7 @@ export default function Workspace() {
     }
 
 	return (
-		<VStack className="workspace w-full h-full p-1 bg-secondary-background">
+		<VStack className="workspace w-full h-full p-1 pt-2 bg-secondary-background">
 			<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
 		</VStack>
 	);

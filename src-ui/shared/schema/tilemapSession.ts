@@ -2,10 +2,16 @@ import { type } from "arktype";
 
 import { ViewStateSchema } from "./common/viewState";
 
+export const LayerStateSchema = type({
+    selectedLayers: "string[]",
+})
+export type LayerState = typeof LayerStateSchema.infer
+
 export const TilemapSessionSchema = type({
     id: "string",
     tilemapId: "string",
     viewState: ViewStateSchema,
+    layerState: LayerStateSchema
 });
 export type TilemapSessionData = typeof TilemapSessionSchema.infer
 

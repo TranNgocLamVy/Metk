@@ -18,7 +18,7 @@ export default function MenuBar() {
 	};
 
 	return (
-		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-secondary-background shadow-md absolute" data-tauri-drag-region>
+		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-background shadow-md absolute" data-tauri-drag-region>
 			<HStack className="text-foreground/70">
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />
