@@ -1,13 +1,14 @@
 import { type } from "arktype";
 
 const layerModule = type.module({
+    LayerType: "'tile' | 'group'",
     TileRefSchema: {
         tileId: type("number"),
         tilesetIndex: type("number")
     },
     TileLayerSchema: {
         id: type("string"),
-        layerType: "'tile'",
+        layerType: "LayerType",
         name: type("string"),
         x: type("number").optional(),
         y: type("number").optional(),
@@ -22,7 +23,7 @@ const layerModule = type.module({
     },
     GroupLayerSchema: {
         id: type("string"),
-        layerType: "'group'",
+        layerType: "LayerType",
         name: type("string"),
         opacity: type("number").default(1),
         visible: type("boolean").default(true),

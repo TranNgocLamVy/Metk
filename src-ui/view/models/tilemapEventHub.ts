@@ -70,7 +70,7 @@ export class TilemapEventHub extends EventEmitter {
 
     private getSelectedTiles(): { tiles: (Tile | null)[][], pivot: Coordinate } | null {
         // Access the Tileset Session Store to get the active brush
-        const tileSetSession = AppCore.getCurrentWorkspace().tilesetSessionManager.currentTilesetSession;
+        const tileSetSession = AppCore.getIns().editorContext.getCurrentTilesetSession();
 
         if (!tileSetSession || !tileSetSession.tileset) return null;
 

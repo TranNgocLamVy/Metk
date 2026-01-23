@@ -2,11 +2,9 @@
 
 import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
-import { JsonWorkspaceStorageService } from "@/infrastructure/workspaceStorageService";
 import { Result } from "@/shared/types/result";
 
-import { Project } from "./application/project";
-import { Workspace } from "./application/workspace";
+import { EditorContext } from "./application/editorContext";
 import { ProjectManager } from "./manager/projectManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
 
@@ -15,13 +13,19 @@ export class AppCore {
     private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
     public readonly workspaceManager: WorkspaceManager;
+    public readonly editorContext: EditorContext;
 
     private constructor() {
         const projectRepo = new JsonProjectRepository();
         const projectStorageService = new JsonProjectStorageService();
-        this.projectManager = new ProjectManager(projectRepo, projectStorageService);
 
+        // Init Managers
+        this.projectManager = new ProjectManager(projectRepo, projectStorageService);
         this.workspaceManager = new WorkspaceManager();
+        
+        // Set Context
+        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager);
+        this.workspaceManager.setEditorContext(this.editorContext);
     }
 
     public async load(): Promise<Result> {
@@ -47,17 +51,5 @@ export class AppCore {
             this.initialize();
         }
         return this._instance;
-    }
-
-    public static getCurrentProject(): Project {
-        const currentProject = AppCore.getIns().projectManager.currentProject;
-        if (!currentProject) throw new Error("Current project not found");
-        return currentProject;
-    }
-
-    public static getCurrentWorkspace(): Workspace {
-        const currentWorkspace = AppCore.getIns().workspaceManager.currentWorkspace;
-        if (!currentWorkspace) throw new Error("Current workspace not found");
-        return currentWorkspace;
     }
 }

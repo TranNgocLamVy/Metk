@@ -7,7 +7,7 @@ import { Button } from "../shadcn/button";
 
 export default function Debug() {
 	const print = async () => {
-        const workspace = AppCore.getCurrentWorkspace().serialize();
+        const workspace = AppCore.getIns().editorContext.getCurrentWorkspace();
         console.log(workspace)
 	};
 
@@ -15,9 +15,21 @@ export default function Debug() {
         const { currentSession } = useTilemapSessionStore.getState();
         if (currentSession) {
             const tilemap = currentSession.session.tilemap;
-            const project = AppCore.getCurrentProject();
+            const project = AppCore.getIns().editorContext.getCurrentProject();
             await project.tilemapManager.saveTilemap(tilemap.id);
         }
+    }
+
+    const undo = () => {
+        const editorContext = AppCore.getIns().editorContext;
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (historyManager) historyManager.undo(editorContext);
+    }
+
+    const redo = () => {
+        const editorContext = AppCore.getIns().editorContext;
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (historyManager) historyManager.redo(editorContext);
     }
 
 	return (
@@ -25,6 +37,8 @@ export default function Debug() {
 			<HStack className="w-full h-full bg-secondary-background p-4 gap-2" justify="start" align="start">
 				<Button onClick={print}>Print</Button>
 				<Button onClick={saveCurrentTilemap}>Save current Tilemap</Button>
+				<Button onClick={undo}>Undo</Button>
+				<Button onClick={redo}>Redo</Button>
 			</HStack>
 		</VStack>
 	);

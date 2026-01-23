@@ -21,8 +21,8 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	const isRenaming = editingId === layer.id;
 
 	const [tempName, setTempName] = useState(layer.name);
+    const isRenameByUI = useRef(false);
 	const [dragOverPos, setDragOverPos] = useState<DropPosition | null>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (isRenaming) setTempName(layer.name);
@@ -36,6 +36,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	const handleDoubleClick = (e: MouseEvent) => {
 		e.stopPropagation();
 		store.setEditingId(layer.id);
+        isRenameByUI.current = true;
 	};
 
 	const handleToggle = (e: MouseEvent) => {
@@ -47,10 +48,8 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	};
 
 	const handleRename = () => {
-		if (tempName.trim()) {
-			layer.rename(tempName);
-			store.refresh();
-		}
+		if (tempName.trim()) TilemapLayerService.renameLayer(layer.id, tempName, isRenameByUI.current);
+        isRenameByUI.current = false;
 		store.setEditingId(null);
 	};
 
@@ -62,7 +61,6 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 			TilemapLayerService.selectLayer(layer.id, false);
 			idsToDrag = [layer.id];
 		} else {
-			// If dragging a selected layer, drag all selected layers
 			idsToDrag = Array.from(selectedIds);
 		}
 
@@ -78,7 +76,6 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 		const y = e.clientY - rect.top;
 		const height = rect.height;
 
-		// Determine position: Top 25%, Bottom 25%, Middle 50%
 		if (y < height * 0.25) {
 			setDragOverPos("top");
 		} else if (y > height * 0.75) {
@@ -87,7 +84,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 			if (isGroup) {
 				setDragOverPos("inside");
 			} else {
-				setDragOverPos("bottom"); // Default to bottom for leaves
+				setDragOverPos("bottom");
 			}
 		}
 	};
@@ -154,7 +151,6 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				<div className={`shrink-0 ${isGroup ? "text-blue-500" : "text-emerald-500"}`}>{isGroup ? (layer as GroupLayer).isOpen ? <FolderOpen size={16} /> : <Folder size={16} /> : <Grid size={16} />}</div>
 				{isRenaming ? (
 					<input
-						ref={inputRef}
 						value={tempName}
 						onChange={(e) => setTempName(e.target.value)}
 						onBlur={handleRename}
@@ -163,8 +159,9 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 							if (e.key === "Escape") store.setEditingId(null);
 						}}
 						autoFocus
+                        onFocus={(e) => e.currentTarget.select()}
 						onClick={(e) => e.stopPropagation()}
-						className="truncate min-w-0 flex-1 text-sm border rounded"
+						className="truncate w-40 text-sm border rounded"
 					/>
 				) : (
 					<span onDoubleClick={handleDoubleClick} className="truncate text-sm font-medium border border-transparent flex-1">{layer.name}</span>
@@ -172,7 +169,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				<Button
 					variant={"ghost"}
 					size={"icon-sm"}
-                    className="hover:bg-white/20"
+                    className="hover:bg-white/20 ml-auto"
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
