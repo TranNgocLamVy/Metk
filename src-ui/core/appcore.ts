@@ -5,7 +5,9 @@ import { JsonProjectStorageService } from "@/infrastructure/projectStorageServic
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "./application/editorContext";
+import { KeybindingManager } from "./manager/keybindingManager";
 import { ProjectManager } from "./manager/projectManager";
+import { SystemCommandManager } from "./manager/SystemCommandManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
 
 export class AppCore {
@@ -13,6 +15,9 @@ export class AppCore {
     private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
     public readonly workspaceManager: WorkspaceManager;
+    private commandManager: SystemCommandManager;
+    private keybindingManager: KeybindingManager;
+
     public readonly editorContext: EditorContext;
 
     private constructor() {
@@ -22,9 +27,12 @@ export class AppCore {
         // Init Managers
         this.projectManager = new ProjectManager(projectRepo, projectStorageService);
         this.workspaceManager = new WorkspaceManager();
+        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager);
+
+        this.commandManager = new SystemCommandManager(this.editorContext);
+        this.keybindingManager = new KeybindingManager(this.commandManager);
         
         // Set Context
-        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager);
         this.workspaceManager.setEditorContext(this.editorContext);
     }
 

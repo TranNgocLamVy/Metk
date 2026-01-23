@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
@@ -17,33 +18,37 @@ export class DeleteLayerCommand implements IBaseCommand {
         private readonly layerId: string,
     ) { }
 
-    public execute(context: EditorContext): void {
+    public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.layerId);
-        if (!targetLayer) return;
+        if (!targetLayer) return ErrorResult("Target layer not found");
         this.layer = targetLayer;
         const parent = this.layer.parentLayer || root;
         this.parentId = parent.id;
         this.index = parent.getLayerIndex(targetLayer.id);
         this.layer.removeFromParent();
 
-        useLayerManagerStore.getState().refresh()
+        useLayerManagerStore.getState().refresh();
+
+        return SuccessResult();
     }
 
-    public undo(context: EditorContext): void {
+    public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.parentId);
-        if (!targetLayer) return;
+        if (!targetLayer) return ErrorResult("Target layer not found");
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
         parent.insertLayer(this.layer, this.index);
 
-        useLayerManagerStore.getState().refresh()
+        useLayerManagerStore.getState().refresh();
+
+        return SuccessResult();
     }
 
     public delete(): void {

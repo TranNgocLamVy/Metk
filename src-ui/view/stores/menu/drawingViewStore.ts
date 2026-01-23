@@ -43,7 +43,7 @@ export const ShowObjectNamesOptions = {
     ForSelectedObjects: "ForSelectedObjects",
     ForHoveredObjects: "ForHoveredObjects",
 } as const;
-export type ShowObjectNamesTypes = keyof typeof ShowObjectNamesOptions
+export type ShowObjectNamesTypes = typeof ShowObjectNamesOptions[keyof typeof ShowObjectNamesOptions]
 
 export const SnappingModeOptions = {
     None: "None",

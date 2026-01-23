@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
@@ -12,34 +13,38 @@ export class DuplicateLayerCommand implements IBaseCommand {
         private readonly targetLayerId: string,
     ) { }
 
-    public execute(context: EditorContext): void {
+    public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return;
+        if (!targetLayer) return ErrorResult("Target layer not found");
 
         const duplicateLayer = targetLayer.duplicate();
-        if (!duplicateLayer) return;
+        if (!duplicateLayer) return ErrorResult("Failed to duplicate layer");
         this.newLayerId = duplicateLayer.id;
         const cloneLayerName = `${targetLayer.name} (copy)`
         duplicateLayer.rename(cloneLayerName);
 
-        useLayerManagerStore.getState().refresh()
+        useLayerManagerStore.getState().refresh();
+
+        return SuccessResult();
     }
 
-    public undo(context: EditorContext): void {
+    public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.newLayerId);
-        if (!targetLayer) return;
+        if (!targetLayer) return ErrorResult("Target layer not found");
 
         targetLayer.removeFromParent();
 
-        useLayerManagerStore.getState().refresh()
+        useLayerManagerStore.getState().refresh();
+
+        return SuccessResult();
     }
 
     public delete(): void {
