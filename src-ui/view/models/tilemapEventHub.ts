@@ -136,7 +136,6 @@ export class TilemapEventHub extends EventEmitter {
 
                 if (tile) {
                     // TODO: Implement Command Manager for Undo/Redo
-                    console.log("paint", targetX, targetY, tile);
                     targetLayer.setTileRefAt({ x: targetX, y: targetY }, tile);
                 }
             }

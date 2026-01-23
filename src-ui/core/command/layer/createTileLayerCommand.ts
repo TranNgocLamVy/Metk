@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { TileLayerData } from "@/shared/schema/layerSchema";
+import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
@@ -17,9 +18,9 @@ export class CreateTileLayerCommand implements IBaseCommand {
         private readonly parentLayerId: string,
     ) { }
 
-    public execute(context: EditorContext): void {
+    public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.parentLayerId);
@@ -32,18 +33,22 @@ export class CreateTileLayerCommand implements IBaseCommand {
 
         this.tileLayerId = newTileLayer.id;
 
-        useLayerManagerStore.getState().refresh()
+        useLayerManagerStore.getState().refresh();
+
+        return SuccessResult();
     }
 
-    public undo(context: EditorContext): void {
+    public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         const tileLayer = root.findLayer(this.tileLayerId) as TileLayer;
         tileLayer.removeFromParent();
         this.tileLayerData = tileLayer.serialize();
         
-        useLayerManagerStore.getState().refresh()
+        useLayerManagerStore.getState().refresh();
+
+        return SuccessResult();
     }
 
     public delete(): void {

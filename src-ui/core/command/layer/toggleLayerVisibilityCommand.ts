@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
@@ -13,31 +14,35 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
         private readonly newIsVisible: boolean
     ) { }
 
-    public execute(context: EditorContext): void {
+    public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return;
+        if (!targetLayer) return ErrorResult("Target layer not found");
 
         this.oldIsVisible = targetLayer.visible;
         targetLayer.toggleVisibility(this.newIsVisible);
 
         useLayerManagerStore.getState().refresh()
+
+        return SuccessResult();
     }
 
-    public undo(context: EditorContext): void {
+    public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return;
+        if (!currentSession) return ErrorResult("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         
         const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return;
+        if (!targetLayer) return ErrorResult("Target layer not found");
 
         targetLayer.toggleVisibility(this.oldIsVisible);
 
         useLayerManagerStore.getState().refresh()
+        
+        return SuccessResult();
     }
 
     public delete(): void {

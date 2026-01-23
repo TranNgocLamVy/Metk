@@ -3,17 +3,17 @@ import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 
-import { LayerData } from "../schema/layerSchema";
+import { GroupLayerData, LayerData, TileLayerData } from "../schema/layerSchema";
 
 export class LayerUtils {
     public static createLayeFromData(layerData: LayerData, parent: IGroupLayer | null, tilesetRefManager: TilesetRefManager): BaseLayer | null {
         let layer: BaseLayer<any> | null = null;
         switch (layerData.layerType) {
             case "tile":
-                layer = new TileLayer(layerData, parent, tilesetRefManager);
+                layer = new TileLayer(layerData as TileLayerData, parent, tilesetRefManager);
                 break;
             case "group":
-                layer = new GroupLayer(layerData, parent, tilesetRefManager);
+                layer = new GroupLayer(layerData as GroupLayerData, parent, tilesetRefManager);
         }
         return layer;
     }
