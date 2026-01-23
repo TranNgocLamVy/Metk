@@ -17,15 +17,15 @@ export class WorkspaceService {
         }
 
         useTilesetSessionStore.getState().clear();
-        const tilesetsSession = AppCore.getCurrentWorkspace().tilesetSessionManager.tilesetsSession;
+        const tilesetsSession = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager.tilesetsSession;
         useTilesetSessionStore.getState().setSessions(tilesetsSession);
-        const currentTilesetSession = AppCore.getCurrentWorkspace().tilesetSessionManager.currentTilesetSession;
+        const currentTilesetSession = AppCore.getIns().editorContext.getCurrentTilesetSession();
         if (currentTilesetSession) useTilesetSessionStore.getState().openSession(currentTilesetSession)
 
         WorkspaceService.clearTilemapSessions();
-        const tilemapsSession = AppCore.getCurrentWorkspace().tilemapSessionManager.tilemapsSession;
+        const tilemapsSession = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager.tilemapsSession;
         useTilemapSessionStore.getState().setTilemapSessions(tilemapsSession);
-        const currentTilemapSession = AppCore.getCurrentWorkspace().tilemapSessionManager.currentTilemapSession;
+        const currentTilemapSession = AppCore.getIns().editorContext.getCurrentTilemapSession();
         if (currentTilemapSession) await WorkspaceService.openTilemapSession(currentTilemapSession.id)
     }
 
@@ -52,7 +52,7 @@ export class WorkspaceService {
     //================ tileset ================
 
     public static async openTilesetViewSesion(sessionId: string): Promise<void> {
-        const result = await AppCore.getCurrentWorkspace().openTilesetSession(sessionId);
+        const result = await AppCore.getIns().editorContext.getCurrentWorkspace().openTilesetSession(sessionId);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
@@ -61,14 +61,14 @@ export class WorkspaceService {
     }
 
     public static async createTilesetSession(tilesetId: string): Promise<void> {
-        const tilesetResult = AppCore.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
+        const tilesetResult = AppCore.getIns().editorContext.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
         if (tilesetResult.status !== "Success" || !tilesetResult.data) {
             console.error(tilesetResult.message);
             ToastService.error({ message: tilesetResult.message });
             return;
         }
         const tileset = tilesetResult.data;
-        const result = await AppCore.getCurrentWorkspace().createTilesetSession(tileset);
+        const result = await AppCore.getIns().editorContext.getCurrentWorkspace().createTilesetSession(tileset);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
@@ -77,7 +77,7 @@ export class WorkspaceService {
     }
 
     public static async closeTilesetSession(sessionId: string): Promise<void> {
-        const result = await AppCore.getCurrentWorkspace().closeTilesetSession(sessionId);
+        const result = await AppCore.getIns().editorContext.getCurrentWorkspace().closeTilesetSession(sessionId);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
@@ -89,14 +89,14 @@ export class WorkspaceService {
     //================ tilemap ================
 
     public static async createTilemapSession(tilemapId: string) {
-        const tilemapResult = AppCore.getCurrentProject().tilemapManager.getTilemapById(tilemapId);
+        const tilemapResult = AppCore.getIns().editorContext.getCurrentProject().tilemapManager.getTilemapById(tilemapId);
         if (tilemapResult.status !== "Success" || !tilemapResult.data) {
             console.error(tilemapResult.message);
             ToastService.error({ message: tilemapResult.message });
             return;
         }
         const tilemap = tilemapResult.data;
-        const result = await AppCore.getCurrentWorkspace().createTilemapSession(tilemap);
+        const result = await AppCore.getIns().editorContext.getCurrentWorkspace().createTilemapSession(tilemap);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
@@ -107,7 +107,7 @@ export class WorkspaceService {
     }
 
     public static async openTilemapSession(sessionId: string): Promise<void> {
-        const result = await AppCore.getCurrentWorkspace().openTilemapSession(sessionId);
+        const result = await AppCore.getIns().editorContext.getCurrentWorkspace().openTilemapSession(sessionId);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;
@@ -118,7 +118,7 @@ export class WorkspaceService {
     }
 
     public static async closeTilemapSession(sessionId: string): Promise<void> {
-        const result = await AppCore.getCurrentWorkspace().closeTilemapSession(sessionId);
+        const result = await AppCore.getIns().editorContext.getCurrentWorkspace().closeTilemapSession(sessionId);
         if (result.status !== "Success" || !result.data) {
             ToastService.error({ message: result.message });
             return;

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSession";
 import { Result } from "@/shared/types/result";
 
+import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { Tilemap } from "../application/tile/tilemap";
 import { TilemapManager } from "./tilemapManager";
@@ -15,7 +16,10 @@ export class TilemapSessionManager {
         return Array.from(this.tilemapSessionMap.values());
     }
 
-    constructor(private readonly tilemapSessionManagerData: TilemapSessionManagerData) {
+    constructor(
+        private readonly tilemapSessionManagerData: TilemapSessionManagerData,
+        private readonly editorContext: EditorContext
+    ) {
         
     }
 
@@ -27,7 +31,7 @@ export class TilemapSessionManager {
                 return;
             }
             const tilemap = tilemapResult.data;
-            const tilemapSession = new TilemapSession(tilemap, sessionData);
+            const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorContext);
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
             this.tilemapMap.set(tilemap.id, tilemapSession.id);
         });
@@ -50,7 +54,7 @@ export class TilemapSessionManager {
             layerState: { selectedLayers: [] },
         }
 
-        const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData);
+        const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData, this.editorContext);
         
         this.tilemapSessionMap.set(newTilemapSession.id, newTilemapSession);
         this.tilemapMap.set(tilemap.id, newTilemapSession.id);
@@ -72,6 +76,9 @@ export class TilemapSessionManager {
         if (!tilemapSession) return { status: "Error", message: "Tilemap session not found" };
         this.tilemapSessionMap.delete(sessionId);
         this.tilemapMap.delete(tilemapSession.tilemap.id);
+        if (this.currentTilemapSession?.id === sessionId) {
+            this.currentTilemapSession = null;
+        }
         return { status: "Success", data: sessionId };
     }
 

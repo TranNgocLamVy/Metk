@@ -6,6 +6,7 @@ import { TilemapManager } from "../manager/tilemapManager";
 import { TilemapSessionManager } from "../manager/tilemapSessionManager";
 import { TilesetManager } from "../manager/tilesetManager";
 import { TilesetSessionManager } from "../manager/tilesetSessionManager";
+import { EditorContext } from "./editorContext";
 import { TilemapSession } from "./session/tilemapSession";
 import { TilesetSession } from "./session/tilesetSession";
 import { Tilemap } from "./tile/tilemap";
@@ -14,15 +15,15 @@ import { Tileset } from "./tile/tileset";
 export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;
     public tilemapSessionManager: TilemapSessionManager;
-    private workspaceStorageService: IWorkspacetorageService;
-    private tilesetManager: TilesetManager;
-    private tilemapManager: TilemapManager;
-    constructor (workspaceData: WorkpsaceData, tilesetManager: TilesetManager, tilemapManager: TilemapManager, workspaceStorageService: IWorkspacetorageService) {
-        this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets);
-        this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps);
-        this.tilesetManager = tilesetManager;
-        this.tilemapManager = tilemapManager;
-        this.workspaceStorageService = workspaceStorageService;
+    constructor (
+        workspaceData: WorkpsaceData, 
+        private readonly tilesetManager: TilesetManager, 
+        private readonly tilemapManager: TilemapManager, 
+        private readonly workspaceStorageService: IWorkspacetorageService,
+        private readonly editorContext: EditorContext,
+    ) {
+        this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorContext);
+        this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
     }
 
     public async load(): Promise<Result> {

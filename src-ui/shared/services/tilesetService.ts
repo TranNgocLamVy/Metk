@@ -13,7 +13,7 @@ import { WorkspaceService } from "./workspaceService";
 
 export class TilesetService {
     public static async loadTilesetView(): Promise<void> {
-        const project = AppCore.getCurrentProject();
+        const project = AppCore.getIns().editorContext.getCurrentProject();
         const tilesets = project.tilesetManager.getAllTilesets();
         useExplorerStore.getState().setTilesets(tilesets.map((tileset) => {
             return {
@@ -24,7 +24,7 @@ export class TilesetService {
     }
 
     public static async createTileset(): Promise<void> {
-        const currentProject = AppCore.getCurrentProject();
+        const currentProject = AppCore.getIns().editorContext.getCurrentProject();
         const form = await FormService.openFormDialog(createTilesetForm)
         if (!form) return;
 

@@ -49,16 +49,16 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         if (this.parentLayer) this.parentLayer.removeLayer(this.id);
     }
 
-    public duplicate(): Result {
-        if (!this.parentLayer) return ErrorResult("Parent layer not found.");
+    public duplicate(): BaseLayer<any> | null {
+        if (!this.parentLayer) return null;
 
         const index = this.parentLayer.getLayerIndex(this.id);
-        if (index == -1) return ErrorResult("Layer not found.");
+        if (index == -1) return null
 
         const clone = this.clone();
 
         this.parentLayer.insertLayer(clone, index + 1);
-        return SuccessResult();
+        return clone;
     }
 
     public isAncestorOf(potentialChild: BaseLayer): boolean {

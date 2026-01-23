@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSession";
 import { Result } from "@/shared/types/result";
 
+import { EditorContext } from "../application/editorContext";
 import { TilesetSession } from "../application/session/tilesetSession";
 import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
@@ -15,7 +16,10 @@ export class TilesetSessionManager {
         return Array.from(this.tilesetSessionMap.values());
     }
 
-    constructor(private readonly tilesetSessionManagerData: TilesetSessionManagerData) {
+    constructor(
+        private readonly tilesetSessionManagerData: TilesetSessionManagerData,
+        private readonly editorContext: EditorContext
+    ) {
         
     }
 
@@ -72,6 +76,9 @@ export class TilesetSessionManager {
         if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
         this.tilesetSessionMap.delete(sessionId);
         this.tilesetMap.delete(tilesetSession.tileset.id);
+        if (this.currentTilesetSession?.id === sessionId) {
+            this.currentTilesetSession = null;
+        }
         return { status: "Success", data: sessionId };
     }
 

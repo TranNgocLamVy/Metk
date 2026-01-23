@@ -1,89 +1,121 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { AppCore } from "@/core/appcore";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { RootLayer } from "@/core/application/tile/layer/rootLayer";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
+import { CreateTileLayerCommand } from "@/core/command/layer/createTileLayerCommand";
+import { DeleteLayerCommand } from "@/core/command/layer/deleteLayerCommand";
+import { DuplicateLayerCommand } from "@/core/command/layer/duplicateLayerCommand";
+import { MoveLayerCommand } from "@/core/command/layer/moveLayerCommand";
+import { RenameLayerCommand } from "@/core/command/layer/renameLayerCommand";
+import { ToggleLayerLockCommand } from "@/core/command/layer/toggleLayerLockCommand";
+import { ToggleLayerVisibilityCommand } from "@/core/command/layer/toggleLayerVisibilityCommand";
 import { DropPosition, useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
+import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLayerCommand";
 import { WorkspaceService } from "./workspaceService";
 
 export class TilemapLayerService {
     public static async createNewTileLayer() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!currentSession || !historyManager) return;
+
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = useLayerManagerStore.getState().targetLayer;
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const newTileLayer = new TileLayer({
+        const payload = {
             id: uuidv4(),
             name: "New Tile Layer",
-            layerType: "tile",
+            layerType: "tile" as const,
             width: root.tilemap.width,
             height: root.tilemap.height,
             opacity: 1,
             visible: true,
             locked: false,
             tilesData: []
-        }, parent, parent.tilesetRefManager)
+        }
 
-        parent.addLayer(newTileLayer);
-        if (parent instanceof GroupLayer) parent.toggleOpen(true);
+        const createTileLayerCommand = new CreateTileLayerCommand(payload, parent.id);
 
-        useLayerManagerStore.getState().setEditingId(newTileLayer.id);
-        useLayerManagerStore.getState().refresh()
+        historyManager.startTransaction();
+        historyManager.execute(createTileLayerCommand, editorContext)
+        historyManager.commitTransaction();
+
+        useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
     public static async createNewGroupLayer() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!currentSession || !historyManager) return;
+
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = useLayerManagerStore.getState().targetLayer;
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const newGroupLayer = new GroupLayer({
+        const payload = {
             id: uuidv4(),
             name: "New Group Layer",
-            layerType: "group",
+            layerType: "group" as const,
             opacity: 1,
             visible: true,
             locked: false,
             layers: []
-        }, parent, parent.tilesetRefManager)
+        }
 
-        parent.addLayer(newGroupLayer);
-        if (parent instanceof GroupLayer) parent.toggleOpen(true);
+        const createGroupLayerCommand = new CreateGroupLayerCommand(payload, parent.id);
 
-        useLayerManagerStore.getState().setEditingId(newGroupLayer.id);
-        useLayerManagerStore.getState().refresh()
+        historyManager.startTransaction();
+        historyManager.execute(createGroupLayerCommand, editorContext)
+        historyManager.commitTransaction();
+
+        useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
     public static async duplicateLayer() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
-        const root = currentSession.tilemap.rootLayer;
+       const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!currentSession || !historyManager) return;
+
         const selectedIds = currentSession.layerState.selectedLayers;
+
+        historyManager.startTransaction();
         selectedIds.forEach(id => {
-            const layer = root.findLayer(id);
-            layer?.duplicate();
+            const duplicateLayerCommand = new DuplicateLayerCommand(id);
+            historyManager.execute(duplicateLayerCommand, editorContext);
         });
-        useLayerManagerStore.getState().refresh();
+        historyManager.commitTransaction();
     }
 
     public static async deleteLayer() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
-        const root = currentSession.tilemap.rootLayer;
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = AppCore.getIns().editorContext.getCurrentHistoryManager();
+        if (!currentSession || !historyManager) return;
+
         const selectedIds = useLayerManagerStore.getState().selectedIds
+
+        historyManager.startTransaction();
         selectedIds.forEach((id) => {
-            const layer = root.findLayer(id);
-            layer?.removeFromParent();
+            const deleteLayerCommand = new DeleteLayerCommand(id);
+            historyManager.execute(deleteLayerCommand, editorContext);
         })
+        historyManager.commitTransaction();
+
         useLayerManagerStore.getState().refresh();
     }
 
@@ -121,30 +153,54 @@ export class TilemapLayerService {
     }
 
     public static toggleVisibility(ids: string[], force?: boolean) {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+
+        if (!currentSession || !historyManager) return;
         const root = currentSession.tilemap.rootLayer;
+
+        historyManager.startTransaction();
         ids.forEach(id => {
             const layer = root.findLayer(id);
-            layer?.toggleVisibility(force);
+            if (!layer) return;
+            const toggleVisibilityCommand = new ToggleLayerVisibilityCommand(id, force === undefined ? !layer.visible : force);
+            historyManager.execute(toggleVisibilityCommand, editorContext);
         });
+        historyManager.commitTransaction();
+
         useLayerManagerStore.getState().refresh();
     }
 
     public static toggleLock(ids: string[], force?: boolean) {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+
+        if (!currentSession || !historyManager) return;
         const root = currentSession.tilemap.rootLayer;
+
+        historyManager.startTransaction();
         ids.forEach(id => {
             const layer = root.findLayer(id);
-            layer?.toggleLock(force);
+            if (!layer) return;
+            const toggleLockCommand = new ToggleLayerLockCommand(id, force === undefined ? !layer.locked : force);
+            historyManager.execute(toggleLockCommand, editorContext);
         });
+        historyManager.commitTransaction();
+
         useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayers(draggedIds: string[], targetId: string, position: DropPosition) {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+
+        if (!currentSession || !historyManager) return;
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.id === targetId ? root : root.findLayer(targetId);
@@ -155,90 +211,44 @@ export class TilemapLayerService {
             .map(id => root.findLayer(id))
             .filter((l): l is BaseLayer => {
                 if (!l) return false;
-                if (l.id === targetId) return false; // Cannot drop on self
+                if (l.id === targetId) return false;
                 if (targetLayer === root) return true;
                 return !l.isAncestorOf(targetLayer as any);
             });
 
         if (layersToMove.length === 0) return;
 
-        // 1. Remove all dragged layers from their current parents
-        layersToMove.forEach(l => l.removeFromParent());
-
         if (position === 'inside' && (targetLayer instanceof GroupLayer || targetLayer instanceof RootLayer)) {
+            historyManager.startTransaction();
             layersToMove.forEach(l => {
-                targetLayer.insertLayer(l, targetLayer.layers.length);
+                const moveLayerCommand = new MoveLayerCommand(targetLayer.id, l.id, targetLayer.layers.length);
+                historyManager.execute(moveLayerCommand, editorContext);
             });
-            if (targetLayer instanceof GroupLayer && !targetLayer.isOpen) {
-                targetLayer.toggleOpen(true);
-            }
+            historyManager.commitTransaction();
         } else {
             const parent = targetLayer.parentLayer || root;
             if (parent) {
                 const targetIndex = parent.getLayerIndex(targetLayer.id);
                 if (targetIndex !== -1) {
                     const insertIndex = position === 'top' ? targetIndex : targetIndex + 1;
-                    layersToMove.forEach((l, i) => parent.insertLayer(l, insertIndex + i));
+                    historyManager.startTransaction();
+                    layersToMove.forEach((l, i) => {
+                        const moveLayerCommand = new MoveLayerCommand(parent.id, l.id, insertIndex + i);
+                        historyManager.execute(moveLayerCommand, editorContext);
+                    });
+                    historyManager.commitTransaction();
                 }
             }
         }
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayersUp() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
-        const root = currentSession.tilemap.rootLayer;
+        const editorContext = AppCore.getIns().editorContext;
 
-        const ids = currentSession.layerState.selectedLayers;
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
 
-        const layers = ids.map(id => root.findLayer(id)).filter((l): l is BaseLayer => !!l);
-        if (layers.length === 0) return;
-
-        const firstParent = layers[0].parentLayer;
-        if (!layers.every(l => l.parentLayer === firstParent)) return; // Constraint: same parent
-
-        // Sort top-down by index
-        const parent = firstParent || root;
-        layers.sort((a, b) => parent.layers.indexOf(a) - parent.layers.indexOf(b));
-
-        layers.forEach(layer => {
-            if (!layer.parentLayer) return; // Should allow root children logic? BaseLayer says parent is GroupLayer | null. Root children have parent=Root.
-            const parent = layer.parentLayer;
-            const index = parent.layers.indexOf(layer);
-            if (index === -1) return;
-
-            const prevSibling = parent.layers[index - 1];
-
-            // Logic 1: Top of group -> Move outside above
-            if (index === 0) {
-                if (parent.parentLayer) { // Cannot move out of Root
-                    const grandParent = parent.parentLayer;
-                    const parentIndex = grandParent.layers.indexOf(parent as any);
-                    layer.removeFromParent();
-                    grandParent.insertLayer(layer, parentIndex);
-                }
-            }
-            // Logic 2: Right below a group -> Move inside (bottom)
-            else if (prevSibling instanceof GroupLayer) {
-                layer.removeFromParent();
-                // Insert at the end of the previous group's children
-                prevSibling.insertLayer(layer, prevSibling.layers.length);
-                if (!prevSibling.isOpen) prevSibling.isOpen = true; // Optional: auto open
-            }
-            // Standard Swap
-            else {
-                parent.moveChild(layer.id, -1);
-            }
-        });
-
-        useLayerManagerStore.getState().refresh();
-    }
-
-    public static moveLayersDown() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
-        if (!currentSession) return;
+        if (!currentSession || !historyManager) return;
         const root = currentSession.tilemap.rootLayer;
 
         const ids = currentSession.layerState.selectedLayers;
@@ -252,6 +262,54 @@ export class TilemapLayerService {
         const parent = firstParent || root;
         layers.sort((a, b) => parent.layers.indexOf(a) - parent.layers.indexOf(b));
 
+        historyManager.startTransaction();
+        layers.forEach(layer => {
+            if (!layer.parentLayer) return;
+            const parent = layer.parentLayer;
+            const index = parent.layers.indexOf(layer);
+            if (index === -1) return;
+
+            const prevSibling = parent.layers[index - 1];
+
+            if (index === 0) {
+                if (parent.parentLayer) {
+                    const grandParent = parent.parentLayer;
+                    const parentIndex = grandParent.layers.indexOf(parent as any);
+                    const moveLayerCommand = new MoveLayerCommand(grandParent.id, layer.id, parentIndex);
+                    historyManager.execute(moveLayerCommand, editorContext);
+                }
+            } else if (prevSibling instanceof GroupLayer) {
+                const moveLayerCommand = new MoveLayerCommand(prevSibling.id, layer.id, prevSibling.layers.length);
+                historyManager.execute(moveLayerCommand, editorContext);
+            } else {
+                const moveLayerCommand = new MoveLayerCommand(parent.id, layer.id, index - 1);
+                historyManager.execute(moveLayerCommand, editorContext);
+            }
+        });
+        historyManager.commitTransaction();
+    }
+
+    public static moveLayersDown() {
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+
+        if (!currentSession || !historyManager) return;
+        const root = currentSession.tilemap.rootLayer;
+
+        const ids = currentSession.layerState.selectedLayers;
+
+        const layers = ids.map(id => root.findLayer(id)).filter((l): l is BaseLayer => !!l);
+        if (layers.length === 0) return;
+
+        const firstParent = layers[0].parentLayer;
+        if (!layers.every(l => l.parentLayer === firstParent)) return;
+
+        const parent = firstParent || root;
+        layers.sort((a, b) => parent.layers.indexOf(a) - parent.layers.indexOf(b));
+
+        historyManager.startTransaction();
         layers.forEach(layer => {
             if (!layer.parentLayer) return;
             const parent = layer.parentLayer;
@@ -260,27 +318,39 @@ export class TilemapLayerService {
 
             const nextSibling = parent.layers[index + 1];
 
-            // Logic: Bottom of group -> Move outside below
             if (index === parent.layers.length - 1) {
                 if (parent.parentLayer) {
                     const grandParent = parent.parentLayer;
                     const parentIndex = grandParent.layers.indexOf(parent as any);
-                    layer.removeFromParent();
-                    grandParent.insertLayer(layer, parentIndex + 1);
+                    const moveLayerCommand = new MoveLayerCommand(grandParent.id, layer.id, parentIndex + 1);
+                    historyManager.execute(moveLayerCommand, editorContext);
                 }
-            }
-            // Logic: Right above a group -> Move inside (top)
-            else if (nextSibling instanceof GroupLayer) {
-                layer.removeFromParent();
-                nextSibling.insertLayer(layer, 0); // Top of group
-                if (!nextSibling.isOpen) nextSibling.isOpen = true;
-            }
-            // Standard Swap
-            else {
-                parent.moveChild(layer.id, 1);
+            } else if (nextSibling instanceof GroupLayer) {
+                const moveLayerCommand = new MoveLayerCommand(nextSibling.id, layer.id, 0);
+                historyManager.execute(moveLayerCommand, editorContext);
+            } else {
+                const moveLayerCommand = new MoveLayerCommand(parent.id, layer.id, index + 1);
+                historyManager.execute(moveLayerCommand, editorContext);
             }
         });
+        historyManager.commitTransaction();
+    }
 
-        useLayerManagerStore.getState().refresh();
+    public static renameLayer(id: string, name: string, recordUndo: boolean = true) {
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!currentSession || !historyManager) return;
+
+        if (recordUndo) {
+            const renameLayerCommand = new RenameLayerCommand(id, name);
+            historyManager.execute(renameLayerCommand, editorContext);
+        } else {
+            const root = currentSession.tilemap.rootLayer;
+            const layer = root.findLayer(id);
+            if (!layer) return;
+            layer.rename(name);
+        }
     }
 }

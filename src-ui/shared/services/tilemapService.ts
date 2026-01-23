@@ -11,7 +11,7 @@ import { ToastService } from "./toastService";
 
 export class TilemapService {
     public static async loadTilemapView(): Promise<void> {
-        const project = AppCore.getCurrentProject();
+        const project = AppCore.getIns().editorContext.getCurrentProject();
         const tilemaps = project.tilemapManager.getAllTilemaps();
         useExplorerStore.getState().setTilemaps(tilemaps.map((tilemap) => {
             return {
@@ -22,7 +22,7 @@ export class TilemapService {
     }
 
     public static async createTilemap(): Promise<void> {
-        const currentProject = AppCore.getCurrentProject();
+        const currentProject = AppCore.getIns().editorContext.getCurrentProject();
         const form = await FormService.openFormDialog(createTilemapForm);
         if (!form) return;
 

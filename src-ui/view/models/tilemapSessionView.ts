@@ -41,7 +41,7 @@ export class TilemapSessionView {
             .drag({ mouseButtons: "middle" }) // Drag with middle mouse button
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.05, maxScale: 5 });
+            .clampZoom({ minScale: 0.05, maxScale: 50 });
 
         setTimeout(() => this.updateViewport(), 0);
 

@@ -1,18 +1,28 @@
+import { IBaseSession } from "@/core/interface/IBaseSession";
+import { HistoryManager } from "@/core/manager/historyManager";
 import { ViewState } from "@/shared/schema/common/viewState";
 import { LayerState, TilemapSessionData } from "@/shared/schema/tilemapSession";
 
+import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
 
-export class TilemapSession {
+export class TilemapSession implements IBaseSession {
     public readonly id: string;
-    public readonly tilemap: Tilemap;
-
+    public readonly historyManager: HistoryManager;
+    
     public viewState: ViewState;
     public layerState: LayerState;
 
-    constructor(tilemap: Tilemap, tilemapSessionData: TilemapSessionData) {
-        this.tilemap = tilemap;
+    constructor(
+        public readonly tilemap: Tilemap,
+        tilemapSessionData: TilemapSessionData,
+        public readonly editorContext: EditorContext
+    ) {
         this.id = tilemapSessionData.id;
+        this.tilemap = tilemap;
+
+        this.historyManager = new HistoryManager();
+        
         this.viewState = tilemapSessionData.viewState ?? { x: null, y: null, zoom: 1 };
         this.layerState = tilemapSessionData.layerState ?? { selectedLayers: [] };
     }
