@@ -168,6 +168,8 @@ export class WorkspaceService {
             return;
         }
 
+        useLayerManagerStore.getState().setSession(null);
+
         const lastSessionId = tilemapSessionManager.getLastTilemapSessionId();
         if (lastSessionId) await WorkspaceService.openTilemapSession(lastSessionId);
 
