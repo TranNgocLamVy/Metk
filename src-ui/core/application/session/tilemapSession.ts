@@ -5,13 +5,19 @@ import { LayerState, TilemapSessionData } from "@/shared/schema/tilemapSession";
 
 import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
+import { TilemapSessionView } from "./tilemapSessionView";
 
 export class TilemapSession implements IBaseSession {
     public readonly id: string;
+
+    public isDirty: boolean;
+
     public readonly historyManager: HistoryManager;
-    
+
     public viewState: ViewState;
     public layerState: LayerState;
+
+    public sessionView: TilemapSessionView;
 
     constructor(
         public readonly tilemap: Tilemap,
@@ -25,7 +31,9 @@ export class TilemapSession implements IBaseSession {
         
         this.viewState = tilemapSessionData.viewState ?? { x: null, y: null, zoom: 1 };
         this.layerState = tilemapSessionData.layerState ?? { selectedLayers: [] };
-    }
+
+        this.sessionView = new TilemapSessionView(this);
+;    }
     //==========View State==========
     public updateViewState(state: Partial<ViewState>) {
         this.viewState = { ...this.viewState, ...state };

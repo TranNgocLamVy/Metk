@@ -4,6 +4,7 @@ import { WorkspaceManager } from "../manager/workspaceManager";
 import { Project } from "./project";
 import { TilemapSession } from "./session/tilemapSession";
 import { TilesetSession } from "./session/tilesetSession";
+import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
 
 export class EditorContext {
@@ -49,5 +50,18 @@ export class EditorContext {
         const historyManager = currentMapSession.historyManager;
         if (!historyManager) return null;
         return historyManager;
+    }
+
+    // Access the Tileset Session
+    public getSelectedTile(): (Tile | null)[][] | null {
+        const currentTilesetSession = this.getCurrentTilesetSession();
+        if (!currentTilesetSession) return null;
+        return currentTilesetSession.sessionView.selector.getSelectedTiles();
+    }
+
+    public getPivot(): Coordinate | null {
+        const currentTilesetSession = this.getCurrentTilesetSession();
+        if (!currentTilesetSession) return null;
+        return currentTilesetSession.getPivot();
     }
 }

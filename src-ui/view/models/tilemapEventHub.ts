@@ -69,17 +69,11 @@ export class TilemapEventHub extends EventEmitter {
     }
 
     private getSelectedTiles(): { tiles: (Tile | null)[][], pivot: Coordinate } | null {
-        // Access the Tileset Session Store to get the active brush
-        const tileSetSession = AppCore.getIns().editorContext.getCurrentTilesetSession();
-
-        if (!tileSetSession || !tileSetSession.tileset) return null;
-
-        const tiles = tileSetSession.getSelectedTiles();
-        const pivot = tileSetSession.getPivot();
-
-        if (!tiles || !pivot) return null;
-
-        return { tiles, pivot };
+        const editoContext = AppCore.getIns().editorContext;
+        const selection = editoContext.getSelectedTile();
+        const pivot = editoContext.getPivot();
+        if (!selection || !pivot) return null;
+        return { tiles: selection, pivot };
     }
 
     private paint(globalX: number, globalY: number) {
