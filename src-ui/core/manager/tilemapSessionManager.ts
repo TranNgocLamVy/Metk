@@ -1,3 +1,4 @@
+import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
 import { TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSession";
@@ -12,12 +13,15 @@ export class TilemapSessionManager {
     public currentTilemapSession: TilemapSession | null = null;
     private tilemapSessionMap: Map<string, TilemapSession> = new Map<string, TilemapSession>(); // sessionId -> session
     private tilemapMap: Map<string, string> = new Map<string, string>(); // tilemapId -> sessionId
+
+    private tilemapSessionIdStack: string[] = [];
+
     public get tilemapsSession(): TilemapSession[] {
         return Array.from(this.tilemapSessionMap.values());
     }
 
     constructor(
-        private readonly tilemapSessionManagerData: TilemapSessionManagerData,
+        public readonly tilemapSessionManagerData: TilemapSessionManagerData,
         private readonly editorContext: EditorContext
     ) {
         
@@ -35,16 +39,12 @@ export class TilemapSessionManager {
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
             this.tilemapMap.set(tilemap.id, tilemapSession.id);
         });
-
-        if (this.tilemapSessionManagerData.currentTilemapSessionId) {
-            this.openTilemapSession(this.tilemapSessionManagerData.currentTilemapSessionId);
-        }
     }
 
-    public async createTilemapSession(tilemap: Tilemap): Promise<Result<TilemapSession>> {
+    public async createTilemapSession(tilemap: Tilemap, pixiApp: Application): Promise<Result<TilemapSession>> {
         const sessionId = this.tilemapMap.get(tilemap.id);
         if (sessionId) {
-            return await this.openTilemapSession(sessionId);
+            return await this.openTilemapSession(sessionId, pixiApp);
         }
 
         const newTilemapSessionData: TilemapSessionData = {
@@ -59,27 +59,49 @@ export class TilemapSessionManager {
         this.tilemapSessionMap.set(newTilemapSession.id, newTilemapSession);
         this.tilemapMap.set(tilemap.id, newTilemapSession.id);
 
-        this.openTilemapSession(newTilemapSession.id);
+        this.openTilemapSession(newTilemapSession.id, pixiApp);
 
         return { status: "Success", data: newTilemapSession };
     }
 
-    public async openTilemapSession(sessionId: string): Promise<Result<TilemapSession>> {
+    public async openTilemapSession(sessionId: string, pixiApp: Application): Promise<Result<TilemapSession>> {
         const tilemapSession = this.tilemapSessionMap.get(sessionId);
         if (!tilemapSession) return { status: "Error", message: "Tilemap session not found" };
+
+        if (this.currentTilemapSession) {
+            this.currentTilemapSession.sessionView.unActivateSession();
+        }
+
         this.currentTilemapSession = tilemapSession;
+        
+        this.tilemapSessionIdStack = this.tilemapSessionIdStack.filter(id => id !== sessionId);
+        this.tilemapSessionIdStack.push(sessionId);
+        
+        tilemapSession.sessionView.activateSession(pixiApp);
+
         return { status: "Success", data: tilemapSession };
     }
 
     public async closeTilemapSession(sessionId: string): Promise<Result<string>> {
         const tilemapSession = this.tilemapSessionMap.get(sessionId);
         if (!tilemapSession) return { status: "Error", message: "Tilemap session not found" };
+
+        tilemapSession.sessionView.unActivateSession();
+        tilemapSession.sessionView.destroy();
+
         this.tilemapSessionMap.delete(sessionId);
         this.tilemapMap.delete(tilemapSession.tilemap.id);
+        this.tilemapSessionIdStack = this.tilemapSessionIdStack.filter(id => id !== sessionId);
+        
         if (this.currentTilemapSession?.id === sessionId) {
             this.currentTilemapSession = null;
         }
         return { status: "Success", data: sessionId };
+    }
+
+    public getLastTilemapSessionId(): string | null {
+        if (this.tilemapSessionIdStack.length === 0) return null;
+        return this.tilemapSessionIdStack[this.tilemapSessionIdStack.length - 1] || null; 
     }
 
     public serialize(): TilemapSessionManagerData {

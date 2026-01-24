@@ -179,7 +179,6 @@ export class TilesetViewSelector {
         this.drawRectShape();
 
         this.tilesetSession.updateSelectionState({ selectedTilesSet: Array.from(this.selectedTilesSet), pivot: this.pivot });
-        this.tilesetSession.updateSelectedTiles(this.selectedTilesShape);
         this.tilesetSession.updatePivot(this.pivot);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
@@ -257,7 +256,6 @@ export class TilesetViewSelector {
             this.topLeft = null;
 
             this.tilesetSession.updateSelectionState({ selectedTilesSet: [], pivot: undefined });
-            this.tilesetSession.updateSelectedTiles(this.selectedTilesShape);
             this.tilesetSession.updatePivot(this.pivot);
             WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
@@ -300,7 +298,6 @@ export class TilesetViewSelector {
 
         const mappedSelectedTiles = Array.from(this.selectedTilesSet);
         this.tilesetSession.updateSelectionState({ selectedTilesSet: mappedSelectedTiles, pivot: this.pivot });
-        this.tilesetSession.updateSelectedTiles(this.selectedTilesShape);
         this.tilesetSession.updatePivot(this.pivot);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
@@ -437,6 +434,10 @@ export class TilesetViewSelector {
     public setGap(gap: number): void {
         this.gap = gap;
         this.drawRectShape();
+    }
+
+    public getSelectedTiles(): (Tile | null)[][] | null  {
+        return this.selectedTilesShape;
     }
 
     public destroy() {

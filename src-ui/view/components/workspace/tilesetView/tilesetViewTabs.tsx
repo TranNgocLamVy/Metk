@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
@@ -16,17 +16,25 @@ export default function TilesetViewTabs() {
 
 	useHorizontalScroll(ref);
 
-	const { tilesetsSession, currentSession } = useTilesetSessionStore();
+	const { version, getTilesetDisplayData, getCurrentTilesetSessionId } = useTilesetSessionStore();
+
+    const tilesetsDisplayData = useMemo(() => {
+        return getTilesetDisplayData();
+    }, [version, getTilesetDisplayData])
+
+    const currentTilesetSessionId = useMemo(() => {
+        return getCurrentTilesetSessionId();
+    }, [version, getCurrentTilesetSessionId])
 
 	return (
 		<HStack className="w-full h-fit px-1" justify="start" align="center">
 			<TilesetViewDropDownMenu />
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
-				{tilesetsSession.map((tilesetSession) => {
-					const isCurrent = currentSession?.session.id === tilesetSession.sessionId;
+				{tilesetsDisplayData.map((tilesetSession) => {
+					const isCurrent = currentTilesetSessionId === tilesetSession.sessionId;
 					const openTilesetSession = () => {
 						if (isCurrent) return;
-						WorkspaceService.openTilesetViewSesion(tilesetSession.sessionId);
+						WorkspaceService.openTilesetSession(tilesetSession.sessionId);
 					};
                     const closeTilesetSession = (e: any) => {
                         e.stopPropagation();

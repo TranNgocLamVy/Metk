@@ -1,3 +1,4 @@
+import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
 import { TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSession";
@@ -12,12 +13,15 @@ export class TilesetSessionManager {
     public currentTilesetSession: TilesetSession | null = null;
     private tilesetSessionMap: Map<string, TilesetSession> = new Map<string, TilesetSession>();
     private tilesetMap: Map<string, string> = new Map<string, string>();
+
+    private tilesetSessionIdStack: string[] = [];
+    
     public get tilesetsSession(): TilesetSession[] {
         return Array.from(this.tilesetSessionMap.values());
     }
 
     constructor(
-        private readonly tilesetSessionManagerData: TilesetSessionManagerData,
+        public readonly tilesetSessionManagerData: TilesetSessionManagerData,
         private readonly editorContext: EditorContext
     ) {
         
@@ -35,16 +39,12 @@ export class TilesetSessionManager {
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
             this.tilesetMap.set(tileset.id, tilesetSession.id);
         });
-
-        if (this.tilesetSessionManagerData.currentTilesetSessionId) {
-            this.openTilesetSession(this.tilesetSessionManagerData.currentTilesetSessionId);
-        }
     }
 
-    public async createTilesetSession(tileset: Tileset): Promise<Result<TilesetSession>> {
+    public async createTilesetSession(tileset: Tileset, pixiApp: Application): Promise<Result<TilesetSession>> {
         const sessionId = this.tilesetMap.get(tileset.id);
         if (sessionId) {
-            return await this.openTilesetSession(sessionId);
+            return await this.openTilesetSession(sessionId, pixiApp);
         }
 
         const newTilesetSessionData: TilesetSessionData = {
@@ -59,30 +59,53 @@ export class TilesetSessionManager {
         this.tilesetSessionMap.set(newTilesetSession.id, newTilesetSession);
         this.tilesetMap.set(tileset.id, newTilesetSession.id);
 
-        this.openTilesetSession(newTilesetSession.id);
+        this.openTilesetSession(newTilesetSession.id, pixiApp);
 
         return { status: "Success", data: newTilesetSession };
     }
 
-    public async openTilesetSession(sessionId: string): Promise<Result<TilesetSession>> {
+    public async openTilesetSession(sessionId: string, pixiApp: Application): Promise<Result<TilesetSession>> {
         const tilesetSession = this.tilesetSessionMap.get(sessionId);
         if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
+
+        if (this.currentTilesetSession) {
+            this.currentTilesetSession.sessionView.unActivateSession();
+        }
+
         this.currentTilesetSession = tilesetSession;
+
+        this.tilesetSessionIdStack = this.tilesetSessionIdStack.filter(id => id !== sessionId);
+        this.tilesetSessionIdStack.push(sessionId);
+
+        tilesetSession.sessionView.activateSession(pixiApp);
+        
         return { status: "Success", data: tilesetSession };
     }
 
     public async closeTilesetSession(sessionId: string): Promise<Result<string>> {
         const tilesetSession = this.tilesetSessionMap.get(sessionId);
         if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
+
+        tilesetSession.sessionView.unActivateSession();
+        tilesetSession.sessionView.destroy();
+
         this.tilesetSessionMap.delete(sessionId);
         this.tilesetMap.delete(tilesetSession.tileset.id);
+        this.tilesetSessionIdStack = this.tilesetSessionIdStack.filter(id => id !== sessionId);
+
         if (this.currentTilesetSession?.id === sessionId) {
             this.currentTilesetSession = null;
         }
         return { status: "Success", data: sessionId };
     }
 
+    public getLastTilesetSessionId(): string | null {
+        if (this.tilesetSessionIdStack.length === 0) return null;
+        return this.tilesetSessionIdStack[this.tilesetSessionIdStack.length - 1] || null;
+    }
+
     public serialize(): TilesetSessionManagerData {
+        console.trace(this.currentTilesetSession?.id);
         return {
             tilesetSessions: Array.from(this.tilesetSessionMap.values()).map(session => session.serialize()),
             currentTilesetSessionId: this.currentTilesetSession?.id || null,

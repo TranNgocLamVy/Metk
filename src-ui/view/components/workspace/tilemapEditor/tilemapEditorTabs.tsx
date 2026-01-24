@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
@@ -15,24 +15,32 @@ export default function TilemapEditorTabs() {
 
     useHorizontalScroll(ref);
 
-    const { tilemapsSession, currentSession } = useTilemapSessionStore();
+    const { version, getTileamapDisplayData, getCurrentTilemapSessionId } = useTilemapSessionStore();
+
+    const tilemapsDisplayData = useMemo(() => {
+        return getTileamapDisplayData();
+    }, [version, getTileamapDisplayData]);
+
+    const currentTilemapSessionId = useMemo(() => {
+        return getCurrentTilemapSessionId();
+    }, [version, getCurrentTilemapSessionId]);
 
     return (
         <HStack className="w-full h-fit bg-secondary-background px-1" justify="start" align="center">
             <div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar">
-                {tilemapsSession.map((tilemapSession) => {
-                    const isCurrent = currentSession?.session.id === tilemapSession.sessionId;
+                {tilemapsDisplayData.map((tilemapDisplayData) => {
+                    const isCurrent = currentTilemapSessionId === tilemapDisplayData.sessionId;
                     const openTilemapSession = () => {
                         if (isCurrent) return;
-                        WorkspaceService.openTilemapSession(tilemapSession.sessionId);
+                        WorkspaceService.openTilemapSession(tilemapDisplayData.sessionId);
                     };
                     const closeTilemapSession = (e: any) => {
                         e.stopPropagation();
-                        WorkspaceService.closeTilemapSession(tilemapSession.sessionId);
+                        WorkspaceService.closeTilemapSession(tilemapDisplayData.sessionId);
                     };
                     return (
-                        <Button key={tilemapSession.sessionId} onClick={openTilemapSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
-                            {tilemapSession.name}
+                        <Button key={tilemapDisplayData.sessionId} onClick={openTilemapSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
+                            {tilemapDisplayData.name}
                             <Tooltip delayDuration={500}>
                                 <TooltipTrigger asChild>
                                     <div className="rounded-2xl hover:bg-background p-1" onClick={closeTilemapSession}>

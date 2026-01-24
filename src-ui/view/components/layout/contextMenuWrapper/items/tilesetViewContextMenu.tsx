@@ -1,6 +1,6 @@
 import { Grid3x3 } from "lucide-react";
 
-import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
+import { AppCore } from "@/core/appcore";
 
 const Group1: MenuDropDownGroupType = [
     {
@@ -8,14 +8,14 @@ const Group1: MenuDropDownGroupType = [
         name: "Show Grid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const session = useTilesetSessionStore.getState().currentSession;
+            const session = AppCore.getIns().editorContext.getCurrentTilesetSession();
             if (!session) return false;
-            return session.grid.gridEnabled
+            return session.sessionView.gridEnabled;
         },
         toggle() {
-            const session = useTilesetSessionStore.getState().currentSession;
+            const session = AppCore.getIns().editorContext.getCurrentTilesetSession();
             if (!session) return;
-            session.toggleGrid();
+            session.sessionView.toggleGrid();
         },
     }
 ];
