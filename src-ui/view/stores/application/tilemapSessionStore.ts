@@ -35,10 +35,10 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
             const tilemapSessionManager = get().tilemapSessionManager;
             if (!tilemapSessionManager) return;
             const currentSession = tilemapSessionManager.currentTilemapSession;
-            if (currentSession) WorkspaceService.openTilemapSession(currentSession.id);
+            if (currentSession) currentSession.sessionView.activateSession(pixiApp);
         },
 
-        setTilemapSessionManager: (tilemapSessionManager: TilemapSessionManager) => set({ tilemapSessionManager }),
+        setTilemapSessionManager: (tilemapSessionManager: TilemapSessionManager) => set({ tilemapSessionManager }), 
         getTileamapDisplayData: () => {
             const tilemapSessionManager = get().tilemapSessionManager;
             if (!tilemapSessionManager) return [];
