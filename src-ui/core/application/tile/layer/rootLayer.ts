@@ -17,10 +17,10 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
     public layers: BaseLayer[] = [];
 
     constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
-        super("root", tilesetRefManager);
+        super("root", tilesetRefManager, tilemap);
 
         layersData.forEach((layerData) => {
-            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager);
+            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager, tilemap);
             if (layer) this.layers.push(layer);
         });
     }
@@ -41,6 +41,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         newLayer.parentLayer = this;
         this.layers.unshift(newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
+        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -51,6 +52,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         newLayer.parentLayer = this;
         this.layers.splice(index, 0, newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, index);
+        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -61,6 +63,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
 
         this.layers.splice(index, 1);
         this.eventEmitter.emit("layerRemoved", layerId, index);
+        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -75,23 +78,13 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         const [child] = this.layers.splice(index, 1);
         this.layers.splice(newIndex, 0, child);
         this.eventEmitter.emit("layerReordered");
+        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void) {
         cb(this);
         this.layers.forEach(c => c.traverse(cb));
     }
-
-    // public findLayer(id: string): BaseLayer<any> | null {
-    //     let found: BaseLayer | null = null;
-    //     const search = (layer: BaseLayer) => {
-    //         if (found) return;
-    //         if (layer.id === id) found = layer;
-    //         if (layer instanceof GroupLayer) layer.layers.forEach(search);
-    //     };
-    //     this.layers.forEach(search);
-    //     return found;
-    // }
 
     public findLayer(id: string): BaseLayer<any> | null {
         if (this.id === id) return this;

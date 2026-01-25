@@ -2,7 +2,6 @@
 
 import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
-import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "./application/editorContext";
 import { KeybindingManager } from "./manager/keybindingManager";
@@ -15,7 +14,7 @@ export class AppCore {
     private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
     public readonly workspaceManager: WorkspaceManager;
-    private commandManager: SystemCommandManager;
+    public commandManager: SystemCommandManager;
     private keybindingManager: KeybindingManager;
 
     public readonly editorContext: EditorContext;
@@ -36,11 +35,10 @@ export class AppCore {
         this.workspaceManager.setEditorContext(this.editorContext);
     }
 
-    public async load(): Promise<Result> {
-        if (this.isLoaded) return { status: "Error", message: "AppCore already loaded" };
+    public async load(): Promise<void> {
+        if (this.isLoaded) return;
         await AppCore.getIns().projectManager.load();
         this.isLoaded = true;
-        return { status: "Success", data: null };
     }
 
     public static initialize() {

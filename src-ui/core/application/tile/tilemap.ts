@@ -7,9 +7,7 @@ import { Result, ResultStatus } from "@/shared/types/result";
 import { RootLayer } from "./layer/rootLayer";
 
 interface TilemapEvent extends BaseObjectEvents {
-    tilelayerAdded: (layerId: string) => void
-    tilelayerRemoved: (layerId: string) => void
-    tilelayerReordered: (layerId: string, oldIndex: number, newIndex: number) => void
+    onChange: () => void
 }
 
 export class Tilemap extends BaseObject<TilemapEvent> {

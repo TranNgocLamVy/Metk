@@ -1,11 +1,8 @@
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
-import { LayerData } from "@/shared/schema/layerSchema";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 
 import { BaseObject, BaseObjectEvents } from "../../baseObject";
-import { GroupLayer } from "./groupLayer";
-import { RootLayer } from "./rootLayer";
-import { TileLayer } from "./tileLayer";
+import { Tilemap } from "../tilemap";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
 
@@ -20,7 +17,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     public parentLayer: IGroupLayer;
 
-    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager) {
+    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
         super();
         this.id = id;
     }
@@ -28,31 +25,35 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     public rename(newName: string): void {
         this.name = newName;
         (this.eventEmitter as any).emit("updateProperty", "name", this.name);
+        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public toggleVisibility(force?: boolean): void {
         this.visible = force !== undefined ? force : !this.visible;
         (this.eventEmitter as any).emit("updateProperty", "visible", this.visible);
+        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public toggleLock(force?: boolean): void {
         this.locked = force !== undefined ? force : !this.locked;
         (this.eventEmitter as any).emit("updateProperty", "locked", this.locked);
+        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public updateOpacity(newOpacity: number): void {
         this.opacity = newOpacity;
         (this.eventEmitter as any).emit("updateProperty", "opacity", this.opacity);
+        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public removeFromParent() {
-        if (this.parentLayer) this.parentLayer.removeLayer(this.id);
+        if (this.parentLayer) this.parentLayer.removeLayer(this.id); 
     }
 
     public duplicate(): BaseLayer<any> | null {
         if (!this.parentLayer) return null;
 
-        const index = this.parentLayer.getLayerIndex(this.id);
+        const index = this.parentLayer.getLayerIndex(this.id); 
         if (index == -1) return null
 
         const clone = this.clone();

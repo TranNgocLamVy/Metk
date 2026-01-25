@@ -6,6 +6,7 @@ import { TileLayerData, TileRefData } from "@/shared/schema/layerSchema";
 import { ErrorResult, Result, ResultStatus, SuccessResult } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
+import { Tilemap } from "../tilemap";
 import { Tile } from "../tileset";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 
@@ -20,8 +21,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
 
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager) {
-        super(tileLayerData.id, tilesetRefManager);
+    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
+        super(tileLayerData.id, tilesetRefManager, tilemap);
 
         if (parentLayer) this.parentLayer = parentLayer;
 
@@ -31,10 +32,10 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         this.coordinate.row = tileLayerData.y ?? 0;
         this.offset.x = tileLayerData.offsetx ?? 0;
         this.offset.y = tileLayerData.offsety ?? 0;
-        
+
         this.size.width = tileLayerData.width;
         this.size.height = tileLayerData.height;
-        
+
         this.opacity = tileLayerData.opacity;
         this.visible = tileLayerData.visible;
         this.locked = tileLayerData.locked;
@@ -48,52 +49,56 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         this.tilesRef = MatrixUtils.ensureSize(tilesRef, this.size.height, this.size.width, null);
     }
 
-    public getTileRefAt(coordinate: { x: number, y: number }): Result<TileRef | null> {
-        if (coordinate.x < 0 || coordinate.x >= this.size.width) return ErrorResult("Tile not found, x is out of range");
-        if (coordinate.y < 0 || coordinate.y >= this.size.height) return ErrorResult("Tile not found, y is out of range");
+    public getTileAt(coordinate: Coordinate): TileRef | null {
+        if (coordinate.col < 0 || coordinate.col >= this.size.width) return null;
+        if (coordinate.row < 0 || coordinate.row >= this.size.height) return null;
 
-        const row = this.tilesRef[coordinate.y];
-        if (!row) return ErrorResult("Tile row not found");
+        const row = this.tilesRef[coordinate.row];
+        if (!row) return null;
 
-        const tileRef = row[coordinate.x];
-        if (tileRef === undefined) return ErrorResult("Tile not found");
+        const tileRef = row[coordinate.col];
+        if (tileRef === undefined) return null;
 
-        return SuccessResult(tileRef);
+        return tileRef;
     }
 
-    public setTileRefAt(coordinate: { x: number, y: number }, tile: Tile): Result<TileRefData> {
-        if (coordinate.x < 0 || coordinate.x >= this.size.width) return ErrorResult("Tile not found, x is out of range");
-        if (coordinate.y < 0 || coordinate.y >= this.size.height) return ErrorResult("Tile not found, y is out of range");
 
-        const tileId = tile.id;
-        const tilesetIndex = this.tilesetRefManager.getTilesetIndex(tile.tileset);
+    public setTileAt(coordinate: Coordinate, tileId: number, tilesetId: string): Result<TileRefData | null> {
+        if (coordinate.col < 0 || coordinate.col >= this.size.width) return ErrorResult("Tile not found, col is out of range");
+        if (coordinate.row < 0 || coordinate.row >= this.size.height) return ErrorResult("Tile not found, row is out of range");
+
+        if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
+
+        let tileRef = this.tilesRef[coordinate.row][coordinate.col];
+
+        const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
         if (tilesetIndex === -1) return ErrorResult("Tile not found, tileset not found");
-
-        // Ensure row exists
-        if (!this.tilesRef[coordinate.y]) {
-            this.tilesRef[coordinate.y] = [];
-        }
-
-        let tileRef = this.tilesRef[coordinate.y][coordinate.x];
-
         if (tileRef === null || tileRef === undefined) {
             tileRef = new TileRef({ tileId, tilesetIndex });
-            this.tilesRef[coordinate.y][coordinate.x] = tileRef;
+            this.tilesRef[coordinate.row][coordinate.col] = tileRef;
         }
+        const setTileResult = tileRef.setTile({ tileId, tilesetIndex });
+        this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
+        this.tilemap.eventEmitter.emit("onChange");
         
-        const result = tileRef.setTile({ tileId, tilesetIndex });
-        if (result.status === ResultStatus.Success) {
-            this.eventEmitter.emit("tileChanged", coordinate.x, coordinate.y);
-            return result;
-        }
-        return result;
+        return SuccessResult(setTileResult)
+    }
+
+    public removeTileAt(coordinate: Coordinate): Result {
+        if (coordinate.col < 0 || coordinate.col >= this.size.width) return ErrorResult("Tile not found, col is out of range");
+        if (coordinate.row < 0 || coordinate.row >= this.size.height) return ErrorResult("Tile not found, row is out of range");
+
+        if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
+
+        this.tilesRef[coordinate.row][coordinate.col] = null;
+        this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
+        this.tilemap.eventEmitter.emit("onChange");
+
+        return SuccessResult();
     }
 
     public override serialize(): TileLayerData {
-
-        // Check if tilesRef is all null
         const allNull = this.tilesRef.every((row) => { return row.every((tileRef) => { return tileRef === null }) });
-
         return {
             id: this.id,
             layerType: "tile",
@@ -114,7 +119,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override clone(): TileLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager);
+        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.tilemap);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {
@@ -138,16 +143,14 @@ export class TileRef {
             tilesetIndex: this.tilesetIndex,
         }
     }
-    public setTile(newTileRefData: TileRefData): Result<TileRefData> {
-        const preTileRefData: TileRefData = {
-            tileId: this.tileId,
-            tilesetIndex: this.tilesetIndex,
-        }
+    public setTile(newTileRefData: TileRefData): TileRefData {
+        const preTileRefData: TileRefData = { tileId: this.tileId, tilesetIndex: this.tilesetIndex }
         this.tileId = newTileRefData.tileId;
         this.tilesetIndex = newTileRefData.tilesetIndex;
-        return SuccessResult(preTileRefData);
+        return preTileRefData;
 
     }
+
     public getTile(): TileRefData {
         return {
             tileId: this.tileId,

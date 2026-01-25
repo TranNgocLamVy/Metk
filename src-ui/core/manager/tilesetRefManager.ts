@@ -1,5 +1,5 @@
 import { TilesetRefData } from "@/shared/schema/tilemapSchema";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { ErrorResult, Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { Tileset } from "../application/tile/tileset";
@@ -18,8 +18,12 @@ export class TilesetRefManager {
     public load(tilesetRef: TilesetRefData[]) {
         this.tilesetRef = tilesetRef;
 
-        const maxIndex = Math.max(...this.tilesetRef.map(tileset => tileset.index))
-        this.nextTilesetIndex = maxIndex ? (maxIndex + 1) : 0;
+        if (this.tilesetRef.length === 0) {
+            this.nextTilesetIndex = 0;
+        } else {
+            const maxIndex = Math.max(...this.tilesetRef.map(tileset => tileset.index));
+            this.nextTilesetIndex = maxIndex + 1;
+        }
     }
 
     public serialize(): TilesetRefData[] { return this.tilesetRef; }
@@ -27,11 +31,11 @@ export class TilesetRefManager {
     public getTilesetIndex(tileset: Tileset): number {
         const tilesetRef = this.tilesetRef.find(tilesetRef => tilesetRef.id === tileset.id);
         if (!tilesetRef) {
-            const tilesetAbsPathResult = this.tilesetManager.getTilesetAbsById(tileset.id);
-            if (!tilesetAbsPathResult.data) return -1;
-
-            const tilesetAbsPath = tilesetAbsPathResult.data;
-            const tilesetRelPath = PathUtils.relative(this.tilemapAbsPath, tilesetAbsPath);
+            const tilesetAbsPath = this.tilesetManager.getTilesetAbsById(tileset.id);
+            if (!tilesetAbsPath) return -1;
+            
+            const tilemapDir = PathUtils.dirname(this.tilemapAbsPath);
+            const tilesetRelPath = PathUtils.relative(tilemapDir, tilesetAbsPath);
 
             const newTilesetRef: TilesetRefData = {
                 index: this.nextTilesetIndex,
@@ -47,19 +51,28 @@ export class TilesetRefManager {
     }
 
     public getTilesetIndexById(tilesetId: string): number {
-        const tilesetResult = this.tilesetManager.getTilesetById(tilesetId);
-        if (!tilesetResult.data) return -1;
-        return this.getTilesetIndex(tilesetResult.data);
+        const tileset = this.tilesetManager.getTilesetById(tilesetId);
+        if (!tileset) return -1;
+        return this.getTilesetIndex(tileset);
     }
 
-    public getTilesetById(id: string): Result<Tileset> {
+    public getTilesetById(id: string): Tileset | null {
         return this.tilesetManager.getTilesetById(id);
     }
 
-    public getTilesetByRelPath(tilesetRelPath: string): Result<Tileset> {
-        const tilesetAbsPath = PathUtils.join(this.tilemapAbsPath, tilesetRelPath);
+    public getTilesetByRelPath(tilesetRelPath: string): Tileset | null {
+        const tilemapDir = PathUtils.dirname(this.tilemapAbsPath);
+        const tilesetAbsPath = PathUtils.join(tilemapDir, tilesetRelPath);
+        
         const relPathFromProject = PathUtils.relative(this.projectDir, tilesetAbsPath);
         return this.tilesetManager.getTilesetByRelPath(relPathFromProject);
     }
 
-} 
+    public getTilesetByIndex(index: number): Tileset | null {
+        const tilesetRef = this.tilesetRef.find(tilesetRef => tilesetRef.index === index);
+        if (!tilesetRef) return null
+
+        return this.getTilesetById(tilesetRef.id);
+    }
+
+}

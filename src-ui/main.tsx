@@ -1,6 +1,7 @@
 import "@/assets/style/flexLayout/style.css";
 import "@/assets/style/global.css";
 
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
@@ -15,22 +16,22 @@ import { DialogContainer } from "./view/components/custom/dialogContainer/dialog
 import { appRoutes } from "./view/pages";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	// <React.StrictMode>
-	// </React.StrictMode>
-	<ThemeProvider>
-		<MenuBar />
-		<Router>
-			<MainContainer>
-				<Toaster position="top-center" richColors closeButton={false} />
-				<DialogContainer />
-				<ErrorBoundary fallbackRender={FallbackRender}>
-					<Routes>
-						{appRoutes.map(({ path, element }, index) => (
-							<Route key={index} path={path} element={element} />
-						))}
-					</Routes>
-				</ErrorBoundary>
-			</MainContainer>
-		</Router>
-	</ThemeProvider>
+	<StrictMode>
+		<ThemeProvider>
+			<MenuBar />
+			<Router>
+				<MainContainer>
+					<Toaster position="bottom-right" richColors closeButton={false} />
+					<DialogContainer />
+					<ErrorBoundary fallbackRender={FallbackRender}>
+						<Routes>
+							{appRoutes.map(({ path, element }, index) => (
+								<Route key={index} path={path} element={element} />
+							))}
+						</Routes>
+					</ErrorBoundary>
+				</MainContainer>
+			</Router>
+		</ThemeProvider>
+	</StrictMode>,
 );

@@ -3,6 +3,8 @@ import { create } from "zustand";
 
 import { Field, FormDialogItem, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/types/dialogs/formDialog";
 import { PermissionDialogItem, PermissionDialogOptions } from "@/shared/types/dialogs/permissionDialog";
+import { SaveDialogItem, SaveResult } from "@/shared/types/dialogs/saveDialog";
+import { SaveDialogOptions } from "@tauri-apps/plugin-dialog";
 
 interface DialogStore {
     // Permission dialogs (multiple allowed)
@@ -13,11 +15,14 @@ interface DialogStore {
     // Form dialog (single at a time)
     // The store itself can't be generic; each call to openFormDialog narrows via its generic.
     formDialog: FormDialogItem<any> | null;
-    openFormDialog: <const I extends readonly Field[]>(
-        opts: FormDialogOptions<I>
-    ) => Promise<Simplify<ShapeFromInputs<I>>>;
+    openFormDialog: <const I extends readonly Field[]>(opts: FormDialogOptions<I>) => Promise<Simplify<ShapeFromInputs<I>>>;
     closeFormDialog: (result: any) => void;
     cancelFormDialog: () => void;
+
+    // Save dialog (single at a time)
+    saveDialog: SaveDialogItem | null;
+    openSaveDialog: (opts: SaveDialogOptions) => Promise<SaveResult>;
+    closeSaveDialog: (result: SaveResult) => void;
 }
 
 export const useDialogStore = create<DialogStore>((set, get) => ({
@@ -64,5 +69,19 @@ export const useDialogStore = create<DialogStore>((set, get) => ({
         if (!formDialog) return;
         formDialog.resolve(null);
         set({ formDialog: null });
+    },
+
+    saveDialog: null,
+    openSaveDialog: (opts) => {
+        const id = uuidv4();
+        return new Promise<SaveResult>((resolve) => {
+            set({ saveDialog: { ...opts, id, resolve } as any });
+        });
+    },
+    closeSaveDialog: (result) => {
+        const { saveDialog } = get();
+        if (!saveDialog) return;
+        saveDialog.resolve(result);
+        set({ saveDialog: null });
     },
 }));

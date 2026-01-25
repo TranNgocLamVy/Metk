@@ -2,13 +2,14 @@ import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
 import { TilemapSession } from "@/core/application/session/tilemapSession";
+import { TilemapEventHub } from "@/core/application/tilemapEventHub";
+import { IBaseSessionView } from "@/core/interface/IBaseSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
-import { TilemapEventHub } from "@/view/models/tilemapEventHub";
 
 import { TilemapGridRenderer } from "../renderer/tilemapGridRenderer";
 import { TilemapRenderer } from "../renderer/tilemapRenderer";
 
-export class TilemapSessionView {
+export class TilemapSessionView implements IBaseSessionView {
     public session: TilemapSession;
     public viewport: Viewport;
     private pixiApp: Application;

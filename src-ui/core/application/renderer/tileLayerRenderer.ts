@@ -41,11 +41,10 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     };
 
     private renderTile(x: number, y: number): void {
-        const tileRefResult = this.layer.getTileRefAt({ x, y });
+        const tileRef = this.layer.getTileAt({ col: x, row: y });
         const key = `${x},${y}`;
         const currentSprite = this.sprites.get(key);
-
-        if (tileRefResult.status !== "Success" || !tileRefResult.data) {
+        if (!tileRef) {
             if (currentSprite) {
                 this.container.removeChild(currentSprite);
                 currentSprite.destroy();
@@ -54,17 +53,14 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             return;
         }
 
-        const tileRef = tileRefResult.data;
-
         const tilesetRefData = this.layer.tilesetRefManager.tilesetRef.find(r => r.index === tileRef.getTile().tilesetIndex);
         if (!tilesetRefData) return;
 
-        const tilesetResult = this.layer.tilesetRefManager.getTilesetById(tilesetRefData.id);
+        const tileset = this.layer.tilesetRefManager.getTilesetById(tilesetRefData.id);
 
         // TODO: Handle unfound tileset, render error texture
-        if (tilesetResult.status !== "Success" || !tilesetResult.data) return;
+        if (!tileset) return;
 
-        const tileset = tilesetResult.data;
         const tile = tileset.getTileFromId(tileRef.getTile().tileId);
         
         if (!tile) {

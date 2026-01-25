@@ -35,8 +35,8 @@ export class PathUtils {
         return extname(this.normalize(pathStr));
     }
 
-    public static async toUserFriendlyPath(pathStr: string): Promise<string> {
-        const systemSeparator = await sep();
+    public static toUserFriendlyPath(pathStr: string): string {
+        const systemSeparator = sep();
         if (systemSeparator === '\\') {
             return pathStr.replace(/\//g, '\\');
         }

@@ -2,13 +2,14 @@ import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
 import { TilesetSession } from "@/core/application/session/tilesetSession";
+import { IBaseSessionView } from "@/core/interface/IBaseSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
 import { TilesetGridRenderer } from "../renderer/tilesetGridRenderer";
 import { TilesetRenderer } from "../renderer/tilesetRenderer";
 import { TilesetViewSelector } from "../renderer/tilesetViewSelector";
 
-export class TilesetSessionView {
+export class TilesetSessionView implements IBaseSessionView {
     public session: TilesetSession;
     public viewport: Viewport;
     private pixiApp: Application;
