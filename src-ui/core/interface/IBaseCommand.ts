@@ -12,5 +12,5 @@ export interface IBaseCommand {
 export type ISystemCommandConstructor = new () => ISystemCommand
 
 export interface ISystemCommand {
-    execute(context: EditorContext): Result;
+    execute(context: EditorContext): Result | Promise<Result>;
 }

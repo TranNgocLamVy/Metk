@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import { EventEmitter } from "eventemitter3";
 import { Viewport } from "pixi-viewport";
 import { FederatedPointerEvent, Point } from "pixi.js";
 
@@ -7,6 +7,8 @@ import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
 import { Tile } from "@/core/application/tile/tileset";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
+
+import { SetTileCommand } from "../command/tile/setTileCommand";
 
 export class TilemapEventHub extends EventEmitter {
     private viewport: Viewport;
@@ -77,60 +79,41 @@ export class TilemapEventHub extends EventEmitter {
     }
 
     private paint(globalX: number, globalY: number) {
+        const editorContext = AppCore.getIns().editorContext;
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!historyManager) return;
+        
         const targetLayer = this.getActiveTileLayer();
         if (!targetLayer || targetLayer.locked || !targetLayer.visible) return;
+
 
         const { x: gx, y: gy } = this.getGridCoordinates(globalX, globalY);
 
         const selection = this.getSelectedTiles();
+
         if (!selection) return;
 
-        const { tiles, pivot } = selection;
+        const { tiles } = selection;
         if (!tiles.length) return;
 
-        let relPivotCol = Math.floor((tiles[0].length - 1) / 2);
-        let relPivotRow = Math.floor((tiles.length - 1) / 2);
+        const pivotX = Math.floor(tiles.length / 2)
+        const pivotY = Math.floor(tiles[0].length / 2)
 
-        let foundRef = false;
-        for(let r = 0; r < tiles.length; r++) {
-            for(let c = 0; c < tiles[r].length; c++) {
-                const tile = tiles[r][c];
-                if (tile) {
-                    const columns = tile.tileset.columns;
-                    const absCol = tile.id % columns;
-                    const absRow = Math.floor(tile.id / columns);
-
-                    const minC = absCol - c;
-                    const minR = absRow - r;
-
-                    relPivotCol = pivot.col - minC;
-                    relPivotRow = pivot.row - minR;
-                    
-                    foundRef = true;
-                    break;
-                }
-            }
-            if (foundRef) break;
-        }
-
-        // 2. Paint Tiles
         for (let r = 0; r < tiles.length; r++) {
             const row = tiles[r];
             for (let c = 0; c < row.length; c++) {
                 const tile = row[c];
-                
-                const targetX = gx + (c - relPivotCol);
-                const targetY = gy + (r - relPivotRow);
 
-                // Boundary check
+                const targetX = gx + c - pivotX;
+                const targetY = gy + r - pivotY;                
                 if (targetX < 0 || targetX >= this.tilemap.width || 
                     targetY < 0 || targetY >= this.tilemap.height) {
                     continue;
                 }
 
                 if (tile) {
-                    // TODO: Implement Command Manager for Undo/Redo
-                    targetLayer.setTileRefAt({ x: targetX, y: targetY }, tile);
+                    const setTileCommand = new SetTileCommand(targetLayer.id, { col: targetX, row: targetY }, tile);
+                    const result = historyManager.execute(setTileCommand, AppCore.getIns().editorContext);
                 }
             }
         }
@@ -138,6 +121,10 @@ export class TilemapEventHub extends EventEmitter {
 
     private onPointerDown(e: FederatedPointerEvent) {
         if (e.button !== 0) return; // Left click only
+        const editorContext = AppCore.getIns().editorContext;
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!historyManager) return;
+        historyManager.startTransaction();
         this.isDrawing = true;
         this.paint(e.global.x, e.global.y);
     }
@@ -151,5 +138,9 @@ export class TilemapEventHub extends EventEmitter {
         if (this.isDrawing) {
             this.isDrawing = false;
         }
+        const editorContext = AppCore.getIns().editorContext;
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!historyManager) return;
+        historyManager.commitTransaction();
     }
 }

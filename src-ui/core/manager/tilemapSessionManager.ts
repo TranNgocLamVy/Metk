@@ -29,23 +29,20 @@ export class TilemapSessionManager {
 
     public async loadAll(tilemapManager: TilemapManager): Promise<void> {
         this.tilemapSessionManagerData.tilemapSessions.forEach(sessionData => {
-            const tilemapResult = tilemapManager.getTilemapById(sessionData.tilemapId);
-            if (tilemapResult.status !== "Success" || !tilemapResult.data) {
-                console.error(tilemapResult.message);
+            const tilemap = tilemapManager.getTilemapById(sessionData.tilemapId);
+            if (!tilemap) {
+                console.error("Tilemap not found");
                 return;
             }
-            const tilemap = tilemapResult.data;
             const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorContext);
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
             this.tilemapMap.set(tilemap.id, tilemapSession.id);
         });
     }
 
-    public async createTilemapSession(tilemap: Tilemap, pixiApp: Application): Promise<Result<TilemapSession>> {
+    public createTilemapSession(tilemap: Tilemap, pixiApp: Application): TilemapSession | null {
         const sessionId = this.tilemapMap.get(tilemap.id);
-        if (sessionId) {
-            return await this.openTilemapSession(sessionId, pixiApp);
-        }
+        if (sessionId) return this.openTilemapSession(sessionId, pixiApp);
 
         const newTilemapSessionData: TilemapSessionData = {
             id: uuidv4(),
@@ -59,14 +56,12 @@ export class TilemapSessionManager {
         this.tilemapSessionMap.set(newTilemapSession.id, newTilemapSession);
         this.tilemapMap.set(tilemap.id, newTilemapSession.id);
 
-        this.openTilemapSession(newTilemapSession.id, pixiApp);
-
-        return { status: "Success", data: newTilemapSession };
+        return this.openTilemapSession(newTilemapSession.id, pixiApp);
     }
 
-    public async openTilemapSession(sessionId: string, pixiApp: Application): Promise<Result<TilemapSession>> {
+    public openTilemapSession(sessionId: string, pixiApp: Application): TilemapSession | null {
         const tilemapSession = this.tilemapSessionMap.get(sessionId);
-        if (!tilemapSession) return { status: "Error", message: "Tilemap session not found" };
+        if (!tilemapSession) return null;
 
         if (this.currentTilemapSession) {
             this.currentTilemapSession.sessionView.unActivateSession();
@@ -79,15 +74,14 @@ export class TilemapSessionManager {
         
         tilemapSession.sessionView.activateSession(pixiApp);
 
-        return { status: "Success", data: tilemapSession };
+        return tilemapSession;
     }
 
-    public async closeTilemapSession(sessionId: string): Promise<Result<string>> {
+    public closeTilemapSession(sessionId: string): void {
         const tilemapSession = this.tilemapSessionMap.get(sessionId);
-        if (!tilemapSession) return { status: "Error", message: "Tilemap session not found" };
+        if (!tilemapSession) return;
 
-        tilemapSession.sessionView.unActivateSession();
-        tilemapSession.sessionView.destroy();
+        tilemapSession.destroy();
 
         this.tilemapSessionMap.delete(sessionId);
         this.tilemapMap.delete(tilemapSession.tilemap.id);
@@ -96,7 +90,6 @@ export class TilemapSessionManager {
         if (this.currentTilemapSession?.id === sessionId) {
             this.currentTilemapSession = null;
         }
-        return { status: "Success", data: sessionId };
     }
 
     public getLastTilemapSessionId(): string | null {

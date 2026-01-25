@@ -29,23 +29,20 @@ export class TilesetSessionManager {
 
     public async loadAll(tilesetManager: TilesetManager): Promise<void> {
         this.tilesetSessionManagerData.tilesetSessions.forEach(sessionData => {
-            const tilesetResult = tilesetManager.getTilesetById(sessionData.tilesetId);
-            if (tilesetResult.status !== "Success" || !tilesetResult.data) {
-                console.error(tilesetResult.message);
+            const tileset = tilesetManager.getTilesetById(sessionData.tilesetId);
+            if (!tileset) {
+                console.error("Tileset not found");
                 return;
             }
-            const tileset = tilesetResult.data;
             const tilesetSession = new TilesetSession(tileset, sessionData);
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
             this.tilesetMap.set(tileset.id, tilesetSession.id);
         });
     }
 
-    public async createTilesetSession(tileset: Tileset, pixiApp: Application): Promise<Result<TilesetSession>> {
+    public createTilesetSession(tileset: Tileset, pixiApp: Application): TilesetSession | null {
         const sessionId = this.tilesetMap.get(tileset.id);
-        if (sessionId) {
-            return await this.openTilesetSession(sessionId, pixiApp);
-        }
+        if (sessionId) return this.openTilesetSession(sessionId, pixiApp);
 
         const newTilesetSessionData: TilesetSessionData = {
             id: uuidv4(),
@@ -61,12 +58,12 @@ export class TilesetSessionManager {
 
         this.openTilesetSession(newTilesetSession.id, pixiApp);
 
-        return { status: "Success", data: newTilesetSession };
+        return newTilesetSession;
     }
 
-    public async openTilesetSession(sessionId: string, pixiApp: Application): Promise<Result<TilesetSession>> {
+    public openTilesetSession(sessionId: string, pixiApp: Application): TilesetSession | null {
         const tilesetSession = this.tilesetSessionMap.get(sessionId);
-        if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
+        if (!tilesetSession) return null;
 
         if (this.currentTilesetSession) {
             this.currentTilesetSession.sessionView.unActivateSession();
@@ -79,15 +76,14 @@ export class TilesetSessionManager {
 
         tilesetSession.sessionView.activateSession(pixiApp);
         
-        return { status: "Success", data: tilesetSession };
+        return tilesetSession;
     }
 
-    public async closeTilesetSession(sessionId: string): Promise<Result<string>> {
+    public closeTilesetSession(sessionId: string): void {
         const tilesetSession = this.tilesetSessionMap.get(sessionId);
-        if (!tilesetSession) return { status: "Error", message: "Tileset session not found" };
+        if (!tilesetSession) return;
 
-        tilesetSession.sessionView.unActivateSession();
-        tilesetSession.sessionView.destroy();
+        tilesetSession.destroy();
 
         this.tilesetSessionMap.delete(sessionId);
         this.tilesetMap.delete(tilesetSession.tileset.id);
@@ -96,7 +92,6 @@ export class TilesetSessionManager {
         if (this.currentTilesetSession?.id === sessionId) {
             this.currentTilesetSession = null;
         }
-        return { status: "Success", data: sessionId };
     }
 
     public getLastTilesetSessionId(): string | null {
@@ -105,7 +100,6 @@ export class TilesetSessionManager {
     }
 
     public serialize(): TilesetSessionManagerData {
-        console.trace(this.currentTilesetSession?.id);
         return {
             tilesetSessions: Array.from(this.tilesetSessionMap.values()).map(session => session.serialize()),
             currentTilesetSessionId: this.currentTilesetSession?.id || null,

@@ -1,3 +1,5 @@
+import { IBaseSession } from "@/core/interface/IBaseSession";
+import { HistoryManager } from "@/core/manager/historyManager";
 import { SelectionState } from "@/shared/schema/common/selectionState";
 import { ViewState } from "@/shared/schema/common/viewState";
 import { TilesetSessionData } from "@/shared/schema/tilesetSession";
@@ -5,7 +7,7 @@ import { TilesetSessionData } from "@/shared/schema/tilesetSession";
 import { Tile, Tileset } from "../tile/tileset";
 import { TilesetSessionView } from "./tilesetSessionView";
 
-export class TilesetSession {
+export class TilesetSession implements IBaseSession {
     public readonly id: string;
     public readonly tileset: Tileset;
     public viewState: ViewState;
@@ -13,13 +15,18 @@ export class TilesetSession {
     private selectedTiles: (Tile | null)[][] = [];
     private pivot: Coordinate | null = null;
 
+    public historyManager: HistoryManager;
+
     public sessionView: TilesetSessionView;
+
 
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData) {
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
         this.viewState = tilesetSessionData.viewState;
         this.selectionState = tilesetSessionData.selectionState || { selectedTiles: [] };
+
+        this.historyManager = new HistoryManager();
 
         this.sessionView = new TilesetSessionView(this);
     }
@@ -51,5 +58,10 @@ export class TilesetSession {
             viewState: this.viewState,
             selectionState: selectionState,
         }
+    }
+
+    public destroy(): void {
+        this.sessionView.unActivateSession();
+        this.sessionView.destroy();
     }
 }

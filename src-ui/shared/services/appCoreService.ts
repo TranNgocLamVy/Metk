@@ -4,11 +4,8 @@ import { useProjectManagerStore } from "@/view/stores/application/projectManager
 
 export class AppCoreService {
     public static async load() {
-        const loadResult = await AppCore.getIns().load();
-        if (loadResult.status == "Success") {
-            
-            useAppcore.getState().setIsAppcoreLoaded(true);
-            useProjectManagerStore.getState().setProjects(AppCore.getIns().projectManager.projectMetaData);
-        }
+        await AppCore.getIns().load();
+        useAppcore.getState().setIsAppcoreLoaded(true);
+        useProjectManagerStore.getState().setProjects(AppCore.getIns().projectManager.projectMetaData);
     }
 }

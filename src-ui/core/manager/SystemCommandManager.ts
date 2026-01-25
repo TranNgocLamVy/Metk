@@ -2,7 +2,7 @@ import { ToastService } from "@/shared/services/toastService";
 
 import { EditorContext } from "../application/editorContext";
 import { RedoCommand } from "../command/system/redoCommand";
-import { SaveCommand } from "../command/system/saveCommand";
+import { SaveTilemapCommand } from "../command/system/saveTilemapCommand";
 import { UndoCommand } from "../command/system/undoCommand";
 import { CommandId, CommandIdTypes } from "../constance/systemCommand";
 import { ISystemCommandConstructor } from "../interface/IBaseCommand";
@@ -13,7 +13,7 @@ export class SystemCommandManager {
     constructor(
         private readonly editorContext: EditorContext,
     ) {
-        this.registerCommand(CommandId.ProjectSave, SaveCommand);
+        this.registerCommand(CommandId.ProjectSave, SaveTilemapCommand);
         this.registerCommand(CommandId.ProjectUndo, UndoCommand);
         this.registerCommand(CommandId.ProjectRedo, RedoCommand);
     }
@@ -22,14 +22,12 @@ export class SystemCommandManager {
         this.commands.set(id, commandClass);
     }
 
-    public execute(commandId: string) {
+    public async execute(commandId: string): Promise<void> {
         const CommandClass = this.commands.get(commandId);
         if (CommandClass) {
             const command = new CommandClass();
-            const result = command.execute(this.editorContext);
-            if (result.status !== "Success") {
-                ToastService.error({ message: result.message });
-            }
+            const result = await command.execute(this.editorContext);
+            if (result.status !== "Success") ToastService.error({ message: result.message });
         } else {
             console.warn(`Command ID ${commandId} not found.`);
         }
