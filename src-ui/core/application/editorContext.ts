@@ -1,3 +1,5 @@
+import EventEmitter from "eventemitter3";
+
 import { HistoryManager } from "../manager/historyManager";
 import { ProjectManager } from "../manager/projectManager";
 import { WorkspaceManager } from "../manager/workspaceManager";
@@ -7,8 +9,13 @@ import { TilesetSession } from "./session/tilesetSession";
 import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
 
-export class EditorContext {
+type EditorContextEvent = {
+    onOpenTilemapSession: () => void,
+}
 
+export class EditorContext {
+    public eventEmitter = new EventEmitter<EditorContextEvent>();
+    
     constructor(
         private readonly projectManager: ProjectManager,
         private readonly workspaceManager: WorkspaceManager

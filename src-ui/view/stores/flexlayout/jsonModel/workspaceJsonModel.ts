@@ -99,6 +99,5 @@ export const workspaceLayout: IJsonModel = {
         tabEnableRenderOnDemand: false,
         tabSetTabLocation: "bottom",
     },
-    borders: workspaceBorderNodes,
     layout: workspaceRowNode,
 };

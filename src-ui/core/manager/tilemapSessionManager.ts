@@ -73,7 +73,8 @@ export class TilemapSessionManager {
         this.tilemapSessionIdStack.push(sessionId);
         
         tilemapSession.sessionView.activateSession(pixiApp);
-
+        this.editorContext.eventEmitter.emit("onOpenTilemapSession");
+        
         return tilemapSession;
     }
 
