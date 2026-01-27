@@ -32,7 +32,7 @@ export class SetTileCommand implements IBaseCommand {
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return ErrorResult("Layer not found");
-        
+
         const tileRef = layer.getTileAt(this.coordinate);
         if (tileRef) {
             const { tileId, tilesetIndex } = tileRef.getTile();
@@ -55,7 +55,7 @@ export class SetTileCommand implements IBaseCommand {
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return ErrorResult("Layer not found");
 
-        if (!this.oldTileId || !this.oldTilesetIndex) return layer.removeTileAt(this.coordinate)
+        if (this.oldTileId == null || this.oldTilesetIndex == null) return layer.removeTileAt(this.coordinate)
         return layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
     }
 
