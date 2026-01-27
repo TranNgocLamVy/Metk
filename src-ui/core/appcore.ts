@@ -7,6 +7,7 @@ import { EditorContext } from "./application/editorContext";
 import { KeybindingManager } from "./manager/keybindingManager";
 import { ProjectManager } from "./manager/projectManager";
 import { SystemCommandManager } from "./manager/SystemCommandManager";
+import { ToolManager } from "./manager/toolManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
 
 export class AppCore {
@@ -19,6 +20,8 @@ export class AppCore {
 
     public readonly editorContext: EditorContext;
 
+    public readonly brushManager: ToolManager;
+
     private constructor() {
         const projectRepo = new JsonProjectRepository();
         const projectStorageService = new JsonProjectStorageService();
@@ -30,6 +33,7 @@ export class AppCore {
 
         this.commandManager = new SystemCommandManager(this.editorContext);
         this.keybindingManager = new KeybindingManager(this.commandManager);
+        this.brushManager = new ToolManager(this.editorContext);
         
         // Set Context
         this.workspaceManager.setEditorContext(this.editorContext);
