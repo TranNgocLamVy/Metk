@@ -2,9 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import { EditorContext } from "@/core/application/editorContext";
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { Tile } from "@/core/application/tile/tileset";
 import { IBaseCommand } from "@/core/interface/IBaseCommand";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { ErrorResult, Result } from "@/shared/types/result";
 
 export class SetTileCommand implements IBaseCommand {
     public readonly id: string = uuidv4()
@@ -18,10 +17,11 @@ export class SetTileCommand implements IBaseCommand {
     constructor(
         private readonly layerId: string,
         private readonly coordinate: Coordinate,
-        tile: Tile
+        tileId: number,
+        tilesetId: string
     ) {
-        this.tilesetId = tile.tileset.id;
-        this.tileId = tile.id;
+        this.tileId = tileId;
+        this.tilesetId = tilesetId;
     }
 
     public execute(context: EditorContext): Result {

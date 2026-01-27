@@ -1,8 +1,7 @@
 import { Viewport } from "pixi-viewport";
-import { Application } from "pixi.js";
+import { Application, Container } from "pixi.js";
 
 import { TilemapSession } from "@/core/application/session/tilemapSession";
-import { TilemapEventHub } from "@/core/application/tilemapEventHub";
 import { IBaseSessionView } from "@/core/interface/IBaseSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
@@ -15,8 +14,8 @@ export class TilemapSessionView implements IBaseSessionView {
     private pixiApp: Application;
     
     private renderer: TilemapRenderer;
+    public overlayerContainer: Container;
     public grid: TilemapGridRenderer;
-    private eventHub: TilemapEventHub;
     
     private isInit: boolean = false;
 
@@ -80,12 +79,12 @@ export class TilemapSessionView implements IBaseSessionView {
         // Initialize Renderer
         this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
         this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap, gap: this.grid.gridGap });
+        this.overlayerContainer = new Container();
         
         // Add Renderer
         this.viewport.addChild(this.renderer.container);
+        this.viewport.addChild(this.overlayerContainer);
         this.viewport.addChild(this.grid.graphics);
-
-        this.eventHub = new TilemapEventHub(this.viewport, this.session.tilemap);
     }
 
     public activateSession(pixiApp: Application) {
@@ -116,7 +115,6 @@ export class TilemapSessionView implements IBaseSessionView {
         if (!this.isInit) return;
         this.unActivateSession();
         
-        if (this.eventHub) this.eventHub.destroy();
         if (this.renderer) this.renderer.destroy();
         
         this.viewport.destroy({ children: true });
