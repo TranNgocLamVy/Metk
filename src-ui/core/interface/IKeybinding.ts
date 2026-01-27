@@ -1,7 +1,6 @@
-import { CommandIdTypes } from "../constance/systemCommand";
 
 export interface Keybinding {
-    commandId: CommandIdTypes;
+    commandId: string;
     key: string;
     when?: string;
 }

@@ -1,24 +1,27 @@
 import { ToastService } from "@/shared/services/toastService";
 
 import { EditorContext } from "../application/editorContext";
-import { RedoCommand } from "../command/system/redoCommand";
-import { SaveTilemapCommand } from "../command/system/saveTilemapCommand";
-import { UndoCommand } from "../command/system/undoCommand";
-import { CommandId, CommandIdTypes } from "../constance/systemCommand";
+import { CommandData } from "../decorator/command";
 import { ISystemCommandConstructor } from "../interface/IBaseCommand";
 
 export class SystemCommandManager {
+    public static COMMAND_REGISTRY: Array<CommandData> = [];
+
     private commands: Map<string, ISystemCommandConstructor> = new Map(); 
 
     constructor(
         private readonly editorContext: EditorContext,
     ) {
-        this.registerCommand(CommandId.ProjectSave, SaveTilemapCommand);
-        this.registerCommand(CommandId.ProjectUndo, UndoCommand);
-        this.registerCommand(CommandId.ProjectRedo, RedoCommand);
+        this.initializeDecoratedCommands();
     }
 
-    public registerCommand(id: CommandIdTypes, commandClass: ISystemCommandConstructor) {
+    private initializeDecoratedCommands() {
+        SystemCommandManager.COMMAND_REGISTRY.forEach((commandData: CommandData) => {
+            this.registerCommand(commandData.id, commandData.constructor);
+        });
+    }
+
+    public registerCommand(id: string, commandClass: ISystemCommandConstructor) {
         this.commands.set(id, commandClass);
     }
 
@@ -29,7 +32,7 @@ export class SystemCommandManager {
             const result = await command.execute(this.editorContext);
             if (result.status !== "Success") ToastService.error({ message: result.message });
         } else {
-            console.warn(`Command ID ${commandId} not found.`);
+            ToastService.error({message: `Command ID ${commandId} not found.`});
         }
     }
 }

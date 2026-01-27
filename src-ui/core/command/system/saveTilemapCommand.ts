@@ -1,8 +1,15 @@
 import { EditorContext } from "@/core/application/editorContext";
+import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { ErrorResult, Result } from "@/shared/types/result";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 
+@SystemCommand({
+    id: "project.save",
+    name: "Save",
+    description: "",
+    shortcuts: "Ctrl+S",
+})
 export class SaveTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {
         const currentProject = context.getCurrentProject();

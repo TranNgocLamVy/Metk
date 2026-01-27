@@ -1,4 +1,4 @@
-
+import "./command/system/index";
 
 import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";

@@ -1,0 +1,1 @@
+import.meta.glob("./*Command.ts", { eager: true });

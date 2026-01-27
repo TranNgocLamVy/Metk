@@ -1,6 +1,5 @@
 import { KeyUtils } from "@/shared/utils/keyUtils";
 
-import { DEFAULT_KEYBINDINGS } from "../constance/keybinding";
 import { Keybinding, UserKeybindingOverride } from "../interface/IKeybinding";
 import { SystemCommandManager } from "./SystemCommandManager";
 
@@ -13,7 +12,13 @@ export class KeybindingManager {
 
     constructor(private commandManager: SystemCommandManager) {
         this.bindOnKeyDown = this.handleKeyDown.bind(this);
-        this.registerDefaults(DEFAULT_KEYBINDINGS);
+
+        const defaultKeyBinding: Keybinding[] = SystemCommandManager.COMMAND_REGISTRY.filter(cmd => cmd.shortcuts != undefined).map(command => ({
+            commandId: command.id,
+            key: command.shortcuts!,
+        }))
+
+        this.registerDefaults(defaultKeyBinding);
         window.addEventListener("keydown", this.bindOnKeyDown);
     }
 

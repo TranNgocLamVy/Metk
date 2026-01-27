@@ -2,7 +2,6 @@ import { X } from "lucide-react";
 import { Fragment, useMemo, useRef } from "react";
 
 import { AppCore } from "@/core/appcore";
-import { CommandId } from "@/core/constance/systemCommand";
 import { DialogService } from "@/shared/services/dialogService";
 import { ToastService } from "@/shared/services/toastService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
@@ -48,7 +47,7 @@ export default function TilemapEditorTabs() {
                             })
                             if (saveResult === "save") {
                                 const commandManager = AppCore.getIns().commandManager
-                                await commandManager.execute(CommandId.ProjectSave);
+                                await commandManager.execute("project.save");
                                 WorkspaceService.closeTilemapSession(session.sessionId);
                                 ToastService.success({ message: "Tilemap saved successfully" });
                             } else if (saveResult === "not save") {
