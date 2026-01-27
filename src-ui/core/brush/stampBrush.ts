@@ -74,6 +74,7 @@ export class StampBrush implements ITool {
     private onPointerDown(e: FederatedPointerEvent) {
         if (!this.currentSession) return;
         if (e.button !== 0) return;
+        if (!this.getActiveTileLayer()) return;
         this.isDragging = true;
         this.stampMove(e);
     }

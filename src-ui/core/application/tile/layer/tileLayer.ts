@@ -62,25 +62,35 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return tileRef;
     }
 
-
-    public setTileAt(coordinate: Coordinate, tileId: number, tilesetId: string): Result<TileRefData | null> {
+    public setTileAt(coordinate: Coordinate, tileId: number, tilesetId: string ): Result<TileRefData | null>;
+    public setTileAt(coordinate: Coordinate, tileId: number, tilesetIndex: number ): Result<TileRefData | null>;
+    public setTileAt(coordinate: Coordinate, tileId: number, tileset: string | number ): Result<TileRefData | null> {
         if (coordinate.col < 0 || coordinate.col >= this.size.width) return ErrorResult("Tile not found, col is out of range");
         if (coordinate.row < 0 || coordinate.row >= this.size.height) return ErrorResult("Tile not found, row is out of range");
 
         if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
-
         let tileRef = this.tilesRef[coordinate.row][coordinate.col];
 
-        const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
-        if (tilesetIndex === -1) return ErrorResult("Tile not found, tileset not found");
-        if (tileRef === null || tileRef === undefined) {
-            tileRef = new TileRef({ tileId, tilesetIndex });
-            this.tilesRef[coordinate.row][coordinate.col] = tileRef;
+        let setTileResult: TileRefData | null;
+        if (typeof tileset === "string") {
+            const tilesetId = tileset;
+            const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
+            if (tilesetIndex === -1) return ErrorResult("Tile not found, tileset not found");
+            if (tileRef === null || tileRef === undefined) {
+                tileRef = new TileRef({ tileId, tilesetIndex });
+                this.tilesRef[coordinate.row][coordinate.col] = tileRef;
+            }
+            setTileResult = tileRef.setTile({ tileId, tilesetIndex });
+        } else {
+            const tilesetIndex = tileset;
+            if (tileRef === null || tileRef === undefined) {
+                tileRef = new TileRef({ tileId, tilesetIndex });
+                this.tilesRef[coordinate.row][coordinate.col] = tileRef;
+            }
+            setTileResult = tileRef.setTile({ tileId, tilesetIndex });
         }
-        const setTileResult = tileRef.setTile({ tileId, tilesetIndex });
         this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
         this.tilemap.eventEmitter.emit("onChange");
-        
         return SuccessResult(setTileResult)
     }
 
