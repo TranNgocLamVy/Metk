@@ -11,7 +11,7 @@ export class SetTileCommand implements IBaseCommand {
     private tilesetId: string;
     private tileId: number;
 
-    private oldTilesetId: string | null;
+    private oldTilesetIndex: number | null;
     private oldTileId: number | null;
 
     constructor(
@@ -37,11 +37,9 @@ export class SetTileCommand implements IBaseCommand {
         if (tileRef) {
             const { tileId, tilesetIndex } = tileRef.getTile();
             this.oldTileId = tileId;
-            const tileset = tilemap.tilesetRefManager.getTilesetByIndex(tilesetIndex);
-            if (!tileset) return ErrorResult("Tileset not found");
-            this.oldTilesetId = tileset.id;
+            this.oldTilesetIndex = tilesetIndex;
         } else {
-            this.oldTilesetId = null;
+            this.oldTilesetIndex = null;
             this.oldTileId = null;
         }
 
@@ -57,8 +55,8 @@ export class SetTileCommand implements IBaseCommand {
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return ErrorResult("Layer not found");
 
-        if (!this.oldTileId || !this.oldTilesetId) return layer.removeTileAt(this.coordinate)
-        return layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetId);
+        if (!this.oldTileId || !this.oldTilesetIndex) return layer.removeTileAt(this.coordinate)
+        return layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
     }
 
     public delete(): void {
