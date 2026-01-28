@@ -8,7 +8,7 @@ import { useTilemapSessionStore } from "@/view/stores/application/tilemapSession
     id: "project.save",
     name: "Save",
     description: "",
-    shortcuts: "Ctrl+S",
+    shortcuts: ["Ctrl+S"],
 })
 export class SaveTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {

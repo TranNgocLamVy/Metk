@@ -1,7 +1,7 @@
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
-import { StampBrush } from "../brush/stampBrush";
 import { ITool, IToolContructor } from "../interface/ITool";
+import { StampBrush } from "../tool/stampBrush";
 
 export class ToolManager {
     private toolMap: Map<string, IToolContructor> = new Map<string, IToolContructor>();

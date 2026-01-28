@@ -7,7 +7,7 @@ import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
     id: "project.undo",
     name: "Undo",
     description: "",
-    shortcuts: "Ctrl+Z",
+    shortcuts: ["Ctrl+Z"],
 })
 export class UndoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {

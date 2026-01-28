@@ -7,7 +7,7 @@ import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
     id: "project.redo",
     name: "Redo",
     description: "",
-    shortcuts: "Ctrl+Y",
+    shortcuts: ["Ctrl+Y"],
 })
 export class RedoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {
