@@ -7,8 +7,8 @@ import { useRelativeFlexLayout } from "@/view/hooks/useRelativeFlexLayout";
 import { useWorkspaceDockStore } from "@/view/stores/flexlayout/workspaceDockStore";
 
 import { HStack, VStack } from "../custom/stack/stack";
-import BrushBar from "./brushBar";
 import ContextBar from "./contextBar";
+import ToolBar from "./toolBar";
 
 export default function Workspace() {
 	const layoutRef = useRef<Layout | null>(null);
@@ -30,7 +30,7 @@ export default function Workspace() {
 				</VStack>
 				<ContextBar />
 			</VStack>
-			<BrushBar />
+			<ToolBar />
 		</HStack>
 	);
 }

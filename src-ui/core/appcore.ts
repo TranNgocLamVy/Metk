@@ -6,7 +6,7 @@ import { JsonProjectStorageService } from "@/infrastructure/projectStorageServic
 import { EditorContext } from "./application/editorContext";
 import { KeybindingManager } from "./manager/keybindingManager";
 import { ProjectManager } from "./manager/projectManager";
-import { SystemCommandManager } from "./manager/SystemCommandManager";
+import { SystemCommandManager } from "./manager/systemCommandManager";
 import { ToolManager } from "./manager/toolManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
 
@@ -20,7 +20,7 @@ export class AppCore {
 
     public readonly editorContext: EditorContext;
 
-    public readonly brushManager: ToolManager;
+    public readonly toolManager: ToolManager;
 
     private constructor() {
         const projectRepo = new JsonProjectRepository();
@@ -33,7 +33,7 @@ export class AppCore {
 
         this.commandManager = new SystemCommandManager(this.editorContext);
         this.keybindingManager = new KeybindingManager(this.commandManager);
-        this.brushManager = new ToolManager(this.editorContext);
+        this.toolManager = new ToolManager(this.editorContext);
         
         // Set Context
         this.workspaceManager.setEditorContext(this.editorContext);

@@ -1,10 +1,10 @@
-import { SystemCommandManager } from "../manager/SystemCommandManager";
+import { SystemCommandManager } from "../manager/systemCommandManager";
 
 export type CommandData = {
     id: string;
     name: string;
     description?: string;
-    shortcuts?: string;
+    shortcuts?: string[];
     constructor: any;
 }
 

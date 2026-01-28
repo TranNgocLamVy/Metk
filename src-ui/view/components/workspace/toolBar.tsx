@@ -5,11 +5,11 @@ import { AppCore } from "@/core/appcore";
 import { VStack } from "../custom/stack/stack";
 import { Button } from "../shadcn/button";
 
-export default function BrushBar() {
+export default function ToolBar() {
 
     const onClick = () => {
-        const brushManager = AppCore.getIns().brushManager;
-        brushManager.startTool("stamp");
+        const toolManager = AppCore.getIns().toolManager;
+        toolManager.startTool("stamp");
         alert("Start Stamp")
     }
 
