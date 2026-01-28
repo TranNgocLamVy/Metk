@@ -1,4 +1,4 @@
-import { Undo, Redo, Scissors, Copy, ClipboardPaste, SquareDashedMousePointer, SquareMousePointer, SquareDashed, UserRoundCog, Trash2 } from "lucide-react";
+import { ClipboardPaste, Copy, Redo, Scissors, SquareDashed, SquareDashedMousePointer, SquareMousePointer, Trash2, Undo, UserRoundCog } from "lucide-react";
 
 const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -79,7 +79,7 @@ const EditDropdownOptionGroup4: MenuDropDownGroupType = [
 ];
 
 export const EditDropdownOptions: MenuItemType = {
-	name: "Edit",
+	name: "menuBar.edit",
 	className: "w-100",
 	groups: [EditDropdownOptionGroup1, EditDropdownOptionGroup2, EditDropdownOptionGroup3, EditDropdownOptionGroup4],
 };

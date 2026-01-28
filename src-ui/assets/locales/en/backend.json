@@ -1,0 +1,10 @@
+{
+    "errors": {
+        "fileNotFound": "File does not exist.",
+        "readFailed": "Failed to read file: {{err}}",
+        "unknown": "An unexpected system error occurred."
+    },
+    "messages": {
+        "greet": "Hello, {{name}}! You've been greeted from Rust!"
+    }
+}

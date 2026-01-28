@@ -1,0 +1,10 @@
+{
+    "errors": {
+        "fileNotFound": "Tệp không tồn tại.",
+        "readFailed": "Lỗi khi đọc tệp: {{err}}",
+        "unknown": "Đã xảy ra lỗi hệ thống không xác định."
+    },
+    "messages": {
+        "greet": "Xin chào, {{name}}! Bạn đã nhận được lời chào từ Rust!"
+    }
+}

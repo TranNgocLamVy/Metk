@@ -1,4 +1,4 @@
-import { TilemapService } from "@/shared/services/tilemapService";
+import { i18nService } from "@/core/service/i18n";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
@@ -18,11 +18,18 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
     {
         type: "option",
-        name: "Create Tilemap",
+        name: "Switch to English",
         onClick() {
-            TilemapService.createTilemap();
+            i18nService.changeLanguage("en");
         }
-    }
+    },
+    {
+        type: "option",
+        name: "Switch to VietNamese",
+        onClick() {
+            i18nService.changeLanguage("vi");
+        }
+    },
 ];
 
 export const DebugDropdownOptions: MenuItemType = {

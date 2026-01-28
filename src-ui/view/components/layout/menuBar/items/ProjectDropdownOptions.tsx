@@ -1,4 +1,4 @@
-import { FolderCog, FolderPlus, FolderSync } from "lucide-react"
+import { FolderCog, FolderPlus, FolderSync } from "lucide-react";
 
 const ProjectDropdownOptionGroup1: MenuDropDownGroupType = [
     {
@@ -26,7 +26,7 @@ const ProjectDropdownOptionGroup2: MenuDropDownGroupType = [
 
 
 export const ProjectDropdownOptions: MenuItemType = {
-    name: "Project",
+    name: "menuBar.project",
     className: "w-100",
     groups: [
         ProjectDropdownOptionGroup1,

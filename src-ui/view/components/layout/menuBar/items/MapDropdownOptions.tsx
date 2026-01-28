@@ -86,7 +86,7 @@ const MapDropdownOptionGroup5: MenuDropDownGroupType = [
 ];
 
 export const MapDropdownOptions: MenuItemType = {
-	name: "Map",
+	name: "menuBar.map",
 	className: "w-100",
 	groups: [MapDropdownOptionGroup1, MapDropdownOptionGroup2, MapDropdownOptionGroup3, MapDropdownOptionGroup4, MapDropdownOptionGroup5],
 };
