@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 
 import { Button } from "@/view/components/shadcn/button";
@@ -11,6 +12,8 @@ interface MenuBarItemProps {
 }
 export default function MenuBarItem({ item }: MenuBarItemProps) {
     const [isOpen, setIsOpen] = useState(false);
+
+    const { t: translate } = useTranslation(['common', 'menuBar']);
 
     useEffect(() => {
         const onWindowLoseFocus = () => setIsOpen(false);
@@ -28,7 +31,7 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
 			<DropdownMenuTrigger disabled={disabled}>
 				<Button size={"sm"} variant={"ghost"} className="px-2 rounded-none" asChild>
-					<p className="text-xs">{name}</p>
+					<p className="text-xs">{translate(name)}</p>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={className} side="bottom" align="start" >

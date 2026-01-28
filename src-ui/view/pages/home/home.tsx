@@ -1,7 +1,7 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { AppCore } from "@/core/appcore";
 import { ProjectService } from "@/shared/services/projectService";
 import { HStack, VStack } from "@/view/components/custom/stack/stack";
 import { Button } from "@/view/components/shadcn/button";
@@ -13,22 +13,24 @@ export default function HomePage() {
     const navigate = useNavigate();
 	const projects = useProjectManagerStore((s) => s.projects).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 
+    const { t: translate } = useTranslation(['common', 'home']);
+
 	return (
 		<VStack align="start" justify="start" className="w-full h-full p-16 gap-8">
-			<h1 className="text-3xl font-bold">Welcome to MEtk</h1>
+			<h1 className="text-3xl font-bold">{translate('home.welcome')}</h1>
 			<Separator />
 			<HStack className="w-full h-fit gap-8">
 				<Button variant={"outline"} onClick={ProjectService.openProject}>
 					<SquareArrowOutUpRight />
-					Open Project
+					{translate('home.openProject')}
 				</Button>
 				<Button variant={"outline"} onClick={ProjectService.createProject}>
 					<FolderPlus />
-					New Project
+					{translate('home.newProject')}
 				</Button>
 			</HStack>
 			<VStack className="">
-				<h2 className="mt-8">Recents Projects</h2>
+				<h2 className="mt-8">{translate('home.recentProjects')}</h2>
 				<Separator />
 			</VStack>
 			<VStack className="gap-4">
@@ -43,10 +45,10 @@ export default function HomePage() {
                                     </Button>
 								</TooltipTrigger>
                                 <TooltipContent side="left">
-                                    {project.description ? <p>{`Description: ${project.description}`}</p> : null}
-                                    <p>{`Version: ${project.version}`}</p>
-                                    <p>{`Created At: ${new Date(project.createdAt).toLocaleString()}`}</p>
-                                    <p>{`Updated At: ${new Date(project.updatedAt).toLocaleString()}`}</p>
+                                    {project.description ? <p>{`${translate('home.description')}: ${project.description}`}</p> : null}
+                                    <p>{`${translate('home.version')}: ${project.version}`}</p>
+                                    <p>{`${translate('home.createdAt')}: ${new Date(project.createdAt).toLocaleString()}`}</p>
+                                    <p>{`${translate('home.updatedAt')}: ${new Date(project.updatedAt).toLocaleString()}`}</p>
                                 </TooltipContent>
 							</Tooltip>
 							<h3 className={`text-xs cursor-default ${!project.found ? "line-through" : ""}`}>{project.directory}</h3>

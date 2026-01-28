@@ -298,7 +298,7 @@ const ViewDropdownOptionGroup5: MenuDropDownGroupType = [
 ];
 
 export const ViewDropdownOptions: MenuItemType = {
-	name: "View",
+	name: "menuBar.view",
 	className: "w-110",
 	groups: [ViewDropdownOptionGroup1, ViewDropdownOptionGroup2, ViewDropdownOptionGroup3, ViewDropdownOptionGroup4, ViewDropdownOptionGroup5],
 };

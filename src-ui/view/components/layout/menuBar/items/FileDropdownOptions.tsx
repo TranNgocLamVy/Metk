@@ -171,7 +171,7 @@ const FileDropdownOptionGroup4: MenuDropDownGroupType = [
 ];
 
 export const FileDropdownOptions: MenuItemType = {
-	name: "File",
+	name: "menuBar.file",
     className: "w-100",
 	groups: [FileDropdownOptionGroup1, FileDropdownOptionGroup2, FileDropdownOptionGroup3, FileDropdownOptionGroup4],
 };

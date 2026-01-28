@@ -1,0 +1,89 @@
+{
+    "menuBar": {
+        "file": "Tệp",
+        "edit": "Chỉnh sửa",
+        "view": "Hiển thị",
+        "map": "Bản đồ",
+        "layer": "Lớp",
+        "project": "Dự án",
+        "help": "Trợ giúp"
+    },
+    "actions": {
+        "new": "Mới",
+        "open": "Mở Tệp / Dự án",
+        "openInProject": "Mở Tệp trong Dự án",
+        "save": "Lưu",
+        "saveAs": "Lưu dưới dạng",
+        "saveAll": "Lưu tất cả",
+        "export": "Xuất",
+        "exportAs": "Xuất dưới dạng",
+        "exportImage": "Xuất dưới dạng Hình ảnh",
+        "close": "Đóng",
+        "closeAll": "Đóng tất cả",
+        "closeProject": "Đóng Dự án",
+        "quit": "Thoát",
+        "undo": "Hoàn tác",
+        "redo": "Làm lại",
+        "cut": "Cắt",
+        "copy": "Sao chép",
+        "paste": "Dán",
+        "pasteInPlace": "Dán tại chỗ",
+        "delete": "Xóa",
+        "selectAll": "Chọn tất cả",
+        "invertSelection": "Đảo ngược vùng chọn",
+        "selectNone": "Bỏ chọn",
+        "preferences": "Tùy chỉnh",
+        "zoomIn": "Phóng to",
+        "zoomOut": "Thu nhỏ",
+        "normalSize": "Kích thước chuẩn",
+        "fitInView": "Khớp bản đồ với màn hình"
+    },
+    "home": {
+        "welcome": "Chào mừng đến với MEtk",
+        "openProject": "Mở dự án",
+        "newProject": "Tạo dự án mới",
+        "recentProjects": "Dự án gần đây",
+        "description": "Mô tả",
+        "version": "Phiên bản",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật"
+    },
+    "explorer": {
+        "tilesets": "Bộ gạch",
+        "tilemaps": "Bản đồ gạch",
+        "noTilesets": "Không có bộ gạch",
+        "noTilemaps": "Không có bản đồ gạch"
+    },
+    "layerManager": {
+        "title": "Lớp",
+        "selectTilemap": "Chọn một bản đồ gạch",
+        "newLayer": "Lớp mới",
+        "tileLayer": "Lớp gạch",
+        "objectLayer": "Lớp đối tượng",
+        "imageLayer": "Lớp hình ảnh",
+        "groupLayer": "Lớp nhóm",
+        "duplicate": "Nhân bản lớp",
+        "delete": "Xóa lớp",
+        "showHide": "Hiện/Ẩn lớp",
+        "lockUnlock": "Khóa/Mở khóa lớp"
+    },
+    "forms": {
+        "project": {
+            "title": "Tạo Dự án mới",
+            "nameLabel": "Tên Dự án",
+            "namePlaceholder": "Dự án của bạn",
+            "destLabel": "Đích đến",
+            "destPlaceholder": "Chọn một thư mục",
+            "errorExists": "Thư mục \"{{name}}\" đã tồn tại."
+        },
+        "tilemap": {
+            "title": "Tạo Bản đồ mới",
+            "nameLabel": "Tên Bản đồ",
+            "sizeLabel": "Kích thước Bản đồ",
+            "tileSizeLabel": "Kích thước Ô gạch",
+            "width": "Chiều rộng",
+            "height": "Chiều cao",
+            "infinite": "Vô hạn"
+        }
+    }
+}

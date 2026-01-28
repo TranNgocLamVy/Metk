@@ -1,0 +1,89 @@
+{
+    "menuBar": {
+        "file": "File",
+        "edit": "Edit",
+        "view": "View",
+        "map": "Map",
+        "layer": "Layer",
+        "project": "Project",
+        "help": "Help"
+    },
+    "actions": {
+        "new": "New",
+        "open": "Open File / Project",
+        "openInProject": "Open File in Project",
+        "save": "Save",
+        "saveAs": "Save As",
+        "saveAll": "Save All",
+        "export": "Export",
+        "exportAs": "Export as",
+        "exportImage": "Export as Image",
+        "close": "Close",
+        "closeAll": "Close All",
+        "closeProject": "Close Project",
+        "quit": "Quit",
+        "undo": "Undo",
+        "redo": "Redo",
+        "cut": "Cut",
+        "copy": "Copy",
+        "paste": "Paste",
+        "pasteInPlace": "Paste in Place",
+        "delete": "Delete",
+        "selectAll": "Select All",
+        "invertSelection": "Invert Selection",
+        "selectNone": "Select None",
+        "preferences": "Preferences",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out",
+        "normalSize": "Normal Size",
+        "fitInView": "Fit Map in View"
+    },
+    "home": {
+        "welcome": "Welcome to MEtk",
+        "openProject": "Open Project",
+        "newProject": "New Project",
+        "recentProjects": "Recents Projects",
+        "description": "Description",
+        "version": "Version",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+    },
+    "explorer": {
+        "tilesets": "Tilesets",
+        "tilemaps": "Tilemaps",
+        "noTilesets": "No tilesets",
+        "noTilemaps": "No tilemaps"
+    },
+    "layerManager": {
+        "title": "Layer",
+        "selectTilemap": "Select a tilemap",
+        "newLayer": "New Layer",
+        "tileLayer": "Tile Layer",
+        "objectLayer": "Object Layer",
+        "imageLayer": "Image Layer",
+        "groupLayer": "Group Layer",
+        "duplicate": "Duplicate Layer",
+        "delete": "Delete Layer",
+        "showHide": "Show/Hide Layer",
+        "lockUnlock": "Lock/Unlock Layer"
+    },
+    "forms": {
+        "project": {
+            "title": "Create new Project",
+            "nameLabel": "Project Name",
+            "namePlaceholder": "Your Tile Project",
+            "destLabel": "Destination",
+            "destPlaceholder": "Select a folder",
+            "errorExists": "Folder \"{{name}}\" already exists."
+        },
+        "tilemap": {
+            "title": "Create new Tilemap",
+            "nameLabel": "Map Name",
+            "sizeLabel": "Map Size",
+            "tileSizeLabel": "Tile Size",
+            "width": "Width",
+            "height": "Height",
+            "infinite": "Infinite"
+        }
+    }
+}

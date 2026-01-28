@@ -5,7 +5,7 @@ import { useTheme } from "@/view/components/providers/themeProvider";
 import { Button } from "@/view/components/shadcn/button";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-import { EditDropdownOptions, FileDropdownOptions, LayerDropdownOptions, MapDropdownOptions, ProjectDropdownOptions, ViewDropdownOptions, WorldDropdownOptions } from "./items";
+import { EditDropdownOptions, FileDropdownOptions, HelpDropdownOptions, LayerDropdownOptions, MapDropdownOptions, ProjectDropdownOptions, ViewDropdownOptions } from "./items";
 import { DebugDropdownOptions } from "./items/DebugDropDownOptions";
 import MenuBarItem from "./menuBarItem/menuBarItem";
 
@@ -23,12 +23,11 @@ export default function MenuBar() {
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />
 				<MenuBarItem item={ViewDropdownOptions} />
-				<MenuBarItem item={WorldDropdownOptions} />
 				<MenuBarItem item={MapDropdownOptions} />
 				<MenuBarItem item={LayerDropdownOptions} />
 				<MenuBarItem item={ProjectDropdownOptions} />
+				<MenuBarItem item={HelpDropdownOptions} />
 				<MenuBarItem item={DebugDropdownOptions} />
-				{/* <MenuBarItem item={HelpDropdownOptions} /> */}
 			</HStack>
 
 			<HStack className="ml-auto">

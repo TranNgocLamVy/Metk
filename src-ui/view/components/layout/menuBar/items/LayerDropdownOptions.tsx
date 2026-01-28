@@ -166,7 +166,7 @@ const LayerDropdownOptionGroup4: MenuDropDownGroupType = [
 ]
 
 export const LayerDropdownOptions: MenuItemType = {
-	name: "Layer",
+	name: "menuBar.layer",
 	className: "w-100",
 	groups: [LayerDropdownOptionGroup1, LayerDropdownOptionGroup2, LayerDropdownOptionGroup3, LayerDropdownOptionGroup4],
 };
