@@ -17,7 +17,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     public parentLayer: IGroupLayer;
 
-    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
+    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager) {
         super();
         this.id = id;
     }
@@ -25,25 +25,21 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     public rename(newName: string): void {
         this.name = newName;
         (this.eventEmitter as any).emit("updateProperty", "name", this.name);
-        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public toggleVisibility(force?: boolean): void {
         this.visible = force !== undefined ? force : !this.visible;
         (this.eventEmitter as any).emit("updateProperty", "visible", this.visible);
-        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public toggleLock(force?: boolean): void {
         this.locked = force !== undefined ? force : !this.locked;
         (this.eventEmitter as any).emit("updateProperty", "locked", this.locked);
-        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public updateOpacity(newOpacity: number): void {
         this.opacity = newOpacity;
         (this.eventEmitter as any).emit("updateProperty", "opacity", this.opacity);
-        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public removeFromParent() {

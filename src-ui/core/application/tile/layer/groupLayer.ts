@@ -18,8 +18,8 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public layers: BaseLayer[] = [];
     public isOpen: boolean = false;
 
-    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
-        super(groupLayerData.id, tilesetRefManager, tilemap);
+    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager) {
+        super(groupLayerData.id, tilesetRefManager);
 
         if (parentLayer) this.parentLayer = parentLayer;
 
@@ -30,7 +30,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         this.locked = groupLayerData.locked;
 
         groupLayerData.layers.forEach((layerData: any) => {
-            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager, this.tilemap);
+            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager);
             if (layer) this.layers.push(layer);
         });
     }
@@ -47,7 +47,6 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         newLayer.parentLayer = this;
         this.layers.unshift(newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -58,7 +57,6 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         newLayer.parentLayer = this;
         this.layers.splice(index, 0, newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, index);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -69,7 +67,6 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
 
         this.layers.splice(index, 1);
         this.eventEmitter.emit("layerRemoved", layerId, index);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -84,7 +81,6 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         const [child] = this.layers.splice(index, 1);
         this.layers.splice(newIndex, 0, child);
         this.eventEmitter.emit("layerReordered");
-        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public toggleOpen(force?: boolean): void {
@@ -111,6 +107,6 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override clone(): GroupLayer {
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
-        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.tilemap);
+        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager);
     }
 }

@@ -25,6 +25,8 @@ export class RenameLayerCommand implements IBaseCommand {
         this.oldName = targetLayer.name;
         targetLayer.rename(this.newName);
 
+        currentSession.markAsDirty();
+
         useLayerManagerStore.getState().refresh()
 
         return SuccessResult();
@@ -39,6 +41,8 @@ export class RenameLayerCommand implements IBaseCommand {
         if (!targetLayer) return ErrorResult("Target layer not found");
 
         targetLayer.rename(this.oldName);
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh()
 

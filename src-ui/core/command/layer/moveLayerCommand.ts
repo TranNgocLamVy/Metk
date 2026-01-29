@@ -37,6 +37,8 @@ export class MoveLayerCommand implements IBaseCommand {
         newParentLayer.insertLayer(targetLayer, this.newIndex);
         if (newParentLayer instanceof GroupLayer && !newParentLayer.isOpen) newParentLayer.toggleOpen(true);
 
+        currentSession.markAsDirty();
+
         useLayerManagerStore.getState().refresh();
 
         return SuccessResult();
@@ -58,6 +60,8 @@ export class MoveLayerCommand implements IBaseCommand {
 
         oldParentLayer.insertLayer(targetLayer, this.oldIndex);
         if (oldParentLayer instanceof GroupLayer && !oldParentLayer.isOpen) oldParentLayer.toggleOpen(true);
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh();
 

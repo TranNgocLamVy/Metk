@@ -25,6 +25,8 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
         this.oldIsVisible = targetLayer.visible;
         targetLayer.toggleVisibility(this.newIsVisible);
 
+        currentSession.markAsDirty();
+
         useLayerManagerStore.getState().refresh()
 
         return SuccessResult();
@@ -39,6 +41,8 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
         if (!targetLayer) return ErrorResult("Target layer not found");
 
         targetLayer.toggleVisibility(this.oldIsVisible);
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh()
         

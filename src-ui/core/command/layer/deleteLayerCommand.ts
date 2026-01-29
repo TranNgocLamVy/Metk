@@ -31,6 +31,8 @@ export class DeleteLayerCommand implements IBaseCommand {
         this.index = parent.getLayerIndex(targetLayer.id);
         this.layer.removeFromParent();
 
+        currentSession.markAsDirty();
+
         useLayerManagerStore.getState().refresh();
 
         return SuccessResult();
@@ -45,6 +47,8 @@ export class DeleteLayerCommand implements IBaseCommand {
         if (!targetLayer) return ErrorResult("Target layer not found");
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
         parent.insertLayer(this.layer, this.index);
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh();
 
