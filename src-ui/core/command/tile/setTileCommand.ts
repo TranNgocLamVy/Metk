@@ -25,10 +25,10 @@ export class SetTileCommand implements IBaseCommand {
     }
 
     public execute(context: EditorContext): Result {
-        const tilemapSession = context.getCurrentTilemapSession();
-        if (!tilemapSession) return ErrorResult("Tilemap not found");
+        const currentSession = context.getCurrentTilemapSession();
+        if (!currentSession) return ErrorResult("Tilemap not found");
 
-        const tilemap = tilemapSession.tilemap;
+        const tilemap = currentSession.tilemap;
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return ErrorResult("Layer not found");
@@ -43,20 +43,29 @@ export class SetTileCommand implements IBaseCommand {
             this.oldTileId = null;
         }
 
-        return layer.setTileAt(this.coordinate, this.tileId, this.tilesetId);
+        const result = layer.setTileAt(this.coordinate, this.tileId, this.tilesetId);
+
+        if (result.status == "Success") currentSession.markAsDirty();
+
+        return result
     }
 
     public undo(context: EditorContext): Result {
-        const tilemapSession = context.getCurrentTilemapSession();
-        if (!tilemapSession) return ErrorResult("Tilemap not found");
+        const currentSession = context.getCurrentTilemapSession();
+        if (!currentSession) return ErrorResult("Tilemap not found");
 
-        const tilemap = tilemapSession.tilemap;
+        const tilemap = currentSession.tilemap;
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return ErrorResult("Layer not found");
 
         if (this.oldTileId == null || this.oldTilesetIndex == null) return layer.removeTileAt(this.coordinate)
-        return layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
+
+        const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
+
+        if (result.status == "Success") currentSession.markAsDirty();
+
+        return result
     }
 
     public delete(): void {

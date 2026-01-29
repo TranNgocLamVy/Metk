@@ -18,7 +18,8 @@ export class StampBrush implements ITool {
     private overlayContainer: Container | null = null;
 
 
-    private currentPreviewCoordinate: Coordinate | null = null;
+    private previousPreviewCoordinate: Coordinate = null!;
+    private currentPreviewCoordinate: Coordinate = null!;
     private previewSprites: Sprite[] = [];
 
     private isDragging: boolean = false;
@@ -76,6 +77,7 @@ export class StampBrush implements ITool {
         if (e.button !== 0) return;
         if (!this.getActiveTileLayer()) return;
         this.isDragging = true;
+        this.previousPreviewCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
         this.stampMove(e);
     }
 
@@ -137,6 +139,40 @@ export class StampBrush implements ITool {
         return { col: gridX, row: gridY };
     }
 
+    private getDrawCoordinates(): Coordinate[] {
+        const coordinates: Coordinate[] = [];
+        if (!this.previousPreviewCoordinate || !this.currentPreviewCoordinate) return coordinates;
+
+        let x0 = this.previousPreviewCoordinate.col;
+        let y0 = this.previousPreviewCoordinate.row;
+        const x1 = this.currentPreviewCoordinate.col;
+        const y1 = this.currentPreviewCoordinate.row;
+
+        const dx = Math.abs(x1 - x0);
+        const dy = Math.abs(y1 - y0);
+        const sx = x0 < x1 ? 1 : -1;
+        const sy = y0 < y1 ? 1 : -1;
+        let err = dx - dy;
+
+        while (true) {
+            coordinates.push({ col: x0, row: y0 });
+
+            if (x0 === x1 && y0 === y1) break;
+
+            const e2 = 2 * err;
+            if (e2 > -dy) {
+                err -= dy;
+                x0 += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y0 += sy;
+            }
+        }
+
+        return coordinates;
+    }
+
     private getActiveTileLayer(): TileLayer | null {
         const selectedIds = this.currentSession!.layerState.selectedLayers;
         if (selectedIds.length == 0) return null;
@@ -161,45 +197,51 @@ export class StampBrush implements ITool {
     private stampMove(e: FederatedPointerEvent) {
         if (!this.isDragging) return;
 
-        const drawCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
+        const drawCoordinates = this.getDrawCoordinates();
 
-        const tiles = this.getSelectedTiles();
-        if (!tiles || !tiles.length) return;
+        if (drawCoordinates.length == 0) drawCoordinates.push(this.currentPreviewCoordinate);
 
-        for (let r = 0; r < tiles.length; r++) {
-            const row = tiles[r];
-            for (let c = 0; c < row.length; c++) {
-                const tile = row[c];
+        drawCoordinates.forEach(drawCoordinate => {
+            const tiles = this.getSelectedTiles();
+            if (!tiles || !tiles.length) return;
 
-                const targetX = drawCoordinate.col + c;
-                const targetY = drawCoordinate.row + r;
-                if (targetX < 0 || targetX >= this.currentSession!.tilemap.width ||
-                    targetY < 0 || targetY >= this.currentSession!.tilemap.height) {
-                    continue;
-                }
+            for (let r = 0; r < tiles.length; r++) {
+                const row = tiles[r];
+                for (let c = 0; c < row.length; c++) {
+                    const tile = row[c];
 
-                if (!tile) continue;
-                const tileTexture = tile.getTexture();
-
-                const key = `${targetX},${targetY}`;
-                let tileSpriteData: PreviewSpriteData;
-                if (this.previewSpriteMap.has(key)) {
-                    tileSpriteData = this.previewSpriteMap.get(key)!;
-                    tileSpriteData.sprite.texture = tileTexture;
-                    tileSpriteData.tileId = tile.id;
-                    tileSpriteData.tilesetId = tile.tileset.id;
-                } else {
-                    tileSpriteData = {
-                        sprite: new Sprite(tileTexture),
-                        tileId: tile.id,
-                        tilesetId: tile.tileset.id,
+                    const targetX = drawCoordinate.col + c;
+                    const targetY = drawCoordinate.row + r;
+                    if (targetX < 0 || targetX >= this.currentSession!.tilemap.width ||
+                        targetY < 0 || targetY >= this.currentSession!.tilemap.height) {
+                        continue;
                     }
-                    this.previewSpriteMap.set(key, tileSpriteData);
-                    this.overlayContainer!.addChild(tileSpriteData.sprite);
+
+                    if (!tile) continue;
+                    const tileTexture = tile.getTexture();
+
+                    const key = `${targetX},${targetY}`;
+                    let tileSpriteData: PreviewSpriteData;
+                    if (this.previewSpriteMap.has(key)) {
+                        tileSpriteData = this.previewSpriteMap.get(key)!;
+                        tileSpriteData.sprite.texture = tileTexture;
+                        tileSpriteData.tileId = tile.id;
+                        tileSpriteData.tilesetId = tile.tileset.id;
+                    } else {
+                        tileSpriteData = {
+                            sprite: new Sprite(tileTexture),
+                            tileId: tile.id,
+                            tilesetId: tile.tileset.id,
+                        }
+                        this.previewSpriteMap.set(key, tileSpriteData);
+                        this.overlayContainer!.addChild(tileSpriteData.sprite);
+                    }
+                    tileSpriteData.sprite.position.set(targetX * this.currentSession!.tilemap.tilewidth, targetY * this.currentSession!.tilemap.tileheight);
                 }
-                tileSpriteData.sprite.position.set(targetX * this.currentSession!.tilemap.tilewidth, targetY * this.currentSession!.tilemap.tileheight);
             }
-        }
+        })
+
+        this.previousPreviewCoordinate = this.currentPreviewCoordinate;
     }
 
     private stampEnd(e: FederatedPointerEvent) {
