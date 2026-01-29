@@ -26,12 +26,14 @@ export class CreateTileLayerCommand implements IBaseCommand {
         const targetLayer = root.findLayer(this.parentLayerId);
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
 
-        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager, currentSession.tilemap);
+        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager);
 
         parent.addLayer(newTileLayer);
         if (parent instanceof GroupLayer) parent.toggleOpen(true);
 
         this.tileLayerId = newTileLayer.id;
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh();
 
@@ -45,6 +47,8 @@ export class CreateTileLayerCommand implements IBaseCommand {
         const tileLayer = root.findLayer(this.tileLayerId) as TileLayer;
         tileLayer.removeFromParent();
         this.tileLayerData = tileLayer.serialize();
+
+        currentSession.markAsDirty();
         
         useLayerManagerStore.getState().refresh();
 

@@ -21,8 +21,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
 
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
-        super(tileLayerData.id, tilesetRefManager, tilemap);
+    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager) {
+        super(tileLayerData.id, tilesetRefManager);
 
         if (parentLayer) this.parentLayer = parentLayer;
 
@@ -90,7 +90,6 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             setTileResult = tileRef.setTile({ tileId, tilesetIndex });
         }
         this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
-        this.tilemap.eventEmitter.emit("onChange");
         return SuccessResult(setTileResult)
     }
 
@@ -102,7 +101,6 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
 
         this.tilesRef[coordinate.row][coordinate.col] = null;
         this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -129,7 +127,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override clone(): TileLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.tilemap);
+        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

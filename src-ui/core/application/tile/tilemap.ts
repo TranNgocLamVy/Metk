@@ -39,7 +39,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilewidth = tilemapData.tilewidth;
         this.tileheight = tilemapData.tileheight;
         
-        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this);
+        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager);
         
         this.tilesetRefManager.load(tilemapData.tileset);
     }

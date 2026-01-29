@@ -37,8 +37,7 @@ export class TilemapSession implements IBaseSession {
 
         this.sessionView = new TilemapSessionView(this);
 
-        this.bindOnTilemapChange = this.onTilemapChange.bind(this);
-        this.tilemap.eventEmitter.on("onChange", this.bindOnTilemapChange);
+        this.bindOnTilemapChange = this.markAsDirty.bind(this);
         this.tilemap.eventEmitter.on("updateProperty", this.bindOnTilemapChange);
     }
     //==========View State==========
@@ -60,8 +59,13 @@ export class TilemapSession implements IBaseSession {
         }
     }
 
-    public onTilemapChange(): void {
+    public markAsDirty(): void {
         this.isDirty = true;
+        useTilemapSessionStore.getState().refresh();
+    }
+
+    public markAsClean(): void {
+        this.isDirty = false;
         useTilemapSessionStore.getState().refresh();
     }
 

@@ -25,6 +25,8 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         this.oldIsLocked = targetLayer.locked;
         targetLayer.toggleLock(this.newIsLocked);
 
+        currentSession.markAsDirty();
+
         useLayerManagerStore.getState().refresh()
 
         return SuccessResult();
@@ -39,6 +41,8 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         if (!targetLayer) return ErrorResult("Target layer not found");
 
         targetLayer.toggleLock(this.oldIsLocked);
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh()
 

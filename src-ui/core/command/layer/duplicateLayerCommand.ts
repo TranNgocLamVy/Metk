@@ -27,6 +27,8 @@ export class DuplicateLayerCommand implements IBaseCommand {
         const cloneLayerName = `${targetLayer.name} (copy)`
         duplicateLayer.rename(cloneLayerName);
 
+        currentSession.markAsDirty();
+
         useLayerManagerStore.getState().refresh();
 
         return SuccessResult();
@@ -39,8 +41,9 @@ export class DuplicateLayerCommand implements IBaseCommand {
 
         const targetLayer = root.findLayer(this.newLayerId);
         if (!targetLayer) return ErrorResult("Target layer not found");
-
         targetLayer.removeFromParent();
+
+        currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh();
 

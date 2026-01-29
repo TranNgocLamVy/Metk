@@ -19,7 +19,7 @@ export class SaveTilemapCommand implements ISystemCommand {
         const tilemap = tilemapSession.tilemap;
         const saveResult = await currentProject.tilemapManager.saveTilemap(tilemap.id);
         if (saveResult.status == "Success") {
-            tilemapSession.isDirty = false
+            tilemapSession.markAsClean();
             useTilemapSessionStore.getState().refresh();
         }
         return saveResult;

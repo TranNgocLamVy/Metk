@@ -16,11 +16,11 @@ interface RootLayerEvents extends BaseLayerEvents {
 export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer {
     public layers: BaseLayer[] = [];
 
-    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, public readonly tilemap: Tilemap) {
-        super("root", tilesetRefManager, tilemap);
+    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager) {
+        super("root", tilesetRefManager);
 
         layersData.forEach((layerData) => {
-            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager, tilemap);
+            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager);
             if (layer) this.layers.push(layer);
         });
     }
@@ -41,7 +41,6 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         newLayer.parentLayer = this;
         this.layers.unshift(newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -52,7 +51,6 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         newLayer.parentLayer = this;
         this.layers.splice(index, 0, newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, index);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -63,7 +61,6 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
 
         this.layers.splice(index, 1);
         this.eventEmitter.emit("layerRemoved", layerId, index);
-        this.tilemap.eventEmitter.emit("onChange");
 
         return SuccessResult();
     }
@@ -78,7 +75,6 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         const [child] = this.layers.splice(index, 1);
         this.layers.splice(newIndex, 0, child);
         this.eventEmitter.emit("layerReordered");
-        this.tilemap.eventEmitter.emit("onChange");
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void) {
