@@ -81,7 +81,7 @@ export class HistoryManager {
         }
     }
 
-    private pushToUndoStack(cmd: IBaseCommand) {
+    public pushToUndoStack(cmd: IBaseCommand) {
         this.undoStack.push(cmd);
         this.redoStack = [];
         
