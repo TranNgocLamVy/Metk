@@ -1,6 +1,7 @@
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { ITool, IToolContructor } from "../interface/ITool";
+import { EraseBrush } from "../tool/eraseBrush";
 import { StampBrush } from "../tool/stampBrush";
 
 export class ToolManager {
@@ -9,6 +10,7 @@ export class ToolManager {
 
     constructor(private readonly editorContext: EditorContext) {
         this.registerTool("stamp", StampBrush);
+        this.registerTool("erase", EraseBrush);
 
         this.editorContext.eventEmitter.on("onOpenTilemapSession", () => {
             this.onSessionChanged(this.editorContext.getCurrentTilemapSession());

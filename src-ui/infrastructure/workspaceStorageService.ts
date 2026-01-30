@@ -31,6 +31,7 @@ export class JsonWorkspaceStorageService implements IWorkspacetorageService {
         const stringContent = JsonFormatter.format(content);
         if (!stringContent) return { status: "Error", message: "Error while formatting json" };
         if (exist) {
+            await writeTextFile(workspaceAbsPath, "");
             await writeTextFile(workspaceAbsPath, stringContent);
         } else {
             const file = await create(workspaceAbsPath);

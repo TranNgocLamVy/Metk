@@ -1,5 +1,5 @@
 import { Viewport } from "pixi-viewport";
-import { Application, Container } from "pixi.js";
+import { Application, Container, FederatedWheelEvent } from "pixi.js";
 
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { IBaseSessionView } from "@/core/interface/IBaseSession";
@@ -12,11 +12,11 @@ export class TilemapSessionView implements IBaseSessionView {
     public session: TilemapSession;
     public viewport: Viewport;
     private pixiApp: Application;
-    
+
     private renderer: TilemapRenderer;
     public overlayerContainer: Container;
     public grid: TilemapGridRenderer;
-    
+
     private isInit: boolean = false;
 
     constructor(session: TilemapSession) {
@@ -31,7 +31,7 @@ export class TilemapSessionView implements IBaseSessionView {
             screenHeight: pixiApp.screen.height,
             worldWidth: this.session.tilemap.width * this.session.tilemap.tilewidth,
             worldHeight: this.session.tilemap.height * this.session.tilemap.tileheight,
-            passiveWheel: true,
+            passiveWheel: false,
             stopPropagation: true,
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
@@ -42,6 +42,17 @@ export class TilemapSessionView implements IBaseSessionView {
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
             .clampZoom({ minScale: 0.05, maxScale: 50 });
+
+        const wheelPlugin = this.viewport.plugins.get('wheel');
+
+        // // 3. Save the original wheel function
+        // const originalWheel = wheelPlugin!.wheel;
+        // wheelPlugin!.wheel = function (e: FederatedWheelEvent) {
+        //     if (e.ctrlKey) {
+        //         return false;
+        //     }
+        //     return originalWheel.call(this, e);
+        // };
 
         setTimeout(() => this.updateViewport(), 0);
 
@@ -80,7 +91,7 @@ export class TilemapSessionView implements IBaseSessionView {
         this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
         this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap, gap: this.grid.gridGap });
         this.overlayerContainer = new Container();
-        
+
         // Add Renderer
         this.viewport.addChild(this.renderer.container);
         this.viewport.addChild(this.overlayerContainer);
@@ -92,12 +103,12 @@ export class TilemapSessionView implements IBaseSessionView {
             this.initSession(pixiApp);
             this.isInit = true;
         }
-        
+
         this.viewport.eventMode = 'static';
         this.viewport.plugins.resume('drag');
         this.viewport.plugins.resume('wheel');
         this.viewport.plugins.resume('decelerate');
-        
+
         this.pixiApp.stage.addChild(this.viewport);
         this.updateViewport();
     }
@@ -114,9 +125,9 @@ export class TilemapSessionView implements IBaseSessionView {
     public destroy() {
         if (!this.isInit) return;
         this.unActivateSession();
-        
+
         if (this.renderer) this.renderer.destroy();
-        
+
         this.viewport.destroy({ children: true });
     }
 
