@@ -1,11 +1,11 @@
 import { ToastService } from "@/shared/services/toastService";
 
 import { EditorContext } from "../application/editorContext";
-import { CommandData } from "../decorator/command";
+import { CommandContext } from "../decorator/command";
 import { ISystemCommandConstructor } from "../interface/IBaseCommand";
 
 export class SystemCommandManager {
-    public static COMMAND_REGISTRY: Array<CommandData> = [];
+    public static COMMAND_REGISTRY: Array<CommandContext> = [];
 
     private commands: Map<string, ISystemCommandConstructor> = new Map(); 
 
@@ -16,7 +16,7 @@ export class SystemCommandManager {
     }
 
     private initializeDecoratedCommands() {
-        SystemCommandManager.COMMAND_REGISTRY.forEach((commandData: CommandData) => {
+        SystemCommandManager.COMMAND_REGISTRY.forEach((commandData: CommandContext) => {
             this.registerCommand(commandData.id, commandData.constructor);
         });
     }

@@ -4,12 +4,11 @@ import { useMemo, useRef } from "react";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
 import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
-import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 import TilesetViewDropDownMenu from "../../contextMenu/tilesetViewContextMenu";
 import { HStack } from "../../custom/stack/stack";
 import { Button } from "../../shadcn/button";
-import { Tooltip } from "../../shadcn/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 
 export default function TilesetViewTabs() {
 	const ref = useRef<HTMLDivElement>(null);

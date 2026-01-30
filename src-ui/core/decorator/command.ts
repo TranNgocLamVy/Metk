@@ -1,6 +1,6 @@
 import { SystemCommandManager } from "../manager/systemCommandManager";
 
-export type CommandData = {
+export type CommandContext = {
     id: string;
     name: string;
     description?: string;
@@ -8,7 +8,7 @@ export type CommandData = {
     constructor: any;
 }
 
-export type CommandMetadata = Omit<CommandData, "constructor">
+export type CommandMetadata = Omit<CommandContext, "constructor">
 
 export function SystemCommand(metadata: CommandMetadata) {
     return function (constructor: any) {

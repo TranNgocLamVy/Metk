@@ -1,10 +1,13 @@
+import { Stamp } from "lucide-react";
 import { Container, FederatedPointerEvent, Point, Sprite } from "pixi.js";
+import React from "react";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { TileLayer } from "../application/tile/layer/tileLayer";
 import { Tile } from "../application/tile/tileset";
 import { SetTileCommand } from "../command/tile/setTileCommand";
+import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
 
 type PreviewSpriteData = {
@@ -13,6 +16,16 @@ type PreviewSpriteData = {
     tilesetId: string;
 }
 
+@Tool({
+    id: "stamp",
+    name: "Stamp Brush",
+    displayOnToolbar: {
+        icon: React.createElement(Stamp),
+        tooltip: "Stamp Brush",
+        index: 0,
+    },
+    shortcuts: ["B"],
+})
 export class StampBrush implements ITool {
     private currentSession: TilemapSession | null = null;
     private overlayContainer: Container | null = null;
@@ -28,11 +41,13 @@ export class StampBrush implements ITool {
     private bindPointerOnDown: (event: FederatedPointerEvent) => void;
     private bindPointerOnMove: (event: FederatedPointerEvent) => void;
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
+    private bindPointerOutside: (event: FederatedPointerEvent) => void;
 
     constructor(private readonly editorContext: EditorContext) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
+        this.bindPointerOutside = this.onPointerOutside.bind(this);
     }
 
     public onEnable(): void {
@@ -55,6 +70,7 @@ export class StampBrush implements ITool {
         viewport.on("pointermove", this.bindPointerOnMove);
         viewport.on("pointerup", this.bindPointerOnUp);
         viewport.on("pointerupoutside", this.bindPointerOnUp);
+        viewport.addEventListener("mouseleave", this.bindPointerOutside);
     }
 
     public detach(): void {
@@ -65,6 +81,7 @@ export class StampBrush implements ITool {
         viewport.off("pointermove", this.bindPointerOnMove);
         viewport.off("pointerup", this.bindPointerOnUp);
         viewport.off("pointerupoutside", this.bindPointerOnUp);
+        viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
         this.currentSession = null;
 
@@ -99,6 +116,12 @@ export class StampBrush implements ITool {
         if (!this.isDragging) return;
         this.isDragging = false;
         this.stampEnd(e);
+    }
+
+    private onPointerOutside(e: FederatedPointerEvent) {
+        if (this.overlayContainer) {
+            this.previewSprites.forEach(sprite => this.overlayContainer!.removeChild(sprite));
+        }
     }
 
     private drawPreviewTiles() {

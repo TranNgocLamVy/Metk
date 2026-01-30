@@ -7,11 +7,10 @@ import { ToastService } from "@/shared/services/toastService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
-import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 import { HStack } from "../../custom/stack/stack";
 import { Button } from "../../shadcn/button";
-import { Tooltip } from "../../shadcn/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 
 export default function TilemapEditorTabs() {
 	const ref = useRef<HTMLDivElement>(null);
@@ -46,7 +45,7 @@ export default function TilemapEditorTabs() {
                                 description: "If you don't save, your changes will be lost.",
                             })
                             if (saveResult === "save") {
-                                const commandManager = AppCore.getIns().commandManager
+                                const commandManager = AppCore.getIns().systemCommandManager
                                 await commandManager.execute("project.save");
                                 WorkspaceService.closeTilemapSession(session.sessionId);
                                 ToastService.success({ message: "Tilemap saved successfully" });
@@ -60,7 +59,7 @@ export default function TilemapEditorTabs() {
 					return (
 						<Button key={session.sessionId} onClick={openTilemapSession} size={"sm"} className={`group pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
 							{session.name}
-							<Tooltip delayDuration={500}>
+							<Tooltip delayDuration={500} disableHoverableContent>
 								<TooltipTrigger asChild>
 									<div className="group/icon ml-1 flex h-6 w-6 items-center justify-center rounded-md hover:bg-muted-foreground/20" onClick={closeTilemapSession}>
 										{isDirty ? (
