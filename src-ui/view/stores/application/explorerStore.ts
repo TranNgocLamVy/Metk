@@ -1,4 +1,3 @@
-// src-ui/view/stores/application/explorerStore.ts
 import { create } from "zustand";
 
 type DisplayData = {
@@ -8,11 +7,11 @@ type DisplayData = {
 
 type ExplorerStore = {
     tilesets: DisplayData[];
-    tilemaps: DisplayData[]; // [ADD]
+    tilemaps: DisplayData[];
     setTilesets: (tilesets: DisplayData[]) => void;
-    setTilemaps: (tilemaps: DisplayData[]) => void; // [ADD]
+    setTilemaps: (tilemaps: DisplayData[]) => void;
     addTileset: (tileset: DisplayData) => void;
-    addTilemap: (tilemap: DisplayData) => void; // [ADD]
+    addTilemap: (tilemap: DisplayData) => void;
 }
 
 export const useExplorerStore = create<ExplorerStore>((set, get) => ({

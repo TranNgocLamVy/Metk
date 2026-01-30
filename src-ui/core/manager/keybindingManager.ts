@@ -1,24 +1,36 @@
 import { KeyUtils } from "@/shared/utils/keyUtils";
 
-import { CommandData } from "../decorator/command";
+import { CommandContext } from "../decorator/command";
+import { ToolContext } from "../decorator/tool";
 import { Keybinding, UserKeybindingOverride } from "../interface/IKeybinding";
 import { SystemCommandManager } from "./systemCommandManager";
+import { ToolManager } from "./toolManager";
 
 export class KeybindingManager {
     private defaultKeyBinding: Keybinding[] = [];
-    private userOverrides: Map<string, string> = new Map();
-    private lookupTable: Map<string, string> = new Map();
+    private userOverrides: Map<string, Keybinding> = new Map();
+    private lookupTable: Map<string, Keybinding> = new Map();
 
     private bindOnKeyDown: (e: KeyboardEvent) => void
 
-    constructor(private commandManager: SystemCommandManager) {
+    constructor(
+        private commandManager: SystemCommandManager,
+        private toolManager: ToolManager
+    ) {
         this.bindOnKeyDown = this.handleKeyDown.bind(this);
 
         const defaultKeyBinding: Keybinding[] = [];
-        SystemCommandManager.COMMAND_REGISTRY.forEach((commandData: CommandData) => {
+        SystemCommandManager.COMMAND_REGISTRY.forEach((commandData: CommandContext) => {
             if (commandData.shortcuts == undefined) return;
             commandData.shortcuts.forEach((s) => {
-                defaultKeyBinding.push({ key: s, commandId: commandData.id });
+                defaultKeyBinding.push({ key: s, id: commandData.id, type: "command" });
+            })
+        })
+
+        ToolManager.TOOL_REGISTRY.forEach((toolContext: ToolContext) => {
+            if (toolContext.shortcuts == undefined) return;
+            toolContext.shortcuts.forEach((s) => {
+                defaultKeyBinding.push({ key: s, id: toolContext.id, type: "tool" });
             })
         })
 
@@ -34,7 +46,7 @@ export class KeybindingManager {
     public applyUserOverrides(overrides: UserKeybindingOverride[]) {
         this.userOverrides.clear();
         overrides.forEach(o => {
-            this.userOverrides.set(o.key, o.commandId);
+            this.userOverrides.set(o.key, o);
         });
         this.rebuildLookupTable();
     }
@@ -42,10 +54,10 @@ export class KeybindingManager {
     private rebuildLookupTable() {
         this.lookupTable.clear();
         this.defaultKeyBinding.forEach((binding) => {
-            this.lookupTable.set(binding.key, binding.commandId);
+            this.lookupTable.set(binding.key, binding);
         });
-        this.userOverrides.forEach((newKey, commandId) => {
-            this.lookupTable.set(newKey, commandId); 
+        this.userOverrides.forEach((binding) => {
+            this.lookupTable.set(binding.key, binding);
         });
     }
 
@@ -53,12 +65,14 @@ export class KeybindingManager {
         const keystroke = KeyUtils.getKeystrokeString(e);
         
         if (this.lookupTable.has(keystroke)) {
-            const commandId = this.lookupTable.get(keystroke);
-            
-            if (commandId) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.commandManager.execute(commandId);
+            const binding = this.lookupTable.get(keystroke);
+            if (!binding) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (binding.type == "command") {
+                this.commandManager.execute(binding.id);
+            } else if (binding.type == "tool") {
+                this.toolManager.startTool(binding.id);
             }
         }
     }
@@ -66,7 +80,7 @@ export class KeybindingManager {
     public getShortcuts(commandId: string): string[] | undefined {
         const shortcuts: string[] = []
         this.lookupTable.forEach((value, key) => {
-            if (value === commandId) shortcuts.push(key)
+            if (value.id === commandId) shortcuts.push(key)
         })
         return shortcuts
     }

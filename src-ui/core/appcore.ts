@@ -1,4 +1,5 @@
 import "./command/system/index";
+import "./tool/index";
 
 import { JsonProjectRepository } from "@/infrastructure/projectRepository";
 import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
@@ -15,12 +16,12 @@ export class AppCore {
     private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
     public readonly workspaceManager: WorkspaceManager;
-    public commandManager: SystemCommandManager;
+    public systemCommandManager: SystemCommandManager;
+    public readonly toolManager: ToolManager;
     private keybindingManager: KeybindingManager;
 
     public readonly editorContext: EditorContext;
 
-    public readonly toolManager: ToolManager;
 
     private constructor() {
         const projectRepo = new JsonProjectRepository();
@@ -31,9 +32,9 @@ export class AppCore {
         this.workspaceManager = new WorkspaceManager();
         this.editorContext = new EditorContext(this.projectManager, this.workspaceManager);
 
-        this.commandManager = new SystemCommandManager(this.editorContext);
-        this.keybindingManager = new KeybindingManager(this.commandManager);
+        this.systemCommandManager = new SystemCommandManager(this.editorContext);
         this.toolManager = new ToolManager(this.editorContext);
+        this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
         
         // Set Context
         this.workspaceManager.setEditorContext(this.editorContext);

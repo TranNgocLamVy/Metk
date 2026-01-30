@@ -1,15 +1,26 @@
+import { Eraser } from "lucide-react";
 import { Container, FederatedPointerEvent, FederatedWheelEvent, Graphics, Point } from "pixi.js";
+import React from "react";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { TileLayer } from "../application/tile/layer/tileLayer";
-import { Tile } from "../application/tile/tileset";
 import { BatchCommand } from "../command/batchCommand";
 import { EraseTileCommand } from "../command/tile/eraseTileCommand";
-import { SetTileCommand } from "../command/tile/setTileCommand";
+import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
 
-export class EraseBrush implements ITool {
+@Tool({
+    id: "eraser",
+    name: "Eraser",
+    displayOnToolbar: {
+        icon: React.createElement(Eraser),
+        tooltip: "Eraser",
+        index: 1,
+    },
+    shortcuts: ["E"],
+})
+export class EraserBrush implements ITool {
     private currentSession: TilemapSession | null = null;
     private overlayContainer: Container | null = null;
 
@@ -18,11 +29,12 @@ export class EraseBrush implements ITool {
 
     private isDragging: boolean = false;
     private previewGraphics: Graphics | null = null;
-    private eraserSize: number = 1;
+    private static eraserSize: number = 1;
 
     private bindPointerOnDown: (event: FederatedPointerEvent) => void;
     private bindPointerOnMove: (event: FederatedPointerEvent) => void;
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
+    private bindPointerOutside: (event: FederatedPointerEvent) => void;
 
     private originalWheelEvent: (e: FederatedWheelEvent) => boolean;
 
@@ -32,6 +44,7 @@ export class EraseBrush implements ITool {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
+        this.bindPointerOutside = this.onPointerOutside.bind(this);
     }
 
     public onEnable(): void {
@@ -59,6 +72,7 @@ export class EraseBrush implements ITool {
         viewport.on("pointermove", this.bindPointerOnMove);
         viewport.on("pointerup", this.bindPointerOnUp);
         viewport.on("pointerupoutside", this.bindPointerOnUp);
+        viewport.addEventListener("mouseleave", this.bindPointerOutside);
 
         const wheelPlugin = viewport.plugins.get('wheel');
         const originalWheelEvent = wheelPlugin!.wheel;
@@ -78,6 +92,7 @@ export class EraseBrush implements ITool {
         viewport.off("pointermove", this.bindPointerOnMove);
         viewport.off("pointerup", this.bindPointerOnUp);
         viewport.off("pointerupoutside", this.bindPointerOnUp);
+        viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
         const wheelPlugin = viewport.plugins.get('wheel')!;
         wheelPlugin.wheel = this.originalWheelEvent;
@@ -115,9 +130,15 @@ export class EraseBrush implements ITool {
         this.eraseEnd(e);
     }
 
+    private onPointerOutside(e: FederatedPointerEvent) {
+        if (this.overlayContainer) {
+            this.previewGraphics?.clear();
+        }
+    }
+
     private onWheel(e: FederatedWheelEvent): boolean {
         const deltaY = e.deltaY > 0 ? 1 : -1;
-        this.eraserSize = Math.max(1, this.eraserSize - deltaY);
+        EraserBrush.eraserSize = Math.max(1, EraserBrush.eraserSize - deltaY);
         this.drawPreviewErase();
         return false;
     }
@@ -134,8 +155,8 @@ export class EraseBrush implements ITool {
         }
 
         const endPoint = {
-            x: (this.currentPreviewCoordinate.col + this.eraserSize) * this.currentSession.tilemap.tilewidth,
-            y: (this.currentPreviewCoordinate.row + this.eraserSize) * this.currentSession.tilemap.tileheight
+            x: (this.currentPreviewCoordinate.col + EraserBrush.eraserSize) * this.currentSession.tilemap.tilewidth,
+            y: (this.currentPreviewCoordinate.row + EraserBrush.eraserSize) * this.currentSession.tilemap.tileheight
         }
 
         this.previewGraphics.moveTo(startPoint.x, startPoint.y)
@@ -214,8 +235,8 @@ export class EraseBrush implements ITool {
         
         drawCoordinates.forEach(drawCoordinate => {
 
-            for (let r = 0; r < this.eraserSize; r++) {
-                for (let c = 0; c < this.eraserSize; c++) {
+            for (let r = 0; r < EraserBrush.eraserSize; r++) {
+                for (let c = 0; c < EraserBrush.eraserSize; c++) {
                     const targetX = drawCoordinate.col + c;
                     const targetY = drawCoordinate.row + r;
                     if (targetX < 0 || targetX >= this.currentSession!.tilemap.width ||

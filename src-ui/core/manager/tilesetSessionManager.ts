@@ -68,6 +68,7 @@ export class TilesetSessionManager {
         if (this.currentTilesetSession) {
             this.currentTilesetSession.sessionView.unActivateSession();
         }
+        pixiApp.stage.removeChildren();
 
         this.currentTilesetSession = tilesetSession;
 

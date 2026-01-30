@@ -1,11 +1,13 @@
 
 export interface Keybinding {
-    commandId: string;
+    id: string;
     key: string;
+    type: "command" | "tool";
     when?: string;
 }
 
 export interface UserKeybindingOverride {
-    commandId: string;
+    id: string;
     key: string;
+    type: "command" | "tool";
 }
