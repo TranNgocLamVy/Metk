@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 import { ToolManager } from "../manager/toolManager";
 
 export type ToolContext = {
@@ -9,7 +7,7 @@ export type ToolContext = {
     shortcuts?: string[];
     constructor: any;
     displayOnToolbar?: {
-        icon: string | ReactNode;
+        icon: string;
         tooltip?: string;
         index?: number;
     }

@@ -1,6 +1,6 @@
-import { Eraser } from "lucide-react";
 import { Container, FederatedPointerEvent, FederatedWheelEvent, Graphics, Point } from "pixi.js";
-import React from "react";
+
+import eraser from "@/assets/icons/eraser.svg?raw";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
@@ -14,7 +14,7 @@ import { ITool } from "../interface/ITool";
     id: "eraser",
     name: "Eraser",
     displayOnToolbar: {
-        icon: React.createElement(Eraser),
+        icon: eraser,
         tooltip: "Eraser",
         index: 1,
     },

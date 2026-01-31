@@ -1,6 +1,6 @@
-import { Stamp } from "lucide-react";
 import { Container, FederatedPointerEvent, Point, Sprite } from "pixi.js";
-import React from "react";
+
+import stamp from "@/assets/icons/stamp.svg?raw";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
@@ -20,7 +20,7 @@ type PreviewSpriteData = {
     id: "stamp",
     name: "Stamp Brush",
     displayOnToolbar: {
-        icon: React.createElement(Stamp),
+        icon: stamp,
         tooltip: "Stamp Brush",
         index: 0,
     },
