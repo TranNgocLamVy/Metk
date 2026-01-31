@@ -1,32 +1,51 @@
-import { ReactNode } from "react";
 import { create } from "zustand";
 
-import { AppCore } from "@/core/appcore";
+import { ToolManager } from "@/core/manager/toolManager";
 
 export type ToolbarItemDisplayData = {
     id: string;
-    icon: string | ReactNode;
+    icon: string;
     tooltip?: string;
     index: number;
     shortcuts?: string[]
 }
 
 type ToolbarStore = {
-    tools: ToolbarItemDisplayData[],
-    activeTool: string | null,
+    toolManager: ToolManager;
     version: number;
 
-    setTools: (tools: ToolbarItemDisplayData[]) => void
-    setActiveTool: (tool: string) => void
+    setToolManager: (toolManager: ToolManager) => void;
+    getTools: () => ToolbarItemDisplayData[];
+    getActiceTool: () => string | null
     refresh: () => void
 }
 
 export const useToolbarStore = create<ToolbarStore>((set, get) => ({
-    tools: [],
-    activeTool: null,
+    toolManager: null!,
     version: 0,
 
-    setTools: (tools: ToolbarItemDisplayData[]) => set({ tools: tools }),
-    setActiveTool: (tool: string) => set({ activeTool: tool }),
-    refresh: () => set((state) => ({ version: state.version + 1, tools: AppCore.getIns().toolManager.getToolsData(), activeTool: AppCore.getIns().toolManager.getCurrentToolId() })) 
+    setToolManager: (toolManager: ToolManager) => set({ toolManager: toolManager }),
+    getTools: () => {
+        const toolManager = get().toolManager;
+        if (!toolManager) return [];
+        const toolData: ToolbarItemDisplayData[] = [];
+        toolManager.getToolContexts().forEach((toolContext) => {
+            if (toolContext.displayOnToolbar) {
+                toolData.push({
+                    id: toolContext.id,
+                    icon: toolContext.displayOnToolbar.icon,
+                    tooltip: toolContext.displayOnToolbar.tooltip,
+                    shortcuts: toolContext.shortcuts,
+                    index: toolContext.displayOnToolbar.index ?? 1000
+                });
+            }
+        })
+        return toolData.sort((a, b) => a.index - b.index);
+    },
+    getActiceTool: () => {
+        const toolManager = get().toolManager;
+        if (!toolManager) return null;
+        return toolManager.getCurrentToolId();
+    },
+    refresh: () => set((state) => ({ version: (state.version + 1) % 100000 })) 
 }))

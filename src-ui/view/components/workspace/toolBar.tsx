@@ -1,20 +1,30 @@
+import { useEffect, useMemo } from "react";
 import { Fragment } from "react/jsx-runtime";
 
 import { AppCore } from "@/core/appcore";
 import { useToolbarStore } from "@/view/stores/application/toolbarStore";
 
+import SVGIcon from "../custom/icons/svgIcon";
 import { VStack } from "../custom/stack/stack";
 import { Separator } from "../shadcn/separator";
 import { Toggle } from "../shadcn/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../shadcn/tooltip";
 
 export default function ToolBar() {
-	const { tools, setActiveTool, activeTool } = useToolbarStore();
+	const { version, setToolManager, getTools, getActiceTool, refresh } = useToolbarStore();
+
+    useEffect(() => {
+        setToolManager(AppCore.getIns().toolManager);
+        refresh();
+    }, [])
+
+    const tools = useMemo(() => getTools(), [version]);
+
+    const activeTool = useMemo(() => getActiceTool(), [version]);
 
 	const changeTool = (toolId: string) => {
 		const toolManager = AppCore.getIns().toolManager;
 		toolManager.startTool(toolId);
-		setActiveTool(toolId);
 	};
 
 	return (
@@ -26,7 +36,7 @@ export default function ToolBar() {
 						<Tooltip delayDuration={250} disableHoverableContent>
 							<TooltipTrigger asChild>
 								<Toggle pressed={tool.id === activeTool} onPressedChange={() => changeTool(tool.id)} variant={"outline"} className="hover:bg-secondary-background">
-									{tool.icon}
+									<SVGIcon svgString={tool.icon} />
 								</Toggle>
 							</TooltipTrigger>
 							{tool.tooltip && (

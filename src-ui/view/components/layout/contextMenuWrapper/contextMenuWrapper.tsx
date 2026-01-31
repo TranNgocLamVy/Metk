@@ -1,7 +1,6 @@
 import { twMerge } from "tailwind-merge";
 
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/view/components/shadcn/context-menu";
-import { usePreventContextMenu } from "@/view/hooks/usePreventContextMenu";
 
 import ContextMenuItemGroup from "./contextMenu/contextMenuItemGroup";
 
@@ -11,8 +10,6 @@ interface ContextMenuWrapperProps {
 }
 
 export default function ContextMenuWrapper({ item, children }: ContextMenuWrapperProps) {
-	usePreventContextMenu();
-
     const className = twMerge("w-40 bg-secondary-background", item.className);
 	return (
 		<ContextMenu modal={true}>
