@@ -5,6 +5,7 @@
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable", "ES2021"],
+    "types": ["node"],
     "module": "ESNext",
     "skipLibCheck": true,
 

@@ -15,7 +15,7 @@ export default function TilesetViewCanvas() {
 			if (!pixiApp) return;
 			const w = entry.contentRect.width;
 			const h = entry.contentRect.height;
-			pixiApp.renderer.resize(w - 4, h);
+			pixiApp.renderer?.resize(w - 4, h);
 		},
 		[pixiApp]
 	);

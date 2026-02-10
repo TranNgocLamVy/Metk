@@ -1,7 +1,9 @@
 import EventEmitter from "eventemitter3";
 
+import { AppCore } from "../appcore";
 import { HistoryManager } from "../manager/historyManager";
 import { ProjectManager } from "../manager/projectManager";
+import { ToolManager } from "../manager/toolManager";
 import { WorkspaceManager } from "../manager/workspaceManager";
 import { Project } from "./project";
 import { TilemapSession } from "./session/tilemapSession";
@@ -18,7 +20,8 @@ export class EditorContext {
     
     constructor(
         private readonly projectManager: ProjectManager,
-        private readonly workspaceManager: WorkspaceManager
+        private readonly workspaceManager: WorkspaceManager,
+        private readonly toolManager: ToolManager
     ) { }
 
     public getCurrentProject(): Project {
@@ -31,6 +34,10 @@ export class EditorContext {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) throw new Error("Current workspace not found");
         return currentWorkspace;
+    }
+
+    public getToolManager(): ToolManager {
+        return this.toolManager;
     }
 
     public getCurrentTilemapSession(): TilemapSession | null {

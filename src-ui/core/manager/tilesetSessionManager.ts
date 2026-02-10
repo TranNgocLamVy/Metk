@@ -40,6 +40,10 @@ export class TilesetSessionManager {
         });
     }
 
+    public async unloadAll(): Promise<void> {
+        
+    }
+
     public createTilesetSession(tileset: Tileset, pixiApp: Application): TilesetSession | null {
         const sessionId = this.tilesetMap.get(tileset.id);
         if (sessionId) return this.openTilesetSession(sessionId, pixiApp);

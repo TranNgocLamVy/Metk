@@ -30,20 +30,22 @@ export class AppCore {
         // Init Managers
         this.projectManager = new ProjectManager(projectRepo, projectStorageService);
         this.workspaceManager = new WorkspaceManager();
-        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager);
+        this.toolManager = new ToolManager();
+        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager, this.toolManager);
 
         this.systemCommandManager = new SystemCommandManager(this.editorContext);
-        this.toolManager = new ToolManager(this.editorContext);
         this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
         
         // Set Context
+        this.toolManager.setEditorContext(this.editorContext);
         this.workspaceManager.setEditorContext(this.editorContext);
     }
 
-    public async load(): Promise<void> {
-        if (this.isLoaded) return;
+    public async load(): Promise<AppCore> {
+        if (this.isLoaded) return this;
         await AppCore.getIns().projectManager.load();
         this.isLoaded = true;
+        return this;
     }
 
     public static initialize() {

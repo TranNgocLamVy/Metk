@@ -12,6 +12,7 @@ import MenuBar from "@/view/components/layout/menuBar/menuBar";
 import { ThemeProvider } from "@/view/components/providers/themeProvider";
 import { Toaster } from "@/view/components/shadcn/sonner";
 
+import { AppCore } from "./core/appcore";
 import i18n from "./core/service/i18n";
 import { DialogContainer } from "./view/components/custom/dialogContainer/dialogContainer";
 import { LanguageLoadingOverlay } from "./view/components/layout/languageLoadingOverlay";
@@ -38,3 +39,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	</ThemeProvider>
     </I18nextProvider>,
 );
+
+AppCore.initialize();

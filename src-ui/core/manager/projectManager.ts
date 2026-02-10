@@ -13,6 +13,7 @@ import { PROJECT_FILE_NAME } from "../constance/project";
 export class ProjectManager {
     public currentProject: Project | null = null;
     public projectMetaDataMap: Map<string, ProjectMetaData> = new Map<string, ProjectMetaData>(); // id -> metaData
+    
     public get projectMetaData(): ProjectMetaData[] {
         return Array.from(this.projectMetaDataMap.values()).map((metaData) => {
             const project = this.projectMap.get(metaData.id);
@@ -32,14 +33,7 @@ export class ProjectManager {
         const projectsMetaData = await this.projectRepo.loadAll();
         await Promise.all(projectsMetaData.map(async (metaData) => {
             this.projectMetaDataMap.set(metaData.id, metaData);
-            const projectAbsPath = PathUtils.join(metaData.directory, PROJECT_FILE_NAME);
-            const exist = await exists(projectAbsPath);
-            if (exist) {
-                metaData.found = true;
-                this.projectMap.set(metaData.id, null)
-            } else {
-                metaData.found = false; 
-            }
+            this.projectMap.set(metaData.id, null);
         }));
     }
 
@@ -104,6 +98,14 @@ export class ProjectManager {
     }
 
     public async loadProject(id: string): Promise<Result<Project>> {
+        if (this.currentProject) {
+            if (this.currentProject.metaData.id === id) return { status: ResultStatus.Success, data: this.currentProject };
+            
+            const saveResult = await this.saveCurrrentProject();
+            if (saveResult.status == "Error") return { status: ResultStatus.Error, message: saveResult.message };
+            await this.currentProject.unload();
+        }
+
         const metaData = this.projectMetaDataMap.get(id);
         if (!metaData) return { status: ResultStatus.Error, message: "Project meta data not found" };
         let project = this.projectMap.get(id);

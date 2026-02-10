@@ -1,3 +1,4 @@
+import { AppCore } from "@/core/appcore";
 import { i18nService } from "@/core/service/i18n";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
@@ -14,6 +15,13 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 		name: "Clear Local Storage",
 		onClick() {
 			localStorage.clear();
+		}
+	},
+	{
+		type: "option",
+		name: "Print Projects",
+		onClick() {
+			console.log(AppCore.getIns().projectManager.projectMetaData);
 		}
 	},
     {

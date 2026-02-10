@@ -1,4 +1,5 @@
 import { FolderPlus, SquareArrowOutUpRight } from "lucide-react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -11,9 +12,18 @@ import { useProjectManagerStore } from "@/view/stores/application/projectManager
 
 export default function HomePage() {
     const navigate = useNavigate();
-	const projects = useProjectManagerStore((s) => s.projects).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    const { getProjects, version } = useProjectManagerStore()
+
+    const projects = useMemo(() => {
+        return getProjects();
+    }, [version])
 
     const { t: translate } = useTranslation(['common', 'home']);
+
+    const openProject = (id: string) => {
+        navigate(`/project/${id}`);
+        window.location.reload();
+    }
 
 	return (
 		<VStack align="start" justify="start" className="w-full h-full p-16 gap-8">
@@ -39,7 +49,7 @@ export default function HomePage() {
 						<HStack align="center" justify="start" key={project.id} className="gap-4">
 							<Tooltip>
 								<TooltipTrigger asChild>
-                                    <Button onClick={() => navigate("/project/" + project.id)}>
+                                    <Button onClick={() => openProject(project.id)}>
                                         <SquareArrowOutUpRight size={20} />
 										{project.name}
                                     </Button>
@@ -51,7 +61,7 @@ export default function HomePage() {
                                     <p>{`${translate('home.updatedAt')}: ${new Date(project.updatedAt).toLocaleString()}`}</p>
                                 </TooltipContent>
 							</Tooltip>
-							<h3 className={`text-xs cursor-default ${!project.found ? "line-through" : ""}`}>{project.directory}</h3>
+							<h3 className="text-xs cursor-default">{project.directory}</h3>
 						</HStack>
 					);
 				})}

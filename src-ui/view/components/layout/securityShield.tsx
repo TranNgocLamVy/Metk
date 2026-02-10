@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { KeyUtils } from "@/shared/utils/keyUtils";
 
@@ -41,15 +41,33 @@ export default function SecurityShield() {
 		};
 	}, []);
 
-	useEffect(() => {
-		const handleBeforeUnload = (e: any) => {
-			e.preventDefault();
-			e.returnValue = "";
-		};
+	const isF5Pressed = useRef(false);
 
-		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-	}, []);
+useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "F5") {
+            isF5Pressed.current = true;
+        }
+    };
+
+    const handleBeforeUnload = (e: any) => {
+        if (isF5Pressed.current) {
+            e.preventDefault();
+            e.returnValue = "";
+            setTimeout(() => {
+                isF5Pressed.current = false;
+            }, 100);
+        }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+}, []);
 
 	return null;
 }

@@ -1,28 +1,23 @@
 import { create } from "zustand";
 
-import { Project } from "@/core/application/project";
+import { AppCore } from "@/core/appcore";
 import { ProjectMetaData } from "@/shared/schema/projectSchema";
 
 type ProjectManagerState = {
+    version: number;
     projects: ProjectMetaData[];
-    currentProject: Project | null;
-    setProjects: (projects: ProjectMetaData[]) => void;
-    addProject: (project: ProjectMetaData) => void;
-    setCurrentProject: (project: Project) => void;
+    getProjects(): ProjectMetaData[];
+    refresh: () => void
 }
 
 export const useProjectManagerStore = create<ProjectManagerState>((set, get) => {
     return {
+        version: 0,
         projects: [],
         currentProject: null,
-        setProjects: (projects: ProjectMetaData[]) => set({ projects }),
-        addProject: (project: ProjectMetaData) => {
-            set((state) => {
-                return { projects: [...state.projects, project] };
-            })
+        getProjects: () => {
+            return AppCore.getIns().projectManager.projectMetaData;
         },
-        setCurrentProject: (project: Project) => {
-            set({ currentProject: project });
-        }
+        refresh: () => { set({ version: (get().version + 1) % 100000 }) }
     }
 })

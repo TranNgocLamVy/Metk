@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useUIHook } from "@/view/hooks/useUIHook";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
 import SecurityShield from "./securityShield";
@@ -27,6 +28,8 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 			}
 		}
 	}, [containerRef.current]);
+
+    useUIHook();
 
 	return (
 		<main {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-background">

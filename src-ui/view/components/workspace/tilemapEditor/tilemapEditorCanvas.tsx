@@ -14,7 +14,7 @@ export default function TilemapEditorCanvas() {
 			if (!pixiApp) return;
 			const w = entry.contentRect.width;
 			const h = entry.contentRect.height;
-			pixiApp.renderer.resize(w, h);
+			pixiApp.renderer?.resize(w, h);
 		},
 		[pixiApp]
 	);

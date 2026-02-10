@@ -1,7 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { ProjectService } from "@/shared/services/projectService";
+import { WorkspaceService } from "@/shared/services/workspaceService";
 import LoadingOverlay from "@/view/components/layout/loadingOverlay";
 import Workspace from "@/view/components/workspace/workspace";
 import { useAppcore } from "@/view/stores/appCoreStore";
@@ -20,7 +21,7 @@ export default function Project() {
 
 	useEffect(() => {
 		const loadProject = async () => {
-			const result = await ProjectService.loadProject(id);
+			const result = await WorkspaceService.loadProjectWorkspace(id);
 			if (result.status !== "Success") {
 				navigate("/");
                 return;
