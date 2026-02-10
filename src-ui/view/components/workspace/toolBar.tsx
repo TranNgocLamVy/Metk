@@ -11,12 +11,7 @@ import { Toggle } from "../shadcn/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../shadcn/tooltip";
 
 export default function ToolBar() {
-	const { version, setToolManager, getTools, getActiceTool, refresh } = useToolbarStore();
-
-    useEffect(() => {
-        setToolManager(AppCore.getIns().toolManager);
-        refresh();
-    }, [])
+	const { version, getTools, getActiceTool } = useToolbarStore();
 
     const tools = useMemo(() => getTools(), [version]);
 

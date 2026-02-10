@@ -21,6 +21,9 @@ export class WorkspaceManager {
     }
 
     public async loadProjectWorkspace(project: Project): Promise<Result> {
+        if (this.currentWorkspace) await this.currentWorkspace.unload();
+        this.currentWorkspace = null;
+        
         const workspaceStorageService = new JsonWorkspaceStorageService(project.metaData.directory);
         const loadSessionResult = await workspaceStorageService.loadWorkspace();
         if (loadSessionResult.status === "Success") {
@@ -35,6 +38,9 @@ export class WorkspaceManager {
                     tilemapSessions: [],
                     currentTilemapSessionId: null,
                 },
+                toolState: {
+                    currentTool: undefined,
+                }
             }
             this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, workspaceStorageService, this.editorContext);
         }

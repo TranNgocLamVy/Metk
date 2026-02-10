@@ -39,6 +39,10 @@ export class TilemapSessionManager {
         });
     }
 
+    public async unloadAll(): Promise<void> {
+        
+    }
+
     public createTilemapSession(tilemap: Tilemap, pixiApp: Application): TilemapSession | null {
         const sessionId = this.tilemapMap.get(tilemap.id);
         if (sessionId) return this.openTilemapSession(sessionId, pixiApp);

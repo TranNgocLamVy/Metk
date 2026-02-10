@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
-import { AppCoreService } from "@/shared/services/appCoreService";
+import { AppCore } from "@/core/appcore";
+
+import { useProjectManagerStore } from "./application/projectManagerStore";
 
 export type AppcoreState = {
     isAppcoreLoaded: boolean;
@@ -8,7 +10,10 @@ export type AppcoreState = {
 }
 
 export const useAppcore = create<AppcoreState>((set, get) => {
-    AppCoreService.load();
+    AppCore.getIns().load().then((appcore) => {
+        set({ isAppcoreLoaded: true });
+        useProjectManagerStore.getState().refresh();
+    })
     return {
         isAppcoreLoaded: false,
         setIsAppcoreLoaded: (value: boolean) => set({ isAppcoreLoaded: value }),

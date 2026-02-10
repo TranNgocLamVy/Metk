@@ -1,19 +1,30 @@
-import { useToolbarStore } from "@/view/stores/application/toolbarStore";
+import EventEmitter from "eventemitter3";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { ToolContext } from "../decorator/tool";
 import { ITool, IToolContructor } from "../interface/ITool";
 
-export class ToolManager {
+type ToolManagerEvent = {
+    onToolChanged: () => void;
+}
+
+export class ToolManager extends EventEmitter<ToolManagerEvent> {
     public static TOOL_REGISTRY: Array<ToolContext> = [];
 
     private toolMap: Map<string, IToolContructor> = new Map<string, IToolContructor>();
     private currentTool: ITool | null;
     private currentToolId: string | null;
 
-    constructor(private readonly editorContext: EditorContext) {
+    private editorContext: EditorContext
+
+    constructor() {
+        super();
         this.initializeDecoratedTools();
+    }
+
+    public setEditorContext(editorContext: EditorContext) {
+        this.editorContext = editorContext;
 
         this.editorContext.eventEmitter.on("onOpenTilemapSession", () => {
             this.onSessionChanged(this.editorContext.getCurrentTilemapSession());
@@ -24,7 +35,7 @@ export class ToolManager {
         ToolManager.TOOL_REGISTRY.forEach((toolContext: ToolContext) => {
             this.registerTool(toolContext.id, toolContext.constructor);
         });
-        useToolbarStore.getState().refresh();
+        this.emit("onToolChanged");
     }
 
     public getToolContexts(): ToolContext[] {
@@ -67,9 +78,8 @@ export class ToolManager {
             if (activeTilemapSession) {
                 this.currentTool.attach(activeTilemapSession);
             }
+            this.emit("onToolChanged");
         }
-
-        useToolbarStore.getState().refresh();
     }
 
     public stopTool() {
@@ -78,8 +88,7 @@ export class ToolManager {
             this.currentTool.onDisable();
             this.currentTool = null;
             this.currentToolId = null;
+            this.emit("onToolChanged");
         }
-
-        useToolbarStore.getState().refresh();
     }
 }

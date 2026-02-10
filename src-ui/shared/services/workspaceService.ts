@@ -1,36 +1,49 @@
 import { AppCore } from "@/core/appcore";
-import { Project } from "@/core/application/project";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
+import { Result, SuccessResult } from "../types/result";
+import { TilemapService } from "./tilemapService";
+import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
 
 export class WorkspaceService {
-    private static saveWorkspaceTimeout: NodeJS.Timeout | null = null;
+    private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
 
-    public static async loadWorkspace(project: Project): Promise<void> {
-        const result = await AppCore.getIns().workspaceManager.loadProjectWorkspace(project);
-        if (result.status !== "Success") {
-            ToastService.error({ message: result.message });
-            return;
+    public static async loadProjectWorkspace(projectId: string): Promise<Result> {
+        const loadProjectResult = await AppCore.getIns().projectManager.loadProject(projectId);
+        if (loadProjectResult.status !== "Success") {
+            ToastService.error({ message: loadProjectResult.message });
+            return loadProjectResult;
+        }
+
+        const project = loadProjectResult.data;
+
+        await TilesetService.loadTilesetView(); // TODO: Refactor
+        await TilemapService.loadTilemapView(); // TODO: Refactor
+
+        const loadWorkspaceResult = await AppCore.getIns().workspaceManager.loadProjectWorkspace(project);
+        if (loadWorkspaceResult.status !== "Success") {
+            ToastService.error({ message: loadWorkspaceResult.message });
+            return loadWorkspaceResult;
         }
 
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
-        useTilesetSessionStore.getState().setTilesetSessionManager(tilesetSessionManager);
-        const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId
+        const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
         useTilesetSessionStore.getState().refresh();
 
         const tilemapPixiApp = useTilemapSessionStore.getState().pixiApp;
         const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
-        useTilemapSessionStore.getState().setTilemapSessionManager(tilemapSessionManager);
-        const currentTilemapSessionId = tilemapSessionManager.tilemapSessionManagerData.currentTilemapSessionId
+        const currentTilemapSessionId = tilemapSessionManager.tilemapSessionManagerData.currentTilemapSessionId;
         if (currentTilemapSessionId && tilemapPixiApp) await WorkspaceService.openTilemapSession(currentTilemapSessionId);
         useTilemapSessionStore.getState().refresh();
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+
+        return SuccessResult();
     }
 
     public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
@@ -68,7 +81,7 @@ export class WorkspaceService {
             ToastService.error({ message: "Tileset not found" });
             return;
         }
-        
+
         const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
         tilesetSessionManager.createTilesetSession(tileset, tilesetPixiApp);
         useTilesetSessionStore.getState().refresh();
@@ -119,7 +132,7 @@ export class WorkspaceService {
         const tilemapSession = tilemapSessionManager.createTilemapSession(tilemap, tilesetPixiApp);
 
         useLayerManagerStore.getState().setSession(tilemapSession);
-        
+
         useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
@@ -143,7 +156,7 @@ export class WorkspaceService {
     public static async closeTilemapSession(sessionId: string): Promise<void> {
         const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
         tilemapSessionManager.closeTilemapSession(sessionId);
-        
+
         useLayerManagerStore.getState().setSession(null);
 
         const lastSessionId = tilemapSessionManager.getLastTilemapSessionId();

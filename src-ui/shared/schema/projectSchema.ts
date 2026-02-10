@@ -23,7 +23,6 @@ const ProjectMetaDataBase = type({
     createdAt: "string.date",
     updatedAt: "string.date",
     directory: "string",
-    found: type("boolean").optional(),
 })
 export const ProjectMetaDataSchema = type("string.json.parse").to(ProjectMetaDataBase)
 export type ProjectMetaData = typeof ProjectMetaDataSchema.infer
