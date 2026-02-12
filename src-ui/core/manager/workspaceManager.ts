@@ -1,5 +1,5 @@
 import { JsonWorkspaceStorageService } from "@/infrastructure/workspaceStorageService";
-import { WorkpsaceData } from "@/shared/schema/workspace";
+import { WorkpsaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "../application/editorContext";

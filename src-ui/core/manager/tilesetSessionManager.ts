@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSession";
+import { TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSessionSchema";
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "../application/editorContext";

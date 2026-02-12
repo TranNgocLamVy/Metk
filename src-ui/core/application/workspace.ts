@@ -1,7 +1,8 @@
 import { IWorkspacetorageService } from "@/infrastructure/interface/IWorkspaceStorageService";
-import { WorkpsaceData } from "@/shared/schema/workspace";
+import { WorkpsaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
+import { ExportPathManager } from "../manager/exportPathManager";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilemapSessionManager } from "../manager/tilemapSessionManager";
 import { TilesetManager } from "../manager/tilesetManager";
@@ -13,6 +14,7 @@ export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;
     public tilemapSessionManager: TilemapSessionManager;
     public toolSessionManager: ToolSessionManager;
+    public exportPathManager: ExportPathManager;
 
     constructor (
         workspaceData: WorkpsaceData, 
@@ -24,6 +26,7 @@ export class Workspace {
         this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorContext);
         this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
         this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorContext);
+        this.exportPathManager = new ExportPathManager(workspaceData.exportPaths ?? []);
     }
 
     public async load(): Promise<Result> {
@@ -49,6 +52,7 @@ export class Workspace {
             tilesets: this.tilesetSessionManager.serialize(),
             tilemaps: this.tilemapSessionManager.serialize(),
             toolState: this.toolSessionManager.serialize(),
+            exportPaths: this.exportPathManager.serialize(),
         }
     }
 }

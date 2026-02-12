@@ -1,4 +1,4 @@
-import { ToolStateData } from "@/shared/schema/toolSession";
+import { ToolStateData } from "@/shared/schema/toolSessionSchema";
 
 import { EditorContext } from "../application/editorContext";
 

@@ -2,7 +2,7 @@ import { IBaseSession } from "@/core/interface/IBaseSession";
 import { HistoryManager } from "@/core/manager/historyManager";
 import { SelectionState } from "@/shared/schema/common/selectionState";
 import { ViewState } from "@/shared/schema/common/viewState";
-import { TilesetSessionData } from "@/shared/schema/tilesetSession";
+import { TilesetSessionData } from "@/shared/schema/tilesetSessionSchema";
 
 import { Tile, Tileset } from "../tile/tileset";
 import { TilesetSessionView } from "./tilesetSessionView";
