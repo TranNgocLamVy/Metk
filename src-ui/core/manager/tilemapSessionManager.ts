@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSession";
+import { TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSessionSchema";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";

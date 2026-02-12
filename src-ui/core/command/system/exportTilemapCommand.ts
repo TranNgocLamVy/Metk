@@ -1,0 +1,55 @@
+import { EditorContext } from "@/core/application/editorContext";
+import { TmxTilemapExporter } from "@/core/application/exporter/TmxTilemapExporter";
+import { SystemCommand } from "@/core/decorator/command";
+import { ISystemCommand } from "@/core/interface/IBaseCommand";
+import { ToastService } from "@/shared/services/toastService";
+import { CancelResult, ErrorResult, Result } from "@/shared/types/result";
+import { save } from "@tauri-apps/plugin-dialog";
+
+import { ExportStorageService } from "../../../infrastructure/exportStorageService";
+
+@SystemCommand({
+    id: "project.export",
+    name: "Export Tilemap",
+    description: "",
+    shortcuts: ["Ctrl+E"],
+})
+export class ExportTilemapCommand implements ISystemCommand {
+    public async execute(context: EditorContext): Promise<Result> {
+        const workspace = context.getCurrentWorkspace();
+
+        const tilemapSession = workspace.tilemapSessionManager.currentTilemapSession;
+        if (!tilemapSession) return CancelResult();
+        const tilemap = tilemapSession.tilemap;
+        if (!tilemap) return ErrorResult("Tilemap not found");
+
+        const exportPathManager = workspace.exportPathManager;
+        let exportPath = exportPathManager.getExportPath(tilemap.id);
+        if (!exportPath) {
+            const savePath = await save({
+                filters: [{ name: "TMX", extensions: ["tmx"] }],
+                canCreateDirectories: true,
+                title: "Export Tilemap",
+            });
+            if (!savePath) return CancelResult();
+            exportPath = savePath;
+        }
+
+        const exporter = new TmxTilemapExporter(); // TODO: get custom exporter from appcore
+
+        const buffer = exporter.export(tilemap, exportPath, context);
+
+        const exportStorageService = new ExportStorageService();
+
+        const result = await exportStorageService.exportToPath(exportPath, buffer);
+
+        if (result.status === "Success") {
+            exportPathManager.setExportPath(tilemap.id, exportPath);
+            workspace.save();
+            
+            ToastService.success({ message: "Tilemap exported successfully" });
+        }
+
+        return result
+    }
+}

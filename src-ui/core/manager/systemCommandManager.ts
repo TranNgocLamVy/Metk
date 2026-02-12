@@ -30,7 +30,7 @@ export class SystemCommandManager {
         if (CommandClass) {
             const command = new CommandClass();
             const result = await command.execute(this.editorContext);
-            if (result.status !== "Success") ToastService.error({ message: result.message });
+            if (result.status == "Error") ToastService.error({ message: result.message });
         } else {
             ToastService.error({message: `Command ID ${commandId} not found.`});
         }
