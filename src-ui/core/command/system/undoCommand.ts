@@ -12,8 +12,8 @@ import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
 export class UndoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {
         const historyManager = context.getCurrentHistoryManager();
-        if (!historyManager) return ErrorResult("History manager not found");
+        if (!historyManager) return Result.Error("History manager not found");
         historyManager.undo(context);
-        return SuccessResult();
+        return Result.Success();
     }
 }

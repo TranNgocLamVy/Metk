@@ -20,7 +20,7 @@ export class CreateTileLayerCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.parentLayerId);
@@ -37,12 +37,12 @@ export class CreateTileLayerCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         const tileLayer = root.findLayer(this.tileLayerId) as TileLayer;
         tileLayer.removeFromParent();
@@ -52,7 +52,7 @@ export class CreateTileLayerCommand implements IBaseCommand {
         
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public delete(): void {

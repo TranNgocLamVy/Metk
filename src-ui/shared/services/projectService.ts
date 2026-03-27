@@ -30,7 +30,7 @@ export class ProjectService {
             const newProject = createProjectResult.data;
             useProjectManagerStore.getState().refresh();
             ToastService.success({ message: "Project created successfully" });
-            await WorkspaceService.loadProjectWorkspace(newProject.metaData.id);
+            await WorkspaceService.loadProjectWorkspace(newProject.id);
         } else if (createProjectResult.status == "Error") {
             ToastService.error({ message: createProjectResult.message });
         }

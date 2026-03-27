@@ -5,6 +5,7 @@ import { TilemapData } from "@/shared/schema/tilemapSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
 
 import { RootLayer } from "./layer/rootLayer";
+import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 
 interface TilemapEvent extends BaseObjectEvents {
     onChange: () => void
@@ -23,11 +24,14 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     public rootLayer: RootLayer;
 
+    public readonly tilemapPathSystem: FilePathSystem;
+
     constructor(
         tilemapData: TilemapData,
         public readonly tilesetRefManager: TilesetRefManager
     ) {
         super();
+        this.tilemapPathSystem = tilesetRefManager.tilemapPathSystem;
 
         this.id = tilemapData.id;
         this.name = tilemapData.name;

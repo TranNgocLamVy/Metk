@@ -1,4 +1,3 @@
-import { IWorkspacetorageService } from "@/infrastructure/interface/IWorkspaceStorageService";
 import { WorkpsaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
@@ -9,6 +8,7 @@ import { TilesetManager } from "../manager/tilesetManager";
 import { TilesetSessionManager } from "../manager/tilesetSessionManager";
 import { ToolSessionManager } from "../manager/toolSessionManager";
 import { EditorContext } from "./editorContext";
+import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 
 export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;
@@ -20,7 +20,7 @@ export class Workspace {
         workspaceData: WorkpsaceData, 
         private readonly tilesetManager: TilesetManager, 
         private readonly tilemapManager: TilemapManager,
-        private readonly workspaceStorageService: IWorkspacetorageService,
+        public readonly projectPathSystem: ProjectPathSystem,
         private readonly editorContext: EditorContext,
     ) {
         this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorContext);
@@ -40,11 +40,6 @@ export class Workspace {
         await this.tilesetSessionManager.unloadAll();
         await this.tilemapSessionManager.unloadAll();
         await this.toolSessionManager.unload();
-    }
-
-    public async save(): Promise<Result> {
-        const workspaceData = this.serialize();
-        return await this.workspaceStorageService.saveWorkspace(workspaceData);
     }
 
     public serialize(): WorkpsaceData {

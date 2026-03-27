@@ -1,39 +1,37 @@
 import { ToastService } from "@/shared/services/toastService";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { ITilemapStorageService } from "../../infrastructure/interface/ITilemapStorageService";
 import { TilemapData, TilemapMetaData } from "../../shared/schema/tilemapSchema";
 import { Tilemap } from "../application/tile/tilemap";
 import { TilesetManager } from "./tilesetManager";
 import { TilesetRefManager } from "./tilesetRefManager";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { TilemapStorageService } from "@/infrastructure/container";
 
 export class TilemapManager {
     private tilemapMap: Map<string, Tilemap> = new Map<string, Tilemap>(); // id -> tilemap
 
     public constructor(
-        private readonly tilemapStorageService: ITilemapStorageService, 
         private readonly tilesetManager: TilesetManager,
-        private tilemapsMetaData: TilemapMetaData[]
+        private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
     public getTilemapsMetaData(): TilemapMetaData[] {
-        return this.tilemapsMetaData.map((metaData) => {
-            const tilemap = this.tilemapMap.get(metaData.id);
-            if (!tilemap) return metaData;
-            return { name: tilemap.name, id: tilemap.id, tilemapRelPath: metaData.tilemapRelPath };
-        })
+        const tilemapArray = Array.from(this.tilemapMap.values());
+        return tilemapArray.map((tilemap) => ({ name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relDir }));
     }
 
-    public async loadAll(): Promise<void> {
-        await Promise.all(this.tilemapsMetaData.map(async (metaData) => {
-            const loadTilemapResult = await this.tilemapStorageService.loadTilemap(metaData.tilemapRelPath);
+    public async loadAll(tilemapsMetaData: TilemapMetaData[]): Promise<void> {
+        await Promise.all(tilemapsMetaData.map(async (metaData) => {
+            const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
+
+            const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
             if (loadTilemapResult.status === "Success") {
                 const tilemapData = loadTilemapResult.data;
 
-                const tilemapAbsPath = PathUtils.join(this.tilemapStorageService.projectDir, metaData.tilemapRelPath);
-
-                const tilesetRefManager = new TilesetRefManager(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
+                const tilemapPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.tilemapRelPath);
+                const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
                 const tilemap = new Tilemap(tilemapData, tilesetRefManager);
                 
                 await tilemap.load();
@@ -46,16 +44,14 @@ export class TilemapManager {
 
     public async saveTilemap(id: string): Promise<Result> {
         const tilemap = this.tilemapMap.get(id);
-        if (tilemap === undefined) return ErrorResult("Tilemap not found")
-        const tilemapRelPath = this.tilemapsMetaData.find(metaData => metaData.id === id)?.tilemapRelPath;
-        if (!tilemapRelPath) return ErrorResult("Tilemap path not found");
+        if (tilemap === undefined) return Result.Error("Tilemap not found")
 
         try {
             const tilemapData = tilemap.serialize();
-            await this.tilemapStorageService.saveTilemap(tilemapRelPath, tilemapData);
-            return SuccessResult();
+            await TilemapStorageService.save(tilemap.tilemapPathSystem.getFileAbsPath(), tilemapData);
+            return Result.Success();
         } catch (error) {
-            return ErrorResult(`Failed to save tilemap, error: ${error}`)
+            return Result.Error(`Failed to save tilemap, error: ${error}`)
         }
     }
 
@@ -69,19 +65,18 @@ export class TilemapManager {
     }
 
     public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
-        const tilesetRefManager = new TilesetRefManager(this.tilesetManager, this.tilemapStorageService.projectDir, tilemapAbsPath);
+        const tilemapRefPath = PathUtils.relative(this.projectPathSystem.projectDir, tilemapAbsPath);
+        const tilemapPathSystem = new FilePathSystem(tilemapData.id, this.projectPathSystem, tilemapRefPath);
+        const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const newTilemap = new Tilemap(tilemapData, tilesetRefManager);
         await newTilemap.load();
-        const tilemapRelPath = PathUtils.relative(this.tilemapStorageService.projectDir, tilemapAbsPath);
-        this.tilemapsMetaData.push({ name: newTilemap.name, id: newTilemap.id, tilemapRelPath: tilemapRelPath });
         this.tilemapMap.set(newTilemap.id, newTilemap);
         const result = await this.saveTilemap(newTilemap.id);
         if (result.status === "Success") {
-            return SuccessResult(newTilemap);
+            return Result.Success(newTilemap);
         } else {
-            this.tilemapsMetaData = this.tilemapsMetaData.filter(metaData => metaData.id !== newTilemap.id);
             this.tilemapMap.delete(newTilemap.id);
-            return ErrorResult(result.message);
+            return Result.Error(result.message);
         }
     }
 }

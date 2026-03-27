@@ -26,12 +26,12 @@ export class SetTileCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession();
-        if (!currentSession) return ErrorResult("Tilemap not found");
+        if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
-        if (!layer) return ErrorResult("Layer not found");
+        if (!layer) return Result.Error("Layer not found");
 
         const tileRef = layer.getTileAt(this.coordinate);
         if (tileRef) {
@@ -52,12 +52,12 @@ export class SetTileCommand implements IBaseCommand {
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession();
-        if (!currentSession) return ErrorResult("Tilemap not found");
+        if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
-        if (!layer) return ErrorResult("Layer not found");
+        if (!layer) return Result.Error("Layer not found");
 
         if (this.oldTileId == null || this.oldTilesetIndex == null) return layer.removeTileAt(this.coordinate)
 

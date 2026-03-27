@@ -62,6 +62,10 @@ export class KeybindingManager {
     }
 
     public handleKeyDown(e: KeyboardEvent) {
+        if (this.isEditableElement(document.activeElement)) {
+            return;
+        }
+
         const keystroke = KeyUtils.getKeystrokeString(e);
         
         if (this.lookupTable.has(keystroke)) {
@@ -75,6 +79,16 @@ export class KeybindingManager {
                 this.toolManager.startTool(binding.id);
             }
         }
+    }
+
+    private isEditableElement(el: Element | null): boolean {
+        if (!el) return false;
+
+        const tagName = el.tagName.toUpperCase();
+        const isInput = tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
+        const isContentEditable = el.getAttribute('contenteditable') === 'true';
+
+        return isInput || isContentEditable;
     }
 
     public getShortcuts(commandId: string): string[] | undefined {

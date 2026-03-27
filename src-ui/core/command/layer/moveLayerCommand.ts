@@ -19,13 +19,13 @@ export class MoveLayerCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const rawParentLayer = root.findLayer(this.parentLayerId);
         const targetLayer = root.findLayer(this.targetLayerId);
 
-        if (!rawParentLayer || !targetLayer) return ErrorResult("Target layer not found");
+        if (!rawParentLayer || !targetLayer) return Result.Error("Target layer not found");
 
         const newParentLayer = rawParentLayer instanceof GroupLayer ? rawParentLayer : (rawParentLayer?.parentLayer ? rawParentLayer.parentLayer : root);
 
@@ -41,18 +41,18 @@ export class MoveLayerCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         
         const rawOldParentLayer = root.findLayer(this.oldParentLayerId);
         const targetLayer = root.findLayer(this.targetLayerId);
 
-        if (!targetLayer || !rawOldParentLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer || !rawOldParentLayer) return Result.Error("Target layer not found");
 
         const oldParentLayer = rawOldParentLayer instanceof GroupLayer ? rawOldParentLayer : (rawOldParentLayer?.parentLayer ? rawOldParentLayer.parentLayer : root);
 
@@ -65,7 +65,7 @@ export class MoveLayerCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public delete(): void {

@@ -16,11 +16,11 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer) return Result.Error("Target layer not found");
 
         this.oldIsVisible = targetLayer.visible;
         targetLayer.toggleVisibility(this.newIsVisible);
@@ -29,16 +29,16 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh()
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         
         const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer) return Result.Error("Target layer not found");
 
         targetLayer.toggleVisibility(this.oldIsVisible);
 
@@ -46,7 +46,7 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh()
         
-        return SuccessResult();
+        return Result.Success();
     }
 
     public delete(): void {

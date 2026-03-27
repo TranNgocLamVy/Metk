@@ -29,7 +29,7 @@ export class ToolSessionManager {
         const currentTool = this.editorContext.getToolManager().getCurrentToolId() ?? undefined;
         this.updateToolState({ currentTool });
         const workspace = this.editorContext.getCurrentWorkspace();
-        await workspace.save();
+        await this.editorContext.workspaceManager.saveCurrentWorkspace();
     }
 
     public async updateToolState(toolStateData: Partial<ToolStateData>) {

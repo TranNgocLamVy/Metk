@@ -1,52 +1,56 @@
 
-import { JsonTilemapStorageService } from "@/infrastructure/tilemapStorageService";
-import { JsonTilesetStorageService } from "@/infrastructure/tilesetStorageService";
 import { TilemapData } from "@/shared/schema/tilemapSchema";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
-import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { IProjectStorageService } from "../../infrastructure/interface/IProjectStorageService";
 import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
-import { PROJECT_FILE_NAME } from "../constance/project";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilesetManager } from "../manager/tilesetManager";
 import { Tilemap } from "./tile/tilemap";
 import { Tileset } from "./tile/tileset";
+import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ProjectStorageService } from "@/infrastructure/container";
 
 export class Project {
-    private _metaData: ProjectMetaData;
-    public get metaData(): ProjectMetaData { return { ...this._metaData, updatedAt: new Date().toDateString() } }
-    private set metaData(value: ProjectMetaData) { this._metaData = value }
+    public readonly id: string;
+    public name: string;
+    public version: string;
+    public description: string;
+    public createdAt: string;
+    public updatedAt: string;
+
+    public get metaData(): ProjectMetaData {
+        return {
+            id: this.id,
+            name: this.name,
+            version: this.version,
+            description: this.description,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+            directory: this.projectPathSystem.projectDir,
+        }
+    }
     
-    private projectStorageService: IProjectStorageService;
     public tilesetManager: TilesetManager;
     public tilemapManager: TilemapManager;
 
-    constructor(data: ProjectData, directory: string, projectStorageService: IProjectStorageService) {
-        this.metaData = {
-            id: data.id,
-            name: data.name,
-            version: data.version,
-            description: data.description,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
-            directory: directory,
-        }
+    constructor(private data: ProjectData, public readonly projectPathSystem: ProjectPathSystem) {
+        this.id = data.id;
+        this.name = data.name;
+        this.version = data.version;
+        this.description = data.description;
+        this.createdAt = data.createdAt;
+        this.updatedAt = data.updatedAt;
 
-        this.projectStorageService = projectStorageService;
+        this.tilesetManager = new TilesetManager(this.projectPathSystem);
 
-        const tilesetStorageService = new JsonTilesetStorageService(this.metaData.directory);
-        this.tilesetManager = new TilesetManager(tilesetStorageService, data.tilesets);
-
-        const tilemapStorageService = new JsonTilemapStorageService(this.metaData.directory);
-        this.tilemapManager = new TilemapManager(tilemapStorageService, this.tilesetManager, data.tilemaps);
+        this.tilemapManager = new TilemapManager(this.tilesetManager, this.projectPathSystem);
     }
 
     public async load() {
-        await this.tilesetManager.loadAll();
-        await this.tilemapManager.loadAll();
+        await this.tilesetManager.loadAll(this.data.tilesets);
+        await this.tilemapManager.loadAll(this.data.tilemaps);
     }
 
     public async unload() {
@@ -55,11 +59,11 @@ export class Project {
 
     public serialize(): ProjectData {
         return {
-            id: this.metaData.id,
-            name: this.metaData.name,
-            version: this.metaData.version,
-            description: this.metaData.description,
-            createdAt: this.metaData.createdAt,
+            id: this.id,
+            name: this.name,
+            version: this.version,
+            description: this.description,
+            createdAt: this.createdAt,
             updatedAt: new Date().toDateString(),
             tilemaps: this.tilemapManager.getTilemapsMetaData(),
             tilesets: this.tilesetManager.getTilesetsMetaData(),
@@ -68,8 +72,7 @@ export class Project {
 
     private async save(): Promise<void> {
         const projectData = this.serialize();
-        const filePath = PathUtils.join(this.metaData.directory, PROJECT_FILE_NAME);
-        const result = await this.projectStorageService.saveProject(filePath, projectData);
+        const result = await ProjectStorageService.save(this.projectPathSystem.getAbsPathFromRelPath("project.json"), projectData);
         if (result.status == "Error") {
             ToastService.error({ message: `Error while saving project: ${result.message}` });
         }

@@ -5,6 +5,7 @@ import { TextureService } from "@/infrastructure/textureService";
 import { TileData, TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result, ResultStatus } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/textureUtils";
+import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 
 const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
     texture.destroy();
@@ -31,7 +32,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
     public texture: Texture;
     public isTextureLoaded: boolean = false;
 
-    constructor(tilesetData: TilesetData, public readonly textureService: TextureService) {
+    constructor(tilesetData: TilesetData, public readonly textureService: TextureService, public readonly tilesetPathSystem: FilePathSystem) {
         super();
         this.id = tilesetData.id;
         this.name = tilesetData.name;

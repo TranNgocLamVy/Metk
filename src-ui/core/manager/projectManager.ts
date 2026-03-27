@@ -2,16 +2,17 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result, ResultStatus } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
-import { exists, mkdir } from "@tauri-apps/plugin-fs";
+import { mkdir } from "@tauri-apps/plugin-fs";
 
-import { IProjectRepository } from "../../infrastructure/interface/IProjectRepository";
-import { IProjectStorageService } from "../../infrastructure/interface/IProjectStorageService";
 import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
 import { Project } from "../application/project";
-import { PROJECT_FILE_NAME } from "../constance/project";
+import { ProjectMetaDataRepo, ProjectStorageService } from "@/infrastructure/container";
+import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 
 export class ProjectManager {
     public currentProject: Project | null = null;
+
+    // TODO: find a better way to manage project meta data, when project update or delete, the meta data should be updated
     public projectMetaDataMap: Map<string, ProjectMetaData> = new Map<string, ProjectMetaData>(); // id -> metaData
     
     public get projectMetaData(): ProjectMetaData[] {
@@ -24,13 +25,19 @@ export class ProjectManager {
     /** id -> project, null: unloaded, undefined: not found */
     public projectMap: Map<string, Project | null> = new Map<string, Project | null>();
 
-    public constructor(
-        private readonly projectRepo: IProjectRepository,
-        private readonly projectStorageService: IProjectStorageService
-    ) { }
+    public constructor( ) { }
 
     public async load() {
-        const projectsMetaData = await this.projectRepo.loadAll();
+        const result = await ProjectMetaDataRepo.load('projects.json');
+
+        if (result.status != Result.Status.Success) {
+            console.error(result.message);
+            // TODO: handle error
+            return;
+        }
+
+        const projectsMetaData = result.data;
+
         await Promise.all(projectsMetaData.map(async (metaData) => {
             this.projectMetaDataMap.set(metaData.id, metaData);
             this.projectMap.set(metaData.id, null);
@@ -38,15 +45,15 @@ export class ProjectManager {
     }
 
     public async save(): Promise<Result> {
-        return this.projectRepo.saveAll(Array.from(this.projectMetaDataMap.values()));
+        return ProjectMetaDataRepo.save("projects.json", Array.from(this.projectMetaDataMap.values()));
     }
 
     public async saveCurrrentProject(): Promise<Result> {
         const project = this.currentProject;
         if (!project) return { status: "Error", message: "No project selected" };
         const projectData = project.serialize();
-        const projectAbsPath = PathUtils.join(project.metaData.directory, PROJECT_FILE_NAME);
-        return await this.projectStorageService.saveProject(projectAbsPath, projectData);
+        const projectAbsPath = PathUtils.join(project.projectPathSystem.getAbsPathFromRelPath("project.json"));
+        return await ProjectStorageService.save(projectAbsPath, projectData);
     }
 
     public async createProject(name: string, destination: string): Promise<Result<Project>> {
@@ -68,10 +75,11 @@ export class ProjectManager {
             tilesets: [],
         };
 
-        const project = new Project(projectData, projectDir, this.projectStorageService);
+        const projectPathSystem = new ProjectPathSystem(projectDir);
+        const project = new Project(projectData, projectPathSystem);
 
-        const projectAbsPath = PathUtils.join(projectDir, PROJECT_FILE_NAME);
-        const saveProjectResult = await this.projectStorageService.saveProject(projectAbsPath, project.serialize());
+        const projectAbsPath = projectPathSystem.getAbsPathFromRelPath("project.json");
+        const saveProjectResult = await ProjectStorageService.save(projectAbsPath, project.serialize());
         if (saveProjectResult.status !== "Success") {
             return { status: ResultStatus.Error, message: "Failed to create project while saving: " + saveProjectResult.message };
         }
@@ -80,26 +88,27 @@ export class ProjectManager {
         if (saveResult.status !== "Success") {
             return { status: ResultStatus.Error, message: "Failed to create project while saving project meta data: " + saveResult.message };
         }
-        this.projectMetaDataMap.set(project.metaData.id, project.metaData);
-        this.projectMap.set(project.metaData.id, project);
+        this.projectMetaDataMap.set(project.id, project.metaData);
+        this.projectMap.set(project.id, project);
         return { status: ResultStatus.Success, data: project };
     }
 
     public async openProject(projectAbsPath: string): Promise<Result> {
-        const loadProjectResult = await this.projectStorageService.loadProject(projectAbsPath);
+        const loadProjectResult = await ProjectStorageService.load(projectAbsPath);
         if (!loadProjectResult.data) return { status: ResultStatus.Error, message: loadProjectResult.message };
         const projectData = loadProjectResult.data;
         if (!projectData) return { status: ResultStatus.Error, message: "Failed to open project, project data not found" };
         const projectDir = PathUtils.dirname(projectAbsPath);
-        const project = new Project(projectData, projectDir, this.projectStorageService);
-        this.projectMetaDataMap.set(project.metaData.id, project.metaData);
-        this.projectMap.set(project.metaData.id, project);
+        const projectPathSystem = new ProjectPathSystem(projectDir);
+        const project = new Project(projectData, projectPathSystem);
+        this.projectMetaDataMap.set(project.id, project.metaData);
+        this.projectMap.set(project.id, project);
         return { status: ResultStatus.Success, data: null, message: "Project opened successfully" };
     }
 
     public async loadProject(id: string): Promise<Result<Project>> {
         if (this.currentProject) {
-            if (this.currentProject.metaData.id === id) return { status: ResultStatus.Success, data: this.currentProject };
+            if (this.currentProject.id === id) return { status: ResultStatus.Success, data: this.currentProject };
             
             const saveResult = await this.saveCurrrentProject();
             if (saveResult.status == "Error") return { status: ResultStatus.Error, message: saveResult.message };
@@ -111,13 +120,16 @@ export class ProjectManager {
         let project = this.projectMap.get(id);
         if (project === undefined) return { status: ResultStatus.Error, message: "Can not load project" }
         if (project === null) {
-            const projectAbsPath = PathUtils.join(metaData.directory, PROJECT_FILE_NAME);
-            const loadProjectResult = await this.projectStorageService.loadProject(projectAbsPath);
+            const projectAbsPath = PathUtils.join(metaData.directory, "project.json");
+            const loadProjectResult = await ProjectStorageService.load(projectAbsPath);
             const projectData = loadProjectResult.data;
             if (!projectData) return { status: ResultStatus.Error, message: loadProjectResult.message };
-            const newProject = new Project(projectData, metaData.directory, this.projectStorageService);
-            this.projectMetaDataMap.set(newProject.metaData.id, newProject.metaData);
-            this.projectMap.set(newProject.metaData.id, newProject);
+
+            const projectPathSystem = new ProjectPathSystem(metaData.directory);
+            const newProject = new Project(projectData, projectPathSystem);
+
+            this.projectMetaDataMap.set(newProject.id, newProject.metaData);
+            this.projectMap.set(newProject.id, newProject);
             project = newProject;
         }
         if (this.currentProject) {

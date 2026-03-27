@@ -15,14 +15,14 @@ export class DuplicateLayerCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer) return Result.Error("Target layer not found");
 
         const duplicateLayer = targetLayer.duplicate();
-        if (!duplicateLayer) return ErrorResult("Failed to duplicate layer");
+        if (!duplicateLayer) return Result.Error("Failed to duplicate layer");
         this.newLayerId = duplicateLayer.id;
         const cloneLayerName = `${targetLayer.name} (copy)`
         duplicateLayer.rename(cloneLayerName);
@@ -31,23 +31,23 @@ export class DuplicateLayerCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.newLayerId);
-        if (!targetLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer) return Result.Error("Target layer not found");
         targetLayer.removeFromParent();
 
         currentSession.markAsDirty();
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public delete(): void {
