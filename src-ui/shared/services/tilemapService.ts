@@ -8,6 +8,7 @@ import { TilemapData } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { FormService } from "./formService";
 import { ToastService } from "./toastService";
+import { Result } from "../types/result";
 
 export class TilemapService {
     public static async loadTilemapView(): Promise<void> {
@@ -43,11 +44,11 @@ export class TilemapService {
 
         const createTilesetResult = await currentProject.createTilemap(tilemapData, tilemapAbsPath);
 
-        if (createTilesetResult.status === "Success") {
+        if (createTilesetResult.status === Result.Status.Success) {
             const newTilemap = createTilesetResult.data;
             useExplorerStore.getState().addTilemap({ name: newTilemap.name, id: newTilemap.id });
             ToastService.success({ message: "Tilemap created successfully" });
-        } else if (createTilesetResult.status === "Error") {
+        } else if (createTilesetResult.status === Result.Status.Error) {
             ToastService.error({ message: createTilesetResult.message });
         }
     }

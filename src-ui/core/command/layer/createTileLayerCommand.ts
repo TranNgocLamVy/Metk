@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { TileLayerData } from "@/shared/schema/layerSchema";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";

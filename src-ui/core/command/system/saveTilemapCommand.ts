@@ -1,7 +1,7 @@
 import { EditorContext } from "@/core/application/editorContext";
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
-import { ErrorResult, Result } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 
 @SystemCommand({
@@ -18,7 +18,7 @@ export class SaveTilemapCommand implements ISystemCommand {
         if (!tilemapSession) return Result.Error("Tilemap not found");
         const tilemap = tilemapSession.tilemap;
         const saveResult = await currentProject.tilemapManager.saveTilemap(tilemap.id);
-        if (saveResult.status == "Success") {
+        if (saveResult.status === Result.Status.Success) {
             tilemapSession.markAsClean();
             useTilemapSessionStore.getState().refresh();
         }

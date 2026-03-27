@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { EditorContext } from "@/core/application/editorContext";
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { IBaseCommand } from "@/core/interface/IBaseCommand";
-import { ErrorResult, Result } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 
 export class SetTileCommand implements IBaseCommand {
     public readonly id: string = uuidv4()
@@ -45,7 +45,7 @@ export class SetTileCommand implements IBaseCommand {
 
         const result = layer.setTileAt(this.coordinate, this.tileId, this.tilesetId);
 
-        if (result.status == "Success") currentSession.markAsDirty();
+        if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
         return result
     }
@@ -63,7 +63,7 @@ export class SetTileCommand implements IBaseCommand {
 
         const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
 
-        if (result.status == "Success") currentSession.markAsDirty();
+        if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
         return result
     }

@@ -1,19 +1,14 @@
-
-const SuccessStatus = "Success";
-type SuccessStatus = typeof SuccessStatus;
-
 const FailStatus = {
     Error: "Error",
     Cancel: "Cancel"
 }
 type FailStatus = keyof typeof FailStatus;
 
-export const ResultStatus = {
+const ResultStatus = {
     Success: "Success",
     Error: "Error",
     Cancel: "Cancel"
 } as const;
-export type ResultStatus = SuccessStatus | FailStatus;
 
 export type Result<T = any> = SuccessResult<T> | ErrorResult<T>;
 
@@ -29,16 +24,16 @@ type SuccessResult<T = any> = {
     data: T;
 };
 
-export function ErrorResult<T = any>(message: string | undefined): ErrorResult<T> {
+function ErrorResult<T = any>(message: string | undefined): ErrorResult<T> {
     console.trace(message);
     return { status: "Error", message };
 }
 
-export function SuccessResult<T = any>(data?: T, message?: string | undefined): SuccessResult<T> {
+function SuccessResult<T = any>(data?: T, message?: string | undefined): SuccessResult<T> {
     return { status: "Success", message, data: data as any};
 }
 
-export function CancelResult<T = any>(message?: string): ErrorResult<T> {
+function CancelResult<T = any>(message?: string): ErrorResult<T> {
     return { status: "Cancel", message };
 }
 

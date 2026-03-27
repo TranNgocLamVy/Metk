@@ -3,7 +3,7 @@ import { useLayerManagerStore } from "@/view/stores/application/layerManagerStor
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
-import { Result, SuccessResult } from "../types/result";
+import { Result } from "../types/result";
 import { TilemapService } from "./tilemapService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
@@ -13,7 +13,7 @@ export class WorkspaceService {
 
     public static async loadProjectWorkspace(projectId: string): Promise<Result> {
         const loadProjectResult = await AppCore.getIns().projectManager.loadProject(projectId);
-        if (loadProjectResult.status !== "Success") {
+        if (loadProjectResult.status !== Result.Status.Success) {
             ToastService.error({ message: loadProjectResult.message });
             return loadProjectResult;
         }
@@ -24,7 +24,7 @@ export class WorkspaceService {
         await TilemapService.loadTilemapView(); // TODO: Refactor
 
         const loadWorkspaceResult = await AppCore.getIns().workspaceManager.loadProjectWorkspace(project);
-        if (loadWorkspaceResult.status !== "Success") {
+        if (loadWorkspaceResult.status !== Result.Status.Success) {
             ToastService.error({ message: loadWorkspaceResult.message });
             return loadWorkspaceResult;
         }
@@ -58,7 +58,7 @@ export class WorkspaceService {
         }
         WorkspaceService.saveWorkspaceTimeout = setTimeout(async () => {
             const result = await AppCore.getIns().workspaceManager.saveCurrentWorkspace();
-            if (result.status !== "Success") {
+            if (result.status !== Result.Status.Success) {
                 ToastService.error({ message: result.message });
                 return;
             }

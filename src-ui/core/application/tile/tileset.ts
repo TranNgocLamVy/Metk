@@ -3,7 +3,7 @@ import { Texture } from "pixi.js";
 import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
 import { TextureService } from "@/infrastructure/textureService";
 import { TileData, TilesetData } from "@/shared/schema/tilesetSchema";
-import { Result, ResultStatus } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/textureUtils";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 
@@ -74,7 +74,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.eventEmitter.emit("updateProperty", "name", this.name);
-        return { status: ResultStatus.Success, data: null };
+        return { status: Result.Status.Success, data: null };
     }
 
     public getTileFromId(id: number): Tile | null {
@@ -99,13 +99,13 @@ export class Tileset extends BaseObject<TilesetEvent> {
     }
 
     public async loadTexture(): Promise<Result> {
-        if (this.isTextureLoaded) return { status: ResultStatus.Success, data: null };
+        if (this.isTextureLoaded) return { status: Result.Status.Success, data: null };
         const imageRelPath = this.image.source;
 
         const loadTextureResult = await this.textureService.loadTexture(imageRelPath);
-        if (loadTextureResult.status === "Error") return loadTextureResult;
+        if (loadTextureResult.status === Result.Status.Error) return loadTextureResult;
         const texture = loadTextureResult.data;
-        if (!texture) return { status: ResultStatus.Error, message: "Failed to load texture" };
+        if (!texture) return { status: Result.Status.Error, message: "Failed to load texture" };
         this.texture = texture;
 
         this.image.width = texture.width;
@@ -131,7 +131,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
             tile.loadTexture(tileTexture);
         })
 
-        return { status: ResultStatus.Success, data: null };
+        return { status: Result.Status.Success, data: null };
     }
 
     public async unloadTexture(): Promise<void> {

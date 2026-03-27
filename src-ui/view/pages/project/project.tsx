@@ -6,6 +6,7 @@ import { WorkspaceService } from "@/shared/services/workspaceService";
 import LoadingOverlay from "@/view/components/layout/loadingOverlay";
 import Workspace from "@/view/components/workspace/workspace";
 import { useAppcore } from "@/view/stores/appCoreStore";
+import { Result } from "@/shared/types/result";
 
 export default function Project() {
     const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +23,7 @@ export default function Project() {
 	useEffect(() => {
 		const loadProject = async () => {
 			const result = await WorkspaceService.loadProjectWorkspace(id);
-			if (result.status !== "Success") {
+			if (result.status !== Result.Status.Success) {
 				navigate("/");
                 return;
 			}

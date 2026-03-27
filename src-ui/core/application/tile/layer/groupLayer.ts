@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { GroupLayerData } from "@/shared/schema/layerSchema";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
 import { Tilemap } from "../tilemap";

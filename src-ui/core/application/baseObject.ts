@@ -1,6 +1,6 @@
 ﻿import { EventEmitter } from "eventemitter3";
 
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 
 export interface BaseObjectEvents {
     updateProperty: (key: string, value: any) => void

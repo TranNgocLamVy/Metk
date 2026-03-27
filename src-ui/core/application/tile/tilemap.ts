@@ -2,7 +2,7 @@
 import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { TilemapData } from "@/shared/schema/tilemapSchema";
-import { Result, ResultStatus } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 
 import { RootLayer } from "./layer/rootLayer";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
@@ -75,6 +75,6 @@ export class Tilemap extends BaseObject<TilemapEvent> {
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.eventEmitter.emit("updateProperty", "name", this.name);
-        return { status: ResultStatus.Success, data: null };
+        return { status: Result.Status.Success, data: null };
     }
 }

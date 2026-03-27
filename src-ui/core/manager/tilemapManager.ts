@@ -27,7 +27,7 @@ export class TilemapManager {
             const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
 
             const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
-            if (loadTilemapResult.status === "Success") {
+            if (loadTilemapResult.status === Result.Status.Success) {
                 const tilemapData = loadTilemapResult.data;
 
                 const tilemapPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.tilemapRelPath);
@@ -36,7 +36,7 @@ export class TilemapManager {
                 
                 await tilemap.load();
                 this.tilemapMap.set(tilemapData.id, tilemap);
-            } else if (loadTilemapResult.status === "Error") {
+            } else if (loadTilemapResult.status === Result.Status.Error) {
                 ToastService.error({ message: loadTilemapResult.message });
             }
         }));
@@ -72,7 +72,7 @@ export class TilemapManager {
         await newTilemap.load();
         this.tilemapMap.set(newTilemap.id, newTilemap);
         const result = await this.saveTilemap(newTilemap.id);
-        if (result.status === "Success") {
+        if (result.status === Result.Status.Success) {
             return Result.Success(newTilemap);
         } else {
             this.tilemapMap.delete(newTilemap.id);

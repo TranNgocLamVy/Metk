@@ -6,6 +6,7 @@ import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { WorkspaceService } from "./workspaceService";
+import { Result } from "../types/result";
 
 export class ProjectService {
 
@@ -13,7 +14,7 @@ export class ProjectService {
         const projectAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Project", extensions: ["json"] }] });
         if (!projectAbsPath) return;
         const result = await AppCore.getIns().projectManager.openProject(projectAbsPath);
-        if (result.status == "Success") {
+        if (result.status === Result.Status.Success) {
             WorkspaceService.loadProjectWorkspace(result.data.metaData.id);
         }
     }
@@ -26,12 +27,12 @@ export class ProjectService {
         const projectManager = AppCore.getIns().projectManager;
         const createProjectResult = await projectManager.createProject(form.name, form.destination);
 
-        if (createProjectResult.status == "Success") {
+        if (createProjectResult.status === Result.Status.Success) {
             const newProject = createProjectResult.data;
             useProjectManagerStore.getState().refresh();
             ToastService.success({ message: "Project created successfully" });
             await WorkspaceService.loadProjectWorkspace(newProject.id);
-        } else if (createProjectResult.status == "Error") {
+        } else if (createProjectResult.status === Result.Status.Error) {
             ToastService.error({ message: createProjectResult.message });
         }
     }

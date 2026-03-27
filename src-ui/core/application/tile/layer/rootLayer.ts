@@ -1,6 +1,6 @@
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { RootLayerData } from "@/shared/schema/layerSchema";
-import { ErrorResult, Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
 import { Tilemap } from "../tilemap";

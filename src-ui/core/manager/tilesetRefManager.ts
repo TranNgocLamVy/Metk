@@ -1,5 +1,4 @@
 import { TilesetRefData } from "@/shared/schema/tilemapSchema";
-import { ErrorResult, Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { Tileset } from "../application/tile/tileset";
