@@ -20,11 +20,11 @@ export class DeleteLayerCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.layerId);
-        if (!targetLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer) return Result.Error("Target layer not found");
         this.layer = targetLayer;
         const parent = this.layer.parentLayer || root;
         this.parentId = parent.id;
@@ -35,16 +35,16 @@ export class DeleteLayerCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession()
-        if (!currentSession) return ErrorResult("Current session not found");
+        if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.findLayer(this.parentId);
-        if (!targetLayer) return ErrorResult("Target layer not found");
+        if (!targetLayer) return Result.Error("Target layer not found");
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
         parent.insertLayer(this.layer, this.index);
 
@@ -52,7 +52,7 @@ export class DeleteLayerCommand implements IBaseCommand {
 
         useLayerManagerStore.getState().refresh();
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public delete(): void {

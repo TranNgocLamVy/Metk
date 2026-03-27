@@ -18,15 +18,15 @@ export class EraseTileCommand implements IBaseCommand {
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession();
-        if (!currentSession) return ErrorResult("Tilemap not found");
+        if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
-        if (!layer) return ErrorResult("Layer not found");
+        if (!layer) return Result.Error("Layer not found");
 
         const tileRef = layer.getTileAt(this.coordinate);
-        if (!tileRef) return SuccessResult();
+        if (!tileRef) return Result.Success();
 
         const { tileId, tilesetIndex } = tileRef.getTile();
         this.oldTileId = tileId;
@@ -41,14 +41,14 @@ export class EraseTileCommand implements IBaseCommand {
 
     public undo(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession();
-        if (!currentSession) return ErrorResult("Tilemap not found");
+        if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
 
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
-        if (!layer) return ErrorResult("Layer not found");
+        if (!layer) return Result.Error("Layer not found");
 
-        if (this.oldTileId == null || this.oldTilesetIndex == null) return SuccessResult();
+        if (this.oldTileId == null || this.oldTilesetIndex == null) return Result.Success();
 
         const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
 

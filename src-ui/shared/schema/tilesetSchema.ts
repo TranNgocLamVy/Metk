@@ -9,7 +9,7 @@ const tileData = type({
 })
 export type TileData = typeof tileData.infer;
 
-export const tilesetDataSchema = type("string.json.parse").to({
+export const TilesetDataSchema = type("string.json.parse").to({
     id: type("string"),
     name: type("string"),
     columns: type("number"),
@@ -23,7 +23,7 @@ export const tilesetDataSchema = type("string.json.parse").to({
     }),
     tiles: tileData.array(),
 })
-export type TilesetData = typeof tilesetDataSchema.infer;
+export type TilesetData = typeof TilesetDataSchema.infer;
 
 export const TilesetMetaDataSchema = type({
     name: type("string"),

@@ -19,9 +19,9 @@ export class EditorContext {
     public eventEmitter = new EventEmitter<EditorContextEvent>();
     
     constructor(
-        private readonly projectManager: ProjectManager,
-        private readonly workspaceManager: WorkspaceManager,
-        private readonly toolManager: ToolManager
+        public readonly projectManager: ProjectManager,
+        public readonly workspaceManager: WorkspaceManager,
+        public readonly toolManager: ToolManager
     ) { }
 
     public getCurrentProject(): Project {

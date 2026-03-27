@@ -43,7 +43,7 @@ export class WorkspaceService {
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {

@@ -1,4 +1,4 @@
-import { Result, SuccessResult } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { create, exists, writeFile } from "@tauri-apps/plugin-fs";
 
 export class ExportStorageService {
@@ -11,6 +11,6 @@ export class ExportStorageService {
             await file.write(buffer);
             await file.close();
         }
-        return SuccessResult()
+        return Result.Success()
     }
 }

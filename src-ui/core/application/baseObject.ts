@@ -22,9 +22,9 @@ export abstract class BaseObject<T extends BaseObjectEvents = BaseObjectEvents> 
     try {
         (this as any)[key] = value;
         (this.eventEmitter as any).emit("updateProperty", { key, value });
-        return SuccessResult();
+        return Result.Success();
     } catch (error) {
-        return ErrorResult("Failed to set property: " + (error as any).toString());
+        return Result.Error("Failed to set property: " + (error as any).toString());
     }
 }
 }

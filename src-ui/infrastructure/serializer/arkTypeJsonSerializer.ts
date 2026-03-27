@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { ISerializer } from "@/infrastructure/interface/ISerializer";
-import { Result } from "../shared/types/result";
+import { Result } from "../../shared/types/result";
 
 export class ArkTypeJsonSerializer<T> implements ISerializer<T> {
     // Nhận vào một arktype schema
@@ -21,7 +21,7 @@ export class ArkTypeJsonSerializer<T> implements ISerializer<T> {
         // Parse JSON sau đó validate bằng schema
         const parsed = JSON.parse(rawString);
 
-            if (!this.schema) return Result.Success(parsed);
+        if (!this.schema) return Result.Success(parsed);
 
         const validatedData = this.schema(parsed);
         

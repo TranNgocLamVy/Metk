@@ -21,7 +21,7 @@ export class ExportTilemapCommand implements ISystemCommand {
         const tilemapSession = workspace.tilemapSessionManager.currentTilemapSession;
         if (!tilemapSession) return CancelResult();
         const tilemap = tilemapSession.tilemap;
-        if (!tilemap) return ErrorResult("Tilemap not found");
+        if (!tilemap) return Result.Error("Tilemap not found");
 
         const exportPathManager = workspace.exportPathManager;
         let exportPath = exportPathManager.getExportPath(tilemap.id);
@@ -45,7 +45,7 @@ export class ExportTilemapCommand implements ISystemCommand {
 
         if (result.status === "Success") {
             exportPathManager.setExportPath(tilemap.id, exportPath);
-            workspace.save();
+            await context.workspaceManager.saveCurrentWorkspace();
             
             ToastService.success({ message: "Tilemap exported successfully" });
         }

@@ -1,9 +1,6 @@
 import "./command/system/index";
 import "./tool/index";
 
-import { JsonProjectRepository } from "@/infrastructure/projectRepository";
-import { JsonProjectStorageService } from "@/infrastructure/projectStorageService";
-
 import { EditorContext } from "./application/editorContext";
 import { KeybindingManager } from "./manager/keybindingManager";
 import { ProjectManager } from "./manager/projectManager";
@@ -24,11 +21,8 @@ export class AppCore {
 
 
     private constructor() {
-        const projectRepo = new JsonProjectRepository();
-        const projectStorageService = new JsonProjectStorageService();
-
         // Init Managers
-        this.projectManager = new ProjectManager(projectRepo, projectStorageService);
+        this.projectManager = new ProjectManager();
         this.workspaceManager = new WorkspaceManager();
         this.toolManager = new ToolManager();
         this.editorContext = new EditorContext(this.projectManager, this.workspaceManager, this.toolManager);

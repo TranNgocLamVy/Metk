@@ -42,27 +42,27 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         this.layers.unshift(newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public insertLayer(newLayer: BaseLayer<any>, index: number): Result {
-        if (index < 0) return ErrorResult("Invalid layer's index: " + index);
+        if (index < 0) return Result.Error("Invalid layer's index: " + index);
 
         newLayer.parentLayer = this;
         this.layers.splice(index, 0, newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, index);
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public removeLayer(layerId: string): Result {
         const index = this.layers.findIndex(layer => layer.id === layerId);
-        if (index === -1) return ErrorResult("Layer not found: " + layerId);
+        if (index === -1) return Result.Error("Layer not found: " + layerId);
 
         this.layers.splice(index, 1);
         this.eventEmitter.emit("layerRemoved", layerId, index);
 
-        return SuccessResult();
+        return Result.Success();
     }
 
     public moveChild(id: string, offset: number) {
