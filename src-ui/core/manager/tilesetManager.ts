@@ -25,7 +25,7 @@ export class TilesetManager {
             const tilesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilesetRelPath);
             
             const loadTilesetResult = await TilesetStorageService.load(tilesetAbsPath);
-            if (loadTilesetResult.status === "Success") {
+            if (loadTilesetResult.status === Result.Status.Success) {
                 const tilesetData = loadTilesetResult.data;
                 
                 const tilesetPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.tilesetRelPath);
@@ -38,7 +38,7 @@ export class TilesetManager {
                 this.tilesetMap.set(tilesetData.id, newTileset);
 
                 await this.saveTileset(newTileset.id);
-            } else if (loadTilesetResult.status === "Error") {
+            } else if (loadTilesetResult.status === Result.Status.Error) {
                 ToastService.error({ message: loadTilesetResult.message });
             }
         }));
@@ -81,7 +81,7 @@ export class TilesetManager {
         await newTileset.loadTexture();
         this.tilesetMap.set(newTileset.id, newTileset);
         const result = await this.saveTileset(newTileset.id);
-        if (result.status === "Success") {
+        if (result.status === Result.Status.Success) {
             return Result.Success(newTileset);
         } else {
             this.tilesetMap.delete(newTileset.id);

@@ -3,7 +3,7 @@ import { TmxTilemapExporter } from "@/core/application/exporter/TmxTilemapExport
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { ToastService } from "@/shared/services/toastService";
-import { CancelResult, ErrorResult, Result } from "@/shared/types/result";
+import { Result } from "@/shared/types/result";
 import { save } from "@tauri-apps/plugin-dialog";
 
 import { ExportStorageService } from "../../../infrastructure/exportStorageService";
@@ -19,7 +19,7 @@ export class ExportTilemapCommand implements ISystemCommand {
         const workspace = context.getCurrentWorkspace();
 
         const tilemapSession = workspace.tilemapSessionManager.currentTilemapSession;
-        if (!tilemapSession) return CancelResult();
+        if (!tilemapSession) return Result.Cancel();
         const tilemap = tilemapSession.tilemap;
         if (!tilemap) return Result.Error("Tilemap not found");
 
@@ -31,7 +31,7 @@ export class ExportTilemapCommand implements ISystemCommand {
                 canCreateDirectories: true,
                 title: "Export Tilemap",
             });
-            if (!savePath) return CancelResult();
+            if (!savePath) return Result.Cancel();
             exportPath = savePath;
         }
 
@@ -43,7 +43,7 @@ export class ExportTilemapCommand implements ISystemCommand {
 
         const result = await exportStorageService.exportToPath(exportPath, buffer);
 
-        if (result.status === "Success") {
+        if (result.status === Result.Status.Success) {
             exportPathManager.setExportPath(tilemap.id, exportPath);
             await context.workspaceManager.saveCurrentWorkspace();
             

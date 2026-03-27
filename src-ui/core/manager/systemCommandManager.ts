@@ -3,6 +3,7 @@ import { ToastService } from "@/shared/services/toastService";
 import { EditorContext } from "../application/editorContext";
 import { CommandContext } from "../decorator/command";
 import { ISystemCommandConstructor } from "../interface/IBaseCommand";
+import { Result } from "@/shared/types/result";
 
 export class SystemCommandManager {
     public static COMMAND_REGISTRY: Array<CommandContext> = [];
@@ -30,7 +31,7 @@ export class SystemCommandManager {
         if (CommandClass) {
             const command = new CommandClass();
             const result = await command.execute(this.editorContext);
-            if (result.status == "Error") ToastService.error({ message: result.message });
+            if (result.status === Result.Status.Error) ToastService.error({ message: result.message });
         } else {
             ToastService.error({message: `Command ID ${commandId} not found.`});
         }

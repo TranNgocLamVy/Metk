@@ -73,14 +73,14 @@ export class Project {
     private async save(): Promise<void> {
         const projectData = this.serialize();
         const result = await ProjectStorageService.save(this.projectPathSystem.getAbsPathFromRelPath("project.json"), projectData);
-        if (result.status == "Error") {
+        if (result.status === Result.Status.Error) {
             ToastService.error({ message: `Error while saving project: ${result.message}` });
         }
     }
 
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
         const result = await this.tilesetManager.createTileset(tilesetData, tilesetAbsPath);
-        if (result.status === "Success") {
+        if (result.status === Result.Status.Success) {
             this.save();
         }
         return result;
@@ -88,7 +88,7 @@ export class Project {
 
     public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
         const result = await this.tilemapManager.createTilemap(tilemapData, tilemapAbsPath);
-        if (result.status === "Success") {
+        if (result.status === Result.Status.Success) {
             this.save();
         }
         return result;

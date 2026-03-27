@@ -26,7 +26,7 @@ export class WorkspaceManager {
 
         const workspaceAbsPath = project.projectPathSystem.getAbsPathFromRelPath("session.ss.json");
         const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
-        if (loadSessionResult.status === "Success") {
+        if (loadSessionResult.status === Result.Status.Success) {
             this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
         } else {
             const defaultWorkspaceData: WorkpsaceData = {

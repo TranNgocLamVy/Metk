@@ -14,7 +14,7 @@ type XMLBuilder = ReturnType<typeof create>;
 export class TmxTilemapExporter implements ITilemapExporter {
     private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // id -> firstGid
 
-    public export(tilemap: Tilemap, exportPath: string, editorContext: EditorContext): Uint8Array<ArrayBuffer> {
+    public export(tilemap: Tilemap, exportPath: string, editorContext: EditorContext): Uint8Array {
 
         const builder: XMLBuilder = create({ version: '1.0', encoding: 'UTF-8' })
 

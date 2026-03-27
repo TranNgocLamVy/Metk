@@ -3,11 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { TileLayerData, TileRefData } from "@/shared/schema/layerSchema";
-import { ErrorResult, Result, ResultStatus, SuccessResult } from "@/shared/types/result";
+import {  Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
-import { Tilemap } from "../tilemap";
-import { Tile } from "../tileset";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 
 interface TileLayerEvents extends BaseLayerEvents {

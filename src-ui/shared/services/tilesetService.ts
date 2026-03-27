@@ -10,6 +10,7 @@ import { PathUtils } from "../utils/pathUtils";
 import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { WorkspaceService } from "./workspaceService";
+import { Result } from "../types/result";
 
 export class TilesetService {
     public static async loadTilesetView(): Promise<void> {
@@ -52,12 +53,12 @@ export class TilesetService {
 
         const createTilesetResult = await currentProject.createTileset(tilesetData, tilesetAbsPath);
 
-        if (createTilesetResult.status === "Success") {
+        if (createTilesetResult.status === Result.Status.Success) {
             const newTileset = createTilesetResult.data;
             useExplorerStore.getState().addTileset({ name: newTileset.name, id: newTileset.id });
             WorkspaceService.createTilesetSession(newTileset.id);
             ToastService.success({ message: "Tileset created successfully" });
-        } else if (createTilesetResult.status === "Error") {
+        } else if (createTilesetResult.status === Result.Status.Error) {
             ToastService.error({ message: createTilesetResult.message });
         }
     }
