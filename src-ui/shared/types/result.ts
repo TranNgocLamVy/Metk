@@ -41,3 +41,10 @@ export function SuccessResult<T = any>(data?: T, message?: string | undefined): 
 export function CancelResult<T = any>(message?: string): ErrorResult<T> {
     return { status: "Cancel", message };
 }
+
+export namespace Result {
+    export const Success = SuccessResult;
+    export const Error = ErrorResult;
+    export const Cancel = CancelResult;
+    export const Status = ResultStatus;
+}
