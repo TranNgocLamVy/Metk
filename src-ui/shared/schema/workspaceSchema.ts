@@ -20,3 +20,18 @@ export const WorkpsaceSchema = type({
 export const WorkspaceRepoSchema = type("string.json.parse").to(WorkpsaceSchema)
 
 export type WorkpsaceData = typeof WorkpsaceSchema.infer
+
+export const defaultWorkspaceData: WorkpsaceData = {
+    tilesets: {
+        tilesetSessions: [],
+        currentTilesetSessionId: null,
+    },
+    tilemaps: {
+        tilemapSessions: [],
+        currentTilemapSessionId: null,
+    },
+    toolState: {
+        currentTool: undefined,
+    },
+    exportPaths: [],
+}

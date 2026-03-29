@@ -10,7 +10,7 @@ export type AppcoreState = {
 }
 
 export const useAppcore = create<AppcoreState>((set, get) => {
-    AppCore.getIns().load().then((appcore) => {
+    AppCore.getIns().load().then((result) => {
         set({ isAppcoreLoaded: true });
         useProjectManagerStore.getState().refresh();
     })

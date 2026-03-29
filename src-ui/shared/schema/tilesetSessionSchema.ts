@@ -1,7 +1,7 @@
 import { type } from "arktype";
 
-import { SelectionStateSchema } from "./common/selectionState";
-import { ViewStateSchema } from "./common/viewState";
+import { SelectionStateSchema } from "./selectionState";
+import { ViewStateSchema } from "./viewState";
 
 export const TilesetSessionSchema = type({
     id: "string",

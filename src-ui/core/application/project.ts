@@ -1,7 +1,6 @@
 
 import { TilemapData } from "@/shared/schema/tilemapSchema";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
-import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 
 import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
@@ -10,7 +9,6 @@ import { TilesetManager } from "../manager/tilesetManager";
 import { Tilemap } from "./tile/tilemap";
 import { Tileset } from "./tile/tileset";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
-import { ProjectStorageService } from "@/infrastructure/container";
 
 export class Project {
     public readonly id: string;
@@ -28,7 +26,7 @@ export class Project {
             description: this.description,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
-            directory: this.projectPathSystem.projectDir,
+            directory: this.projectPathSystem.absDir,
         }
     }
     
@@ -65,32 +63,16 @@ export class Project {
             description: this.description,
             createdAt: this.createdAt,
             updatedAt: new Date().toDateString(),
-            tilemaps: this.tilemapManager.getTilemapsMetaData(),
-            tilesets: this.tilesetManager.getTilesetsMetaData(),
+            tilemaps: this.tilemapManager.serialize(),
+            tilesets: this.tilesetManager.serialize(),
         };
     }
 
-    private async save(): Promise<void> {
-        const projectData = this.serialize();
-        const result = await ProjectStorageService.save(this.projectPathSystem.getAbsPathFromRelPath("project.json"), projectData);
-        if (result.status === Result.Status.Error) {
-            ToastService.error({ message: `Error while saving project: ${result.message}` });
-        }
-    }
-
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
-        const result = await this.tilesetManager.createTileset(tilesetData, tilesetAbsPath);
-        if (result.status === Result.Status.Success) {
-            this.save();
-        }
-        return result;
+        return await this.tilesetManager.createTileset(tilesetData, tilesetAbsPath);
     }
 
     public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
-        const result = await this.tilemapManager.createTilemap(tilemapData, tilemapAbsPath);
-        if (result.status === Result.Status.Success) {
-            this.save();
-        }
-        return result;
+        return await this.tilemapManager.createTilemap(tilemapData, tilemapAbsPath);
     }
 }

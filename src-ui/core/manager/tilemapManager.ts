@@ -17,11 +17,6 @@ export class TilemapManager {
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
-    public getTilemapsMetaData(): TilemapMetaData[] {
-        const tilemapArray = Array.from(this.tilemapMap.values());
-        return tilemapArray.map((tilemap) => ({ name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relDir }));
-    }
-
     public async loadAll(tilemapsMetaData: TilemapMetaData[]): Promise<void> {
         await Promise.all(tilemapsMetaData.map(async (metaData) => {
             const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
@@ -65,7 +60,7 @@ export class TilemapManager {
     }
 
     public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
-        const tilemapRefPath = PathUtils.relative(this.projectPathSystem.projectDir, tilemapAbsPath);
+        const tilemapRefPath = PathUtils.relative(this.projectPathSystem.absDir, tilemapAbsPath);
         const tilemapPathSystem = new FilePathSystem(tilemapData.id, this.projectPathSystem, tilemapRefPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const newTilemap = new Tilemap(tilemapData, tilesetRefManager);
@@ -78,5 +73,10 @@ export class TilemapManager {
             this.tilemapMap.delete(newTilemap.id);
             return Result.Error(result.message);
         }
+    }
+
+    public serialize(): TilemapMetaData[] {
+        const tilemapArray = Array.from(this.tilemapMap.values());
+        return tilemapArray.map((tilemap) => ({ name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relDir }));
     }
 }

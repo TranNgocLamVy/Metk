@@ -7,6 +7,8 @@ import { ProjectManager } from "./manager/projectManager";
 import { SystemCommandManager } from "./manager/systemCommandManager";
 import { ToolManager } from "./manager/toolManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
+import { ProjectMetaDataRepo } from "@/infrastructure/container";
+import { Result } from "@/shared/types/result";
 
 export class AppCore {
     private static _instance: AppCore;
@@ -35,13 +37,6 @@ export class AppCore {
         this.workspaceManager.setEditorContext(this.editorContext);
     }
 
-    public async load(): Promise<AppCore> {
-        if (this.isLoaded) return this;
-        await AppCore.getIns().projectManager.load();
-        this.isLoaded = true;
-        return this;
-    }
-
     public static initialize() {
         if (AppCore._instance) return;
         const global = globalThis as any;
@@ -58,5 +53,28 @@ export class AppCore {
             this.initialize();
         }
         return this._instance;
+    }
+
+    public async load(): Promise<Result<AppCore>> {
+        if (this.isLoaded) return Result.Success(this);
+
+        const projectRepoResult = await ProjectMetaDataRepo.load('projects.json');
+
+        if (projectRepoResult.status !== Result.Status.Success) {
+            console.error(projectRepoResult.message);
+            AppCore.getIns().projectManager.load([]);
+            return Result.Error("Failed to load project repository");
+        }
+
+        const projectRepoData = projectRepoResult.data;
+        AppCore.getIns().projectManager.load(projectRepoData);
+
+        this.isLoaded = true;
+        return Result.Success(this);
+    }
+
+    public async saveProjectManager(): Promise<Result> {
+        const data = this.projectManager.serialize();
+        return await ProjectMetaDataRepo.save("projects.json", data);
     }
 }

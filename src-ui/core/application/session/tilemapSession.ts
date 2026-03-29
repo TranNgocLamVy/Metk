@@ -1,6 +1,6 @@
 import { IBaseSession } from "@/core/interface/IBaseSession";
 import { HistoryManager } from "@/core/manager/historyManager";
-import { ViewState } from "@/shared/schema/common/viewState";
+import { ViewState } from "@/shared/schema/viewState";
 import { LayerState, TilemapSessionData } from "@/shared/schema/tilemapSessionSchema";
 import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
 

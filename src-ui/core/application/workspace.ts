@@ -33,7 +33,7 @@ export class Workspace {
         await this.tilesetSessionManager.loadAll(this.tilesetManager);
         await this.tilemapSessionManager.loadAll(this.tilemapManager);
         await this.toolSessionManager.load();
-        return { status: "Success", data: null };
+        return Result.Success();
     }
 
     public async unload(): Promise<void> {

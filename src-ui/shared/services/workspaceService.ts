@@ -12,7 +12,9 @@ export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
 
     public static async loadProjectWorkspace(projectId: string): Promise<Result> {
-        const loadProjectResult = await AppCore.getIns().projectManager.loadProject(projectId);
+        const projectManager = AppCore.getIns().projectManager;
+
+        const loadProjectResult = await projectManager.setAndLoadProject(projectId);
         if (loadProjectResult.status !== Result.Status.Success) {
             ToastService.error({ message: loadProjectResult.message });
             return loadProjectResult;

@@ -1,5 +1,5 @@
 import { AppCore } from "@/core/appcore";
-import { i18nService } from "@/core/service/i18n";
+import { ToastService } from "@/shared/services/toastService";
 import { useNavigationStore } from "@/view/stores/menu/navigationStore";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
@@ -21,21 +21,15 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 		type: "option",
 		name: "Print Projects",
 		onClick() {
-			console.log(AppCore.getIns().projectManager.projectMetaData);
+			console.log(AppCore.getIns().projectManager.serialize());
 		}
 	},
     {
         type: "option",
-        name: "Switch to English",
-        onClick() {
-            i18nService.changeLanguage("en");
-        }
-    },
-    {
-        type: "option",
-        name: "Switch to VietNamese",
-        onClick() {
-            i18nService.changeLanguage("vi");
+        name: "save project manager",
+        async onClick() {
+            await AppCore.getIns().saveProjectManager();
+            ToastService.success({ message: "Project manager saved successfully" });
         }
     },
 ];
