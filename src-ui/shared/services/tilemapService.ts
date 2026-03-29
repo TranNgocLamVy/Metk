@@ -15,8 +15,8 @@ export class TilemapService {
     public static async loadTilemapView(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const project = editorContext.getCurrentProject();
-        const tilemaps = project.tilemapManager.getAllTilemaps();
-        useExplorerStore.getState().setTilemaps(tilemaps.map((tilemap) => {
+        const tilemapsMetadata = project.tilemapManager.getTilemapsMetadata();
+        useExplorerStore.getState().setTilemaps(tilemapsMetadata.map((tilemap) => {
             return {
                 id: tilemap.id,
                 name: tilemap.name,

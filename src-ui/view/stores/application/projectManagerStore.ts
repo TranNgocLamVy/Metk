@@ -1,12 +1,12 @@
 import { create } from "zustand";
 
 import { AppCore } from "@/core/appcore";
-import { ProjectMetaData } from "@/shared/schema/projectSchema";
+import { ProjectMetadata } from "@/shared/schema/projectSchema";
 
 type ProjectManagerState = {
     version: number;
-    projects: ProjectMetaData[];
-    getProjects(): ProjectMetaData[];
+    projects: ProjectMetadata[];
+    getProjects(): ProjectMetadata[];
     refresh: () => void
 }
 

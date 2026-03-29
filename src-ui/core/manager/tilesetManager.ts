@@ -3,7 +3,7 @@ import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { TilesetData, TilesetMetaData } from "../../shared/schema/tilesetSchema";
+import { TilesetData, TilesetMetadata } from "../../shared/schema/tilesetSchema";
 import { Tileset } from "../application/tile/tileset";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { TilesetStorageService } from "@/infrastructure/container";
@@ -15,8 +15,8 @@ export class TilesetManager {
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
-    public async loadAll(tilesetsMetaData: TilesetMetaData[]): Promise<void> {
-        await Promise.all(tilesetsMetaData.map(async (metaData) => {
+    public async loadAll(tilesetsMetadata: TilesetMetadata[]): Promise<void> {
+        await Promise.all(tilesetsMetadata.map(async (metaData) => {
             const tilesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilesetRelPath);
             
             const loadTilesetResult = await TilesetStorageService.load(tilesetAbsPath);
@@ -84,7 +84,7 @@ export class TilesetManager {
         }
     }
 
-    public serialize(): TilesetMetaData[] {
+    public serialize(): TilesetMetadata[] {
         const tilesetArray = Array.from(this.tilesetMap.values());
         return tilesetArray.map((tileset) => ({ name: tileset.name, id: tileset.id, tilesetRelPath: tileset.tilesetPathSystem.relDir }));
     }

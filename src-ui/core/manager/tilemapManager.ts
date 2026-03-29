@@ -2,7 +2,7 @@ import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { TilemapData, TilemapMetaData } from "../../shared/schema/tilemapSchema";
+import { TilemapData, TilemapMetadata } from "../../shared/schema/tilemapSchema";
 import { Tilemap } from "../application/tile/tilemap";
 import { TilesetManager } from "./tilesetManager";
 import { TilesetRefManager } from "./tilesetRefManager";
@@ -10,15 +10,16 @@ import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathS
 import { TilemapStorageService } from "@/infrastructure/container";
 
 export class TilemapManager {
-    private tilemapMap: Map<string, Tilemap> = new Map<string, Tilemap>(); // id -> tilemap
+    private tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
+    private loadedTilemap: Map<string, Tilemap> = new Map<string, Tilemap>(); // id -> tilemap
 
     public constructor(
         private readonly tilesetManager: TilesetManager,
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
-    public async loadAll(tilemapsMetaData: TilemapMetaData[]): Promise<void> {
-        await Promise.all(tilemapsMetaData.map(async (metaData) => {
+    public async loadAll(tilemapsMetadata: TilemapMetadata[]): Promise<void> {
+        await Promise.all(tilemapsMetadata.map(async (metaData) => {
             const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
 
             const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
@@ -30,7 +31,7 @@ export class TilemapManager {
                 const tilemap = new Tilemap(tilemapData, tilesetRefManager);
                 
                 await tilemap.load();
-                this.tilemapMap.set(tilemapData.id, tilemap);
+                this.loadedTilemap.set(tilemapData.id, tilemap);
             } else if (loadTilemapResult.status === Result.Status.Error) {
                 ToastService.error({ message: loadTilemapResult.message });
             }
@@ -38,7 +39,7 @@ export class TilemapManager {
     }
 
     public async saveTilemap(id: string): Promise<Result> {
-        const tilemap = this.tilemapMap.get(id);
+        const tilemap = this.loadedTilemap.get(id);
         if (tilemap === undefined) return Result.Error("Tilemap not found")
 
         try {
@@ -50,12 +51,12 @@ export class TilemapManager {
         }
     }
 
-    public getAllTilemaps(): Tilemap[] {
-        return Array.from(this.tilemapMap.values());
+    public getTilemapsMetadata(): TilemapMetadata[] {
+        return Array.from(this.tilemapMetadata.values());
     }
 
     public getTilemapById(id: string): Tilemap | null {
-        const tilemap = this.tilemapMap.get(id);
+        const tilemap = this.loadedTilemap.get(id);
         return tilemap ?? null;
     }
 
@@ -65,18 +66,21 @@ export class TilemapManager {
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const newTilemap = new Tilemap(tilemapData, tilesetRefManager);
         await newTilemap.load();
-        this.tilemapMap.set(newTilemap.id, newTilemap);
+        this.loadedTilemap.set(newTilemap.id, newTilemap);
         const result = await this.saveTilemap(newTilemap.id);
         if (result.status === Result.Status.Success) {
             return Result.Success(newTilemap);
         } else {
-            this.tilemapMap.delete(newTilemap.id);
+            this.loadedTilemap.delete(newTilemap.id);
             return Result.Error(result.message);
         }
     }
 
-    public serialize(): TilemapMetaData[] {
-        const tilemapArray = Array.from(this.tilemapMap.values());
-        return tilemapArray.map((tilemap) => ({ name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relDir }));
+    public serialize(): TilemapMetadata[] {
+        return Array.from(this.tilemapMetadata.values()).map((metaData) => {
+            const tilemap = this.loadedTilemap.get(metaData.id);
+            if (!tilemap) return metaData;
+            return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relDir };
+        });
     }
 }
