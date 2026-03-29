@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { ProjectService } from "@/shared/services/projectService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import LoadingOverlay from "@/view/components/layout/loadingOverlay";
 import Workspace from "@/view/components/workspace/workspace";

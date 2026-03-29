@@ -11,25 +11,26 @@ export class ArkTypeJsonSerializer<T> implements ISerializer<T> {
         try {
             const stringContent = JsonFormatter.format(data);
             if (!stringContent) throw new Error("Format failed");
-            return { status: "Success", data: stringContent };
+            return Result.Success(stringContent);
         } catch (error) {
-            return { status: "Error", message: "Serialization failed" };
+            return Result.Error("Serialization failed");
         }
     }
 
     deserialize(rawString: string): Result<T> {
         // Parse JSON sau đó validate bằng schema
-        const parsed = JSON.parse(rawString);
+        if (!this.schema) {
+            const parsed = JSON.parse(rawString);
+            return Result.Success(parsed)
+        }
 
-        if (!this.schema) return Result.Success(parsed);
-
-        const validatedData = this.schema(parsed);
+        const validatedData = this.schema(rawString);
         
         if (validatedData instanceof type.errors) {
             console.error(validatedData.summary);
-            return { status: "Error", message: "Data validation failed: " + validatedData.summary };
+            return Result.Error("Data validation failed: " + validatedData.summary);
         }
         
-        return { status: "Success", data: validatedData as T };
+        return Result.Success(validatedData);
     }
 }

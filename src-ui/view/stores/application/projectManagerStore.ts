@@ -16,7 +16,7 @@ export const useProjectManagerStore = create<ProjectManagerState>((set, get) => 
         projects: [],
         currentProject: null,
         getProjects: () => {
-            return AppCore.getIns().projectManager.projectMetaData;
+            return AppCore.getIns().projectManager.serialize();
         },
         refresh: () => { set({ version: (get().version + 1) % 100000 }) }
     }

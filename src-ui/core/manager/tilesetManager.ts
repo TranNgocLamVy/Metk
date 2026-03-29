@@ -15,11 +15,6 @@ export class TilesetManager {
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
-    public getTilesetsMetaData(): TilesetMetaData[] {
-        const tilesetArray = Array.from(this.tilesetMap.values());
-        return tilesetArray.map((tileset) => ({ name: tileset.name, id: tileset.id, tilesetRelPath: tileset.tilesetPathSystem.relDir }));
-    }
-
     public async loadAll(tilesetsMetaData: TilesetMetaData[]): Promise<void> {
         await Promise.all(tilesetsMetaData.map(async (metaData) => {
             const tilesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilesetRelPath);
@@ -87,5 +82,10 @@ export class TilesetManager {
             this.tilesetMap.delete(newTileset.id);
             return Result.Error(result.message);
         }
+    }
+
+    public serialize(): TilesetMetaData[] {
+        const tilesetArray = Array.from(this.tilesetMap.values());
+        return tilesetArray.map((tileset) => ({ name: tileset.name, id: tileset.id, tilesetRelPath: tileset.tilesetPathSystem.relDir }));
     }
 }

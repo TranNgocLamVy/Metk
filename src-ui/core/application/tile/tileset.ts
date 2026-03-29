@@ -74,8 +74,8 @@ export class Tileset extends BaseObject<TilesetEvent> {
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.eventEmitter.emit("updateProperty", "name", this.name);
-        return { status: Result.Status.Success, data: null };
-    }
+        return Result.Success();
+    }   
 
     public getTileFromId(id: number): Tile | null {
         return this.tiles.find(tile => tile.id === id) || null;
@@ -99,13 +99,13 @@ export class Tileset extends BaseObject<TilesetEvent> {
     }
 
     public async loadTexture(): Promise<Result> {
-        if (this.isTextureLoaded) return { status: Result.Status.Success, data: null };
+        if (this.isTextureLoaded) return Result.Success();
         const imageRelPath = this.image.source;
 
         const loadTextureResult = await this.textureService.loadTexture(imageRelPath);
         if (loadTextureResult.status === Result.Status.Error) return loadTextureResult;
         const texture = loadTextureResult.data;
-        if (!texture) return { status: Result.Status.Error, message: "Failed to load texture" };
+        if (!texture) return Result.Error("Failed to load texture");
         this.texture = texture;
 
         this.image.width = texture.width;
@@ -131,7 +131,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
             tile.loadTexture(tileTexture);
         })
 
-        return { status: Result.Status.Success, data: null };
+        return Result.Success();
     }
 
     public async unloadTexture(): Promise<void> {

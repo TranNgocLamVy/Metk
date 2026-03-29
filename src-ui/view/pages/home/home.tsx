@@ -20,17 +20,12 @@ export default function HomePage() {
 
     const { t: translate } = useTranslation(['common', 'home']);
 
-    const openProject = (id: string) => {
-        navigate(`/project/${id}`);
-        window.location.reload();
-    }
-
 	return (
 		<VStack align="start" justify="start" className="w-full h-full p-16 gap-8">
 			<h1 className="text-3xl font-bold">{translate('home.welcome')}</h1>
 			<Separator />
 			<HStack className="w-full h-fit gap-8">
-				<Button variant={"outline"} onClick={ProjectService.openProject}>
+				<Button variant={"outline"} onClick={ProjectService.openNewProject}>
 					<SquareArrowOutUpRight />
 					{translate('home.openProject')}
 				</Button>
@@ -49,7 +44,7 @@ export default function HomePage() {
 						<HStack align="center" justify="start" key={project.id} className="gap-4">
 							<Tooltip>
 								<TooltipTrigger asChild>
-                                    <Button onClick={() => openProject(project.id)}>
+                                    <Button onClick={() => navigate(`/project/${project.id}`)}>
                                         <SquareArrowOutUpRight size={20} />
 										{project.name}
                                     </Button>

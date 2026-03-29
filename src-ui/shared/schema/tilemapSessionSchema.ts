@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-import { ViewStateSchema } from "./common/viewState";
+import { ViewStateSchema } from "./viewState";
 
 export const LayerStateSchema = type({
     selectedLayers: "string[]",

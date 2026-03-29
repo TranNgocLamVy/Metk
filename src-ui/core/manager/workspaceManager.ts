@@ -1,4 +1,4 @@
-import { WorkpsaceData } from "@/shared/schema/workspaceSchema";
+import { defaultWorkspaceData, WorkpsaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "../application/editorContext";
@@ -15,11 +15,6 @@ export class WorkspaceManager {
         this.editorContext = editorContext;
     }
 
-    // public async saveCurrentWorkspace(): Promise<Result> {
-    //     if (!this.currentWorkspace) return { status: "Error", message: "No current workspace" };
-    //     return await this.currentWorkspace.save();
-    // }
-
     public async loadProjectWorkspace(project: Project): Promise<Result> {
         if (this.currentWorkspace) await this.currentWorkspace.unload();
         this.currentWorkspace = null;
@@ -29,24 +24,10 @@ export class WorkspaceManager {
         if (loadSessionResult.status === Result.Status.Success) {
             this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
         } else {
-            const defaultWorkspaceData: WorkpsaceData = {
-                tilesets: {
-                    tilesetSessions: [],
-                    currentTilesetSessionId: null,
-                },
-                tilemaps: {
-                    tilemapSessions: [],
-                    currentTilemapSessionId: null,
-                },
-                toolState: {
-                    currentTool: undefined,
-                },
-                exportPaths: [],
-            }
             this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
         }
         await this.currentWorkspace.load();
-        return { status: "Success", data: null };
+        return Result.Success();
     }
 
     public async saveCurrentWorkspace(): Promise<Result> {

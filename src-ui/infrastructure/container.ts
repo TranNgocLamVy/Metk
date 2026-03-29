@@ -7,10 +7,10 @@ import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { TilesetData, TilesetDataSchema } from "@/shared/schema/tilesetSchema";
 import { WorkpsaceData } from "@/shared/schema/workspaceSchema";
 
-const fileStorage = new TauriFileSystemProvider();
+export const TauriFileStorage = new TauriFileSystemProvider();
 
-export const ProjectMetaDataRepo = new JsonFileRepository<ProjectMetaData[]>(fileStorage, new ArkTypeJsonSerializer(), { baseDir: BaseDirectory.AppData });
-export const ProjectStorageService = new JsonFileRepository<ProjectData>(fileStorage, new ArkTypeJsonSerializer());
-export const TilemapStorageService = new JsonFileRepository<TilemapData>(fileStorage, new ArkTypeJsonSerializer());
-export const TilesetStorageService = new JsonFileRepository<TilesetData>(fileStorage, new ArkTypeJsonSerializer());
-export const WorkspaceStorageService = new JsonFileRepository<WorkpsaceData>(fileStorage, new ArkTypeJsonSerializer());
+export const ProjectMetaDataRepo = new JsonFileRepository<ProjectMetaData[]>(TauriFileStorage, new ArkTypeJsonSerializer(), { baseDir: BaseDirectory.AppData });
+export const ProjectStorageService = new JsonFileRepository<ProjectData>(TauriFileStorage, new ArkTypeJsonSerializer());
+export const TilemapStorageService = new JsonFileRepository<TilemapData>(TauriFileStorage, new ArkTypeJsonSerializer());
+export const TilesetStorageService = new JsonFileRepository<TilesetData>(TauriFileStorage, new ArkTypeJsonSerializer());
+export const WorkspaceStorageService = new JsonFileRepository<WorkpsaceData>(TauriFileStorage, new ArkTypeJsonSerializer());

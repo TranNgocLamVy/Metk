@@ -4,12 +4,8 @@ export class ProjectPathSystem {
     public children: Map<string, FilePathSystem> = new Map<string, FilePathSystem>();
 
     public constructor(
-        public readonly projectDir: string
+        public readonly absDir: string
     ) { }
-
-    public get projectAbsPath(): string {
-        return PathUtils.join(this.projectDir, "project.json");
-    }
 
     public addNode(node: FilePathSystem) {
         this.children.set(node.id, node);
@@ -20,7 +16,7 @@ export class ProjectPathSystem {
     }
 
     public getAbsPathFromRelPath(relPath: string): string {
-        return PathUtils.join(this.projectDir, relPath);
+        return PathUtils.join(this.absDir, relPath);
     }
 }
 
@@ -41,15 +37,15 @@ export class FilePathSystem {
     }
     
     public getFileAbsPath(): string {
-        return PathUtils.join(this.parent.projectDir, this.relDir, this.fileName);
+        return PathUtils.join(this.parent.absDir, this.relDir, this.fileName);
     }
 
     public getFileAbsDir(): string {
-        return PathUtils.join(this.parent.projectDir, this.relDir);
+        return PathUtils.join(this.parent.absDir, this.relDir);
     }
     
     public getAbsPathFromRelPath(relPath: string): string {
-        const absDir = PathUtils.join(this.parent.projectDir, this.relDir);
+        const absDir = PathUtils.join(this.parent.absDir, this.relDir);
         return PathUtils.join(absDir, relPath);
     }
 }

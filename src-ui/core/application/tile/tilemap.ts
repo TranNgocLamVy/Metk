@@ -75,6 +75,6 @@ export class Tilemap extends BaseObject<TilemapEvent> {
     public async rename(name: string): Promise<Result> {
         this.name = name;
         this.eventEmitter.emit("updateProperty", "name", this.name);
-        return { status: Result.Status.Success, data: null };
+        return Result.Success();
     }
 }
