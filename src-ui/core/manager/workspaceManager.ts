@@ -26,7 +26,7 @@ export class WorkspaceManager {
         } else {
             this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
         }
-        await this.currentWorkspace.load();
+        await this.currentWorkspace.loadSession();
         return Result.Success();
     }
 

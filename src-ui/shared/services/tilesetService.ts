@@ -16,7 +16,7 @@ export class TilesetService {
     public static async loadTilesetView(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const project = editorContext.getCurrentProject();
-        const tilesets = project.tilesetManager.getAllTilesets();
+        const tilesets = project.tilesetManager.serialize();
         useExplorerStore.getState().setTilesets(tilesets.map((tileset) => {
             return {
                 id: tileset.id,

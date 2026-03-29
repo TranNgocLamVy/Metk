@@ -25,7 +25,8 @@ type SuccessResult<T = any> = {
 };
 
 function ErrorResult<T = any>(message: string | undefined): ErrorResult<T> {
-    console.trace(message);
+    const trace = new Error(message).stack;
+    console.error(`[ErrorResult]: ${message}\n`, trace);
     return { status: "Error", message };
 }
 

@@ -26,7 +26,7 @@ export default function TilesetViewTabs() {
     }, [version, getCurrentTilesetSessionId])
 
 	return (
-		<HStack className="w-full h-fit px-1" justify="start" align="center">
+		<HStack className="w-full h-fit" justify="start" align="center">
 			<TilesetViewDropDownMenu />
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
 				{tilesetsDisplayData.map((tilesetSession) => {

@@ -61,7 +61,6 @@ export class AppCore {
         const projectRepoResult = await ProjectMetadataRepo.load('projects.json');
 
         if (projectRepoResult.status !== Result.Status.Success) {
-            console.error(projectRepoResult.message);
             AppCore.getIns().projectManager.load([]);
             return Result.Error("Failed to load project repository");
         }

@@ -14,7 +14,7 @@ export default function TilemapEditorCanvas() {
 			if (!pixiApp) return;
 			const w = entry.contentRect.width;
 			const h = entry.contentRect.height;
-			pixiApp.renderer?.resize(w, h);
+			pixiApp.renderer?.resize(w - 3, h - 3);
 		},
 		[pixiApp]
 	);
@@ -24,7 +24,7 @@ export default function TilemapEditorCanvas() {
 	};
 
 	return (
-		<div ref={containerRef} className="bg-secondary-background w-full h-full overflow-hidden pl-1 pr-1.5 pt-2 pb-3">
+		<div ref={containerRef} className="bg-secondary-background w-full h-full overflow-hidden pt-1">
 			<ContextMenuWrapper item={TilemapEditorContextMenu}>
 				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="rounded-lg bg-background border-2 shadow-sm" />
 			</ContextMenuWrapper>

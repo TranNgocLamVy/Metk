@@ -28,7 +28,7 @@ export default function TilemapEditorTabs() {
 	}, [version, getCurrentTilemapSessionId]);
 
 	return (
-		<HStack className="w-full h-fit bg-secondary-background px-1" justify="start" align="center">
+		<HStack className="w-full h-fit bg-secondary-background" justify="start" align="center">
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar">
 				{tilemapSession.map((session) => {
 					const isCurrent = currentSessionId === session.sessionId;
@@ -61,7 +61,7 @@ export default function TilemapEditorTabs() {
 							{session.name}
 							<Tooltip delayDuration={500} disableHoverableContent>
 								<TooltipTrigger asChild>
-									<div className="group/icon ml-1 flex h-6 w-6 items-center justify-center rounded-md hover:bg-muted-foreground/20" onClick={closeTilemapSession}>
+									<div className="group/icon ml-1 flex items-center justify-center rounded-md hover:bg-muted-foreground/20" onClick={closeTilemapSession}>
 										{isDirty ? (
 											<Fragment>
 												<div className="h-2 w-2 rounded-full bg-foreground group-hover/icon:hidden" />

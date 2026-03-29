@@ -4,6 +4,7 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
+import { TilesetMetadata } from "@/shared/schema/tilesetSchema";
 
 export class TilesetRefManager {
     public tilesetRef: TilesetRefData[]
@@ -27,7 +28,7 @@ export class TilesetRefManager {
 
     public serialize(): TilesetRefData[] { return this.tilesetRef; }
 
-    public getTilesetIndex(tileset: Tileset): number {
+    public getTilesetIndex(tileset: TilesetMetadata): number {
         const tilesetRef = this.tilesetRef.find(tilesetRef => tilesetRef.id === tileset.id);
         if (!tilesetRef) {
             const tilesetAbsPath = this.tilesetManager.getTilesetAbsById(tileset.id);
@@ -49,9 +50,9 @@ export class TilesetRefManager {
     }
 
     public getTilesetIndexById(tilesetId: string): number {
-        const tileset = this.tilesetManager.getTilesetById(tilesetId);
-        if (!tileset) return -1;
-        return this.getTilesetIndex(tileset);
+        const tilesetMetadata = this.tilesetManager.getTilesetMetadataById(tilesetId);
+        if (!tilesetMetadata) return -1;
+        return this.getTilesetIndex(tilesetMetadata);
     }
 
     public getTilesetById(id: string): Tileset | null {

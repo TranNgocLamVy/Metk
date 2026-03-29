@@ -47,8 +47,8 @@ export class Project {
     }
 
     public async load() {
-        await this.tilesetManager.loadAll(this.data.tilesets);
-        await this.tilemapManager.loadAll(this.data.tilemaps);
+        await this.tilesetManager.loadTilesetsMetadata(this.data.tilesets);
+        await this.tilemapManager.loadTilemapsMetada(this.data.tilemaps);
     }
 
     public async unload() {
@@ -70,9 +70,5 @@ export class Project {
 
     public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
         return await this.tilesetManager.createTileset(tilesetData, tilesetAbsPath);
-    }
-
-    public async createTilemap(tilemapData: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
-        return await this.tilemapManager.createTilemap(tilemapData, tilemapAbsPath);
     }
 }

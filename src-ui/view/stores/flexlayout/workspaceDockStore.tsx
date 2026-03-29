@@ -47,10 +47,6 @@ export const useWorkspaceDockStore = create<WorkspaceState>((set, get) => {
                     return <TilemapEditor />
                 case "explorer":
                     return <Explorer node={node} />
-                case "debug":
-                    return <Debug />
-                case "log":
-                    return <Log />;
 				default:
 					return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 			}

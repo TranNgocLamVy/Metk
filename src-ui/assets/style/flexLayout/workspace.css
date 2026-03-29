@@ -64,6 +64,14 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 1.5px;
+    height: 2px;
     background-color: var(--foreground);
+}
+
+.workspace .flexlayout__tab_button--selected {
+    background-color: var(--background);
+}
+
+.workspace .flexlayout__tab_button_content {
+	font-size: 0.75rem;
 }

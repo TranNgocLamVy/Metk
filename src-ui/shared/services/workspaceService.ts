@@ -77,12 +77,13 @@ export class WorkspaceService {
             return;
         }
 
-        const tileset = AppCore.getIns().editorContext.getCurrentProject().tilesetManager.getTilesetById(tilesetId);
-        if (!tileset) {
-            console.error("Tileset not found");
-            ToastService.error({ message: "Tileset not found" });
+        const tilesetResult = await AppCore.getIns().editorContext.getCurrentProject().tilesetManager.loadTileset(tilesetId);
+        if (tilesetResult.status !== Result.Status.Success) {
+            ToastService.error({ message: tilesetResult.message });
             return;
         }
+
+        const tileset = tilesetResult.data;
 
         const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
         tilesetSessionManager.createTilesetSession(tileset, tilesetPixiApp);
@@ -124,11 +125,13 @@ export class WorkspaceService {
             return;
         }
 
-        const tilemap = AppCore.getIns().editorContext.getCurrentProject().tilemapManager.getTilemapById(tilemapId);
-        if (!tilemap) {
-            ToastService.error({ message: "Tilemap not found" });
+        const tilemapResult = await AppCore.getIns().editorContext.getCurrentProject().tilemapManager.loadTilemap(tilemapId);
+        if (tilemapResult.status !== Result.Status.Success) {
+            ToastService.error({ message: tilemapResult.message });
             return;
         }
+
+        const tilemap = tilemapResult.data;
 
         const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
         const tilemapSession = tilemapSessionManager.createTilemapSession(tilemap, tilesetPixiApp);

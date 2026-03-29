@@ -67,6 +67,10 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     }
 
+    public async unload(): Promise<void> {
+        this.eventEmitter.removeAllListeners();
+    }
+
     // ------------------------------ Properties Operations ------------------------------
     public getName(): string {
         return this.name;

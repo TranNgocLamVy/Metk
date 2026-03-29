@@ -7,6 +7,8 @@ import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { Tilemap } from "../application/tile/tilemap";
 import { TilemapManager } from "./tilemapManager";
+import { Result } from "@/shared/types/result";
+import { ToastService } from "@/shared/services/toastService";
 
 export class TilemapSessionManager {
     public currentTilemapSession: TilemapSession | null = null;
@@ -26,17 +28,19 @@ export class TilemapSessionManager {
         
     }
 
-    public async loadAll(tilemapManager: TilemapManager): Promise<void> {
-        this.tilemapSessionManagerData.tilemapSessions.forEach(sessionData => {
-            const tilemap = tilemapManager.getTilemapById(sessionData.tilemapId);
-            if (!tilemap) {
-                console.error("Tilemap not found");
+    public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<void> {
+        await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
+            const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);
+            if (tilemapResult.status !== Result.Status.Success) {
+                // TODO: Move ToastService outside
+                ToastService.error({ message: tilemapResult.message });
                 return;
             }
+            const tilemap = tilemapResult.data;
             const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorContext);
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
             this.tilemapMap.set(tilemap.id, tilemapSession.id);
-        });
+        }))
     }
 
     public async unloadAll(): Promise<void> {
@@ -91,6 +95,9 @@ export class TilemapSessionManager {
         this.tilemapSessionMap.delete(sessionId);
         this.tilemapMap.delete(tilemapSession.tilemap.id);
         this.tilemapSessionIdStack = this.tilemapSessionIdStack.filter(id => id !== sessionId);
+
+        const tilemapManager = this.editorContext.getCurrentProject().tilemapManager;
+        tilemapManager.unloadTilemap(tilemapSession.tilemap.id);
         
         if (this.currentTilemapSession?.id === sessionId) {
             this.currentTilemapSession = null;

@@ -4,18 +4,20 @@ import { AppCore } from "@/core/appcore";
 import { createTilemapForm } from "@/view/components/form/tilemapForm";
 import { useExplorerStore } from "@/view/stores/application/explorerStore";
 
-import { TilemapData } from "../schema/tilemapSchema";
+import { TilemapData, TilemapMetadata } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspaceService";
+import { TilemapStorageService } from "@/infrastructure/container";
+import { PathUtils } from "../utils/pathUtils";
 
 export class TilemapService {
     public static async loadTilemapView(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const project = editorContext.getCurrentProject();
-        const tilemapsMetadata = project.tilemapManager.getTilemapsMetadata();
+        const tilemapsMetadata = project.tilemapManager.serialize();
         useExplorerStore.getState().setTilemaps(tilemapsMetadata.map((tilemap) => {
             return {
                 id: tilemap.id,
@@ -45,23 +47,24 @@ export class TilemapService {
             layers: [],
         }
 
-        const createTilesetResult = await currentProject.createTilemap(tilemapData, tilemapAbsPath);
-        if (createTilesetResult.status !== Result.Status.Success) {
-            ToastService.error({ message: createTilesetResult.message });
+        const saveResult = await TilemapStorageService.save(tilemapAbsPath, tilemapData);
+        if (saveResult.status !== Result.Status.Success) {
+            ToastService.error({ message: saveResult.message });
             return;
         }
 
-        const saveResult = await editorContext.projectManager.saveCurrrentProject();
-        if (saveResult.status !== Result.Status.Success) {
-            ToastService.error({ message: saveResult.message });
-            //TODO: remove tilemap
-            return;
+        const tilemapRefPath = PathUtils.relative(currentProject.projectPathSystem.absDir, tilemapAbsPath);
+        const tilemapMetadata: TilemapMetadata = {
+            id: tilemapData.id,
+            name: tilemapData.name,
+            tilemapRelPath: tilemapRefPath,
         }
-        const newTilemap = createTilesetResult.data;
-        WorkspaceService.createTilemapSession(newTilemap.id);
+        currentProject.tilemapManager.addTilemapMetadata(tilemapMetadata);
         
-        // TODO: remove this section
-        useExplorerStore.getState().addTilemap({ name: newTilemap.name, id: newTilemap.id });
+        WorkspaceService.createTilemapSession(tilemapData.id);
+        
+        // TODO: remove this section in the future
+        useExplorerStore.getState().addTilemap({ name: tilemapMetadata.name, id: tilemapMetadata.id });
 
         ToastService.success({ message: "Tilemap created successfully" });
 
