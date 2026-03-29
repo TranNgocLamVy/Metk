@@ -29,7 +29,7 @@ export class ProjectService {
         const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
 
         const projectManager = AppCore.getIns().projectManager;
-        projectManager.addProjectMetaData(project.metaData);
+        projectManager.addProjectMetadata(project.metaData);
         await AppCore.getIns().saveProjectManager();
 
         const openProject = await DialogService.openPermissionDialog({ title: "Project opened successfully", description: "Do you want to open this project?" })
@@ -60,7 +60,7 @@ export class ProjectService {
         }
 
         const projectManager = AppCore.getIns().projectManager;
-        projectManager.addProjectMetaData(project.metaData);
+        projectManager.addProjectMetadata(project.metaData);
         await AppCore.getIns().saveProjectManager();
 
         const openProject = await DialogService.openPermissionDialog({ title: "Project created successfully", description: "Do you want to open the project?" })

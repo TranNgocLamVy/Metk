@@ -3,7 +3,7 @@ import { type } from "arktype";
 import { RootLayerSchema } from "./layerSchema";
 
 const tilemapModule = type.module({
-    TilemapMetaDataSchema: {
+    TilemapMetadataSchema: {
         id: type("string"),
         name: type("string"),
         tilemapRelPath: type("string"),
@@ -29,8 +29,8 @@ const tilemapModule = type.module({
     },
 })
 
-export const TilemapMetaDataSchema = tilemapModule.TilemapMetaDataSchema
-export type TilemapMetaData = typeof TilemapMetaDataSchema.infer
+export const TilemapMetadataSchema = tilemapModule.TilemapMetadataSchema
+export type TilemapMetadata = typeof TilemapMetadataSchema.infer
 
 export const TilesetRefDataSchema = tilemapModule.TilesetRefDataSchema
 export type TilesetRefData = typeof TilesetRefDataSchema.infer

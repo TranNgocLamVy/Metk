@@ -25,9 +25,9 @@ export const TilesetDataSchema = type("string.json.parse").to({
 })
 export type TilesetData = typeof TilesetDataSchema.infer;
 
-export const TilesetMetaDataSchema = type({
+export const TilesetMetadataSchema = type({
     name: type("string"),
     id: type("string"),
     tilesetRelPath: type("string"),
 })
-export type TilesetMetaData = typeof TilesetMetaDataSchema.infer
+export type TilesetMetadata = typeof TilesetMetadataSchema.infer

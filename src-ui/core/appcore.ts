@@ -7,7 +7,7 @@ import { ProjectManager } from "./manager/projectManager";
 import { SystemCommandManager } from "./manager/systemCommandManager";
 import { ToolManager } from "./manager/toolManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
-import { ProjectMetaDataRepo } from "@/infrastructure/container";
+import { ProjectMetadataRepo } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 
 export class AppCore {
@@ -58,7 +58,7 @@ export class AppCore {
     public async load(): Promise<Result<AppCore>> {
         if (this.isLoaded) return Result.Success(this);
 
-        const projectRepoResult = await ProjectMetaDataRepo.load('projects.json');
+        const projectRepoResult = await ProjectMetadataRepo.load('projects.json');
 
         if (projectRepoResult.status !== Result.Status.Success) {
             console.error(projectRepoResult.message);
@@ -75,6 +75,6 @@ export class AppCore {
 
     public async saveProjectManager(): Promise<Result> {
         const data = this.projectManager.serialize();
-        return await ProjectMetaDataRepo.save("projects.json", data);
+        return await ProjectMetadataRepo.save("projects.json", data);
     }
 }

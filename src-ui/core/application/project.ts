@@ -3,7 +3,7 @@ import { TilemapData } from "@/shared/schema/tilemapSchema";
 import { TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result } from "@/shared/types/result";
 
-import { ProjectData, ProjectMetaData } from "../../shared/schema/projectSchema";
+import { ProjectData, ProjectMetadata } from "../../shared/schema/projectSchema";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilesetManager } from "../manager/tilesetManager";
 import { Tilemap } from "./tile/tilemap";
@@ -18,7 +18,7 @@ export class Project {
     public createdAt: string;
     public updatedAt: string;
 
-    public get metaData(): ProjectMetaData {
+    public get metaData(): ProjectMetadata {
         return {
             id: this.id,
             name: this.name,

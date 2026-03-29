@@ -1,20 +1,20 @@
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { ProjectMetaData, ProjectRepoData } from "../../shared/schema/projectSchema";
+import { ProjectMetadata, ProjectRepoData } from "../../shared/schema/projectSchema";
 import { Project } from "../application/project";
 import { ProjectStorageService } from "@/infrastructure/container";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 
 export class ProjectManager {
     public currentProject: Project | null = null;
-    public projectMetaDataMap: Map<string, ProjectMetaData> = new Map<string, ProjectMetaData>(); // id -> metaData
+    public projectMetadataMap: Map<string, ProjectMetadata> = new Map<string, ProjectMetadata>(); // id -> metaData
 
     public constructor( ) { }
 
     public load(projectRepoData: ProjectRepoData) {
         for (const metaData of projectRepoData) {
-            this.projectMetaDataMap.set(metaData.id, metaData);
+            this.projectMetadataMap.set(metaData.id, metaData);
         }
     }
 
@@ -25,7 +25,7 @@ export class ProjectManager {
             this.currentProject = null;
         }
 
-        const metaData = this.projectMetaDataMap.get(projectId);
+        const metaData = this.projectMetadataMap.get(projectId);
         if (!metaData) return Result.Error("Project meta data not found");
 
         const projectAbsPath = PathUtils.join(metaData.directory, "project.json");
@@ -49,12 +49,12 @@ export class ProjectManager {
         return await ProjectStorageService.save(projectAbsPath, project.serialize());
     }
 
-    public addProjectMetaData(projectMetaData: ProjectMetaData): void {
-        this.projectMetaDataMap.set(projectMetaData.id, projectMetaData);
+    public addProjectMetadata(projectMetadata: ProjectMetadata): void {
+        this.projectMetadataMap.set(projectMetadata.id, projectMetadata);
     }
 
-    public serialize(): ProjectMetaData[] {
-        return Array.from(this.projectMetaDataMap.values()).map((metaData) => {
+    public serialize(): ProjectMetadata[] {
+        return Array.from(this.projectMetadataMap.values()).map((metaData) => {
             if (this.currentProject && this.currentProject.id === metaData.id) return this.currentProject.metaData;
             return metaData;
         });

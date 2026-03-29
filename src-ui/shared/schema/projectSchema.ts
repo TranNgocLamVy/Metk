@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { type } from "arktype";
 
-import { TilemapMetaDataSchema } from "./tilemapSchema";
-import { TilesetMetaDataSchema } from "./tilesetSchema";
+import { TilemapMetadataSchema } from "./tilemapSchema";
+import { TilesetMetadataSchema } from "./tilesetSchema";
 
 export const ProjectDataSchema = type("string.json.parse").to({
     id: type("string"),
@@ -11,12 +11,12 @@ export const ProjectDataSchema = type("string.json.parse").to({
     description: type("string").default(""),
     createdAt: type("string.date").default(() => new Date().toDateString()),
     updatedAt: type("string.date").default(() => new Date().toDateString()),
-    tilemaps: TilemapMetaDataSchema.array().default(() => []),
-    tilesets: TilesetMetaDataSchema.array().default(() => []),
+    tilemaps: TilemapMetadataSchema.array().default(() => []),
+    tilesets: TilesetMetadataSchema.array().default(() => []),
 })
 export type ProjectData = typeof ProjectDataSchema.infer
 
-const ProjectMetaDataBase = type({
+const ProjectMetadataBase = type({
     id: type("string").default(() => uuidv4()),
     name: type("string").default("Untitled Project"),
     version: type("string").default("0.1.0"),
@@ -25,11 +25,11 @@ const ProjectMetaDataBase = type({
     updatedAt: type("string.date").default(() => new Date().toDateString()),
     directory: type("string").default(""),
 })
-export const ProjectMetaDataSchema = type("string.json.parse").to(ProjectMetaDataBase)
-export type ProjectMetaData = typeof ProjectMetaDataSchema.infer
+export const ProjectMetadataSchema = type("string.json.parse").to(ProjectMetadataBase)
+export type ProjectMetadata = typeof ProjectMetadataSchema.infer
 
 export const ProjectRepoSchema = type("string.json.parse").to(
-    ProjectMetaDataBase.array()
+    ProjectMetadataBase.array()
 )
 export type ProjectRepoData = typeof ProjectRepoSchema.infer
 

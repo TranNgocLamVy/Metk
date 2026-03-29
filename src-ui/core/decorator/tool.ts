@@ -13,10 +13,10 @@ export type ToolContext = {
     }
 }
 
-export type ToolMetaData = Omit<ToolContext, "constructor">
+export type ToolMetadata = Omit<ToolContext, "constructor">
 
 
-export function Tool(metadata: ToolMetaData) {
+export function Tool(metadata: ToolMetadata) {
     return function (constructor: any) {
         ToolManager.TOOL_REGISTRY.push({ ...metadata, constructor });
     };
