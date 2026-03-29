@@ -14,7 +14,7 @@ import { TilemapStorageService } from "@/infrastructure/container";
 import { PathUtils } from "../utils/pathUtils";
 
 export class TilemapService {
-    public static async loadTilemapView(): Promise<void> {
+    public static async loadTilemapEditor(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const project = editorContext.getCurrentProject();
         const tilemapsMetadata = project.tilemapManager.serialize();

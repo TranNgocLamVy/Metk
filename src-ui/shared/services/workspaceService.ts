@@ -23,7 +23,7 @@ export class WorkspaceService {
         const project = loadProjectResult.data;
 
         await TilesetService.loadTilesetView(); // TODO: Refactor
-        await TilemapService.loadTilemapView(); // TODO: Refactor
+        await TilemapService.loadTilemapEditor(); // TODO: Refactor
 
         const loadWorkspaceResult = await AppCore.getIns().workspaceManager.loadProjectWorkspace(project);
         if (loadWorkspaceResult.status !== Result.Status.Success) {
