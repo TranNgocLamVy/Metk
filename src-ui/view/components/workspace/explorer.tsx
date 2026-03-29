@@ -17,7 +17,7 @@ export default function Explorer({ node }: Props) {
 	const { tilesets, tilemaps } = useExplorerStore();
 
 	return (
-		<VStack className="w-full h-full p-1 bg-secondary-background">
+		<VStack className="w-full h-full bg-secondary-background">
 			<ScrollArea className="w-full h-full p-2 gap-4 bg-background rounded-lg border-2 shadow-sm">
 				<VStack className="gap-2">
 					<Label className="text-muted-foreground font-bold text-xs uppercase">Tilesets</Label>

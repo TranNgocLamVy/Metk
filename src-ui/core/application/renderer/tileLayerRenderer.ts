@@ -1,4 +1,4 @@
-import { Sprite } from "pixi.js";
+import { Sprite, Texture } from "pixi.js";
 
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
@@ -19,7 +19,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     constructor(context: CreateTileLayerRendererContext) {
         super(context.layer, context.tilemap);
         this.gap = context.gap;
-        
+
         this.bindOnTileChanged = this.onTileChanged.bind(this);
 
         // Initial render
@@ -59,20 +59,15 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         const tileset = this.layer.tilesetRefManager.getTilesetById(tilesetRefData.id);
 
         // TODO: Handle unfound tileset, render error texture
-        if (!tileset) return;
-
-        const tile = tileset.getTileFromId(tileRef.getTile().tileId);
-        
-        if (!tile) {
-            if (currentSprite) {
-                this.container.removeChild(currentSprite);
-                currentSprite.destroy();
-                this.sprites.delete(key);
-            }
+        let texture: Texture;
+        if (tileset && tileset.getTileFromId(tileRef.getTile().tileId)) {
+            const tile = tileset.getTileFromId(tileRef.getTile().tileId)!;
+            texture = tile.getTexture();
+        } else {
+            // TODO: Handle unfound tile, render error texture
             return;
         }
-        const texture = tile.getTexture();
-        
+
         // Calculate Position: (GridPos + LayerGridOffset) * (TileSize + Gap) + LayerPixelOffset
         const posX = (x + this.layer.coordinate.col) * (this.tilemap.tilewidth + this.gap) + this.layer.offset.x;
         const posY = (y + this.layer.coordinate.row) * (this.tilemap.tileheight + this.gap) + this.layer.offset.y;
@@ -85,7 +80,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             const sprite = new Sprite(texture);
             sprite.x = posX;
             sprite.y = posY;
-            
+
             this.container.addChild(sprite);
             this.sprites.set(key, sprite);
         }

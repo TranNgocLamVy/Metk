@@ -43,19 +43,6 @@ const workspaceRowNode: IJsonRowNode = {
                 },
             ],
         },
-        {
-            type: "tabset",
-            weight: 20,
-            enableMaximize: false,
-            children: [
-                {
-                    type: "tab",
-                    name: "Log",
-                    component: "log",
-                    enableClose: false,
-                },
-            ],
-        }
     ],
 };
 
@@ -97,7 +84,6 @@ export const workspaceLayout: IJsonModel = {
         splitterEnableHandle: true,
         tabEnableRename: false,
         tabEnableRenderOnDemand: false,
-        tabSetTabLocation: "bottom",
     },
     layout: workspaceRowNode,
 };

@@ -29,9 +29,9 @@ export class Workspace {
         this.exportPathManager = new ExportPathManager(workspaceData.exportPaths ?? []);
     }
 
-    public async load(): Promise<Result> {
-        await this.tilesetSessionManager.loadAll(this.tilesetManager);
-        await this.tilemapSessionManager.loadAll(this.tilemapManager);
+    public async loadSession(): Promise<Result> {
+        await this.tilesetSessionManager.loadTilesetSessions(this.tilesetManager);
+        await this.tilemapSessionManager.loadTilemapSessions(this.tilemapManager);
         await this.toolSessionManager.load();
         return Result.Success();
     }

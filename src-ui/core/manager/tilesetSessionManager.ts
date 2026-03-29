@@ -8,6 +8,7 @@ import { EditorContext } from "../application/editorContext";
 import { TilesetSession } from "../application/session/tilesetSession";
 import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
+import { ToastService } from "@/shared/services/toastService";
 
 export class TilesetSessionManager {
     public currentTilesetSession: TilesetSession | null = null;
@@ -27,17 +28,19 @@ export class TilesetSessionManager {
         
     }
 
-    public async loadAll(tilesetManager: TilesetManager): Promise<void> {
-        this.tilesetSessionManagerData.tilesetSessions.forEach(sessionData => {
-            const tileset = tilesetManager.getTilesetById(sessionData.tilesetId);
-            if (!tileset) {
-                console.error("Tileset not found");
+    public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<void> {
+        await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
+            const tilesetResult = await tilesetManager.loadTileset(sessionData.tilesetId);
+            if (tilesetResult.status !== Result.Status.Success) {
+                // TODO: Move ToastService outside
+                ToastService.error({ message: tilesetResult.message });
                 return;
             }
+            const tileset = tilesetResult.data;
             const tilesetSession = new TilesetSession(tileset, sessionData);
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
             this.tilesetMap.set(tileset.id, tilesetSession.id);
-        });
+        }))
     }
 
     public async unloadAll(): Promise<void> {

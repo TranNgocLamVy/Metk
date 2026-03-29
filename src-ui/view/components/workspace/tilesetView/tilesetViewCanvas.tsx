@@ -15,7 +15,7 @@ export default function TilesetViewCanvas() {
 			if (!pixiApp) return;
 			const w = entry.contentRect.width;
 			const h = entry.contentRect.height;
-			pixiApp.renderer?.resize(w - 4, h);
+			pixiApp.renderer?.resize(w - 4, h - 4);
 		},
 		[pixiApp]
 	);
@@ -25,7 +25,7 @@ export default function TilesetViewCanvas() {
 	};
 
 	return (
-		<div ref={containerRef} className="w-full h-full overflow-hidden p-1 pt-2 bg-secondary-background">
+		<div ref={containerRef} className="w-full h-full overflow-hidden bg-secondary-background pt-1">
 			<ContextMenuWrapper item={TilesetViewContextMenu}>
 				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-background rounded-lg border-2 shadow-sm" />
 			</ContextMenuWrapper>
