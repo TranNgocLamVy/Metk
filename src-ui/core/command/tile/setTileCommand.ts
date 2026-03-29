@@ -59,10 +59,13 @@ export class SetTileCommand implements IBaseCommand {
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return Result.Error("Layer not found");
 
-        if (this.oldTileId == null || this.oldTilesetIndex == null) return layer.removeTileAt(this.coordinate)
+        if (this.oldTileId == null || this.oldTilesetIndex == null) {
+            const result = layer.removeTileAt(this.coordinate);
+            if (result.status === Result.Status.Success) currentSession.markAsDirty();
+            return result;
+        }
 
         const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
-
         if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
         return result
