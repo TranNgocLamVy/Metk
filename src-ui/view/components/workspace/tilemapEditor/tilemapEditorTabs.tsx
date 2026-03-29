@@ -61,7 +61,7 @@ export default function TilemapEditorTabs() {
 							{session.name}
 							<Tooltip delayDuration={500} disableHoverableContent>
 								<TooltipTrigger asChild>
-									<div className="group/icon ml-1 flex items-center justify-center rounded-md hover:bg-muted-foreground/20" onClick={closeTilemapSession}>
+									<div className="group/icon ml-1 flex w-6 h-6 items-center justify-center rounded-md hover:bg-muted-foreground/20" onClick={closeTilemapSession}>
 										{isDirty ? (
 											<Fragment>
 												<div className="h-2 w-2 rounded-full bg-foreground group-hover/icon:hidden" />
