@@ -22,6 +22,7 @@ export class ProjectPathSystem {
 
 export class FilePathSystem {
     public relDir: string;
+    public get relPath(): string { return PathUtils.join(this.relDir, this.fileName); }
     public fileName: string;
     public readonly fileExtension: string;
     public constructor(

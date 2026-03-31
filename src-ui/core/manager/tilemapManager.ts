@@ -95,7 +95,7 @@ export class TilemapManager {
         return Array.from(this.tilemapMetadata.values()).map((metaData) => {
             const tilemap = this.loadedTilemaps.get(metaData.id);
             if (!tilemap) return metaData;
-            return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relDir };
+            return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relPath };
         });
     }
 }

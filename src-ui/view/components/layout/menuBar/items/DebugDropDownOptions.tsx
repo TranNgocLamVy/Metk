@@ -32,6 +32,13 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
             ToastService.success({ message: "Project manager saved successfully" });
         }
     },
+    {
+        type: "option",
+        name: "print current project",
+        async onClick() {
+			console.log(AppCore.getIns().projectManager.currentProject?.serialize());
+        }
+    },
 ];
 
 export const DebugDropdownOptions: MenuItemType = {
