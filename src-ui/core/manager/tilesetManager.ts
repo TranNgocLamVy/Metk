@@ -124,7 +124,7 @@ export class TilesetManager {
         return Array.from(this.tilesetMetadata.values()).map((tilesetMetadata) => {
             const tileset = this.loadedTilesets.get(tilesetMetadata.id);
             if (!tileset) return tilesetMetadata;
-            return { name: tileset.name, id: tileset.id, tilesetRelPath: tileset.tilesetPathSystem.relDir };
+            return { name: tileset.name, id: tileset.id, tilesetRelPath: tileset.tilesetPathSystem.relPath };
         });
     }
 }
