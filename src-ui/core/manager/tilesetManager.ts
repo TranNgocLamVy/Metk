@@ -1,5 +1,4 @@
 import { TextureService } from "@/infrastructure/textureService";
-import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
@@ -18,8 +17,8 @@ export class TilesetManager {
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
-    public addTilemapMetadata(tilemapMetadata: TilesetMetadata): void {
-        this.tilesetMetadata.set(tilemapMetadata.id, tilemapMetadata);
+    public addTilesetMetadata(tilesetMetadata: TilesetMetadata): void {
+        this.tilesetMetadata.set(tilesetMetadata.id, tilesetMetadata);
     }
 
     public async loadTilesetsMetadata(tilesetsMetadata: TilesetMetadata[]): Promise<void> {

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { AppCore } from "@/core/appcore";
-import { TilesetData } from "@/shared/schema/tilesetSchema";
+import { TilesetData, TilesetMetadata } from "@/shared/schema/tilesetSchema";
 import { createTilesetForm } from "@/view/components/form/tilesetForm";
 import { useExplorerStore } from "@/view/stores/application/explorerStore";
 
@@ -11,6 +11,7 @@ import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { WorkspaceService } from "./workspaceService";
 import { Result } from "../types/result";
+import { TilesetStorageService } from "@/infrastructure/container";
 
 export class TilesetService {
     public static async loadTilesetView(): Promise<void> {
@@ -53,24 +54,25 @@ export class TilesetService {
             tileheight: form.image.setting.tile.tileheight,
         }
 
-        const createTilesetResult = await currentProject.createTileset(tilesetData, tilesetAbsPath);
-        if (createTilesetResult.status !== Result.Status.Success) {
-            ToastService.error({ message: createTilesetResult.message });
-            return;
-        }
-
-        const saveResult = await editorContext.projectManager.saveCurrrentProject();
+        const saveResult = await TilesetStorageService.save(tilesetAbsPath, tilesetData);
         if (saveResult.status !== Result.Status.Success) {
             ToastService.error({ message: saveResult.message });
-            //TODO: remove tileset
             return;
         }
 
-        const newTileset = createTilesetResult.data;
-        WorkspaceService.createTilesetSession(newTileset.id);
+        const tilemapRelPath = PathUtils.relative(currentProject.projectPathSystem.absDir, tilesetAbsPath);
+        const tilesetMetadata: TilesetMetadata = {
+            id: tilesetData.id,
+            name: tilesetData.name,
+            tilesetRelPath: tilemapRelPath,
+        }
+        currentProject.tilesetManager.addTilesetMetadata(tilesetMetadata);
+        await editorContext.projectManager.saveCurrrentProject();
+
+        WorkspaceService.createTilesetSession(tilesetData.id);
 
         // TODO: remove this section
-        useExplorerStore.getState().addTileset({ name: newTileset.name, id: newTileset.id });
+        useExplorerStore.getState().addTileset({ name: tilesetData.name, id: tilesetData.id });
 
         ToastService.success({ message: "Tileset created successfully" });
     }
