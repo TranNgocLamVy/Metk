@@ -1,6 +1,8 @@
 import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquareArrowOutUpRight, SquarePlus, SquareX, X } from "lucide-react";
 
 import { ProjectService } from "@/shared/services/projectService";
+import { TilemapService } from "@/shared/services/tilemapService";
+import { TilesetService } from "@/shared/services/tilesetService";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -23,13 +25,17 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					name: "New Map",
 					startIcon: <SquarePlus />,
-                    onClick() { },
+                    onClick() {
+						TilemapService.createTilemap();
+					},
 				},
 				{
 					type: "option",
 					name: "New Tileset",
 					startIcon: <Grid2x2Plus />,
-                    onClick() { },
+                    onClick() {
+						TilesetService.createTileset();
+					},
 				},
 			],
 		],

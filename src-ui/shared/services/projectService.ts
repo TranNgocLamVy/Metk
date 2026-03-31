@@ -43,14 +43,16 @@ export class ProjectService {
 
         if (!form) return;
 
-        const mkdirResult = await TauriFileStorage.mkdir(form.destination);
+        const projectAbsDir = PathUtils.join(form.destination, form.name);
+
+        const mkdirResult = await TauriFileStorage.mkdir(projectAbsDir);
         if (mkdirResult.status !== Result.Status.Success) {
             ToastService.error({ message: mkdirResult.message });
             return;
         }
 
         const projectData = defaultProjectData({ name: form.name });
-        const project = new Project(projectData, new ProjectPathSystem(form.destination));
+        const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
 
         const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath("project.json");
         const saveResult = await ProjectStorageService.save(projectAbsPath, project.serialize());

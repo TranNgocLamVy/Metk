@@ -60,7 +60,8 @@ export class TilemapService {
             tilemapRelPath: tilemapRefPath,
         }
         currentProject.tilemapManager.addTilemapMetadata(tilemapMetadata);
-        
+        await editorContext.projectManager.saveCurrrentProject();
+
         WorkspaceService.createTilemapSession(tilemapData.id);
         
         // TODO: remove this section in the future
