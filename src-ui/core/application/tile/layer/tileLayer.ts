@@ -19,17 +19,17 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
 
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager) {
+    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager) {
         super(tileLayerData.id, tilesetRefManager);
 
-        if (parentLayer) this.parentLayer = parentLayer;
+        this.parentLayer = parentLayer;
 
         this.name = tileLayerData.name;
 
-        this.coordinate.col = tileLayerData.x ?? 0;
-        this.coordinate.row = tileLayerData.y ?? 0;
-        this.offset.x = tileLayerData.offsetx ?? 0;
-        this.offset.y = tileLayerData.offsety ?? 0;
+        this.coordinate.col = tileLayerData.x;
+        this.coordinate.row = tileLayerData.y;
+        this.offset.x = tileLayerData.offsetx;
+        this.offset.y = tileLayerData.offsety;
 
         this.size.width = tileLayerData.width;
         this.size.height = tileLayerData.height;
@@ -38,12 +38,15 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         this.visible = tileLayerData.visible;
         this.locked = tileLayerData.locked;
 
-        const tilesRef = tileLayerData.tilesData.map((tileRefRow) => {
-            return tileRefRow.map((tileRef) => {
-                if (tileRef === null) return null;
-                return new TileRef(tileRef);
+        const tilesRef = tileLayerData.tilesData.split("\n").map((tileRow) => {
+            return tileRow.split(" ").map((tileRef) => {
+                if (tileRef === "0") return null;
+                const tileId = parseInt(tileRef.split(":")[0]);
+                const tilesetIndex = parseInt(tileRef.split(":")[1]);
+                if (isNaN(tileId) || isNaN(tilesetIndex)) return null;
+                return new TileRef({ tileId, tilesetIndex });
             });
-        });
+        })
         this.tilesRef = MatrixUtils.ensureSize(tilesRef, this.size.height, this.size.width, null);
     }
 
@@ -104,10 +107,15 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     }
 
     public override serialize(): TileLayerData {
-        const allNull = this.tilesRef.every((row) => { return row.every((tileRef) => { return tileRef === null }) });
+        const tileData = this.tilesRef.map(row => row.map(tileRef => {
+            if (!tileRef) return "0";
+            return tileRef.serialize();
+        }).join(" ")).join("\n");
+    
         return {
             id: this.id,
-            layerType: "tile",
+            parentId: this.parentLayer.id,
+            type: "tile",
             name: this.name,
             x: this.coordinate.col,
             y: this.coordinate.row,
@@ -118,7 +126,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             locked: this.locked,
             offsetx: this.offset.x,
             offsety: this.offset.y,
-            tilesData: allNull ? [] : this.tilesRef.map((tileRefRow) => tileRefRow.map(tileRef => tileRef ? tileRef.serialize() : null)),
+            tilesData: tileData,
         }
     }
 
@@ -143,11 +151,8 @@ export class TileRef {
         this.tilesetIndex = tileData.tilesetIndex;
 
     }
-    public serialize(): TileRefData {
-        return {
-            tileId: this.tileId,
-            tilesetIndex: this.tilesetIndex,
-        }
+    public serialize(): string {
+        return `${this.tileId}:${this.tilesetIndex}`;
     }
     public setTile(newTileRefData: TileRefData): TileRefData {
         const preTileRefData: TileRefData = { tileId: this.tileId, tilesetIndex: this.tilesetIndex }

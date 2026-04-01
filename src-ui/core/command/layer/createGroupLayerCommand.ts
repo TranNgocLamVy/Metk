@@ -26,8 +26,8 @@ export class CreateGroupLayerCommand implements IBaseCommand {
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
 
         const newGroupLayer = new GroupLayer(this.groupLayerData, parent, parent.tilesetRefManager)
-
         parent.addLayer(newGroupLayer);
+        
         if (parent instanceof GroupLayer) parent.toggleOpen(true);
         
         this.groupLayerId = newGroupLayer.id;

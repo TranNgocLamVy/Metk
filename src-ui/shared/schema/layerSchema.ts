@@ -1,4 +1,5 @@
 import { type } from "arktype";
+import { safeArray } from ".";
 
 const layerModule = type.module({
     LayerType: "'tile' | 'group'",
@@ -34,16 +35,44 @@ const layerModule = type.module({
     RootSchema: "LayerSchema[]"
 });
 
-export const TileRefSchema = layerModule.TileRefSchema
-export type TileRefData = typeof TileRefSchema.infer
+export type TileRefData = {
+    tileId: number,
+    tilesetIndex: number
+}
 
-export const TileLayerSchema = layerModule.TileLayerSchema
+export const LayerType = type("'tile' | 'group' | 'auto_rule'");
+
+export const TileLayerSchema = type({
+    id: type("string"),
+    parentId: type("string").default("root"),
+    type: type("'tile'"),
+    name: type("string").default("Untitled Layer"),
+    x: type("number").default(0),
+    y: type("number").default(0),
+    width: type("number").default(0),
+    height: type("number").default(0),
+    opacity: type("number").default(1),
+    visible: type("boolean").default(true),
+    locked: type("boolean").default(false),
+    offsetx: type("number").default(0),
+    offsety: type("number").default(0),
+    tilesData: type("string").default("")
+})
 export type TileLayerData = typeof TileLayerSchema.infer
 
-export const GroupLayerSchema = layerModule.GroupLayerSchema
+export const GroupLayerSchema = type({
+    id: type("string"),
+    parentId: type("string").default("root"),
+    type: type("'group'"),
+    name: type("string").default("Untitled Layer"),
+    opacity: type("number").default(1),
+    visible: type("boolean").default(true),
+    locked: type("boolean").default(false),
+})
 export type GroupLayerData = typeof GroupLayerSchema.infer
 
-export type LayerData = TileLayerData | GroupLayerData
+export const LayerSchema = type(TileLayerSchema).or(GroupLayerSchema);
+export type LayerData = typeof LayerSchema.infer
 
-export const RootLayerSchema = layerModule.RootSchema
+export const RootLayerSchema = safeArray(LayerSchema);
 export type RootLayerData = typeof RootLayerSchema.infer

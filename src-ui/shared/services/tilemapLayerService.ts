@@ -15,6 +15,7 @@ import { DropPosition, useLayerManagerStore } from "@/view/stores/application/la
 
 import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLayerCommand";
 import { WorkspaceService } from "./workspaceService";
+import { GroupLayerData, TileLayerData } from "../schema/layerSchema";
 
 export class TilemapLayerService {
     public static async createNewTileLayer() {
@@ -30,16 +31,21 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload = {
+        const payload: TileLayerData = {
             id: uuidv4(),
+            parentId: parent.id,
             name: "New Tile Layer",
-            layerType: "tile" as const,
+            type: "tile" as const,
             width: currentSession.tilemap.width,
             height: currentSession.tilemap.height,
+            x: 0,
+            y: 0,
+            offsetx: 0,
+            offsety: 0,
             opacity: 1,
             visible: true,
             locked: false,
-            tilesData: []
+            tilesData: ""
         }
 
         const createTileLayerCommand = new CreateTileLayerCommand(payload, parent.id);
@@ -64,14 +70,14 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload = {
+        const payload: GroupLayerData = {
             id: uuidv4(),
+            parentId: parent.id,
             name: "New Group Layer",
-            layerType: "group" as const,
+            type: "group" as const,
             opacity: 1,
             visible: true,
             locked: false,
-            layers: []
         }
 
         const createGroupLayerCommand = new CreateGroupLayerCommand(payload, parent.id);
