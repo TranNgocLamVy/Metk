@@ -25,9 +25,9 @@ export default function HomePage() {
 			<h1 className="text-3xl font-bold">{translate('home.welcome')}</h1>
 			<Separator />
 			<HStack className="w-full h-fit gap-8">
-				<Button variant={"outline"} onClick={ProjectService.openNewProject}>
+				<Button variant={"outline"} onClick={ProjectService.importProject}>
 					<SquareArrowOutUpRight />
-					{translate('home.openProject')}
+					{translate('home.importProject')}
 				</Button>
 				<Button variant={"outline"} onClick={ProjectService.createProject}>
 					<FolderPlus />

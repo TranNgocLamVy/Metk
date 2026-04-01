@@ -9,7 +9,7 @@ import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathS
 import { TilemapStorageService } from "@/infrastructure/container";
 
 export class TilemapManager {
-    private tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
+    public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
     private loadedTilemaps: Map<string, Tilemap> = new Map<string, Tilemap>(); // id -> tilemap
 
     private pendingLoads: Map<string, Promise<Result<Tilemap>>> = new Map(); // tilemapId -> loadTilemap Promise
@@ -24,7 +24,7 @@ export class TilemapManager {
     }
 
     public async loadTilemapsMetada(tilemapsMetadata: TilemapMetadata[]): Promise<void> {
-        this.tilemapMetadata = new Map<string, TilemapMetadata>(tilemapsMetadata.map((meta) => [meta.id, meta]));
+        tilemapsMetadata.forEach((meta) => this.tilemapMetadata.set(meta.id, meta));
     }
 
     public async loadTilemap(id: string): Promise<Result<Tilemap>> {
@@ -58,9 +58,6 @@ export class TilemapManager {
 
         const tilemapData = loadTilemapResult.data;
 
-        const referencedTilesetIds = tilemapData.tileset.map(tileset => tileset.id)
-        await Promise.all(referencedTilesetIds.map(tilesetId => this.tilesetManager.loadTileset(tilesetId)));
-
         const tilemapPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const tilemap = new Tilemap(tilemapData, tilesetRefManager);
@@ -68,6 +65,18 @@ export class TilemapManager {
         await tilemap.load();
 
         this.loadedTilemaps.set(tilemapData.id, tilemap);
+
+        let addMoreTileset: boolean = false;
+        await Promise.all(tilemapData.tileset.map(tilesetRef => {
+            if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
+                return this.tilesetManager.loadTileset({ id: tilesetRef.id })
+            } else {
+                addMoreTileset = true;
+                const tilesetAbsPath = tilemapPathSystem.getAbsPathFromRelPath(tilesetRef.source);
+                const tilesetRelPathFromProject = this.projectPathSystem.getRelPathFromAbsPath(tilesetAbsPath);
+                return this.tilesetManager.loadTileset({ tilesetRelPath: tilesetRelPathFromProject });
+            }
+        }));
 
         return Result.Success(tilemap);
     }
@@ -95,7 +104,7 @@ export class TilemapManager {
         return Array.from(this.tilemapMetadata.values()).map((metaData) => {
             const tilemap = this.loadedTilemaps.get(metaData.id);
             if (!tilemap) return metaData;
-            return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relPath };
+        return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relPath };
         });
     }
 }

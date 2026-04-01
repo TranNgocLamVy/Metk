@@ -16,7 +16,7 @@ import { PathUtils } from "../utils/pathUtils";
 
 export class ProjectService {
 
-    public static async openNewProject(): Promise<void> {
+    public static async importProject(): Promise<void> {
         const projectAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Project", extensions: ["json"] }] });
         if (!projectAbsPath) return;
         const projectDataResult = await ProjectStorageService.load(projectAbsPath);

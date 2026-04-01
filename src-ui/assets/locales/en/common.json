@@ -40,7 +40,7 @@
     },
     "home": {
         "welcome": "Welcome to MEtk",
-        "openProject": "Open Project",
+        "importProject": "Import Project",
         "newProject": "New Project",
         "recentProjects": "Recents Projects",
         "description": "Description",

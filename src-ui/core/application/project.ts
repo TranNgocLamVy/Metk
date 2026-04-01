@@ -47,7 +47,7 @@ export class Project {
     }
 
     public async load() {
-        await this.tilesetManager.loadTilesetsMetadata(this.data.tilesets);
+        await this.tilesetManager.setTilesetsMetadata(this.data.tilesets);
         await this.tilemapManager.loadTilemapsMetada(this.data.tilemaps);
     }
 
@@ -66,9 +66,5 @@ export class Project {
             tilemaps: this.tilemapManager.serialize(),
             tilesets: this.tilesetManager.serialize(),
         };
-    }
-
-    public async createTileset(tilesetData: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
-        return await this.tilesetManager.createTileset(tilesetData, tilesetAbsPath);
     }
 }

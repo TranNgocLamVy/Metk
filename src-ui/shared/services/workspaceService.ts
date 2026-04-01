@@ -77,7 +77,7 @@ export class WorkspaceService {
             return;
         }
 
-        const tilesetResult = await AppCore.getIns().editorContext.getCurrentProject().tilesetManager.loadTileset(tilesetId);
+        const tilesetResult = await AppCore.getIns().editorContext.getCurrentProject().tilesetManager.loadTileset({ id: tilesetId });
         if (tilesetResult.status !== Result.Status.Success) {
             ToastService.error({ message: tilesetResult.message });
             return;
