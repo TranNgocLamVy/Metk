@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSessionSchema";
+import { defaultTilesetSessionData, TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSessionSchema";
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "../application/editorContext";
@@ -51,12 +51,7 @@ export class TilesetSessionManager {
         const sessionId = this.tilesetMap.get(tileset.id);
         if (sessionId) return this.openTilesetSession(sessionId, pixiApp);
 
-        const newTilesetSessionData: TilesetSessionData = {
-            id: uuidv4(),
-            tilesetId: tileset.id,
-            viewState: { x: null, y: null, zoom: 1 },
-            selectionState: { selectedTilesSet: [] },
-        }
+        const newTilesetSessionData = defaultTilesetSessionData(tileset.id);
 
         const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData);
         

@@ -1,4 +1,4 @@
-import { defaultWorkspaceData, WorkpsaceData } from "@/shared/schema/workspaceSchema";
+import { defaultWorkspaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "../application/editorContext";

@@ -26,7 +26,7 @@ export class Workspace {
         this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorContext);
         this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
         this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorContext);
-        this.exportPathManager = new ExportPathManager(workspaceData.exportPaths ?? []);
+        this.exportPathManager = new ExportPathManager(workspaceData.exportPaths);
     }
 
     public async loadSession(): Promise<Result> {

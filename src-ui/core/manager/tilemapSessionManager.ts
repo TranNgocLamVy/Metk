@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSessionSchema";
+import { defaultTilemapSessionData, TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSessionSchema";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
@@ -51,12 +51,7 @@ export class TilemapSessionManager {
         const sessionId = this.tilemapMap.get(tilemap.id);
         if (sessionId) return this.openTilemapSession(sessionId, pixiApp);
 
-        const newTilemapSessionData: TilemapSessionData = {
-            id: uuidv4(),
-            tilemapId: tilemap.id,
-            viewState: { x: null, y: null, zoom: 1 },
-            layerState: { selectedLayers: [] },
-        }
+        const newTilemapSessionData = defaultTilemapSessionData(tilemap.id);
 
         const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData, this.editorContext);
         

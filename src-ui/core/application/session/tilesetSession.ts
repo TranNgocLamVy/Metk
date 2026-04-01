@@ -23,8 +23,8 @@ export class TilesetSession implements IBaseSession {
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData) {
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
-        this.viewState = tilesetSessionData.viewState;
-        this.selectionState = tilesetSessionData.selectionState || { selectedTiles: [] };
+        this.viewState = tilesetSessionData.viewState ?? { x: null, y: null, zoom: 1 };
+        this.selectionState = tilesetSessionData.selectionState ?? { selectedTilesSet: [], pivot: null };
 
         this.historyManager = new HistoryManager();
 
@@ -50,7 +50,7 @@ export class TilesetSession implements IBaseSession {
     public serialize(): TilesetSessionData {
         const selectionState: SelectionState = {
             selectedTilesSet: this.selectionState.selectedTilesSet,
-            pivot: this.selectionState.pivot || undefined,
+            pivot: this.selectionState.pivot,
         }
         return {
             id: this.id,

@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { JsonFormatter } from "@/shared/utils/jsonFormatter";
 import { ISerializer } from "@/infrastructure/interface/ISerializer";
-import { Result } from "../../shared/types/result";
+import { Result } from "../shared/types/result";
 
 export class ArkTypeJsonSerializer<T> implements ISerializer<T> {
     // Nhận vào một arktype schema
@@ -18,14 +18,13 @@ export class ArkTypeJsonSerializer<T> implements ISerializer<T> {
     }
 
     deserialize(rawString: string): Result<T> {
-        // Parse JSON sau đó validate bằng schema
         if (!this.schema) {
             const parsed = JSON.parse(rawString);
             return Result.Success(parsed)
         }
 
         const validatedData = this.schema(rawString);
-        
+
         if (validatedData instanceof type.errors) {
             console.error(validatedData.summary);
             return Result.Error("Data validation failed: " + validatedData.summary);
