@@ -2,7 +2,6 @@ import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { Result } from "@/shared/types/result";
 
 import { BaseObject, BaseObjectEvents } from "../../baseObject";
-import { Tilemap } from "../tilemap";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
 
@@ -92,6 +91,7 @@ export interface IGroupLayer {
     layers: BaseLayer<any>[];
     getLayerIndex(layerId: string): number;
     addLayer(newLayer: BaseLayer<any>): Result;
+    pushLayer(newLayer: BaseLayer<any>): Result;
     insertLayer(newLayer: BaseLayer<any>, index: number): Result;
     removeLayer(layerId: string): Result;
     moveChild(id: string, offset: number): void;

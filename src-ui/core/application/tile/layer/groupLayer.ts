@@ -5,7 +5,6 @@ import { GroupLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
-import { Tilemap } from "../tilemap";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 
 interface GroupLayerEvents extends BaseLayerEvents {
@@ -18,21 +17,16 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public layers: BaseLayer[] = [];
     public isOpen: boolean = false;
 
-    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer | null, tilesetRefManager: TilesetRefManager) {
+    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager) {
         super(groupLayerData.id, tilesetRefManager);
 
-        if (parentLayer) this.parentLayer = parentLayer;
+        this.parentLayer = parentLayer;
 
         this.name = groupLayerData.name;
 
         this.opacity = groupLayerData.opacity;
         this.visible = groupLayerData.visible;
         this.locked = groupLayerData.locked;
-
-        groupLayerData.layers.forEach((layerData: any) => {
-            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager);
-            if (layer) this.layers.push(layer);
-        });
     }
 
     public getLayers(): BaseLayer<any>[] {
@@ -46,6 +40,14 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public addLayer(newLayer: BaseLayer<any>): Result {
         newLayer.parentLayer = this;
         this.layers.unshift(newLayer);
+        this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
+
+        return Result.Success();
+    }
+
+    public pushLayer(newLayer: BaseLayer<any>): Result {
+        newLayer.parentLayer = this;
+        this.layers.push(newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
 
         return Result.Success();
@@ -95,12 +97,12 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override serialize(): GroupLayerData {
         return {
             id: this.id,
-            layerType: "group",
+            parentId: this.parentLayer.id,
+            type: "group",
             name: this.name,
             opacity: this.opacity,
             visible: this.visible,
             locked: this.locked,
-            layers: this.layers.map((layer) => layer.serialize()),
         }
     }
 

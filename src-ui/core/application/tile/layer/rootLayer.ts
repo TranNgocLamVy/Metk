@@ -3,7 +3,6 @@ import { RootLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
-import { Tilemap } from "../tilemap";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { GroupLayer } from "./groupLayer";
 
@@ -19,14 +18,17 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
     constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager) {
         super("root", tilesetRefManager);
 
+        const groupLayerMap: Map<string, IGroupLayer> = new Map([["root", this]]);
+        
         layersData.forEach((layerData) => {
-            const layer = LayerUtils.createLayeFromData(layerData, this, this.tilesetRefManager);
-            if (layer) this.layers.push(layer);
+            const parentLayer = groupLayerMap.get(layerData.parentId) ?? this;
+            const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager);
+            if (layer) parentLayer.pushLayer(layer);
         });
     }
 
     public override serialize(): RootLayerData {
-        return this.layers.map((layer) => layer.serialize());
+        return this.getAllLayers().map((layer) => layer.serialize());
     }
 
     public getLayers(): BaseLayer<any>[] {
@@ -40,6 +42,14 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
     public addLayer(newLayer: BaseLayer<any>): Result {
         newLayer.parentLayer = this;
         this.layers.unshift(newLayer);
+        this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
+
+        return Result.Success();
+    }
+
+    public pushLayer(newLayer: BaseLayer<any>): Result {
+        newLayer.parentLayer = this;
+        this.layers.push(newLayer);
         this.eventEmitter.emit("layerAdded", newLayer.id, this.layers.length - 1);
 
         return Result.Success();
@@ -95,7 +105,13 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         return found;
     }
 
-    getAllIds(): Set<string> {
+    public getAllLayers(): BaseLayer<any>[] {
+        const allLayers: BaseLayer<any>[] = [];
+        this.traverse((layer) => { if (layer !== this) allLayers.push(layer) });
+        return allLayers;
+    }
+
+    public getAllIds(): Set<string> {
         const ids = new Set<string>();
         this.traverse((layer) => { if (layer !== this) ids.add(layer.id) });
         return ids;
