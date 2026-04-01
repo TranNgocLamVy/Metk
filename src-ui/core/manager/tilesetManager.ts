@@ -1,4 +1,3 @@
-import { TextureService } from "@/infrastructure/textureService";
 import { Result } from "@/shared/types/result";
 
 import { TilesetMetadata } from "../../shared/schema/tilesetSchema";
@@ -78,9 +77,7 @@ export class TilesetManager {
         const tilesetData = loadTilesetResult.data;
 
         const tilesetPathSystem = new FilePathSystem(tilesetData.id, this.projectPathSystem, tilesetRelPath);
-        const tileset = new Tileset(tilesetData, new TextureService(tilesetPathSystem.getFileAbsDir()), tilesetPathSystem);
-
-        await tileset.loadTexture();
+        const tileset = new Tileset(tilesetData, tilesetPathSystem);
 
         this.tilesetMetadata.set(tilesetData.id, { id: tilesetData.id, name: tilesetData.name, tilesetRelPath });
         this.loadedTilesets.set(tilesetData.id, tileset);
@@ -95,8 +92,6 @@ export class TilesetManager {
 
         const tileset = this.loadedTilesets.get(id);
         if (!tileset) return;
-
-        await tileset.unloadTexture();
 
         this.loadedTilesets.delete(id);
     }

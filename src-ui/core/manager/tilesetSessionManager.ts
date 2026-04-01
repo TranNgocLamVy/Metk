@@ -28,33 +28,37 @@ export class TilesetSessionManager {
         
     }
 
-    public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<void> {
+    public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<Result> {
         await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
             const tilesetResult = await tilesetManager.loadTileset({ id: sessionData.tilesetId });
             if (tilesetResult.status !== Result.Status.Success) {
-                // TODO: Move ToastService outside
-                ToastService.error({ message: tilesetResult.message });
-                return;
+                return Result.Error(tilesetResult.message);
             }
             const tileset = tilesetResult.data;
-            const tilesetSession = new TilesetSession(tileset, sessionData);
+            const tilesetSession = new TilesetSession(tileset, sessionData, this.editorContext);
+            await tilesetSession.loadTilesetSession();
+            
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
             this.tilesetMap.set(tileset.id, tilesetSession.id);
         }))
+        return Result.Success();
     }
 
     public async unloadAll(): Promise<void> {
-        
+        Array.from(this.tilesetSessionMap.values()).forEach(session => session.destroy());
+        this.tilesetSessionMap.clear();
+        this.tilesetMap.clear();
     }
 
-    public createTilesetSession(tileset: Tileset, pixiApp: Application): TilesetSession | null {
+    public async createTilesetSession(tileset: Tileset, pixiApp: Application): Promise<TilesetSession | null> {
         const sessionId = this.tilesetMap.get(tileset.id);
         if (sessionId) return this.openTilesetSession(sessionId, pixiApp);
 
         const newTilesetSessionData = defaultTilesetSessionData(tileset.id);
 
-        const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData);
-        
+        const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData, this.editorContext);
+        await newTilesetSession.loadTilesetSession();
+
         this.tilesetSessionMap.set(newTilesetSession.id, newTilesetSession);
         this.tilesetMap.set(tileset.id, newTilesetSession.id);
 
