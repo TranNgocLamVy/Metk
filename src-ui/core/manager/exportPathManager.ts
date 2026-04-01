@@ -5,7 +5,7 @@ export class ExportPathManager {
 
     constructor(exportPathData: ExportPathData[]) {
         exportPathData.forEach((data) => {
-            this.exportPathMap.set(data.tilemapId, data.exportPath);
+            if (data.exportPath) this.exportPathMap.set(data.tilemapId, data.exportPath);
         })
     }
 

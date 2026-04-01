@@ -1,46 +1,36 @@
 import { type } from "arktype";
+import { safeArray } from ".";
 
-const atRuleModule = type.module({
-    ATConstraint: "'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'",
-    ATOutputSchema: {
-        tileId: type("number"),
-        tilesetIndex: type("number"),
-    },
-    ATRuleConstraintSchema: {
-        constraint: type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'").default("ANY"),
-        targets: type("string").array().default(() => []),
-    },
-    ATRuleData: {
-        id: type("string"),
-        size: type({
-            width: type("number"),
-            height: type("number"),
-        }).default(() => ({ width: 1, height: 1 })),
-        constraints: type({
-            targets: type("string").array(),
-            constraint: type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'").default("ANY"),
-        }).array().default(() => []),
-        output: "ATOutputSchema | null",
-    },
-    ATRuleSetSchema: {
-        id: type("string"),
-        name: type("string"),
-        color: type("string"),
-        rules: "ATRuleData[]",
-    }
-});
-
-export const atConstraint = atRuleModule.ATConstraint;
+export const atConstraint = type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'")
 export type ATConstraint = typeof atConstraint.infer;
 
-export const aTRuleConstraintSchema = atRuleModule.ATRuleConstraintSchema;
+export const aTRuleConstraintSchema = type({
+    constraint: atConstraint.default("ANY"),
+    targets: safeArray(type("string")).default(() => []),
+})
 export type ATRuleConstraintData = typeof aTRuleConstraintSchema.infer;
 
-export const atOutputSchema = atRuleModule.ATOutputSchema;
+export const atOutputSchema = type({
+    tileId: type("number"),
+    tilesetIndex: type("number"),
+})
 export type ATOutputData = typeof atOutputSchema.infer;
 
-export const atRuleData = atRuleModule.ATRuleData;
+export const atRuleData = type({
+    id: type("string"),
+    size: type({
+        width: type("number"),
+        height: type("number"),
+    }).default(() => ({ width: 1, height: 1 })),
+    constraints: safeArray(aTRuleConstraintSchema).default(() => []),
+    output: atOutputSchema.or("null").default(null),
+})
 export type ATRuleData = typeof atRuleData.infer;
 
-export const atRuleSetSchema = atRuleModule.ATRuleSetSchema;
+export const atRuleSetSchema = type({
+    id: type("string"),
+    name: type("string").default("Untitled AT Rule Set"),
+    color: type("string").default("#ffffff"),
+    rules: safeArray(atRuleData).default(() => []),
+})
 export type ATRuleSetData = typeof atRuleSetSchema.infer;

@@ -1,7 +1,6 @@
 import { TilesetRefData } from "@/shared/schema/tilemapSchema";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
-import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { TilesetMetadata } from "@/shared/schema/tilesetSchema";
