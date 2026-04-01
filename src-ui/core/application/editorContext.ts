@@ -10,6 +10,7 @@ import { TilemapSession } from "./session/tilemapSession";
 import { TilesetSession } from "./session/tilesetSession";
 import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
+import { TextureManager } from "../manager/textureManager";
 
 type EditorContextEvent = {
     onOpenTilemapSession: () => void,
@@ -21,7 +22,8 @@ export class EditorContext {
     constructor(
         public readonly projectManager: ProjectManager,
         public readonly workspaceManager: WorkspaceManager,
-        public readonly toolManager: ToolManager
+        public readonly toolManager: ToolManager,
+        public readonly textureManager: TextureManager
     ) { }
 
     public getCurrentProject(): Project {

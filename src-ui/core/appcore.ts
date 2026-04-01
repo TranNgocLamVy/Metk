@@ -9,6 +9,7 @@ import { ToolManager } from "./manager/toolManager";
 import { WorkspaceManager } from "./manager/workspaceManager";
 import { ProjectMetadataRepo } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
+import { TextureManager } from "./manager/textureManager";
 
 export class AppCore {
     private static _instance: AppCore;
@@ -17,7 +18,8 @@ export class AppCore {
     public readonly workspaceManager: WorkspaceManager;
     public systemCommandManager: SystemCommandManager;
     public readonly toolManager: ToolManager;
-    private keybindingManager: KeybindingManager;
+    private readonly keybindingManager: KeybindingManager;
+    public readonly textureManager: TextureManager;
 
     public readonly editorContext: EditorContext;
 
@@ -27,10 +29,11 @@ export class AppCore {
         this.projectManager = new ProjectManager();
         this.workspaceManager = new WorkspaceManager();
         this.toolManager = new ToolManager();
-        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager, this.toolManager);
+        this.textureManager = new TextureManager();
+        this.editorContext = new EditorContext(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager);
 
         this.systemCommandManager = new SystemCommandManager(this.editorContext);
-        this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
+        this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);""
         
         // Set Context
         this.toolManager.setEditorContext(this.editorContext);
@@ -67,6 +70,8 @@ export class AppCore {
 
         const projectRepoData = projectRepoResult.data;
         AppCore.getIns().projectManager.load(projectRepoData);
+
+        await AppCore.getIns().textureManager.loadDefaultTextures();
 
         this.isLoaded = true;
         return Result.Success(this);

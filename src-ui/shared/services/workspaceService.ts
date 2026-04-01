@@ -86,7 +86,7 @@ export class WorkspaceService {
         const tileset = tilesetResult.data;
 
         const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
-        tilesetSessionManager.createTilesetSession(tileset, tilesetPixiApp);
+        await tilesetSessionManager.createTilesetSession(tileset, tilesetPixiApp);
         useTilesetSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
@@ -134,7 +134,7 @@ export class WorkspaceService {
         const tilemap = tilemapResult.data;
 
         const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
-        const tilemapSession = tilemapSessionManager.createTilemapSession(tilemap, tilesetPixiApp);
+        const tilemapSession = await tilemapSessionManager.createTilemapSession(tilemap, tilesetPixiApp);
 
         useLayerManagerStore.getState().setSession(tilemapSession);
 

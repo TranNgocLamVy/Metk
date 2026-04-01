@@ -1,15 +1,8 @@
-import { Texture } from "pixi.js";
-
 import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
-import { TextureService } from "@/infrastructure/textureService";
 import { TileData, TilesetData } from "@/shared/schema/tilesetSchema";
 import { Result } from "@/shared/types/result";
-import { TextureUtils } from "@/shared/utils/textureUtils";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 
-const tileTextureFinalizer = new FinalizationRegistry((texture: Texture) => {
-    texture.destroy();
-});
 
 interface TilesetEvent extends BaseObjectEvents {
     update(): void
@@ -29,10 +22,8 @@ export class Tileset extends BaseObject<TilesetEvent> {
         width: number;
         height: number;
     };
-    public texture: Texture;
-    public isTextureLoaded: boolean = false;
 
-    constructor(tilesetData: TilesetData, public readonly textureService: TextureService, public readonly tilesetPathSystem: FilePathSystem) {
+    constructor(tilesetData: TilesetData, public readonly tilesetPathSystem: FilePathSystem) {
         super();
         this.id = tilesetData.id;
         this.name = tilesetData.name;
@@ -97,52 +88,10 @@ export class Tileset extends BaseObject<TilesetEvent> {
     public getTileCount(): number {
         return this.tiles.length;
     }
-
-    public async loadTexture(): Promise<Result> {
-        if (this.isTextureLoaded) return Result.Success();
-        const imageRelPath = this.image.source;
-
-        const loadTextureResult = await this.textureService.loadTexture(imageRelPath);
-        if (loadTextureResult.status === Result.Status.Error) return loadTextureResult;
-        const texture = loadTextureResult.data;
-        if (!texture) return Result.Error("Failed to load texture");
-        this.texture = texture;
-
-        this.image.width = texture.width;
-        this.image.height = texture.height;
-
-        this.columns = Math.ceil(this.image.width / this.tilewidth);
-        this.rows = Math.ceil(this.image.height / this.tileheight);
-
-        this.isTextureLoaded = true;
-
-        const expectedTileCount = this.columns * this.rows;
-        if (this.tiles.length === 0 && expectedTileCount > 0) {
-            this.tiles = Array.from({ length: expectedTileCount }, (_, index) => {
-                return new Tile({ id: index }, this);
-            });
-        }
-
-        const tileTextureList = TextureUtils.sliceTexture(this.texture, this.tilewidth, this.tileheight);
-
-        const sortedTiles = Array.from(this.tiles).sort((a, b) => a.id - b.id);
-        sortedTiles.forEach((tile, index) => {
-            const tileTexture = tileTextureList[index];
-            tile.loadTexture(tileTexture);
-        })
-
-        return Result.Success();
-    }
-
-    public async unloadTexture(): Promise<void> {
-
-    }
 }
 
 export class Tile extends BaseObject {
     public id: number;
-    protected texture: Texture;
-    public isTextureLoaded: boolean = false;
     public tileset: Tileset;
 
     constructor(tileData: TileData, tileset: Tileset) {
@@ -155,21 +104,5 @@ export class Tile extends BaseObject {
         return {
             id: this.id,
         }
-    }
-
-    public loadTexture(texture: Texture): void {
-        if (this.isTextureLoaded) return;
-        this.texture = texture;
-        tileTextureFinalizer.register(this, texture);
-        this.isTextureLoaded = true;
-    }
-
-    public getTexture(): Texture {
-        return this.texture;
-    }
-
-    public destroy(): void {
-        tileTextureFinalizer.unregister(this);
-        this.texture.destroy();
     }
 }

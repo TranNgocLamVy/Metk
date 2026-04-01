@@ -7,6 +7,7 @@ import { useTilemapSessionStore } from "@/view/stores/application/tilemapSession
 import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
 import { TilemapSessionView } from "./tilemapSessionView";
+import { Tile, Tileset } from "../tile/tileset";
 
 export class TilemapSession implements IBaseSession {
     public readonly id: string;
@@ -40,6 +41,19 @@ export class TilemapSession implements IBaseSession {
         this.bindOnTilemapChange = this.markAsDirty.bind(this);
         this.tilemap.eventEmitter.on("updateProperty", this.bindOnTilemapChange);
     }
+
+    public async loadTilemapSession(): Promise<void> {
+        const tilesetIds = this.tilemap.tilesetRefManager.serialize().map(r => r.id);
+        const tilesetManager = this.editorContext.getCurrentProject().tilesetManager;
+        const tilesets: Tileset[] = [];
+        for (const id of tilesetIds) {
+            const tileset = tilesetManager.getTilesetById(id);
+            if (tileset) tilesets.push(tileset);
+        }
+        const textureManager = this.editorContext.textureManager;
+        await Promise.all(tilesets.map(t => textureManager.retainTilesetGraphics(t)));
+    }
+
     //==========View State==========
     public updateViewState(state: Partial<ViewState>) {
         this.viewState = { ...this.viewState, ...state };
@@ -70,6 +84,10 @@ export class TilemapSession implements IBaseSession {
     }
 
     public destroy() {
+        const tilesetIds = this.tilemap.tilesetRefManager.serialize().map(r => r.id);
+        const textureManager = this.editorContext.textureManager;
+        for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id);
+
         this.sessionView.unActivateSession();
         this.sessionView.destroy();
     }

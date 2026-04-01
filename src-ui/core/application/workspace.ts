@@ -9,6 +9,7 @@ import { TilesetSessionManager } from "../manager/tilesetSessionManager";
 import { ToolSessionManager } from "../manager/toolSessionManager";
 import { EditorContext } from "./editorContext";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ToastService } from "@/shared/services/toastService";
 
 export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;

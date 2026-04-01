@@ -6,6 +6,7 @@ import { TilesetSessionData } from "@/shared/schema/tilesetSessionSchema";
 
 import { Tile, Tileset } from "../tile/tileset";
 import { TilesetSessionView } from "./tilesetSessionView";
+import { EditorContext } from "../editorContext";
 
 export class TilesetSession implements IBaseSession {
     public readonly id: string;
@@ -20,7 +21,7 @@ export class TilesetSession implements IBaseSession {
     public sessionView: TilesetSessionView;
 
 
-    constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData) {
+    constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorContext: EditorContext) {
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
         this.viewState = tilesetSessionData.viewState ?? { x: null, y: null, zoom: 1 };
@@ -29,6 +30,11 @@ export class TilesetSession implements IBaseSession {
         this.historyManager = new HistoryManager();
 
         this.sessionView = new TilesetSessionView(this);
+    }
+
+    public async loadTilesetSession(): Promise<void> {
+        const textureManager = this.editorContext.textureManager;
+        await textureManager.retainTilesetGraphics(this.tileset);
     }
 
     public updateViewState(state: Partial<ViewState>) {
@@ -61,6 +67,9 @@ export class TilesetSession implements IBaseSession {
     }
 
     public destroy(): void {
+        const textureManager = this.editorContext.textureManager;
+        textureManager.releaseTilesetGraphics(this.tileset.id);
+
         this.sessionView.unActivateSession();
         this.sessionView.destroy();
     }

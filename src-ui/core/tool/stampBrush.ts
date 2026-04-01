@@ -146,7 +146,13 @@ export class StampBrush implements ITool {
                 if (col < 0 || col >= this.currentSession!.tilemap.width ||
                     row < 0 || row >= this.currentSession!.tilemap.height) continue;
 
-                const sprite = new Sprite(tile.getTexture());
+                const textureManager = this.editorContext.textureManager;
+                const texture = textureManager.getTileTexture(tile.tileset.id, tile.id);
+
+                // TODO: Handle unfound tileset, render error texture
+                if (!texture) continue;
+
+                const sprite = new Sprite(texture);
                 sprite.position.set(col * this.currentSession!.tilemap.tilewidth, row * this.currentSession!.tilemap.tileheight);
                 this.overlayContainer!.addChild(sprite);
                 this.previewSprites.push(sprite);
@@ -241,18 +247,24 @@ export class StampBrush implements ITool {
                     }
 
                     if (!tile) continue;
-                    const tileTexture = tile.getTexture();
+
+                    const textureManager = this.editorContext.textureManager;
+                    const texture = textureManager.getTileTexture(tile.tileset.id, tile.id);
+
+                    // TODO: Handle unfound tileset, render error texture
+                    if (!texture) continue;
+                    
 
                     const key = `${targetX},${targetY}`;
                     let tileSpriteData: PreviewSpriteData;
                     if (this.previewSpriteMap.has(key)) {
                         tileSpriteData = this.previewSpriteMap.get(key)!;
-                        tileSpriteData.sprite.texture = tileTexture;
+                        tileSpriteData.sprite.texture = texture;
                         tileSpriteData.tileId = tile.id;
                         tileSpriteData.tilesetId = tile.tileset.id;
                     } else {
                         tileSpriteData = {
-                            sprite: new Sprite(tileTexture),
+                            sprite: new Sprite(texture),
                             tileId: tile.id,
                             tilesetId: tile.tileset.id,
                         }

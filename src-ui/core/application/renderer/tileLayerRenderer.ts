@@ -1,4 +1,4 @@
-import { Sprite, Texture } from "pixi.js";
+import { Sprite } from "pixi.js";
 
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
@@ -41,7 +41,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         this.renderTile(x, y);
     };
 
-    private renderTile(x: number, y: number): void {
+    private async renderTile(x: number, y: number): Promise<void> {
         const tileRef = this.layer.getTileAt({ col: x, row: y });
         const key = `${x},${y}`;
         const currentSprite = this.sprites.get(key);
@@ -57,17 +57,12 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         const tilesetRefData = this.layer.tilesetRefManager.tilesetRef.find(r => r.index === tileRef.getTile().tilesetIndex);
         if (!tilesetRefData) return;
 
-        const tileset = this.layer.tilesetRefManager.tilesetManager.getTilesetById(tilesetRefData.id);
+        // TODO: Fix: Get textureManager from passing context
+        const textureManager = AppCore.getIns().editorContext.textureManager;
+        const texture = textureManager.getTileTexture(tilesetRefData.id, tileRef.getTile().tileId);
 
         // TODO: Handle unfound tileset, render error texture
-        let texture: Texture;
-        if (tileset && tileset.getTileFromId(tileRef.getTile().tileId)) {
-            const tile = tileset.getTileFromId(tileRef.getTile().tileId)!;
-            texture = tile.getTexture();
-        } else {
-            // TODO: Handle unfound tile, render error texture
-            return;
-        }
+        if (!texture) return;
 
         // Calculate Position: (GridPos + LayerGridOffset) * (TileSize + Gap) + LayerPixelOffset
         const posX = (x + this.layer.coordinate.col) * (this.tilemap.tilewidth + this.gap) + this.layer.offset.x;

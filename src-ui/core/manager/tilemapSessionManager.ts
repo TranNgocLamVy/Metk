@@ -28,32 +28,37 @@ export class TilemapSessionManager {
         
     }
 
-    public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<void> {
+    public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<Result> {
         await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
             const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);
             if (tilemapResult.status !== Result.Status.Success) {
                 // TODO: Move ToastService outside
-                ToastService.error({ message: tilemapResult.message });
-                return;
+                return Result.Error(tilemapResult.message);     
             }
             const tilemap = tilemapResult.data;
             const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorContext);
+            await tilemapSession.loadTilemapSession();
+
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
             this.tilemapMap.set(tilemap.id, tilemapSession.id);
         }))
+        return Result.Success();
     }
 
     public async unloadAll(): Promise<void> {
-        
+        Array.from(this.tilemapSessionMap.values()).forEach(session => session.destroy());
+        this.tilemapSessionMap.clear();
+        this.tilemapMap.clear();
     }
 
-    public createTilemapSession(tilemap: Tilemap, pixiApp: Application): TilemapSession | null {
+    public async createTilemapSession(tilemap: Tilemap, pixiApp: Application): Promise<TilemapSession | null> {
         const sessionId = this.tilemapMap.get(tilemap.id);
         if (sessionId) return this.openTilemapSession(sessionId, pixiApp);
 
         const newTilemapSessionData = defaultTilemapSessionData(tilemap.id);
 
         const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData, this.editorContext);
+        await newTilemapSession.loadTilemapSession();
         
         this.tilemapSessionMap.set(newTilemapSession.id, newTilemapSession);
         this.tilemapMap.set(tilemap.id, newTilemapSession.id);
