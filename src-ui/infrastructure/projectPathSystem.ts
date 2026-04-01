@@ -18,6 +18,10 @@ export class ProjectPathSystem {
     public getAbsPathFromRelPath(relPath: string): string {
         return PathUtils.join(this.absDir, relPath);
     }
+
+    public getRelPathFromAbsPath(absPath: string): string {
+        return PathUtils.relative(this.absDir, absPath);
+    }
 }
 
 export class FilePathSystem {
@@ -48,5 +52,10 @@ export class FilePathSystem {
     public getAbsPathFromRelPath(relPath: string): string {
         const absDir = PathUtils.join(this.parent.absDir, this.relDir);
         return PathUtils.join(absDir, relPath);
+    }
+
+    public getRelPathFromAbsPath(absPath: string): string {
+        const relDir = PathUtils.relative(this.parent.absDir, absPath);
+        return PathUtils.join(relDir, PathUtils.basename(absPath));
     }
 }

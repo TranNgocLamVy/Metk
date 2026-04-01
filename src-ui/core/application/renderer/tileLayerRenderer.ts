@@ -4,6 +4,7 @@ import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
+import { AppCore } from "@/core/appcore";
 
 type CreateTileLayerRendererContext = {
     layer: TileLayer;
@@ -56,7 +57,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         const tilesetRefData = this.layer.tilesetRefManager.tilesetRef.find(r => r.index === tileRef.getTile().tilesetIndex);
         if (!tilesetRefData) return;
 
-        const tileset = this.layer.tilesetRefManager.getTilesetById(tilesetRefData.id);
+        const tileset = this.layer.tilesetRefManager.tilesetManager.getTilesetById(tilesetRefData.id);
 
         // TODO: Handle unfound tileset, render error texture
         let texture: Texture;

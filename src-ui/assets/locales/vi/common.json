@@ -40,7 +40,7 @@
     },
     "home": {
         "welcome": "Chào mừng đến với MEtk",
-        "openProject": "Mở dự án",
+        "importProject": "Mở dự án",
         "newProject": "Tạo dự án mới",
         "recentProjects": "Dự án gần đây",
         "description": "Mô tả",

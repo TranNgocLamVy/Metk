@@ -30,7 +30,7 @@ export class TilesetSessionManager {
 
     public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<void> {
         await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
-            const tilesetResult = await tilesetManager.loadTileset(sessionData.tilesetId);
+            const tilesetResult = await tilesetManager.loadTileset({ id: sessionData.tilesetId });
             if (tilesetResult.status !== Result.Status.Success) {
                 // TODO: Move ToastService outside
                 ToastService.error({ message: tilesetResult.message });

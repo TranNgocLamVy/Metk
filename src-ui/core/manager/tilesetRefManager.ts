@@ -32,7 +32,7 @@ export class TilesetRefManager {
         const tilesetRef = this.tilesetRef.find(tilesetRef => tilesetRef.id === tileset.id);
         if (!tilesetRef) {
             const tilesetAbsPath = this.tilesetManager.getTilesetAbsById(tileset.id);
-            if (!tilesetAbsPath) return -1;
+            if (!tilesetAbsPath) return -1;   
         
             const tilesetRelPath = PathUtils.relative(this.tilemapPathSystem.relDir, tilesetAbsPath);
 
@@ -53,9 +53,5 @@ export class TilesetRefManager {
         const tilesetMetadata = this.tilesetManager.getTilesetMetadataById(tilesetId);
         if (!tilesetMetadata) return -1;
         return this.getTilesetIndex(tilesetMetadata);
-    }
-
-    public getTilesetById(id: string): Tileset | null {
-        return this.tilesetManager.getTilesetById(id);
     }
 }
