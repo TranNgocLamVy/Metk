@@ -85,8 +85,19 @@ export class Tileset extends BaseObject<TilesetEvent> {
         return this.tiles[tileIndex] || null;
     }
 
-    public getTileCount(): number {
-        return this.tiles.length;
+    public checkTextureSize(width: number, height: number): void {
+        this.image.width = width;
+        this.image.height = height;
+
+        this.columns = Math.ceil(this.image.width / this.tilewidth);
+        this.rows = Math.ceil(this.image.height / this.tileheight);
+
+        const expectedTileCount = this.columns * this.rows;
+        if (this.tiles.length === 0 && expectedTileCount > 0) {
+            this.tiles = Array.from({ length: expectedTileCount }, (_, index) => {
+                return new Tile({ id: index }, this);
+            });
+        }
     }
 }
 

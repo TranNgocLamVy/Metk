@@ -3,6 +3,7 @@ import { Fragment } from "react/jsx-runtime";
 import { FormDialog } from "./formDialog";
 import { PermissionDialog } from "./permissionDialog";
 import { SaveDialog } from "./saveDialog";
+import { ModalContainer } from "../modalContainer/ModalContainer";
 
 export function DialogContainer() {
 	return (
@@ -10,6 +11,7 @@ export function DialogContainer() {
 			<PermissionDialog />
 			<FormDialog />
 			<SaveDialog />
+			<ModalContainer />
 		</Fragment>
 	);
 }
