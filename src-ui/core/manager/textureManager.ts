@@ -41,10 +41,7 @@ export class TextureManager {
         const baseTexture = loadResult.data!;
         this.baseTexturesCache.set(tileset.id, baseTexture);
 
-        tileset.image.width = baseTexture.width;
-        tileset.image.height = baseTexture.height;
-        tileset.columns = Math.ceil(baseTexture.width / tileset.tilewidth);
-        tileset.rows = Math.ceil(baseTexture.height / tileset.tileheight);
+        tileset.checkTextureSize(baseTexture.width, baseTexture.height);
 
         const slicedTextures = this.sliceTexture(baseTexture, tileset.tilewidth, tileset.tileheight);
 
