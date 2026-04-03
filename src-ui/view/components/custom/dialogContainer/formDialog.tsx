@@ -229,7 +229,7 @@ export function FormDialog() {
 						</DialogContent>
 					</form>
 				</Dialog>,
-				document.body
+				document.getElementById("main-container")!
 			)}
 		</Fragment>
 	);

@@ -8,11 +8,11 @@ import { useModalStore } from "@/view/stores/modalStore";
     id: "project.openFile",
     name: "Open File",
     description: "",
-    shortcuts: ["Ctrl+P"],
+    shortcuts: ["Ctrl+P", "Ctrl+O"],
 })
 export class RedoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {
-        useModalStore.getState().openModal("OPEN_FILE");
+        useModalStore.getState().openModal({ modalName: "OPEN_FILE" });
         return Result.Success();
     }
 }

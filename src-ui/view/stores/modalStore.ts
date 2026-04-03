@@ -1,15 +1,21 @@
 import { create } from "zustand";
 
+type ModalOptions = {
+    
+}
+
 interface ModalState {
     activeModal: string | null;
+    options: ModalOptions;
     props: any;
-    openModal: (name: string, props?: any) => void;
+    openModal: (options: ModalOptions & { modalName: string }, props?: any) => void;
     closeModal: () => void;
 }
 
 export const useModalStore = create<ModalState>((set) => ({
     activeModal: null,
+    options: {},
     props: {},
-    openModal: (name, props = {}) => set({ activeModal: name, props }),
-    closeModal: () => set({ activeModal: null, props: {} }),
+    openModal: (options, props = {}) => set({ activeModal: options.modalName, options, props }),
+    closeModal: () => set({ activeModal: null, props: {}, options: {} }),
 }));

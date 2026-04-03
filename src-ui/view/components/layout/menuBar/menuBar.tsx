@@ -18,7 +18,7 @@ export default function MenuBar() {
 	};
 
 	return (
-		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-background shadow-md absolute" data-tauri-drag-region>
+		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-background shadow-md fixed top-0 z-[999]" data-tauri-drag-region>
 			<HStack className="text-foreground/70">
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />
@@ -31,9 +31,9 @@ export default function MenuBar() {
 			</HStack>
 
 			<HStack className="ml-auto">
-				<Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
+				{/* <Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
 					<SunMoon className="size-4" />
-				</Button>
+				</Button> */}
 				<Button title="Minimize" size={"icon-sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().minimize()}>
 					<Minus className="size-4" />
 				</Button>
