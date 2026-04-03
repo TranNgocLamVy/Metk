@@ -1,6 +1,6 @@
-# Contributing to MEtk
+# Contributing to Metk
 
-We appreciate interest in contributing to the MEtk project. To maintain code quality and architectural integrity, please adhere to the following guidelines.
+We appreciate interest in contributing to the Metk project. To maintain code quality and architectural integrity, please adhere to the following guidelines.
 
 ## Bug Reports
 
@@ -33,4 +33,4 @@ Before submitting a bug report, ensure you are running the latest version of the
 
 ## License
 
-By contributing to MEtk, you agree that your contributions will be licensed under the GNU General Public License v2.0.
+By contributing to Metk, you agree that your contributions will be licensed under the GNU General Public License v2.0.

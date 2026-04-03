@@ -1,6 +1,6 @@
-# MEtk (Modern Editor Toolkit)
+# Metk (Modern Editor Toolkit)
 
-MEtk is a specialized tilemap editor designed for high-performance level design workflows. Built on the Tauri framework, it implements a decoupled architecture that separates native host operations from application logic and user interface concerns.
+Metk is a specialized tilemap editor designed for high-performance level design workflows. Built on the Tauri framework, it implements a decoupled architecture that separates native host operations from application logic and user interface concerns.
 
 ## Technical Architecture
 
@@ -57,4 +57,4 @@ npm run tauri build
 ```
 
 ### License
-MEtk is released under the GNU General Public License v2.0 (GPL-2.0). See the LICENSE file for the full license text.
+Metk is released under the GNU General Public License v2.0 (GPL-2.0). See the LICENSE file for the full license text.
