@@ -1,6 +1,6 @@
 # License Information
 
-**MEtk (Modern Editor Toolkit)** is open-source software.
+**Metk (Modern Editor Toolkit)** is open-source software.
 
 ## Copyright
 
