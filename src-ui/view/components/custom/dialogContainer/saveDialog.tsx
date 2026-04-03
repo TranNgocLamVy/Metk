@@ -26,7 +26,7 @@ export function SaveDialog() {
 						</AlertDialogFooter>
 					</AlertDialogContent>
 				</AlertDialog>,
-				document.body,
+				document.getElementById("main-container")!,
 			)}
 		</Fragment>
 	);

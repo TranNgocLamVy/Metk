@@ -32,7 +32,7 @@ export default function MainContainer({ children, ...props }: MainContainerProps
     useUIHook();
 
 	return (
-		<main {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-background">
+		<main id="main-container" {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-background">
             <SecurityShield />
 			{children}
 		</main>

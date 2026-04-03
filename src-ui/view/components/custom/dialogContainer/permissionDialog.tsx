@@ -24,7 +24,7 @@ export function PermissionDialog() {
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialog>,
-					document.body
+					document.getElementById("main-container")!
 				)
 			)}
 		</Fragment>

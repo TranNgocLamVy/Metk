@@ -1,30 +1,43 @@
 import { useModalStore } from "@/view/stores/modalStore";
-import { modalRegistry } from "./modalRegistry";
 import { Fragment } from "react/jsx-runtime";
 import { createPortal } from "react-dom";
+import { Button } from "../../shadcn/button";
+import { OpenFileModal } from "../../modal/OpenFileModel";
 
 export function ModalContainer() {
-    const { activeModal, props, closeModal } = useModalStore();
+    const { activeModal, options, closeModal } = useModalStore();
 
     if (!activeModal) return null;
-
-    const ModalClass = modalRegistry.get(activeModal);
-
-    if (!ModalClass) {
-        console.warn(`No modal registered for type: ${activeModal}`);
-        return null;
-    }
-
-    const modalInstance = new ModalClass({ ...props, onClose: closeModal });
 
     return (
         <Fragment>
             {createPortal(
                 <div onClick={closeModal} className="w-full h-full bg-black/10 fixed top-0 left-0 z-50 flex items-center justify-center">
-                    {modalInstance.render()}
+                    <ModalContent />
                 </div>
-                , document.body
+                , document.getElementById("main-container")!
             )}
         </Fragment>
     );
+}
+
+function ModalContent() {
+    const { activeModal, props } = useModalStore();
+
+    switch (activeModal) {
+        case "OPEN_FILE":
+            return <OpenFileModal {...props} />
+        default:
+            return <DefaultModalContent />
+    }
+}
+
+function DefaultModalContent() {
+    const { closeModal } = useModalStore();
+
+    return (
+        <div className="w-90 h-90 bg-secondary-background shadow-md border flex items-center justify-center">
+            <Button onClick={closeModal}>Close</Button>
+        </div>
+    )
 }
