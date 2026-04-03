@@ -14,7 +14,6 @@ The project follows a layered architectural pattern to ensure scalability and ma
    - **AppCore & Managers:** Orchestrates the lifecycle of Projects, Tilemaps, Tilesets, and Tools.
    - **Command System:** Implements a robust undo/redo architecture where editor actions are encapsulated as discrete Command objects.
    - **Session Management:** Handles active editing contexts for both tilemaps and tilesets independently.
-   - **Auto-Tiling:** Includes a dedicated "AtRule" system for constraint-based tile placement logic.
 
 3. **Infrastructure Layer:**
    - **Data Integrity:** Utilizes ArkType for runtime schema validation and safe JSON serialization.
@@ -22,7 +21,7 @@ The project follows a layered architectural pattern to ensure scalability and ma
 
 4. **View & Rendering Layer (React):**
    - **Workspace:** Powered by FlexLayout, offering a professional, dockable IDE-style interface.
-   - **Rendering:** High-performance HTML5 Canvas engine tailored for grid-based manipulation.
+   - **Rendering:** PIXIJS for High-performance HTML5 Canvas engine tailored for grid-based manipulation.
    - **State:** Synchronized via specialized stores (Zustand/Custom) that bridge UI components with the Core logic.
 
 ## Project Structure
@@ -44,7 +43,7 @@ The project follows a layered architectural pattern to ensure scalability and ma
 1. Clone the repository.
 2. Initialize dependencies:
 ```bash
-   npm install
+npm install
 ```
 
 Execute the application in development mode with hot-reloading:
