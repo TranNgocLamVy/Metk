@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 import { AppCore } from "@/core/appcore";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
@@ -15,7 +13,7 @@ import { DropPosition, useLayerManagerStore } from "@/view/stores/application/la
 
 import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLayerCommand";
 import { WorkspaceService } from "./workspaceService";
-import { GroupLayerData, TileLayerData } from "../schema/layerSchema";
+import { defaultGroupLayerData, defaultTileLayerData } from "../schema/layerSchema";
 
 export class TilemapLayerService {
     public static async createNewTileLayer() {
@@ -31,22 +29,7 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload: TileLayerData = {
-            id: uuidv4(),
-            parentId: parent.id,
-            name: "New Tile Layer",
-            type: "tile" as const,
-            width: currentSession.tilemap.width,
-            height: currentSession.tilemap.height,
-            x: 0,
-            y: 0,
-            offsetx: 0,
-            offsety: 0,
-            opacity: 1,
-            visible: true,
-            locked: false,
-            tilesData: ""
-        }
+        const payload = defaultTileLayerData({ parentId: parent.id, width: currentSession.tilemap.width, height: currentSession.tilemap.height });
 
         const createTileLayerCommand = new CreateTileLayerCommand(payload, parent.id);
 
@@ -70,15 +53,7 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload: GroupLayerData = {
-            id: uuidv4(),
-            parentId: parent.id,
-            name: "New Group Layer",
-            type: "group" as const,
-            opacity: 1,
-            visible: true,
-            locked: false,
-        }
+        const payload = defaultGroupLayerData({ parentId: parent.id });
 
         const createGroupLayerCommand = new CreateGroupLayerCommand(payload, parent.id);
 

@@ -7,6 +7,7 @@ import TilemapEditor from "@/view/components/workspace/tilemapEditor/tilemapEdit
 import TilesetView from "@/view/components/workspace/tilesetView/tilesetView";
 
 import { workspaceLayout } from "./jsonModel/workspaceJsonModel";
+import ATRulesetManager from "@/view/components/workspace/atRulesetManager/atRulesetManager";
 
 type WorkspaceState = {
 	model: Model;
@@ -42,6 +43,8 @@ export const useWorkspaceDockStore = create<WorkspaceState>((set, get) => {
 					return <LayerManager />;
                 case "tilemapEditor":
                     return <TilemapEditor />
+				case "atRulesetManager":
+					return <ATRulesetManager />
 				default:
 					return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 			}

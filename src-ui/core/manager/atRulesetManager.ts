@@ -25,6 +25,16 @@ export class ATRulesetManager {
         this.atRulesetMetadata.set(atRuleMetadata.id, atRuleMetadata);
     }
 
+    public loadATRulesetsMetadata(atRulesetsMetadata: ATRulesetMetadata[]): void {
+        atRulesetsMetadata.forEach((meta) => this.atRulesetMetadata.set(meta.id, meta));
+    }
+
+    public removeAtRule(id: string): void {
+        this.atRulesetMetadata.delete(id);
+        this.loadedAtRulesets.delete(id);
+        this.pendingLoads.delete(id);
+    }
+
     public async loadAtRulesetsMetada(atRulesetsMetadata: ATRulesetMetadata[]): Promise<void> {
         atRulesetsMetadata.forEach((meta) => this.atRulesetMetadata.set(meta.id, meta));
     }
@@ -125,7 +135,7 @@ export class ATRulesetManager {
         return Array.from(this.atRulesetMetadata.values()).map((metaData) => {
             const atRulesets = this.loadedAtRulesets.get(metaData.id);
             if (!atRulesets) return metaData;
-            return { name: atRulesets.name, id: atRulesets.id, atRulesetRelPath: atRulesets.atRulesetPathSystem.relPath };
+            return {  id: atRulesets.id, name: atRulesets.name, color: atRulesets.color, atRulesetRelPath: atRulesets.atRulesetPathSystem.relPath };
         });
     }
 }

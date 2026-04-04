@@ -4,6 +4,7 @@ export interface FieldTypeMap {
     checkbox: boolean;
     filePath: string[];
     folderPath: string;
+    color: string;
     group: Record<string, any>;
 }
 
@@ -94,6 +95,12 @@ export type GroupFieldInput = BaseField & {
     validate?: (value: Record<string, any>) => Promise<ValidateResult>;
 };
 
+export type ColorSelectFieldInput = BaseField & {
+    type: "color";
+    defaultValue?: string;
+    validate?: (value: string) => Promise<ValidateResult>;
+};
+
 // Update the main Union Type
 export type Field = 
     | TextFieldInput 
@@ -101,4 +108,5 @@ export type Field =
     | CheckboxFieldInput 
     | FilePathFieldInput 
     | FolderPathFieldInput 
+    | ColorSelectFieldInput
     | GroupFieldInput;

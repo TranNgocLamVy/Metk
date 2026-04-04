@@ -61,18 +61,6 @@ const CreateActionGroup: MenuDropDownGroupType = [
             TilemapLayerService.duplicateLayer();
         },
 	},
-	{
-		type: "option",
-		name: "Remove layer",
-		startIcon: <Trash2 />,
-        disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
-            return numberOfLayers < 1;
-        },
-		onClick() {
-            TilemapLayerService.deleteLayer();
-        },
-	},
 ];
 
 const MoveLayerActionGroup: MenuDropDownGroupType = [
@@ -143,8 +131,24 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 	},
 ];
 
+const DeleteActionGroup: MenuDropDownGroupType = [
+	{
+		type: "option",
+		name: "Remove layer",
+		startIcon: <Trash2 />,
+		variant: "destructive",
+        disabled: () => {
+            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+            return numberOfLayers < 1;
+        },
+		onClick() {
+            TilemapLayerService.deleteLayer();
+        },
+	}
+];
+
 export const LayerManagerContextMenu: MenuItemType = {
 	name: "LayerManager",
 	className: "w-60 bg-secondary-background",
-	groups: [CreateActionGroup, MoveLayerActionGroup, PropertiesActionGroup],
+	groups: [CreateActionGroup, MoveLayerActionGroup, PropertiesActionGroup, DeleteActionGroup],
 };

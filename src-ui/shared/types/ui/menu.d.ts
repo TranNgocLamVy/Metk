@@ -19,6 +19,7 @@ declare global {
         startIcon?: React.ReactNode;
         endIcon?: React.ReactNode;
         shortCut?: string;
+        variant?: "default" | "destructive";
         visible?: () => boolean;
         disabled?: () => boolean;
         onClick: () => void;
@@ -58,6 +59,7 @@ declare global {
         disabled?: () => boolean;
         value: () => string;
         onValueChange: (value: any) => void;
+        preventDefault?: boolean;
         items: {
             name: string;
             value: string;

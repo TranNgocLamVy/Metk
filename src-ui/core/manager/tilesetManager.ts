@@ -21,7 +21,7 @@ export class TilesetManager {
         this.tilesetMetadata.set(tilesetMetadata.id, tilesetMetadata);
     }
 
-    public async setTilesetsMetadata(tilesetsMetadata: TilesetMetadata[]): Promise<void> {
+    public loadTilesetsMetadata(tilesetsMetadata: TilesetMetadata[]): void {
         tilesetsMetadata.forEach((meta) => this.tilesetMetadata.set(meta.id, meta));
     }
 

@@ -7,6 +7,7 @@ import { Result } from "../types/result";
 import { TilemapService } from "./tilemapService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
+import { useATRulesetManagerStore } from "@/view/stores/application/atRulesetManagerStore";
 
 export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
@@ -21,9 +22,6 @@ export class WorkspaceService {
         }
 
         const project = loadProjectResult.data;
-
-        await TilesetService.loadTilesetView(); // TODO: Refactor
-        await TilemapService.loadTilemapEditor(); // TODO: Refactor
 
         const loadWorkspaceResult = await AppCore.getIns().workspaceManager.loadProjectWorkspace(project);
         if (loadWorkspaceResult.status !== Result.Status.Success) {
@@ -42,6 +40,9 @@ export class WorkspaceService {
         const currentTilemapSessionId = tilemapSessionManager.tilemapSessionManagerData.currentTilemapSessionId;
         if (currentTilemapSessionId && tilemapPixiApp) await WorkspaceService.openTilemapSession(currentTilemapSessionId);
         useTilemapSessionStore.getState().refresh();
+
+        useLayerManagerStore.getState().refresh();
+        useATRulesetManagerStore.getState().refresh();
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 
