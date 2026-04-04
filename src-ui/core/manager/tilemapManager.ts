@@ -68,7 +68,7 @@ export class TilemapManager {
         this.loadedTilemaps.set(tilemapData.id, tilemap);
 
         let addMoreTileset: boolean = false;
-        await Promise.all(tilemapData.tileset.map(tilesetRef => {
+        await Promise.all(tilemapData.tilesets.map(tilesetRef => {
             if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
                 return this.tilesetManager.loadTileset({ id: tilesetRef.id })
             } else {

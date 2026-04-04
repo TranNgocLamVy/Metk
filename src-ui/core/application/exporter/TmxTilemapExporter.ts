@@ -44,7 +44,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
         const tilesetManager = tilesetRefManager.tilesetManager;
 
         let firstGidCount = 1;
-        const tilesets = tilesetRefManager.tilesetRef.sort((a, b) => a.index - b.index).map((tilesetRef) => {
+        const tilesets = tilesetRefManager.tilesetRefs.sort((a, b) => a.index - b.index).map((tilesetRef) => {
             const tileset = tilesetManager.getTilesetById(tilesetRef.id)!;
 
             const firstGrid = firstGidCount;

@@ -15,8 +15,6 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
     public color: string;
     private rules: ATRule[] = [];
 
-    
-
     constructor(
         atRuleData: ATRulesetData,
         public readonly atRulesetPathSystem: FilePathSystem,
@@ -24,13 +22,13 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
         public readonly atRulesetRefManager: ATRulesetRefManager
     ) {
         super();
-        this.atRulesetPathSystem = tilesetRefManager.filePathSystem;
+        
         this.id = atRuleData.id;
         this.name = atRuleData.name;
         this.color = atRuleData.color;
         this.rules = atRuleData.rules.map((rule) => new ATRule(rule, this.tilesetRefManager));
 
-        this.tilesetRefManager.load(atRuleData.tileset);
+        this.tilesetRefManager.load(atRuleData.tilesets);
     }
 
     public async load(): Promise<void> {
@@ -49,7 +47,7 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
         for (const rule of this.rules) {
             const outputs = rule.getOutputs();
             // TODO: Choose random base on chance
-            if (outputs) return outputs[0];
+            if (outputs && outputs.length > 0) return outputs[0];
         }
         return null;
     }
@@ -60,7 +58,8 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
             name: this.name,
             color: this.color,
             rules: this.rules.map((rule) => rule.serialize()),
-            tileset: this.tilesetRefManager.serialize(),
+            tilesets: this.tilesetRefManager.serialize(),
+            rulesets: this.atRulesetRefManager.serialize(),
         }
     }
 }

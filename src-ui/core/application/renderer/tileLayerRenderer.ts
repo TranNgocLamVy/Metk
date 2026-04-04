@@ -54,7 +54,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             return;
         }
 
-        const tilesetRefData = this.layer.tilesetRefManager.tilesetRef.find(r => r.index === tileRef.getTile().tilesetIndex);
+        const tilesetRefData = this.layer.tilesetRefManager.tilesetRefs.find(r => r.index === tileRef.getTile().tilesetIndex);
         if (!tilesetRefData) return;
 
         // TODO: Fix: Get textureManager from passing context

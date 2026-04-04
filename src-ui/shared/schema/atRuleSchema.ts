@@ -33,12 +33,21 @@ export const ATRuleDataSchema = type({
 })
 export type ATRuleDataSchema = typeof ATRuleDataSchema.infer;
 
+export const ATRulesetRefDataSchema = type({
+    index: type("number"),
+    source: type("string"),
+    id: type("string"),
+    name: type("string").default("Untitled Tileset"),
+})
+export type ATRulesetRefData = typeof ATRulesetRefDataSchema.infer
+
 export const ATRulesetDataSchema = type("string.json.parse").to({
     id: type("string"),
     name: type("string").default("Untitled AT Rule Set"),
     color: type("string").default("#ffffff"),
     rules: safeArray(ATRuleDataSchema).default(() => []),
-    tileset: safeArray(TilesetRefDataSchema).default(() => []),
+    tilesets: safeArray(TilesetRefDataSchema).default(() => []),
+    rulesets: safeArray(ATRulesetRefDataSchema).default(() => []),
 })
 export type ATRulesetData = typeof ATRulesetDataSchema.infer;
 
@@ -49,11 +58,3 @@ export const ATRulesetMetadataSchema = type({
     atRulesetRelPath: type("string"),
 })
 export type ATRulesetMetadata = typeof ATRulesetMetadataSchema.infer
-
-export const ATRulesetRefDataSchema = type({
-    index: type("number"),
-    source: type("string"),
-    id: type("string"),
-    name: type("string").default("Untitled Tileset"),
-})
-export type ATRulesetRefData = typeof TilesetRefDataSchema.infer

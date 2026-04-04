@@ -23,7 +23,15 @@ export class ATRule extends BaseObject<ATRuleEvent> {
                 this.constraints.push(new ATRuleConstraint({ constraint: "ANY", targets: [] }, this));
             }
         }
-        this.outputs = data.outputs.split(" ").map((output) => output.split(":")).map((output) => ({ tileId: parseInt(output[0]), tilesetIndex: parseInt(output[1]), chance: parseInt(output[2]) }));
+        
+        this.outputs = data.outputs ? data.outputs.split(" ").map((output) => {
+            const parts = output.split(":");
+            return { 
+                tileId: parseInt(parts[0]), 
+                tilesetIndex: parseInt(parts[1]), 
+                chance: parseInt(parts[2]) 
+            };
+        }) : [];
     }
 
     public addOutput(tileId: number, tilesetId: string, chance: number): void;
@@ -53,7 +61,7 @@ export class ATRule extends BaseObject<ATRuleEvent> {
             for (let x = 0; x < this.size.width; x++) {
                 const constraintIndex = y * this.size.width + x;
                 const constraint = this.constraints[constraintIndex];
-                const targetSet = input[y][x];
+                const targetSet = input[y]?.[x];
                 if (!constraint.isSatisfied(targetSet ? targetSet.id : null)) {
                     return false;
                 }
