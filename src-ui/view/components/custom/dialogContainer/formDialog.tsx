@@ -13,6 +13,7 @@ import FilePickerField from "../input/filePicker/filePicker";
 import FolderPickerField from "../input/folderPicker/folderPicker";
 import { NumberInputField } from "../input/numberInput/numberInput";
 import { TextInputField } from "../input/textInput/textInput";
+import { ColorInputField } from "../input/colorPicker/colorPicker";
 
 // 1. Recursive Helper for Default Values
 const getInitialValues = (inputs: readonly Field[]): Record<string, any> => {
@@ -83,10 +84,10 @@ const FieldRenderer = ({ input, value, onChange }: { input: Field; value: any; o
 		case "group":
 			return <GroupField field={input} value={value} onChange={onChange} />;
 		case "checkbox":
-            const handleChange = (checked: boolean) => {
-                onChange(input.name, checked);
-            }
+            const handleChange = (checked: boolean) => onChange(input.name, checked);
             return <CheckBoxField {...input} value={value} handleChange={handleChange} />;
+		case "color":
+			return <ColorInputField {...input} value={value} onChange={onChange} />;
 		default:
 			return null;
 	}

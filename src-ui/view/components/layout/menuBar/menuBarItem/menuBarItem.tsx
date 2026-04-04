@@ -25,10 +25,10 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
     const name = typeof item.name === "function" ? item.name() : item.name;
-	const className = twMerge("w-96", item.className);
+	const className = twMerge("w-96 bg-secondary-background shadow-md", item.className);
 
 	return (
-		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
+		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={true}>
 			<DropdownMenuTrigger disabled={disabled}>
 				<Button size={"sm"} variant={"ghost"} className="px-2 rounded-none" asChild>
 					<p className="text-xs">{translate(name)}</p>

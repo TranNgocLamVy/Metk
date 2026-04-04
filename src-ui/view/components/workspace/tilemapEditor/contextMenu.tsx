@@ -1,19 +1,55 @@
-import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, PaintBucket, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
+import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
 import { AppCore } from "@/core/appcore";
+import { TilemapService } from "@/shared/services/tilemapService";
+
+const ActionGroup: MenuDropDownGroupType = [
+    {
+        type: "option",
+        name: "Create new Tilemap",
+        startIcon: <Plus className="stroke-1" />,
+        onClick() {
+            TilemapService.createTilemap();
+        }
+    },
+    {
+        type: "option",
+        name: "Edit Tilemap",
+        startIcon: <Pen className="stroke-1" />,
+        onClick() {
+            // TODO: Implement
+        }
+    },
+];
 
 const UndoRedoGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
 		name: "Undo",
 		startIcon: <Undo />,
-		onClick() {},
+		disabled() {
+			const editorContext = AppCore.getIns().editorContext;
+			const historyManager = editorContext.getCurrentHistoryManager();
+			return !historyManager?.canUndo;
+		},
+		onClick() {
+			const editorContext = AppCore.getIns().editorContext;
+			editorContext.getCurrentHistoryManager()?.undo(editorContext);
+		},
 	},
 	{
 		type: "option",
 		name: "Redo",
 		startIcon: <Redo />,
-		onClick() {},
+		disabled() {
+			const editorContext = AppCore.getIns().editorContext;
+			const historyManager = editorContext.getCurrentHistoryManager();
+			return !historyManager?.canRedo;
+		},
+		onClick() {
+			const editorContext = AppCore.getIns().editorContext;
+			editorContext.getCurrentHistoryManager()?.redo(editorContext);
+		},
 	},
 ];
 
@@ -34,12 +70,6 @@ const EditGroup: MenuDropDownGroupType = [
 		type: "option",
 		name: "Paste",
 		startIcon: <ClipboardPaste />,
-        onClick() { },
-	},
-	{
-		type: "option",
-		name: "Delete",
-		startIcon: <Trash2 />,
         onClick() { },
 	},
 ];
@@ -92,22 +122,19 @@ const BrushGroup: MenuDropDownGroupType = [
 				{
 					type: "radio",
 					name: "Brush Types",
-					value: () => "Stamp",
-					onValueChange(value) {},
+					value: () => AppCore.getIns().toolManager.getCurrentToolId()!,
+					onValueChange(value) {
+						AppCore.getIns().toolManager.startTool(value);
+					},
 					items: [
 						{
 							name: "Stamp",
-							value: "Stamp",
+							value: "stamp",
                             startIcon: <Stamp className="stroke-1" />,
 						},
                         {
-                            name: "Bucket",
-                            value: "Bucket",
-                            startIcon: <PaintBucket className="stroke-1" />,
-                        },
-                        {
-                            name: "Erase",
-                            value: "Erase",
+                            name: "Eraser",
+                            value: "eraser",
                             startIcon: <Eraser className="stroke-1" />,
                         },
 					],
@@ -135,8 +162,20 @@ const GridGroup: MenuDropDownGroupType = [
     }
 ];
 
+const DeleteGroup: MenuDropDownGroupType = [
+    {
+        type: "option",
+        name: "Delete Tilemap",
+        startIcon: <Trash2 />,
+        variant: "destructive",
+        onClick() {
+            // TODO: Implement
+        }
+    },
+];
+
 export const TilemapEditorContextMenu: MenuItemType = {
 	name: "Edit",
 	className: "w-60",
-	groups: [GridGroup],
+	groups: [ActionGroup, BrushGroup, UndoRedoGroup, GridGroup, DeleteGroup],
 };

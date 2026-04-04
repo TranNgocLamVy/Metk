@@ -3,6 +3,7 @@ export type PermissionDialogOptions = {
     description: string;
     okText?: string;
     cancelText?: string;
+    okButtonVariant?: "default" | "destructive";
 };
 
 export type PermissionDialogItem = PermissionDialogOptions & {

@@ -23,7 +23,7 @@ export class TilemapManager {
         this.tilemapMetadata.set(tilemapMetadata.id, tilemapMetadata);
     }
 
-    public async loadTilemapsMetada(tilemapsMetadata: TilemapMetadata[]): Promise<void> {
+    public loadTilemapsMetada(tilemapsMetadata: TilemapMetadata[]): void {
         tilemapsMetadata.forEach((meta) => this.tilemapMetadata.set(meta.id, meta));
     }
 

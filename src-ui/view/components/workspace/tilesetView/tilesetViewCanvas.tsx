@@ -5,7 +5,7 @@ import { useTilesetSessionStore } from "@/view/stores/application/tilesetSession
 import { Application as PixiApplication } from "@pixi/react";
 
 import ContextMenuWrapper from "../../layout/contextMenuWrapper/contextMenuWrapper";
-import { TilesetViewContextMenu } from "../../layout/contextMenuWrapper/items/tilesetViewContextMenu";
+import { TilesetViewContextMenu } from "./contextMenu";
 
 export default function TilesetViewCanvas() {
 	const { pixiApp, setPixiApp } = useTilesetSessionStore();

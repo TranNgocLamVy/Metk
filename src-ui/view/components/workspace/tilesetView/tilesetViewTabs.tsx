@@ -5,7 +5,6 @@ import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
 import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
 
-import TilesetViewDropDownMenu from "../../contextMenu/tilesetViewContextMenu";
 import { HStack } from "../../custom/stack/stack";
 import { Button } from "../../shadcn/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
@@ -27,7 +26,6 @@ export default function TilesetViewTabs() {
 
 	return (
 		<HStack className="w-full h-fit" justify="start" align="center">
-			<TilesetViewDropDownMenu />
 			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
 				{tilesetsDisplayData.map((tilesetSession) => {
 					const isCurrent = currentTilesetSessionId === tilesetSession.sessionId;

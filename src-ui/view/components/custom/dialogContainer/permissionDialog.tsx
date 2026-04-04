@@ -10,7 +10,7 @@ export function PermissionDialog() {
 
 	return (
 		<Fragment>
-			{permissionDialogs.map(({ id, title, description, okText = "OK", cancelText = "Cancel" }) =>
+			{permissionDialogs.map(({ id, title, description, okText = "OK", cancelText = "Cancel", okButtonVariant = "default" }) =>
 				createPortal(
 					<AlertDialog open={true}>
 						<AlertDialogContent>
@@ -20,7 +20,7 @@ export function PermissionDialog() {
 							</AlertDialogHeader>
 							<AlertDialogFooter>
 								<AlertDialogCancel onClick={() => closePermissionDialog(id, false)}>{cancelText}</AlertDialogCancel>
-								<AlertDialogAction onClick={() => closePermissionDialog(id, true)}>{okText}</AlertDialogAction>
+								<AlertDialogAction variant={okButtonVariant} onClick={() => closePermissionDialog(id, true)}>{okText}</AlertDialogAction>
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialog>,

@@ -5,7 +5,7 @@ import { useTilemapSessionStore } from "@/view/stores/application/tilemapSession
 import { Application as PixiApplication } from "@pixi/react";
 
 import ContextMenuWrapper from "../../layout/contextMenuWrapper/contextMenuWrapper";
-import { TilemapEditorContextMenu } from "../../layout/contextMenuWrapper/items/tilemapEditorContextMenu";
+import { TilemapEditorContextMenu } from "./contextMenu";
 
 export default function TilemapEditorCanvas() {
 	const { pixiApp, setPixiApp } = useTilemapSessionStore();

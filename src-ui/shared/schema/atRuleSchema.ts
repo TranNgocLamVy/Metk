@@ -56,5 +56,6 @@ export const ATRulesetMetadataSchema = type({
     name: type("string").default("Untitled Tilemap"),
     id: type("string"),
     atRulesetRelPath: type("string"),
+    color: type("string").default("#ffffff"),
 })
 export type ATRulesetMetadata = typeof ATRulesetMetadataSchema.infer

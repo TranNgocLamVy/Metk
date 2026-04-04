@@ -26,7 +26,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 
 	if (item.type === "option") {
 		return (
-			<ShadContextMenuItem className="gap-2 h-6 text-xs" disabled={disabled} onClick={item.onClick}>
+			<ShadContextMenuItem variant={item.variant} className="gap-2 h-6 text-xs" disabled={disabled} onClick={item.onClick}>
 				{wrapIcon(item.startIcon)}
 				{name}
 				{wrapIcon(item.endIcon, false)}
@@ -70,7 +70,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 				{item.items.map((radioItem) => {
 					const disabled = (radioItem.disabled != undefined && radioItem.disabled()) || false;
 					return (
-						<ContextMenuRadioItem className="gap-2 h-6 text-xs" key={radioItem.value} onSelect={(e) => e.preventDefault()} value={radioItem.value} disabled={disabled}>
+						<ContextMenuRadioItem className="gap-2 h-6 text-xs" key={radioItem.value} onSelect={(e) => {if(item.preventDefault) e.preventDefault()}} value={radioItem.value} disabled={disabled}>
 							{wrapIcon(radioItem.startIcon, false)}
 							{radioItem.name}
 						</ContextMenuRadioItem>

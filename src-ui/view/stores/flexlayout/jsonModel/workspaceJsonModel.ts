@@ -15,6 +15,12 @@ const workspaceRowNode: IJsonRowNode = {
                 },
                 {
                     type: "tab",
+                    name: "Rulesets",
+                    component: "atRulesetManager",
+                    enableClose: false,
+                },
+                {
+                    type: "tab",
                     name: "Layers",
                     component: "layerManager",
                     enableClose: false,
