@@ -90,10 +90,10 @@ export class TilesetManager {
         const tilesetMetadata = this.tilesetMetadata.get(id);
         if (!tilesetMetadata) return;
 
-        const tileset = this.loadedTilesets.get(id);
+        const tileset = this.loadedTilesets.get(tilesetMetadata.id);
         if (!tileset) return;
 
-        this.loadedTilesets.delete(id);
+        this.loadedTilesets.delete(tilesetMetadata.id);
     }
 
     public async saveTileset(id: string): Promise<Result> {

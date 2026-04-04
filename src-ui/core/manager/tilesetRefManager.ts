@@ -1,17 +1,16 @@
-import { TilesetRefData } from "@/shared/schema/tilemapSchema";
 import { PathUtils } from "@/shared/utils/pathUtils";
 
 import { TilesetManager } from "./tilesetManager";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
-import { TilesetMetadata } from "@/shared/schema/tilesetSchema";
+import { TilesetMetadata, TilesetRefData } from "@/shared/schema/tilesetSchema";
 
 export class TilesetRefManager {
-    public tilesetRef: TilesetRefData[]
+    public tilesetRef: TilesetRefData[] = []
     private nextTilesetIndex: number;
 
     constructor(
         public readonly tilesetManager: TilesetManager,
-        public readonly tilemapPathSystem: FilePathSystem,
+        public readonly filePathSystem: FilePathSystem,
     ) { }
 
     public load(tilesetRef: TilesetRefData[]) {
@@ -25,7 +24,7 @@ export class TilesetRefManager {
         }
     }
 
-    public serialize(): TilesetRefData[] { return this.tilesetRef; }
+    public serialize(): TilesetRefData[] { return this.tilesetRef; }    
 
     public getTilesetIndex(tileset: TilesetMetadata): number {
         const tilesetRef = this.tilesetRef.find(tilesetRef => tilesetRef.id === tileset.id);
@@ -33,7 +32,7 @@ export class TilesetRefManager {
             const tilesetAbsPath = this.tilesetManager.getTilesetAbsById(tileset.id);
             if (!tilesetAbsPath) return -1;   
         
-            const tilesetRelPath = PathUtils.relative(this.tilemapPathSystem.relDir, tilesetAbsPath);
+            const tilesetRelPath = PathUtils.relative(this.filePathSystem.relDir, tilesetAbsPath);
 
             const newTilesetRef: TilesetRefData = {
                 index: this.nextTilesetIndex,

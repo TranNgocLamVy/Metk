@@ -31,7 +31,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         public readonly tilesetRefManager: TilesetRefManager
     ) {
         super();
-        this.tilemapPathSystem = tilesetRefManager.tilemapPathSystem;
+        this.tilemapPathSystem = tilesetRefManager.filePathSystem;
 
         this.id = tilemapData.id;
         this.name = tilemapData.name;
