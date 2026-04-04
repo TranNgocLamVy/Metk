@@ -52,6 +52,7 @@ export class TilemapManager {
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
 
         if (loadTilemapResult.status !== Result.Status.Success) {
+            // TODO: Move ToastService outside of TilemapManager
             ToastService.error({ message: loadTilemapResult.message });
             return Result.Error(loadTilemapResult.message);
         }

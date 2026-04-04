@@ -4,6 +4,7 @@ import { type } from "arktype";
 import { TilemapMetadataSchema } from "./tilemapSchema";
 import { TilesetMetadataSchema } from "./tilesetSchema";
 import { safeArray } from ".";
+import { ATRulesetMetadataSchema } from "./atRuleSchema";
 
 export const ProjectDataSchema = type("string.json.parse").to({
     id: type("string"),
@@ -14,6 +15,7 @@ export const ProjectDataSchema = type("string.json.parse").to({
     updatedAt: type("string.date").default(() => new Date().toDateString()),
     tilemaps: safeArray(TilemapMetadataSchema).default(() => []),
     tilesets: safeArray(TilesetMetadataSchema).default(() => []),
+    atrules: safeArray(ATRulesetMetadataSchema).default(() => []),
 })
 export type ProjectData = typeof ProjectDataSchema.infer
 
@@ -42,4 +44,5 @@ export const defaultProjectData = (payload: Partial<ProjectData>): ProjectData =
     updatedAt: new Date().toDateString(),
     tilemaps: [],
     tilesets: [],
+    atrules: [],
 });

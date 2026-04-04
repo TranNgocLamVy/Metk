@@ -6,6 +6,7 @@ import { ArkTypeJsonSerializer } from "./arkTypeJsonSerializer";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { TilesetData, TilesetDataSchema } from "@/shared/schema/tilesetSchema";
 import { WorkpsaceData, WorkpsaceDataSchema } from "@/shared/schema/workspaceSchema";
+import { ATRulesetData, ATRulesetDataSchema } from "@/shared/schema/atRuleSchema";
 
 export const TauriFileStorage = new TauriFileSystemProvider();
 
@@ -14,3 +15,4 @@ export const ProjectStorageService = new JsonFileRepository<ProjectData>(TauriFi
 export const TilemapStorageService = new JsonFileRepository<TilemapData>(TauriFileStorage, new ArkTypeJsonSerializer(TilemapDataSchema));
 export const TilesetStorageService = new JsonFileRepository<TilesetData>(TauriFileStorage, new ArkTypeJsonSerializer(TilesetDataSchema));
 export const WorkspaceStorageService = new JsonFileRepository<WorkpsaceData>(TauriFileStorage, new ArkTypeJsonSerializer(WorkpsaceDataSchema));
+export const ATRulesetStorageService = new JsonFileRepository<ATRulesetData>(TauriFileStorage, new ArkTypeJsonSerializer(ATRulesetDataSchema));

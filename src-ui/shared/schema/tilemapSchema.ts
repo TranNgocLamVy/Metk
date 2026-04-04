@@ -1,6 +1,7 @@
 import { type } from "arktype";
 import { RootLayerSchema } from "./layerSchema";
 import { safeArray } from ".";
+import { TilesetRefDataSchema } from "./tilesetSchema";
 
 export const TilemapMetadataSchema = type({
     name: type("string").default("Untitled Tilemap"),
@@ -8,14 +9,6 @@ export const TilemapMetadataSchema = type({
     tilemapRelPath: type("string"),
 })
 export type TilemapMetadata = typeof TilemapMetadataSchema.infer
-
-export const TilesetRefDataSchema = type({
-    index: type("number"),
-    source: type("string"),
-    id: type("string"),
-    name: type("string").default("Untitled Tileset"),
-})
-export type TilesetRefData = typeof TilesetRefDataSchema.infer
 
 export const TilemapDataSchema = type("string.json.parse").to(type({
     id: type("string"),
