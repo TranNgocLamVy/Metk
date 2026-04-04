@@ -70,7 +70,7 @@ export class ATRulesetManager {
         this.loadedAtRulesets.set(atRulesetData.id, atRuleset);
 
         let addMoreTileset: boolean = false;
-        await Promise.all(atRulesetData.tileset.map(tilesetRef => {
+        await Promise.all(atRulesetData.tilesets.map(tilesetRef => {
             if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
                 return this.tilesetManager.loadTileset({ id: tilesetRef.id })
             } else {

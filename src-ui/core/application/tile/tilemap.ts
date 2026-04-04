@@ -45,7 +45,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         
         this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager);
         
-        this.tilesetRefManager.load(tilemapData.tileset);
+        this.tilesetRefManager.load(tilemapData.tilesets);
     }
 
     public serialize(): TilemapData {
@@ -58,7 +58,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
             tileheight: this.tileheight,
             infinite: this.infinite,
             backgroundcolor: this.backgroundcolor,
-            tileset: this.tilesetRefManager.serialize(),
+            tilesets: this.tilesetRefManager.serialize(),
             layers: this.rootLayer.serialize(),
         }
     }

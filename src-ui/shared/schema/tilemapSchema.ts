@@ -20,7 +20,7 @@ export const TilemapDataSchema = type("string.json.parse").to(type({
     infinite: type("boolean").optional(),
     backgroundcolor: type("string").optional(),
     nextTilesetIndex: type("number").optional(),
-    tileset: safeArray(TilesetRefDataSchema).default(() => []),
+    tilesets: safeArray(TilesetRefDataSchema).default(() => []),
     layers: RootLayerSchema,
 }))
 export type TilemapData = typeof TilemapDataSchema.infer;
