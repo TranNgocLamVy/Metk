@@ -8,9 +8,9 @@ type Props = {
 }
 
 export default function BaseModalWrapper({ dialog, index }: Props) {
-    const { zIndex } = dialog.config || {};
+    const { zLevel } = dialog.config || {};
 
-    const computedZIndex = zIndex ?? (1000 + index * 10);
+    const computedZIndex = zLevel + index * 10;
 
     return (
         <div className="fixed w-full h-full flex items-center justify-center" style={{ zIndex: computedZIndex }}>

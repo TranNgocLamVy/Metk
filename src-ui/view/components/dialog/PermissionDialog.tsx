@@ -26,7 +26,7 @@ export function PermissionDialog({ resolve, dialogId, permissionDialog }: Permis
     }
 
     return (
-        <AlertDialog defaultOpen onOpenChange={onOpenChange}>
+        <AlertDialog open onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
