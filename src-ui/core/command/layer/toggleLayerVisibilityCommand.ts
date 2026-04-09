@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
+import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
 import { IBaseCommand } from "../../interface/IBaseCommand";

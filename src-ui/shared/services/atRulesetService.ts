@@ -5,20 +5,19 @@ import { ATRulesetMetadata, ATRulesetData } from "@/shared/schema/atRuleSchema";
 import { ATRulesetStorageService } from "@/infrastructure/container";
 import { ToastService } from "./toastService";
 import { AppCore } from "@/core/appcore";
-import { createATRulesetForm } from "@/view/components/form/atRulesetForm";
-import { FormService } from "./formService";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
-import { useATRulesetManagerStore } from "@/view/stores/application/atRulesetManagerStore";
+import { useATRulesetManagerStore } from "@/view/stores/atRulesetManagerStore";
 import { remove } from "@tauri-apps/plugin-fs";
 import { DialogService } from "./dialogService";
+import { createATRulesetForm } from "../constant/form/createAtRulesetForm";
 
 export class ATRulesetService {
     public static async createATRuleset(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const currentProject = editorContext.getCurrentProject();
 
-        const form = await FormService.openFormDialog(createATRulesetForm);
+        const form = await DialogService.openFormDialog(createATRulesetForm);
         if (!form) return;
 
         const atRulesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });

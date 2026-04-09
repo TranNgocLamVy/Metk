@@ -1,6 +1,5 @@
 import "./command/system/index";
 import "./tool/index";
-import "../view/components/modal/index";
 
 import { EditorContext } from "./application/editorContext";
 import { KeybindingManager } from "./manager/keybindingManager";

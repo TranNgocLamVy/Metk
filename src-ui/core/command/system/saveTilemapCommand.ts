@@ -2,7 +2,7 @@ import { EditorContext } from "@/core/application/editorContext";
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
-import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 @SystemCommand({
     id: "project.save",

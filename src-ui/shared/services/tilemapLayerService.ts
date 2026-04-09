@@ -9,7 +9,7 @@ import { MoveLayerCommand } from "@/core/command/layer/moveLayerCommand";
 import { RenameLayerCommand } from "@/core/command/layer/renameLayerCommand";
 import { ToggleLayerLockCommand } from "@/core/command/layer/toggleLayerLockCommand";
 import { ToggleLayerVisibilityCommand } from "@/core/command/layer/toggleLayerVisibilityCommand";
-import { DropPosition, useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
+import { DropPosition, useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLayerCommand";
 import { WorkspaceService } from "./workspaceService";

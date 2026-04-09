@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { GroupLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
+import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
 import { IGroupLayer } from "../../application/tile/layer/baseLayer";
