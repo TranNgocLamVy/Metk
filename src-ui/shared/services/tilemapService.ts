@@ -1,23 +1,23 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { AppCore } from "@/core/appcore";
-import { createTilemapForm } from "@/view/components/form/tilemapForm";
 
 import { TilemapData, TilemapMetadata } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspaceService";
 import { TilemapStorageService } from "@/infrastructure/container";
 import { PathUtils } from "../utils/pathUtils";
+import { DialogService } from "./dialogService";
+import { createTilemapForm } from "../constant/form/createTilemapForm";
 
 export class TilemapService {
 
     public static async createTilemap(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const currentProject = editorContext.getCurrentProject();
-        const form = await FormService.openFormDialog(createTilemapForm);
+        const form = await DialogService.openFormDialog(createTilemapForm);
         if (!form) return;
 
         const tilemapAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });

@@ -6,17 +6,17 @@ import { ErrorBoundary } from "react-error-boundary";
 import { I18nextProvider } from "react-i18next";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 
-import { FallbackRender } from "@/view/components/layout/fallbackRender";
-import MainContainer from "@/view/components/layout/mainContainer";
-import MenuBar from "@/view/components/layout/menuBar/menuBar";
-import { ThemeProvider } from "@/view/components/providers/themeProvider";
+import { FallbackRender } from "@/view/components/layout/FallbackRender";
+import MainContainer from "@/view/components/layout/MainContainer";
+import MenuBar from "@/view/components/menuBar/MenuBar";
+import { ThemeProvider } from "@/view/components/providers/ThemeProvider";
 import { Toaster } from "@/view/components/shadcn/sonner";
 
 import { AppCore } from "./core/appcore";
 import i18n from "./core/service/i18n";
-import { DialogContainer } from "./view/components/custom/dialogContainer/dialogContainer";
-import { LanguageLoadingOverlay } from "./view/components/layout/languageLoadingOverlay";
+import { LanguageLoadingOverlay } from "./view/components/layout/LanguageLoadingOverlay";
 import { appRoutes } from "./view/pages";
+import DialogRoot from "./view/components/dialog/DialogRoot";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <I18nextProvider i18n={i18n}>
@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<Router>
 			<MainContainer>
 				<Toaster position="bottom-right" richColors closeButton={false} />
-				<DialogContainer />
+				<DialogRoot />
                 <LanguageLoadingOverlay />
 				<ErrorBoundary fallbackRender={FallbackRender}>
 					<Routes>

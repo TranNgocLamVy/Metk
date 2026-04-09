@@ -2,21 +2,21 @@ import { v4 as uuidv4 } from "uuid";
 
 import { AppCore } from "@/core/appcore";
 import { TilesetData, TilesetMetadata } from "@/shared/schema/tilesetSchema";
-import { createTilesetForm } from "@/view/components/form/tilesetForm";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
-import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { WorkspaceService } from "./workspaceService";
 import { Result } from "../types/result";
 import { TilesetStorageService } from "@/infrastructure/container";
+import { DialogService } from "./dialogService";
+import { createTilesetForm } from "../constant/form/createTilesetForm";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const currentProject = editorContext.getCurrentProject();
-        const form = await FormService.openFormDialog(createTilesetForm)
+        const form = await DialogService.openFormDialog(createTilesetForm)
         if (!form) return;
 
         const tilesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tileset", filters: [{ name: "Tileset", extensions: ["ts.json"] }] });

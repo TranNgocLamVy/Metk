@@ -2,7 +2,7 @@ import { EditorContext } from "@/core/application/editorContext";
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
-import { useModalStore } from "@/view/stores/modalStore";
+import { useDialogStore } from "@/view/stores/dialogStore";
 
 @SystemCommand({
     id: "project.openFile",
@@ -10,9 +10,9 @@ import { useModalStore } from "@/view/stores/modalStore";
     description: "",
     shortcuts: ["Ctrl+P", "Ctrl+O"],
 })
-export class RedoCommand implements ISystemCommand {
+export class OpenFileCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {
-        useModalStore.getState().openModal({ modalName: "OPEN_FILE" });
+        useDialogStore.getState().openDialog("OPEN_FILE_DIALOG");
         return Result.Success();
     }
 }
