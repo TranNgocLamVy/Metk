@@ -26,7 +26,7 @@ export function SaveDialog({ resolve, dialogId, saveDialog }: SaveDialogProps) {
     }
 
     return (
-        <AlertDialog defaultOpen onOpenChange={onOpenChange}>
+        <AlertDialog open onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>

@@ -12,14 +12,6 @@ const ActionGroup: MenuDropDownGroupType = [
             TilemapService.createTilemap();
         }
     },
-    {
-        type: "option",
-        name: "Edit Tilemap",
-        startIcon: <Pen className="stroke-1" />,
-        onClick() {
-            // TODO: Implement
-        }
-    },
 ];
 
 const UndoRedoGroup: MenuDropDownGroupType = [
@@ -177,5 +169,5 @@ const DeleteGroup: MenuDropDownGroupType = [
 export const TilemapEditorContextMenu: MenuItemType = {
 	name: "Edit",
 	className: "w-60",
-	groups: [ActionGroup, BrushGroup, UndoRedoGroup, GridGroup, DeleteGroup],
+	groups: [BrushGroup, UndoRedoGroup, GridGroup, ActionGroup, DeleteGroup],
 };

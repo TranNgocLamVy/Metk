@@ -112,7 +112,7 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
     }
 
     return (
-        <Dialog defaultOpen onOpenChange={() => cancelFormDialog()} modal>
+        <Dialog open onOpenChange={() => cancelFormDialog()}>
             <form autoComplete="off">
                 <DialogContent className={`${sizeClasses[size]} max-h-[90vh] overflow-y-auto w-full`}>
                     <DialogHeader>
