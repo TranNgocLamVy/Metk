@@ -1,9 +1,7 @@
 import { AppCore } from "@/core/appcore";
-import { createProjectForm } from "@/view/components/form/projectForm";
-import { useProjectManagerStore } from "@/view/stores/application/projectManagerStore";
+import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { FormService } from "./formService";
 import { ToastService } from "./toastService";
 import { Result } from "../types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
@@ -11,8 +9,9 @@ import { defaultProjectData } from "../schema/projectSchema";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { Project } from "@/core/application/project";
 import { DialogService } from "./dialogService";
-import { useNavigationStore } from "@/view/stores/menu/navigationStore";
+import { useNavigationStore } from "@/view/stores/navigationStore";
 import { PathUtils } from "../utils/pathUtils";
+import { createProjectForm } from "../constant/form/createProjectForm";
 
 export class ProjectService {
 
@@ -39,7 +38,7 @@ export class ProjectService {
     }
 
     public static async createProject(): Promise<void> {
-        const form = await FormService.openFormDialog(createProjectForm);
+        const form = await DialogService.openFormDialog(createProjectForm);
 
         if (!form) return;
 

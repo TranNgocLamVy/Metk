@@ -1,5 +1,5 @@
-import HomePage from "./home/home";
-import Project from "./project/project";
+import HomePage from "./Home";
+import Project from "./Project";
 
 type AppRoute = {
 	path: string;

@@ -2,7 +2,7 @@ import { IBaseSession } from "@/core/interface/IBaseSession";
 import { HistoryManager } from "@/core/manager/historyManager";
 import { ViewState } from "@/shared/schema/viewState";
 import { LayerState, TilemapSessionData } from "@/shared/schema/tilemapSessionSchema";
-import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";

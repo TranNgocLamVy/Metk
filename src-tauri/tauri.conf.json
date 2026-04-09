@@ -18,7 +18,6 @@
         "minWidth": 600,
         "height": 600,
         "minHeight": 600,
-        "decorations": false,
         "resizable": true,
         "fullscreen": false,
         "closable": true,
