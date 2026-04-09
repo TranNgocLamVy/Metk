@@ -1,13 +1,13 @@
 import { AppCore } from "@/core/appcore";
-import { useLayerManagerStore } from "@/view/stores/application/layerManagerStore";
-import { useTilemapSessionStore } from "@/view/stores/application/tilemapSessionStore";
-import { useTilesetSessionStore } from "@/view/stores/application/tilesetSessionStore";
+import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
+import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
 import { TilemapService } from "./tilemapService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
-import { useATRulesetManagerStore } from "@/view/stores/application/atRulesetManagerStore";
+import { useATRulesetManagerStore } from "@/view/stores/atRulesetManagerStore";
 
 export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 

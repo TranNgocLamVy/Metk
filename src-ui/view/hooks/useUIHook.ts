@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { AppCore } from "@/core/appcore";
 
-import { useToolbarStore } from "../stores/application/toolbarStore";
+import { useToolbarStore } from "../stores/toolbarStore";
 
 // TODO: Refactor name and add other hooks
 export function useUIHook() {

@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { AppCore } from "@/core/appcore";
 
-import { useProjectManagerStore } from "./application/projectManagerStore";
+import { useProjectManagerStore } from "./projectManagerStore";
 
 export type AppcoreState = {
     isAppcoreLoaded: boolean;
