@@ -71,7 +71,8 @@ export function ColorPickerField(props: ColorPickerProps) {
 						<div className="w-8 h-8" style={{ backgroundColor: color ? color : "#ffffff" }} />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-background p-4">
-						<VStack className="w-fit">
+						<VStack className="custom-sketch-picker w-fit">
+							<style>{`.custom-sketch-picker label { color: var(--foreground) !important; }`}</style>
 							<SketchPicker color={color} onChange={(color) => handleChange(color.hex)} styles={customStyles} disableAlpha presetColors={[]} />
 							<HStack className="gap-2">
 								<Button variant="outline" className="ml-auto" type="reset" size="sm" onClick={() => handleClose()}>Reset</Button>

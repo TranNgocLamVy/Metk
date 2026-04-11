@@ -8,6 +8,8 @@ import { ATRulesetManagerContextMenu } from "./ContextMenu";
 import { Button } from "../../shadcn/button";
 import { Pen, Trash } from "lucide-react";
 import { ATRulesetService } from "@/shared/services/atRulesetService";
+import { useDialogStore } from "@/view/stores/dialogStore";
+import { DialogService } from "@/shared/services/dialogService";
 
 
 
@@ -28,7 +30,7 @@ export default function ATRulesetManager() {
                                 <HStack key={atRuleset.id} className="flex items-center justify-center gap-2 p-2 hover:bg-secondary-background">
                                     <div className="w-8 h-8" style={{ backgroundColor: atRuleset.color ?? "#fff" }} />
                                     <div className="text-xs font-bold text-white flex items-center">{atRuleset.name}</div>
-                                    <Button className="ml-auto hover:bg-background" size={"icon"} variant={"ghost"}>
+                                    <Button className="ml-auto hover:bg-background" size={"icon"} variant={"ghost"} onClick={() => DialogService.openEditAtRulesetDialog(atRuleset.id)}>
                                         <Pen />
                                     </Button>
                                     <Button onClick={() => ATRulesetService.deleteATRuleset(atRuleset.id)} className="hover:bg-background" size={"icon"} variant={"destructive"}>

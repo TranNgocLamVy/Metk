@@ -24,10 +24,7 @@ export type ATOutputData = {
 
 export const ATRuleDataSchema = type({
     id: type("string"),
-    size: type({
-        width: type("number"),
-        height: type("number"),
-    }).default(() => ({ width: 1, height: 1 })),
+    size: type("number").default(1),
     constraints: safeArray(ATRuleConstraintDataSchema).default(() => []),
     outputs: type("string").default(""),
 })

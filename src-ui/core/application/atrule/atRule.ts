@@ -9,7 +9,7 @@ interface ATRuleEvent extends BaseObjectEvents {
 
 export class ATRule extends BaseObject<ATRuleEvent> {
     public readonly id: string;
-    public size: { width: number; height: number };
+    public size: number;
     private constraints: ATRuleConstraint[];
     private outputs: ATOutputData[];
 
@@ -18,8 +18,8 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         this.id = data.id;
         this.size = data.size;
         this.constraints = data.constraints.map((constraint) => new ATRuleConstraint(constraint, this));
-        if (this.constraints.length < this.size.width * this.size.height) {
-            for (let i = this.constraints.length; i < this.size.width * this.size.height; i++) {
+        if (this.constraints.length < this.size * this.size) {
+            for (let i = this.constraints.length; i < this.size * this.size; i++) {
                 this.constraints.push(new ATRuleConstraint({ constraint: "ANY", targets: [] }, this));
             }
         }
@@ -50,6 +50,10 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         this.eventEmitter.emit("onChange");
     }
 
+    public getConstraint(index: number): ATRuleConstraint {
+        return this.constraints[index];
+    }
+
     public setChance(tileId: number, tilesetId: string, chance: number): void {
         const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
         this.outputs = this.outputs.map((o) => ({ tileId: o.tileId, tilesetIndex: o.tilesetIndex, chance: o.tileId === tileId && o.tilesetIndex === tilesetIndex ? chance : o.chance }));
@@ -57,9 +61,9 @@ export class ATRule extends BaseObject<ATRuleEvent> {
     }
 
     public isSatisfied(input: (ATRuleset | null)[][]): boolean {
-        for (let y = 0; y < this.size.height; y++) {
-            for (let x = 0; x < this.size.width; x++) {
-                const constraintIndex = y * this.size.width + x;
+        for (let y = 0; y < this.size; y++) {
+            for (let x = 0; x < this.size; x++) {
+                const constraintIndex = y * this.size + x;
                 const constraint = this.constraints[constraintIndex];
                 const targetSet = input[y]?.[x];
                 if (!constraint.isSatisfied(targetSet ? targetSet.id : null)) {
