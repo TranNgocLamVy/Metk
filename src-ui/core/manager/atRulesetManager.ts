@@ -131,6 +131,16 @@ export class ATRulesetManager {
         return this.projectPathSystem.getAbsPathFromRelPath(atRulesetMetadata.atRulesetRelPath);
     }
 
+    public cloneAtRuleset(id: string): ATRuleset | null {
+        const atRuleset = this.loadedAtRulesets.get(id);
+        if (!atRuleset) return null;
+        const atRulesetData = atRuleset.serialize();
+        const atRulesetPathSystem = new FilePathSystem(atRulesetData.id, this.projectPathSystem, atRuleset.atRulesetPathSystem.relPath);
+        const tilesetRefManager = new TilesetRefManager(this.tilesetManager, atRulesetPathSystem);
+        const atRulesetRefManager = new ATRulesetRefManager(this, atRulesetPathSystem);
+        return new ATRuleset(atRulesetData, atRulesetPathSystem, tilesetRefManager, atRulesetRefManager);
+    }
+
     public serialize(): ATRulesetMetadata[] {
         return Array.from(this.atRulesetMetadata.values()).map((metaData) => {
             const atRulesets = this.loadedAtRulesets.get(metaData.id);

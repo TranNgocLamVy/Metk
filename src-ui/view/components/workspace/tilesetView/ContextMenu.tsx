@@ -2,6 +2,8 @@ import { Grid3x3, Pen, Plus, Trash2 } from "lucide-react";
 
 import { AppCore } from "@/core/appcore";
 import { TilesetService } from "@/shared/services/tilesetService";
+import { useDialogStore } from "@/view/stores/dialogStore";
+import { DialogZLevel } from "@/shared/types/dialog";
 
 const Group1: MenuDropDownGroupType = [
     {
@@ -17,7 +19,7 @@ const Group1: MenuDropDownGroupType = [
         name: "Edit Tileset",
         startIcon: <Pen className="stroke-1" />,
         onClick() {
-            // TODO: Implement
+            useDialogStore.getState().openDialog("EDIT_TILESET_MODAL", { zLevel: DialogZLevel.Modal });
         }
     },
 ];

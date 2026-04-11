@@ -2,13 +2,13 @@ import { AppCore } from "@/core/appcore";
 import { Command, CommandDialog, CommandGroup, CommandInput, CommandList, CommandSeparator } from "../shadcn/command";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useDialogStore } from "@/view/stores/dialogStore";
-import { BaseDialogProps } from "../dialog/dialogRegistry";
+import { BaseDialogProps } from "./dialogRegistry";
 
 interface OpenFileModalProps extends BaseDialogProps {
     dialogId: string;
 }
 
-export function OpenFileModal({ dialogId }: OpenFileModalProps) {
+export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
     const { closeDialog } = useDialogStore();
 
     const tilemaps = AppCore.getIns().editorContext.getCurrentProject().tilemapManager.serialize()

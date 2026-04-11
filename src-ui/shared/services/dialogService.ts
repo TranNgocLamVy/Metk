@@ -2,6 +2,8 @@ import { useDialogStore } from "@/view/stores/dialogStore";
 import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/types/formDialog";
 import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "../types/confirmationDialog";
 import { DialogZLevel } from "../types/dialog";
+import { AppCore } from "@/core/appcore";
+import { ToastService } from "./toastService";
 
 
 export class DialogService {
@@ -21,5 +23,17 @@ export class DialogService {
         return new Promise<SaveResult>((resolve) => {
             useDialogStore.getState().openDialog("SAVE_DIALOG", { zLevel: DialogZLevel.AlertDialog }, { resolve, saveDialog: opts });
         });
+    }
+
+    public static async openEditAtRulesetDialog(id: string): Promise<void> {
+        const rulesetManager = AppCore.getIns().editorContext.getCurrentProject().atRulesetManager;
+
+        const ruleset = await rulesetManager.loadAtRuleset(id);
+        if (!ruleset) {
+            ToastService.error({ message: "Ruleset not found" });
+            return;
+        }
+        
+        useDialogStore.getState().openDialog("EDIT_RULESET_MODAL", { zLevel: DialogZLevel.Modal }, { rulesetId: id })
     }
 }
