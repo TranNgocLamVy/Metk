@@ -65,15 +65,24 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: ATRule, selec
         ]
     }, [])
 
+    const middleIndex = ((gridSize * gridSize) - 1) / 2;
+
     return (
         <div className={`w-full gap-2 grid`} style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }} >
             {contraints.map((contraint, index) => {
                 const firstContraintColor = rulesetList.find((ruleset) => contraint.getTargets().includes(ruleset.id))?.color ?? null;
                 const isEmpyOrAny = contraint.getConstraint() === "EMPTY" || contraint.getConstraint() === "ANY";
 
+                if (index === middleIndex) {
+                    return (
+                        <div key={index} className={`aspect-square bg-secondary-background border cursor-not-allowed`} >
+                            
+                        </div>
+                    )
+                }
+
                 return (
-                    <div
-                        key={index} onClick={() => setSelectedGrid(index)}
+                    <div key={index} onClick={() => setSelectedGrid(index)}
                         className={`aspect-square bg-secondary-background relative p-2 flex items-center justify-center border ${selectedGrid === index ? "border-select-color" : "border-foreground/20"}`}
                     >
                         {firstContraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstContraintColor }} />}

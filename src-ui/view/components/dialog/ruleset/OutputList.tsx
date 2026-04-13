@@ -3,7 +3,6 @@ import { Application, Sprite, Texture } from "pixi.js";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { AppCore } from "@/core/appcore";
-import { VStack } from "../../custom/stack/Stack";
 
 export function PixiImage({ texture, pixiApp }: { texture: Texture, pixiApp: Application }) {
     const [imgSrc, setImgSrc] = useState<string>('');
@@ -24,10 +23,6 @@ export function PixiImage({ texture, pixiApp }: { texture: Texture, pixiApp: App
 export default function OutputList() {
     const { session, version } = useEditRulesetStore();
 
-    const ruleset = useMemo(() => {
-        return session.ruleset;
-    }, [session])
-
     const selectedTiles = useMemo(() => {
         const selectedRule = session.getSelectedRule();
         if (!selectedRule) return [];
@@ -36,14 +31,13 @@ export default function OutputList() {
 
     const pixiApp = useMemo(() => {
         return session.pixiApp;
-    }, [session]);
+    }, [session, version]);
 
     return (
         <ScrollArea className='h-full w-full border border-foreground/20 bg-secondary-background'>
             <div className="flex flex-wrap gap-2 p-2 w-full">
                 {pixiApp && selectedTiles.map((tileRef) => {
-                    const tilesetRefManager = ruleset.tilesetRefManager;
-                    const tilesetId = tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
+                    const tilesetId = session.ruleset.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
                     if (!tilesetId) return null;
                     
                     const textureManager = AppCore.getIns().editorContext.textureManager;

@@ -1,6 +1,7 @@
 import { EditorContext } from "@/core/application/editorContext";
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
+import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
@@ -21,6 +22,7 @@ export class SaveTilemapCommand implements ISystemCommand {
         if (saveResult.status === Result.Status.Success) {
             tilemapSession.markAsClean();
             useTilemapSessionStore.getState().refresh();
+            ToastService.success({ message: "Tilemap saved successfully" });
         }
         return saveResult;
     }

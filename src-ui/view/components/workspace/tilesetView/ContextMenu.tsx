@@ -18,6 +18,9 @@ const Group1: MenuDropDownGroupType = [
         type: "option",
         name: "Edit Tileset",
         startIcon: <Pen className="stroke-1" />,
+        disabled() {
+            return true;
+        },
         onClick() {
             useDialogStore.getState().openDialog("EDIT_TILESET_MODAL", { zLevel: DialogZLevel.Modal });
         }

@@ -16,7 +16,7 @@ export const createTilesetForm = FormUtils.createForm({
                     id: "name",
                     name: "name",
                     type: "text",
-                    label: "Map Name",
+                    label: "Tileset Name",
                     placeholder: "Your Tileset",
                     required: true,
                 }
