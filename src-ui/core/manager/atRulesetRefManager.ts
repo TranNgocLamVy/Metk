@@ -25,7 +25,7 @@ export class ATRulesetRefManager {
         }
     }
 
-    public serialize(): ATRulesetRefData[] { return this.atRulesetRefs; }    
+    public serialize(): ATRulesetRefData[] { return Array.from(this.atRulesetRefs); }
 
     public getAtRulesetIndex(atRuleset: ATRulesetMetadata): number {
         const atRulesetRef = this.atRulesetRefs.find(atRulesetRef => atRulesetRef.id === atRuleset.id);

@@ -1,4 +1,3 @@
-import { ATRuleset } from "@/core/application/atrule/atRuleset";
 import { useState } from "react";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
@@ -8,21 +7,21 @@ import { Plus } from "lucide-react";
 import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 
 export default function RuleHeader() {
-    const { version, ruleset, refresh } = useEditRulesetStore();
+    const { session, refresh } = useEditRulesetStore();
 
-    const [tempName, setTempName] = useState(ruleset.name);
-    const [tempColor, setTempColor] = useState(ruleset.color);
+    const [tempName, setTempName] = useState(session!.ruleset.name);
+    const [tempColor, setTempColor] = useState(session!.ruleset.color);
 
     const handleRename = () => {
         if (tempName.trim() == "") {
-            setTempName(ruleset.name);
+            setTempName(session!.ruleset.name);
         } else {
-            ruleset.name = tempName;
+            session.ruleset.name = tempName;
         }
     };
 
     const addRule = () => {
-        ruleset.addEmptyRule();
+        session.ruleset.addEmptyRule();
         refresh();
     }
 
@@ -38,10 +37,10 @@ export default function RuleHeader() {
     };
 
     return (
-        <HStack className="gap-2">
-            <DropdownMenu onOpenChange={() => ruleset.color = tempColor} modal={false}>
+        <HStack className="gap-2 w-full">
+            <DropdownMenu onOpenChange={() => session!.ruleset.color = tempColor} modal={false}>
                 <DropdownMenuTrigger asChild>
-                    <div className="h-8 w-8" style={{ backgroundColor: tempColor }} />
+                    <div className="h-full aspect-square" style={{ backgroundColor: tempColor }} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-background p-4">
                     <VStack className="custom-sketch-picker w-fit">
@@ -55,9 +54,9 @@ export default function RuleHeader() {
                 onChange={(e) => setTempName(e.target.value)}
                 onBlur={handleRename}
                 onKeyDown={(e) => { if (e.key === "Enter") handleRename() }}
-                className="text-sm flex-1 border py-1 px-2 focus:outline-1 focus:outline-foreground bg-secondary-background min-w-0"
+                className="text-sm w-full border py-1 px-2 focus:outline-1 focus:outline-foreground bg-secondary-background"
             />
-            <Button size={"icon"} variant={"outline"} onClick={addRule}>
+            <Button size={"icon"} variant={"outline"} onClick={addRule} className="h-full aspect-square">
                 <Plus />
             </Button>
         </HStack>

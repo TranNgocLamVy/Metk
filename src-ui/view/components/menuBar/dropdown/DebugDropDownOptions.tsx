@@ -36,7 +36,7 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
         type: "option",
         name: "print current project",
         async onClick() {
-			console.log(AppCore.getIns().projectManager.currentProject?.serialize());
+			console.log(AppCore.getIns().projectManager.currentProject);
         }
     },
 ];

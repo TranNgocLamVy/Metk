@@ -32,6 +32,36 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
         this.tilesetRefManager.load(atRuleData.tilesets);
     }
 
+    public updateRuleset(rulesetData: ATRulesetData): void {
+        if (!rulesetData) return;
+        if (this.id !== rulesetData.id) {
+            console.warn(`Trying to update ATRuleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`);
+            return;
+        }
+        this.name = rulesetData.name;
+        this.color = rulesetData.color;
+
+        this.tilesetRefManager.load(rulesetData.tilesets);
+        this.atRulesetRefManager.load(rulesetData.rulesets);
+
+        const processedRuleIds = new Set<string>();
+
+        for (const ruleData of rulesetData.rules) {
+            processedRuleIds.add(ruleData.id);
+            const existingRule = this.getRule(ruleData.id);
+
+            if (existingRule) {
+                existingRule.update(ruleData);
+            } else {
+                this.addRule(new ATRule(ruleData, this.tilesetRefManager));
+            }
+        }
+
+        this.rules = this.rules.filter((rule) => processedRuleIds.has(rule.id));
+
+        this.eventEmitter.emit("onChange");
+    }
+
     public async load(): Promise<void> {
 
     }

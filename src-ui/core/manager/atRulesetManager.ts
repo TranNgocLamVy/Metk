@@ -1,4 +1,4 @@
-import { ATRulesetMetadata } from "@/shared/schema/atRuleSchema";
+import { ATRulesetData, ATRulesetMetadata } from "@/shared/schema/atRuleSchema";
 import { ATRuleset } from "../application/atrule/atRuleset";
 import { TilesetManager } from "./tilesetManager";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
@@ -7,7 +7,6 @@ import { Result } from "@/shared/types/result";
 import { ATRulesetStorageService } from "@/infrastructure/container";
 import { TilesetRefManager } from "./tilesetRefManager";
 import { ATRulesetRefManager } from "./atRulesetRefManager";
-
 
 
 export class ATRulesetManager {
@@ -109,7 +108,7 @@ export class ATRulesetManager {
         if (atRuleset == undefined) return Result.Error("AT Ruleset not found");
 
         const atRulesetData = atRuleset.serialize();
-        return ATRulesetStorageService.save(atRuleset.atRulesetPathSystem.getFileAbsDir(), atRulesetData);
+        return ATRulesetStorageService.save(atRuleset.atRulesetPathSystem.getFileAbsPath(), atRulesetData);
     }
 
     public getAtRulesetById(id: string): ATRuleset | null {
@@ -139,6 +138,12 @@ export class ATRulesetManager {
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, atRulesetPathSystem);
         const atRulesetRefManager = new ATRulesetRefManager(this, atRulesetPathSystem);
         return new ATRuleset(atRulesetData, atRulesetPathSystem, tilesetRefManager, atRulesetRefManager);
+    }
+
+    public updateAtRuleset(atRulesetData: ATRulesetData): void {
+        const atRuleset = this.loadedAtRulesets.get(atRulesetData.id);
+        if (!atRuleset) return;
+        atRuleset.updateRuleset(atRulesetData);
     }
 
     public serialize(): ATRulesetMetadata[] {

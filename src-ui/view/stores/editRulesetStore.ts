@@ -1,27 +1,29 @@
-import { ATRule } from "@/core/application/atrule/atRule";
-import { ATRuleset } from "@/core/application/atrule/atRuleset";
 import { create } from "zustand";
+import { ATRulesetSession } from "@/core/application/session/atRulesetSession";
 
 
 
 type EditRulesetState = {
     version: number;
-    ruleset: ATRuleset;
-    selectedRule: string | null;
+    session: ATRulesetSession;
 
-    setVersion: (version: number) => void;
-    setRuleset: (ruleset: ATRuleset) => void;
-    setSelectedRule: (rule: string | null) => void;
+    setSession: (session: ATRulesetSession) => void;
+    setSelectedRule: (ruleId: string | null) => void;
     refresh: () => void;
 }
 
 export const useEditRulesetStore = create<EditRulesetState>((set, get) => ({
     version: 0,
-    ruleset: null!,
-    selectedRule: null,
+    session: null!,
 
-    setVersion: (version) => set({ version }),
-    setRuleset: (ruleset) => set({ ruleset }),
-    setSelectedRule: (rule) => set({ selectedRule: rule }),
+    setSession: (session) => set({ session }),
+    setSelectedRule: (ruleId) => {
+        const session = get().session;
+        if (session) {
+            session.setSelectedRule(ruleId);
+            set({ version: get().version + 1 });
+        }
+    },
+
     refresh: () => set({ version: get().version + 1 }),
 }));

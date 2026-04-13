@@ -34,6 +34,29 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         }) : [];
     }
 
+    public update(data: ATRuleDataSchema): void {
+        this.size = data.size;
+        
+        this.constraints = data.constraints.map((constraint) => new ATRuleConstraint(constraint, this));
+        
+        if (this.constraints.length < this.size * this.size) {
+            for (let i = this.constraints.length; i < this.size * this.size; i++) {
+                this.constraints.push(new ATRuleConstraint({ constraint: "ANY", targets: [] }, this));
+            }
+        }
+        
+        this.outputs = data.outputs ? data.outputs.split(" ").map((output) => {
+            const parts = output.split(":");
+            return { 
+                tileId: parseInt(parts[0]), 
+                tilesetIndex: parseInt(parts[1]), 
+                chance: parseInt(parts[2]) 
+            };
+        }) : [];
+
+        this.eventEmitter.emit("onChange");
+    }
+
     public addOutput(tileId: number, tilesetId: string, chance: number): void;
     public addOutput(tileId: number, tilesetIndex: number, chance: number): void;
     public addOutput(tileId: number, tileset: string | number, chance: number): void {

@@ -1,22 +1,28 @@
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { HStack, VStack } from "../../custom/stack/Stack";
-import { Copy, EllipsisVertical, GripHorizontal, Pen, Trash2 } from "lucide-react";
+import { Copy, EllipsisVertical, GripHorizontal, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
 import { ATRule } from "@/core/application/atrule/atRule";
 
 
 export default function RuleList() {
-    const { version, ruleset } = useEditRulesetStore();
+    const { version, session, setSelectedRule } = useEditRulesetStore();
 
     const ruleList = useMemo(() => {
+        const ruleset = session.ruleset;
         return ruleset.getAllRules();
-    }, [version])
+    }, [version, session])
+
+    useEffect(() => {
+        const ruleList = session.ruleset.getAllRules();
+        if (ruleList.length > 0) setSelectedRule(ruleList[0].id);
+    }, [])
 
     return (
-        <ScrollArea className="w-full h-full overflow-hidden">
+        <ScrollArea className="w-auto h-full overflow-hidden">
             <VStack className="w-full h-full gap-2">
                 {ruleList.map((rule, index) => {
                     return <RuleItem key={rule.id} rule={rule} index={index} />
@@ -27,7 +33,11 @@ export default function RuleList() {
 }
 
 function RuleItem({ rule, index }: { rule: ATRule, index: number }) {
-    const { selectedRule, setSelectedRule } = useEditRulesetStore();
+    const { session, version, setSelectedRule } = useEditRulesetStore();
+
+    const selectedRuleId = useMemo(() => {
+        return session.getSelectedRule()?.id;
+    }, [session, version])
 
     return (
         <HStack
@@ -35,24 +45,25 @@ function RuleItem({ rule, index }: { rule: ATRule, index: number }) {
             align="center"
             onClick={() => setSelectedRule(rule.id)}
             draggable
-            className={`w-full h-12 p-2 flex gap-4 ${selectedRule === rule.id ? "bg-select-color/50" : "bg-secondary-background"}`}
+            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-select-color/50" : "bg-secondary-background"}`}
         >
             <GripHorizontal size={16} className="cursor-grab active:cursor-grabbing" />
-
-            <HStack align="center" className="gap-2">
-                {index + 1}
-                <div className="size-8 border border-foreground/20" />
-            </HStack>
+            {index + 1}
+            <div className="size-8 border border-foreground/20" />
             <RuleDropdown rule={rule} />
         </HStack>
     )
 }
 
 function RuleDropdown({ rule }: { rule: ATRule }) {
-    const { ruleset, refresh } = useEditRulesetStore();
+    const { session, refresh } = useEditRulesetStore();
+
+    const ruleset = useMemo(() => {
+        return session.ruleset;
+    }, [session])
 
     const handleDuplicate = () => {
-        console.log(rule);
+        // TODO: 
         refresh();
     }
 
