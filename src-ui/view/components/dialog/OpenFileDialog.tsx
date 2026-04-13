@@ -23,9 +23,13 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
         WorkspaceService.createTilesetSession(tilesetId);
     }
 
+    const onOpenChange = (open: boolean) => {
+        closeDialog(dialogId);
+    }
+
     return (
-        <CommandDialog defaultOpen modal title="Open File" description="Open Tilemap or Tileset">
-            <Command onClick={(e) => e.stopPropagation()} className={`h-90 shadow-md border bg-secondary-background p-4 rounded-md gap-2`}>
+        <CommandDialog open onOpenChange={onOpenChange} title="Open File" description="Open Tilemap or Tileset" className="w-fit h-fit">
+            <Command onClick={(e) => e.stopPropagation()} className={`h-90 w-90 shadow-md border bg-secondary-background p-4 rounded-md gap-2`}>
                 <CommandInput placeholder="Type to seach for files..." />
                 <CommandList>
                     {tilemaps.length > 0 && <CommandGroup heading="Tilemaps">

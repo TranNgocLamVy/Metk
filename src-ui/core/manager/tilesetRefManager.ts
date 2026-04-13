@@ -24,7 +24,7 @@ export class TilesetRefManager {
         }
     }
 
-    public serialize(): TilesetRefData[] { return this.tilesetRefs; }    
+    public serialize(): TilesetRefData[] { return Array.from(this.tilesetRefs); }    
 
     public getTilesetIndex(tileset: TilesetMetadata): number {
         const tilesetRef = this.tilesetRefs.find(tilesetRef => tilesetRef.id === tileset.id);
@@ -51,5 +51,11 @@ export class TilesetRefManager {
         const tilesetMetadata = this.tilesetManager.getTilesetMetadataById(tilesetId);
         if (!tilesetMetadata) return -1;
         return this.getTilesetIndex(tilesetMetadata);
+    }
+
+    public getTilesetIdByIndex(index: number): string | null {
+        const tilesetRef = this.tilesetRefs.find(tileset => tileset.index === index);
+        if (!tilesetRef) return null;
+        return tilesetRef.id;
     }
 }
