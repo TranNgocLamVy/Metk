@@ -48,7 +48,6 @@ export default function TilemapEditorTabs() {
                                 const commandManager = AppCore.getIns().systemCommandManager
                                 await commandManager.execute("project.save");
                                 WorkspaceService.closeTilemapSession(session.sessionId);
-                                ToastService.success({ message: "Tilemap saved successfully" });
                             } else if (saveResult === "not save") {
                                 WorkspaceService.closeTilemapSession(session.sessionId);
                             }

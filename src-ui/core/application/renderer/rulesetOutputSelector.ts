@@ -54,7 +54,6 @@ export class RulesetOutputSelector {
         this.pixiApp.renderer.on("resize", () => {
             this.resizeViewport();
         });
-        setTimeout(() => this.resizeViewport(), 1000);
 
         this.viewport.on("drag-start", (e) => {
             this.viewport.cursor = "grabbing";

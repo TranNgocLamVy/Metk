@@ -24,7 +24,7 @@ export default function OutputSelector() {
 
     const usedTilesets = useMemo(() => {
         return session.ruleset.tilesetRefManager.serialize();
-    }, [session, version])
+    }, [session])
 
     useEffect(() => {
         if (session.pixiApp && usedTilesets.length > 0) selectTileset(usedTilesets[0].id);
@@ -44,6 +44,7 @@ export default function OutputSelector() {
         }
         const tileset = tilesetResult.data;
         renderer.setTileset(tileset);
+        renderer.setCurrentRule(rule);
         setActiveTilesetId(tileset.id);
     }
 
@@ -59,7 +60,7 @@ export default function OutputSelector() {
             const h = entry.contentRect.height;
             session.pixiApp.renderer?.resize(w - 4, h - 4);
         },
-        [session]
+        [session, version]
     );
 
     const onInit = (app: Application) => {
