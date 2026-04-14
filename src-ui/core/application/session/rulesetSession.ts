@@ -1,17 +1,17 @@
 import { Application } from "pixi.js";
-import { ATRuleset } from "../atrule/atRuleset";
-import { ATRule } from "../atrule/atRule";
+import { Ruleset } from "../rule/ruleset";
+import { Rule } from "../rule/rule";
 import { EditorContext } from "../editorContext";
 import { RulesetOutputSelector } from "../renderer/rulesetOutputSelector";
 
-export class ATRulesetSession {
-    public readonly ruleset: ATRuleset;
+export class RulesetSession {
+    public readonly ruleset: Ruleset;
     public selectedRuleId: string | null = null;
     public renderer: RulesetOutputSelector = null!;
     public pixiApp: Application | null = null;
 
     constructor(
-        ruleset: ATRuleset, 
+        ruleset: Ruleset, 
         public readonly editorContext: EditorContext
     ) {
         this.ruleset = ruleset;
@@ -34,7 +34,7 @@ export class ATRulesetSession {
         this.selectedRuleId = ruleId;
     }
 
-    public getSelectedRule(): ATRule | null {
+    public getSelectedRule(): Rule | null {
         if (!this.selectedRuleId) return null;
         return this.ruleset.getRule(this.selectedRuleId);
     }

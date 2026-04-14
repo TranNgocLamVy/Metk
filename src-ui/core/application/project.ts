@@ -9,7 +9,7 @@ import { TilesetManager } from "../manager/tilesetManager";
 import { Tilemap } from "./tile/tilemap";
 import { Tileset } from "./tile/tileset";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
-import { ATRulesetManager } from "../manager/atRulesetManager";
+import { RulesetManager } from "../manager/rulesetManager";
 
 export class Project {
     public readonly id: string;
@@ -33,7 +33,7 @@ export class Project {
     
     public tilesetManager: TilesetManager;
     public tilemapManager: TilemapManager;
-    public atRulesetManager: ATRulesetManager;
+    public rulesetManager: RulesetManager;
 
     constructor(private data: ProjectData, public readonly projectPathSystem: ProjectPathSystem) {
         this.id = data.id;
@@ -47,13 +47,13 @@ export class Project {
 
         this.tilemapManager = new TilemapManager(this.tilesetManager, this.projectPathSystem);
 
-        this.atRulesetManager = new ATRulesetManager(this.tilesetManager, this.projectPathSystem);
+        this.rulesetManager = new RulesetManager(this.tilesetManager, this.projectPathSystem);
     }
 
     public async load() {
         this.tilesetManager.loadTilesetsMetadata(this.data.tilesets);
         this.tilemapManager.loadTilemapsMetada(this.data.tilemaps);
-        this.atRulesetManager.loadATRulesetsMetadata(this.data.atrules);
+        this.rulesetManager.loadRulesetsMetadata(this.data.rulesets);
     }
 
     public async unload() {
@@ -70,7 +70,7 @@ export class Project {
             updatedAt: new Date().toDateString(),
             tilemaps: this.tilemapManager.serialize(),
             tilesets: this.tilesetManager.serialize(),
-            atrules: this.atRulesetManager.serialize(),
+            rulesets: this.rulesetManager.serialize(),
         };
     }
 }

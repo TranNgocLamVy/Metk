@@ -7,7 +7,7 @@ import { Result } from "../types/result";
 import { TilemapService } from "./tilemapService";
 import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
-import { useATRulesetManagerStore } from "@/view/stores/atRulesetManagerStore";
+import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 
 export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
@@ -42,7 +42,7 @@ export class WorkspaceService {
         useTilemapSessionStore.getState().refresh();
 
         useLayerManagerStore.getState().refresh();
-        useATRulesetManagerStore.getState().refresh();
+        useRulesetManagerStore.getState().refresh();
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 

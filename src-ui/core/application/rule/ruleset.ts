@@ -1,48 +1,48 @@
-import { ATRule } from "./atRule";
-import { ATOutputData, ATRulesetData } from "@/shared/schema/atRuleSchema";
+import { Rule } from "./rule";
+import { ATOutputData, RulesetData } from "@/shared/schema/ruleSchema";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
-import { ATRulesetRefManager } from "@/core/manager/atRulesetRefManager";
 import { v4 as uuidv4 } from "uuid";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
-interface ATRulesetEvent extends BaseObjectEvents {
+interface RulesetEvent extends BaseObjectEvents {
     onChange: () => void
 }
 
-export class ATRuleset extends BaseObject<ATRulesetEvent> {
+export class Ruleset extends BaseObject<RulesetEvent> {
     public readonly id: string;
     public name: string;
     public color: string;
-    private rules: ATRule[] = [];
+    private rules: Rule[] = [];
 
     constructor(
-        atRuleData: ATRulesetData,
-        public readonly atRulesetPathSystem: FilePathSystem,
+        ruleData: RulesetData,
+        public readonly rulesetPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager, 
-        public readonly atRulesetRefManager: ATRulesetRefManager
+        public readonly rulesetRefManager: RulesetRefManager
     ) {
         super();
         
-        this.id = atRuleData.id;
-        this.name = atRuleData.name;
-        this.color = atRuleData.color;
-        this.rules = atRuleData.rules.map((rule) => new ATRule(rule, this.tilesetRefManager));
+        this.id = ruleData.id;
+        this.name = ruleData.name;
+        this.color = ruleData.color;
+        this.rules = ruleData.rules.map((rule) => new Rule(rule, this.tilesetRefManager));
 
-        this.tilesetRefManager.load(atRuleData.tilesets);
+        this.tilesetRefManager.load(ruleData.tilesets);
     }
 
-    public updateRuleset(rulesetData: ATRulesetData): void {
+    public updateRuleset(rulesetData: RulesetData): void {
         if (!rulesetData) return;
         if (this.id !== rulesetData.id) {
-            console.warn(`Trying to update ATRuleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`);
+            console.warn(`Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`);
             return;
         }
         this.name = rulesetData.name;
         this.color = rulesetData.color;
 
         this.tilesetRefManager.load(rulesetData.tilesets);
-        this.atRulesetRefManager.load(rulesetData.rulesets);
+        this.rulesetRefManager.load(rulesetData.rulesets);
 
         const processedRuleIds = new Set<string>();
 
@@ -53,7 +53,7 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
             if (existingRule) {
                 existingRule.update(ruleData);
             } else {
-                this.addRule(new ATRule(ruleData, this.tilesetRefManager));
+                this.addRule(new Rule(ruleData, this.tilesetRefManager));
             }
         }
 
@@ -66,28 +66,28 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
 
     }
 
-    public getRule(id: string): ATRule | null {
+    public getRule(id: string): Rule | null {
         return this.rules.find((rule) => rule.id === id) ?? null;
     }
 
-    public getAllRules(): ATRule[] {
+    public getAllRules(): Rule[] {
         return this.rules;
     }
 
-    public addRule(rule: ATRule): void {
+    public addRule(rule: Rule): void {
         this.rules.push(rule);
     }
 
     public addEmptyRule(): void {
-        const newRule = new ATRule({ id: uuidv4(), size: 5, constraints: [], outputs: "" }, this.tilesetRefManager);
+        const newRule = new Rule({ id: uuidv4(), size: 5, constraints: [], outputs: "" }, this.tilesetRefManager);
         this.rules.push(newRule);
     }
 
-    public duplicateRule(rule: ATRule): void {
-        this.rules.push(new ATRule(rule.serialize(), this.tilesetRefManager));
+    public duplicateRule(rule: Rule): void {
+        this.rules.push(new Rule(rule.serialize(), this.tilesetRefManager));
     }
 
-    public removeRule(rule: ATRule): void {
+    public removeRule(rule: Rule): void {
         this.rules = this.rules.filter((r) => r !== rule);
     }
 
@@ -100,14 +100,14 @@ export class ATRuleset extends BaseObject<ATRulesetEvent> {
         return null;
     }
 
-    public serialize(): ATRulesetData {
+    public serialize(): RulesetData {
         return {
             id: this.id,
             name: this.name,
             color: this.color,
             rules: this.rules.map((rule) => rule.serialize()),
             tilesets: this.tilesetRefManager.serialize(),
-            rulesets: this.atRulesetRefManager.serialize(),
+            rulesets: this.rulesetRefManager.serialize(),
         }
     }
 }

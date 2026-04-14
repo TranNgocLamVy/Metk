@@ -5,11 +5,11 @@ import { TilesetRefDataSchema } from "./tilesetSchema";
 export const atConstraint = type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'")
 export type ATConstraint = typeof atConstraint.infer;
 
-export const ATRuleConstraintDataSchema = type({
+export const RuleConstraintDataSchema = type({
     constraint: atConstraint.default("ANY"),
     targets: safeArray(type("string")).default(() => []),
 })
-export type ATRuleConstraintData = typeof ATRuleConstraintDataSchema.infer;
+export type RuleConstraintData = typeof RuleConstraintDataSchema.infer;
 
 export const ATOutputDataSchema = type({
     tileId: type("number"),
@@ -22,37 +22,37 @@ export type ATOutputData = {
     chance: number,
 }
 
-export const ATRuleDataSchema = type({
+export const RuleDataSchema = type({
     id: type("string"),
     size: type("number").default(1),
-    constraints: safeArray(ATRuleConstraintDataSchema).default(() => []),
+    constraints: safeArray(RuleConstraintDataSchema).default(() => []),
     outputs: type("string").default(""),
 })
-export type ATRuleDataSchema = typeof ATRuleDataSchema.infer;
+export type RuleDataSchema = typeof RuleDataSchema.infer;
 
-export const ATRulesetRefDataSchema = type({
+export const RulesetRefDataSchema = type({
     index: type("number"),
     source: type("string"),
     id: type("string"),
     name: type("string").default("Untitled Tileset"),
 })
-export type ATRulesetRefData = typeof ATRulesetRefDataSchema.infer
+export type RulesetRefData = typeof RulesetRefDataSchema.infer
 
-export const ATRulesetDataSchema = type("string.json.parse").to({
+export const RulesetDataSchema = type("string.json.parse").to({
     id: type("string"),
     name: type("string").default("Untitled AT Rule Set"),
     color: type("string").default("#ffffff"),
-    rules: safeArray(ATRuleDataSchema).default(() => []),
+    rules: safeArray(RuleDataSchema).default(() => []),
     tilesets: safeArray(TilesetRefDataSchema).default(() => []),
-    rulesets: safeArray(ATRulesetRefDataSchema).default(() => []),
+    rulesets: safeArray(RulesetRefDataSchema).default(() => []),
 })
-export type ATRulesetData = typeof ATRulesetDataSchema.infer;
+export type RulesetData = typeof RulesetDataSchema.infer;
 
 
-export const ATRulesetMetadataSchema = type({
+export const RulesetMetadataSchema = type({
     name: type("string").default("Untitled Tilemap"),
     id: type("string"),
-    atRulesetRelPath: type("string"),
+    rulesetRelPath: type("string"),
     color: type("string").default("#ffffff"),
 })
-export type ATRulesetMetadata = typeof ATRulesetMetadataSchema.infer
+export type RulesetMetadata = typeof RulesetMetadataSchema.infer

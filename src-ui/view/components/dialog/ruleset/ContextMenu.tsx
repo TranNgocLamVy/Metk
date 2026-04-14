@@ -25,7 +25,7 @@ const ActionGroup: MenuDropDownGroupType = [
     },
 ];
 
-export const ATRuleListContextMenu: MenuItemType = {
+export const RuleListContextMenu: MenuItemType = {
     name: "Edit",
     className: "w-60",
     groups: [ActionGroup],

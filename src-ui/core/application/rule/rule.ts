@@ -1,26 +1,26 @@
-import { ATRuleDataSchema, ATOutputData, ATConstraint, ATRuleConstraintData } from "@/shared/schema/atRuleSchema";
-import { ATRuleset } from "./atRuleset";
+import { RuleDataSchema, ATOutputData, ATConstraint, RuleConstraintData } from "@/shared/schema/ruleSchema";
+import { Ruleset } from "./ruleset";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
 
-interface ATRuleEvent extends BaseObjectEvents {
+interface RuleEvent extends BaseObjectEvents {
     onChange: () => void
 }
 
-export class ATRule extends BaseObject<ATRuleEvent> {
+export class Rule extends BaseObject<RuleEvent> {
     public readonly id: string;
     public size: number;
-    private constraints: ATRuleConstraint[];
+    private constraints: RuleConstraint[];
     private outputs: ATOutputData[];
 
-    constructor(data: ATRuleDataSchema, public readonly tilesetRefManager: TilesetRefManager) {
+    constructor(data: RuleDataSchema, public readonly tilesetRefManager: TilesetRefManager) {
         super();
         this.id = data.id;
         this.size = data.size;
-        this.constraints = data.constraints.map((constraint) => new ATRuleConstraint(constraint, this));
+        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
         if (this.constraints.length < this.size * this.size) {
             for (let i = this.constraints.length; i < this.size * this.size; i++) {
-                this.constraints.push(new ATRuleConstraint({ constraint: "ANY", targets: [] }, this));
+                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
             }
         }
         
@@ -34,14 +34,14 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         }) : [];
     }
 
-    public update(data: ATRuleDataSchema): void {
+    public update(data: RuleDataSchema): void {
         this.size = data.size;
         
-        this.constraints = data.constraints.map((constraint) => new ATRuleConstraint(constraint, this));
+        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
         
         if (this.constraints.length < this.size * this.size) {
             for (let i = this.constraints.length; i < this.size * this.size; i++) {
-                this.constraints.push(new ATRuleConstraint({ constraint: "ANY", targets: [] }, this));
+                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
             }
         }
         
@@ -73,7 +73,7 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         this.eventEmitter.emit("onChange");
     }
 
-    public getConstraint(index: number): ATRuleConstraint {
+    public getConstraint(index: number): RuleConstraint {
         return this.constraints[index];
     }
 
@@ -83,7 +83,7 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         this.eventEmitter.emit("onChange");
     }
 
-    public isSatisfied(input: (ATRuleset | null)[][]): boolean {
+    public isSatisfied(input: (Ruleset | null)[][]): boolean {
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {
                 const constraintIndex = y * this.size + x;
@@ -101,11 +101,11 @@ export class ATRule extends BaseObject<ATRuleEvent> {
         return this.outputs;
     }
 
-    public getConstaints(): ATRuleConstraint[] {
+    public getConstaints(): RuleConstraint[] {
         return this.constraints;
     }
 
-    public serialize(): ATRuleDataSchema {
+    public serialize(): RuleDataSchema {
         return {
             id: this.id,
             size: this.size,
@@ -115,11 +115,11 @@ export class ATRule extends BaseObject<ATRuleEvent> {
     }
 }
 
-export class ATRuleConstraint {
+export class RuleConstraint {
     private targets: string[];
     private constraint: ATConstraint;
     
-    constructor(data: ATRuleConstraintData, private readonly atRule: ATRule) {
+    constructor(data: RuleConstraintData, private readonly rule: Rule) {
         this.targets = data.targets;
         this.constraint = data.constraint;
     }
@@ -130,22 +130,22 @@ export class ATRuleConstraint {
     
     public addTarget(targetId: string): void {
         this.targets.push(targetId);
-        this.atRule.eventEmitter.emit("onChange");
+        this.rule.eventEmitter.emit("onChange");
     }
 
     public removeTarget(targetId: string): void {
         this.targets = this.targets.filter((target) => target !== targetId);
-        this.atRule.eventEmitter.emit("onChange");
+        this.rule.eventEmitter.emit("onChange");
     }
 
     public clearAll(): void {
         this.targets = [];
-        this.atRule.eventEmitter.emit("onChange");
+        this.rule.eventEmitter.emit("onChange");
     }
 
     public setConstraint(constraint: ATConstraint): void {
         this.constraint = constraint;
-        this.atRule.eventEmitter.emit("onChange");
+        this.rule.eventEmitter.emit("onChange");
     }
 
     public getConstraint(): ATConstraint {
@@ -165,7 +165,7 @@ export class ATRuleConstraint {
         }
     }
 
-    public serialize(): ATRuleConstraintData {
+    public serialize(): RuleConstraintData {
         return {
             constraint: this.constraint,
             targets: this.targets,

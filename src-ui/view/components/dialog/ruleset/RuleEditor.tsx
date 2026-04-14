@@ -1,10 +1,10 @@
 import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { ReactNode, useMemo, useState } from "react";
-import { ATRule } from "@/core/application/atrule/atRule";
+import { Rule } from "@/core/application/rule/rule";
 import { ArrowRight, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import { AppCore } from "@/core/appcore";
-import { ATConstraint } from "@/shared/schema/atRuleSchema";
+import { ATConstraint } from "@/shared/schema/ruleSchema";
 import OutputList from "./OutputList";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 
@@ -43,7 +43,7 @@ export default function RuleEditor() {
     )
 }
 
-function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: ATRule, selectedGrid: number, setSelectedGrid: (grid: number) => void }) {
+function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: Rule, selectedGrid: number, setSelectedGrid: (grid: number) => void }) {
     const { version, session, refresh } = useEditRulesetStore();
 
     const gridSize = useMemo(() => {
@@ -55,7 +55,7 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: ATRule, selec
     }, [rule, version])
 
     const rulesetList = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().atRulesetManager.serialize();
+        return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
     }, [version])
 
     const contraintsIcon = useMemo(() => {
@@ -122,7 +122,7 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: ATRule, selec
     );
 }
 
-function ContrainEditor({ rule, selectedGrid }: { rule: ATRule, selectedGrid: number }) {
+function ContrainEditor({ rule, selectedGrid }: { rule: Rule, selectedGrid: number }) {
     const { version, refresh } = useEditRulesetStore();
 
     const selectedContraint = useMemo(() => {
@@ -134,7 +134,7 @@ function ContrainEditor({ rule, selectedGrid }: { rule: ATRule, selectedGrid: nu
     }, [selectedContraint, version])
 
     const rulesetList = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().atRulesetManager.serialize();
+        return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
     }, [version])
 
     const handleChangeConstraint = (constraint: ATConstraint) => {
@@ -201,7 +201,7 @@ function ContrainEditor({ rule, selectedGrid }: { rule: ATRule, selectedGrid: nu
     )
 }
 
-function CellToolTip({ rule, gridIndex, children }: { rule: ATRule, gridIndex: number, children: ReactNode }) {
+function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: number, children: ReactNode }) {
     const { version } = useEditRulesetStore();
 
     const [open, setOpen] = useState(false);
@@ -215,7 +215,7 @@ function CellToolTip({ rule, gridIndex, children }: { rule: ATRule, gridIndex: n
     }, [contraint, version])
 
     const rulesetList = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().atRulesetManager.serialize();
+        return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
     }, [version])
 
     const contraintsIcon = useMemo(() => {

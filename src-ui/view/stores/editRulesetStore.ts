@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { ATRulesetSession } from "@/core/application/session/atRulesetSession";
+import { RulesetSession } from "@/core/application/session/rulesetSession";
 
 
 
 type EditRulesetState = {
     version: number;
-    session: ATRulesetSession;
+    session: RulesetSession;
 
-    setSession: (session: ATRulesetSession) => void;
+    setSession: (session: RulesetSession) => void;
     setSelectedRule: (ruleId: string | null) => void;
     refresh: () => void;
 }

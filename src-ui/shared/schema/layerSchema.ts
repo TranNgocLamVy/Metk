@@ -54,7 +54,7 @@ export type RulesetRefData = {
     }
 }
 
-export const ATRuleLayerSchema = type({
+export const RuleLayerSchema = type({
     id: type("string"),
     parentId: type("string").default("root"),
     type: type("'auto_rule'"),
@@ -70,8 +70,8 @@ export const ATRuleLayerSchema = type({
     offsety: type("number").default(0),
     layerData: type("string").default("")
 })
-export type ATRuleLayerData = typeof ATRuleLayerSchema.infer
-export const defaultATRuleLayerData = (data: Pick<ATRuleLayerData, "parentId" | "width" | "height">): ATRuleLayerData => {
+export type RuleLayerData = typeof RuleLayerSchema.infer
+export const defaultRuleLayerData = (data: Pick<RuleLayerData, "parentId" | "width" | "height">): RuleLayerData => {
     return {
         id: uuidv4(),
         parentId: data.parentId,

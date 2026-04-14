@@ -3,7 +3,7 @@ import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenD
 import { ProjectService } from "@/shared/services/projectService";
 import { TilemapService } from "@/shared/services/tilemapService";
 import { TilesetService } from "@/shared/services/tilesetService";
-import { ATRulesetService } from "@/shared/services/atRulesetService";
+import { RulesetService } from "@/shared/services/rulesetService";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -43,7 +43,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					name: "New Ruleset",
 					startIcon: <Grid2x2Plus />,
                     onClick() {
-						ATRulesetService.createATRuleset();
+						RulesetService.createRuleset();
 					},
 				},
 			],
