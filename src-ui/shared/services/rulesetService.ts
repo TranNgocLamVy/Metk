@@ -27,6 +27,7 @@ export class RulesetService {
             id: uuidv4(),
             name: form.name,
             color: form.color,
+            size: 5,
             rules: [],
             tilesets: [],
             rulesets: [],

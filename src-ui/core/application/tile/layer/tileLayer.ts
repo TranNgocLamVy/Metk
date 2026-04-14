@@ -74,7 +74,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         let tileRef = this.tilesRef[coordinate.row][coordinate.col];
 
         const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
-        if (tilesetIndex === -1) return Result.Error("Tile not found, tileset not found");
+        if (tilesetIndex === -1) return Result.Error("Tileset not found");
         if (tileRef === null || tileRef === undefined) {
             tileRef = new TileRef(tileId, tilesetIndex);
             this.tilesRef[coordinate.row][coordinate.col] = tileRef;
@@ -89,16 +89,22 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return Result.Success({ tileId: setTileResult.tileId, tilesetId: resultTilesetId });
     }
 
-    public removeTileAt(coordinate: Coordinate): Result {
+    public removeTileAt(coordinate: Coordinate): Result<TileRefData | null> {
         if (coordinate.col < 0 || coordinate.col >= this.size.width) return Result.Error("Tile not found, col is out of range");
         if (coordinate.row < 0 || coordinate.row >= this.size.height) return Result.Error("Tile not found, row is out of range");
 
         if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
 
+        const tileRef = this.tilesRef[coordinate.row][coordinate.col];
+        if (!tileRef) return Result.Success(null);
+
         this.tilesRef[coordinate.row][coordinate.col] = null;
         this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
 
-        return Result.Success();
+        const resultTilesetId = this.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
+        if (!resultTilesetId) return Result.Error("Tileset not found");
+
+        return Result.Success({ tileId: tileRef.tileId, tilesetId: resultTilesetId });
     }
 
     public override serialize(): TileLayerData {

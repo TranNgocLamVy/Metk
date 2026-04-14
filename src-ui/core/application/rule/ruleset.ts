@@ -1,10 +1,11 @@
 import { Rule } from "./rule";
-import { ATOutputData, RulesetData } from "@/shared/schema/ruleSchema";
+import { RuleOutputData, RulesetData } from "@/shared/schema/ruleSchema";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
 import { v4 as uuidv4 } from "uuid";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
+import { RulesetRefData } from "@/shared/schema/layerSchema";
 
 interface RulesetEvent extends BaseObjectEvents {
     onChange: () => void
@@ -14,6 +15,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public readonly id: string;
     public name: string;
     public color: string;
+    public size: number;
     private rules: Rule[] = [];
 
     constructor(
@@ -27,7 +29,8 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.id = ruleData.id;
         this.name = ruleData.name;
         this.color = ruleData.color;
-        this.rules = ruleData.rules.map((rule) => new Rule(rule, this.tilesetRefManager));
+        this.size = ruleData.size;
+        this.rules = ruleData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager));
 
         this.tilesetRefManager.load(ruleData.tilesets);
     }
@@ -53,13 +56,23 @@ export class Ruleset extends BaseObject<RulesetEvent> {
             if (existingRule) {
                 existingRule.update(ruleData);
             } else {
-                this.addRule(new Rule(ruleData, this.tilesetRefManager));
+                this.addRule(new Rule(ruleData, this.size, this.tilesetRefManager));
             }
         }
 
         this.rules = this.rules.filter((rule) => processedRuleIds.has(rule.id));
 
         this.eventEmitter.emit("onChange");
+    }
+
+    public calculateOutput(context: (RulesetRefData | null)[][]): { tileId: number, tilesetId: string } | null {
+        for (const rule of this.rules) {
+            if (rule.isSatisfied(context)) {
+                const output = rule.calculateOutput();
+                if (output != null) return output;
+            }
+        }
+        return null;
     }
 
     public async load(): Promise<void> {
@@ -79,19 +92,19 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     }
 
     public addEmptyRule(): void {
-        const newRule = new Rule({ id: uuidv4(), size: 5, constraints: [], outputs: "" }, this.tilesetRefManager);
+        const newRule = new Rule({ id: uuidv4(), constraintts: [], outputs: "" }, this.size, this.tilesetRefManager);
         this.rules.push(newRule);
     }
 
     public duplicateRule(rule: Rule): void {
-        this.rules.push(new Rule(rule.serialize(), this.tilesetRefManager));
+        this.rules.push(new Rule(rule.serialize(), this.size, this.tilesetRefManager));
     }
 
     public removeRule(rule: Rule): void {
         this.rules = this.rules.filter((r) => r !== rule);
     }
 
-    public getOutput(): ATOutputData | null {
+    public getOutput(): RuleOutputData | null {
         for (const rule of this.rules) {
             const outputs = rule.getOutputs();
             // TODO: Choose random base on chance
@@ -105,6 +118,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
             id: this.id,
             name: this.name,
             color: this.color,
+            size: this.size,
             rules: this.rules.map((rule) => rule.serialize()),
             tilesets: this.tilesetRefManager.serialize(),
             rulesets: this.rulesetRefManager.serialize(),

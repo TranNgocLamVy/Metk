@@ -1,7 +1,8 @@
-import { RuleDataSchema, ATOutputData, ATConstraint, RuleConstraintData } from "@/shared/schema/ruleSchema";
+import { RuleData, RuleOutputData, RuleConstraintType, RuleConstraintData } from "@/shared/schema/ruleSchema";
 import { Ruleset } from "./ruleset";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
+import { RulesetRefData } from "@/shared/schema/layerSchema";
 
 interface RuleEvent extends BaseObjectEvents {
     onChange: () => void
@@ -9,18 +10,20 @@ interface RuleEvent extends BaseObjectEvents {
 
 export class Rule extends BaseObject<RuleEvent> {
     public readonly id: string;
-    public size: number;
-    private constraints: RuleConstraint[];
-    private outputs: ATOutputData[];
+    private constraintts: RuleConstraint[];
+    private outputs: RuleOutputData[];
 
-    constructor(data: RuleDataSchema, public readonly tilesetRefManager: TilesetRefManager) {
+    constructor(
+        data: RuleData,
+        private readonly size: number,
+        public readonly tilesetRefManager: TilesetRefManager
+    ) {
         super();
         this.id = data.id;
-        this.size = data.size;
-        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
-        if (this.constraints.length < this.size * this.size) {
-            for (let i = this.constraints.length; i < this.size * this.size; i++) {
-                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
+        this.constraintts = data.constraintts.map((constraintt) => new RuleConstraint(constraintt, this));
+        if (this.constraintts.length < this.size * this.size) {
+            for (let i = this.constraintts.length; i < this.size * this.size; i++) {
+                this.constraintts.push(new RuleConstraint({ constraintt: "ANY", targets: [] }, this));
             }
         }
         
@@ -34,14 +37,12 @@ export class Rule extends BaseObject<RuleEvent> {
         }) : [];
     }
 
-    public update(data: RuleDataSchema): void {
-        this.size = data.size;
+    public update(data: RuleData): void {
+        this.constraintts = data.constraintts.map((constraintt) => new RuleConstraint(constraintt, this));
         
-        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
-        
-        if (this.constraints.length < this.size * this.size) {
-            for (let i = this.constraints.length; i < this.size * this.size; i++) {
-                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
+        if (this.constraintts.length < this.size * this.size) {
+            for (let i = this.constraintts.length; i < this.size * this.size; i++) {
+                this.constraintts.push(new RuleConstraint({ constraintt: "ANY", targets: [] }, this));
             }
         }
         
@@ -74,7 +75,7 @@ export class Rule extends BaseObject<RuleEvent> {
     }
 
     public getConstraint(index: number): RuleConstraint {
-        return this.constraints[index];
+        return this.constraintts[index];
     }
 
     public setChance(tileId: number, tilesetId: string, chance: number): void {
@@ -83,13 +84,13 @@ export class Rule extends BaseObject<RuleEvent> {
         this.eventEmitter.emit("onChange");
     }
 
-    public isSatisfied(input: (Ruleset | null)[][]): boolean {
+    public isSatisfied(input: (RulesetRefData | null)[][]): boolean {
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {
-                const constraintIndex = y * this.size + x;
-                const constraint = this.constraints[constraintIndex];
+                const constrainttIndex = y * this.size + x;
+                const constraintt = this.constraintts[constrainttIndex];
                 const targetSet = input[y]?.[x];
-                if (!constraint.isSatisfied(targetSet ? targetSet.id : null)) {
+                if (!constraintt.isSatisfied(targetSet ? targetSet.rulesetId : null)) {
                     return false;
                 }
             }
@@ -97,19 +98,27 @@ export class Rule extends BaseObject<RuleEvent> {
         return true;
     }
 
-    public getOutputs(): ATOutputData[] {
+    public calculateOutput(): { tileId: number, tilesetId: string } | null {
+        const outputs = this.getOutputs();
+        //TODO: Randomly select one output base on its chance scale.
+        const selectedOutput = outputs[0];
+        const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(selectedOutput.tilesetIndex);
+        if (!tilesetId) return null;
+        return { tileId: selectedOutput.tileId, tilesetId: tilesetId };
+    }
+
+    public getOutputs(): RuleOutputData[] {
         return this.outputs;
     }
 
     public getConstaints(): RuleConstraint[] {
-        return this.constraints;
+        return this.constraintts;
     }
 
-    public serialize(): RuleDataSchema {
+    public serialize(): RuleData {
         return {
             id: this.id,
-            size: this.size,
-            constraints: this.constraints.map((constraint) => constraint.serialize()),
+            constraintts: this.constraintts.map((constraintt) => constraintt.serialize()),
             outputs: this.outputs.map((output) => `${output.tileId}:${output.tilesetIndex}:${output.chance}`).join(" "),
         }
     }
@@ -117,11 +126,11 @@ export class Rule extends BaseObject<RuleEvent> {
 
 export class RuleConstraint {
     private targets: string[];
-    private constraint: ATConstraint;
+    private constraintt: RuleConstraintType;
     
     constructor(data: RuleConstraintData, private readonly rule: Rule) {
         this.targets = data.targets;
-        this.constraint = data.constraint;
+        this.constraintt = data.constraintt;
     }
 
     public getTargets(): string[] {
@@ -143,17 +152,17 @@ export class RuleConstraint {
         this.rule.eventEmitter.emit("onChange");
     }
 
-    public setConstraint(constraint: ATConstraint): void {
-        this.constraint = constraint;
+    public setConstraint(constraintt: RuleConstraintType): void {
+        this.constraintt = constraintt;
         this.rule.eventEmitter.emit("onChange");
     }
 
-    public getConstraint(): ATConstraint {
-        return this.constraint;
+    public getConstraint(): RuleConstraintType {
+        return this.constraintt;
     }
 
     public isSatisfied(targetId: string | null): boolean {
-        switch (this.constraint) {
+        switch (this.constraintt) {
             case "EMPTY":
                 return targetId === null;
             case "ANY":
@@ -167,7 +176,7 @@ export class RuleConstraint {
 
     public serialize(): RuleConstraintData {
         return {
-            constraint: this.constraint,
+            constraintt: this.constraintt,
             targets: this.targets,
         }
     }

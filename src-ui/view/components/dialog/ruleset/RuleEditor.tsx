@@ -4,9 +4,9 @@ import { ReactNode, useMemo, useState } from "react";
 import { Rule } from "@/core/application/rule/rule";
 import { ArrowRight, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import { AppCore } from "@/core/appcore";
-import { ATConstraint } from "@/shared/schema/ruleSchema";
 import OutputList from "./OutputList";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
+import { RuleConstraintType } from "@/shared/schema/ruleSchema";
 
 export default function RuleEditor() {
     const { session, version } = useEditRulesetStore();
@@ -37,7 +37,7 @@ export default function RuleEditor() {
                         </div>
                     </div>
                 </div>
-                <ContrainEditor rule={rule} selectedGrid={selectedGrid} />
+                <ConstraintEditor rule={rule} selectedGrid={selectedGrid} />
             </VStack>
         </HStack>
     )
@@ -47,10 +47,10 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: Rule, selecte
     const { version, session, refresh } = useEditRulesetStore();
 
     const gridSize = useMemo(() => {
-        return rule.size;
+        return session.ruleset.size;
     }, [session, version]);
 
-    const contraints = useMemo(() => {
+    const constraintts = useMemo(() => {
         return rule.getConstaints();
     }, [rule, version])
 
@@ -58,11 +58,11 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: Rule, selecte
         return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
     }, [version])
 
-    const contraintsIcon = useMemo(() => {
+    const constrainttsIcon = useMemo(() => {
         return [
-            { constraint: "EMPTY", icon: <SquareDashed /> },
-            { constraint: "REQUIRE", icon: <SquareCheck /> },
-            { constraint: "NOT", icon: <SquareX /> },
+            { constraintt: "EMPTY", icon: <SquareDashed /> },
+            { constraintt: "REQUIRE", icon: <SquareCheck /> },
+            { constraintt: "NOT", icon: <SquareX /> },
         ]
     }, [])
 
@@ -92,9 +92,9 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: Rule, selecte
 
     return (
         <div className={`w-full gap-2 grid`} style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }} >
-            {contraints.map((contraint, index) => {
-                const firstContraintColor = rulesetList.find((ruleset) => contraint.getTargets().includes(ruleset.id))?.color ?? null;
-                const isEmpyOrAny = contraint.getConstraint() === "EMPTY" || contraint.getConstraint() === "ANY";
+            {constraintts.map((constraintt, index) => {
+                const firstConstraintColor = rulesetList.find((ruleset) => constraintt.getTargets().includes(ruleset.id))?.color ?? null;
+                const isEmpyOrAny = constraintt.getConstraint() === "EMPTY" || constraintt.getConstraint() === "ANY";
                 const currentRulesetColor = session.ruleset.color;
 
                 if (index === middleIndex) {
@@ -110,9 +110,9 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: Rule, selecte
                         <div onClick={(e) => onSelect(index)}
                             className={`aspect-square bg-secondary-background relative p-2 flex items-center justify-center border ${selectedGrid === index ? "border-select-color" : "border-foreground/20 hover:border-select-color/50"}`}
                         >
-                            {firstContraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstContraintColor }} />}
+                            {firstConstraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstConstraintColor }} />}
                             <div className="absolute">
-                                {contraintsIcon.find((icon) => icon.constraint === contraint.getConstraint())?.icon}
+                                {constrainttsIcon.find((icon) => icon.constraintt === constraintt.getConstraint())?.icon}
                             </div>
                         </div>
                     </CellToolTip>
@@ -122,57 +122,57 @@ function RuleGrid({ rule, selectedGrid, setSelectedGrid }: { rule: Rule, selecte
     );
 }
 
-function ContrainEditor({ rule, selectedGrid }: { rule: Rule, selectedGrid: number }) {
+function ConstraintEditor({ rule, selectedGrid }: { rule: Rule, selectedGrid: number }) {
     const { version, refresh } = useEditRulesetStore();
 
-    const selectedContraint = useMemo(() => {
+    const selectedConstraint = useMemo(() => {
         return rule.getConstraint(selectedGrid);
     }, [rule, selectedGrid, version])
 
     const selectedTargets = useMemo(() => {
-        return selectedContraint.getTargets();
-    }, [selectedContraint, version])
+        return selectedConstraint.getTargets();
+    }, [selectedConstraint, version])
 
     const rulesetList = useMemo(() => {
         return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
     }, [version])
 
-    const handleChangeConstraint = (constraint: ATConstraint) => {
-        selectedContraint.setConstraint(constraint);
+    const handleChangeConstraint = (constraintt: RuleConstraintType) => {
+        selectedConstraint.setConstraint(constraintt);
         refresh();
     }
 
     const handleSelectTarget = (targetId: string) => {
-        if (selectedContraint.getTargets().includes(targetId)) {
-            selectedContraint.removeTarget(targetId);
+        if (selectedConstraint.getTargets().includes(targetId)) {
+            selectedConstraint.removeTarget(targetId);
         } else {
-            selectedContraint.addTarget(targetId);
+            selectedConstraint.addTarget(targetId);
         }
         refresh();
     }
 
-    const constraintList = useMemo(() => {
+    const constrainttList = useMemo(() => {
         return [
-            { constraint: "ANY", name: "ANY", icon: <CircleQuestionMark /> },
-            { constraint: "EMPTY", name: "EMPTY", icon: <SquareDashed /> },
-            { constraint: "REQUIRE", name: "REQUIRE", icon: <SquareCheck /> },
-            { constraint: "NOT", name: "NOT", icon: <SquareX /> },
+            { constraintt: "ANY", name: "ANY", icon: <CircleQuestionMark /> },
+            { constraintt: "EMPTY", name: "EMPTY", icon: <SquareDashed /> },
+            { constraintt: "REQUIRE", name: "REQUIRE", icon: <SquareCheck /> },
+            { constraintt: "NOT", name: "NOT", icon: <SquareX /> },
         ]
     }, [])
 
     return (
         <VStack className="flex-1 gap-4">
-            <span className="text-base">Contrain</span>
+            <span className="text-base">Constraint</span>
             <div className="w-full gap-2 grid grid-cols-7">
-                {constraintList.map((constraint) => {
+                {constrainttList.map((constraintt) => {
                     return (
                         <div
-                            key={constraint.constraint}
-                            className={`aspect-square bg-secondary-background flex flex-col gap-1 items-center justify-center border cursor-pointer ${selectedContraint.getConstraint() === constraint.constraint ? "border-select-color" : "border-foreground/20"}`}
-                            onClick={() => handleChangeConstraint(constraint.constraint as ATConstraint)}
+                            key={constraintt.constraintt}
+                            className={`aspect-square bg-secondary-background flex flex-col gap-1 items-center justify-center border cursor-pointer ${selectedConstraint.getConstraint() === constraintt.constraintt ? "border-select-color" : "border-foreground/20"}`}
+                            onClick={() => handleChangeConstraint(constraintt.constraintt as RuleConstraintType)}
                         >
-                            {constraint.icon}
-                            <span className="text-xs">{constraint.name}</span>
+                            {constraintt.icon}
+                            <span className="text-xs">{constraintt.name}</span>
                         </div>
                     )
                 })}
@@ -181,8 +181,8 @@ function ContrainEditor({ rule, selectedGrid }: { rule: Rule, selectedGrid: numb
             <span className="text-base">Targets</span>
             <div className="grid grid-cols-7 w-full gap-2">
                 {rulesetList.map((ruleset) => {
-                    const hightlight = selectedTargets.includes(ruleset.id) && selectedContraint.getConstraint() !== "EMPTY" && selectedContraint.getConstraint() !== "ANY";
-                    const requiredTarget = selectedContraint.getConstraint() === "REQUIRE" || selectedContraint.getConstraint() === "NOT";
+                    const hightlight = selectedTargets.includes(ruleset.id) && selectedConstraint.getConstraint() !== "EMPTY" && selectedConstraint.getConstraint() !== "ANY";
+                    const requiredTarget = selectedConstraint.getConstraint() === "REQUIRE" || selectedConstraint.getConstraint() === "NOT";
                     return (
                         <div
                             key={ruleset.id}
@@ -206,28 +206,28 @@ function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: num
 
     const [open, setOpen] = useState(false);
 
-    const contraint = useMemo(() => {
+    const constraintt = useMemo(() => {
         return rule.getConstraint(gridIndex);
     }, [rule, gridIndex, version])
 
     const targets = useMemo(() => {
-        return contraint.getTargets();
-    }, [contraint, version])
+        return constraintt.getTargets();
+    }, [constraintt, version])
 
     const rulesetList = useMemo(() => {
         return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
     }, [version])
 
-    const contraintsIcon = useMemo(() => {
+    const constrainttsIcon = useMemo(() => {
         return [
-            { constraint: "EMPTY", icon: <SquareDashed /> },
-            { constraint: "REQUIRE", icon: <SquareCheck /> },
-            { constraint: "NOT", icon: <SquareX /> },
-            { constraint: "ANY", icon: <CircleQuestionMark /> },
+            { constraintt: "EMPTY", icon: <SquareDashed /> },
+            { constraintt: "REQUIRE", icon: <SquareCheck /> },
+            { constraintt: "NOT", icon: <SquareX /> },
+            { constraintt: "ANY", icon: <CircleQuestionMark /> },
         ]
     }, [])
 
-    const isEmpty = targets.length === 0 || contraint.getConstraint() === "EMPTY" || contraint.getConstraint() === "ANY";
+    const isEmpty = targets.length === 0 || constraintt.getConstraint() === "EMPTY" || constraintt.getConstraint() === "ANY";
 
     return (
         <Tooltip open={open} onOpenChange={setOpen} delayDuration={1000}>
@@ -243,8 +243,8 @@ function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: num
             >
                 <VStack className="flex-1 gap-4">
                     <HStack align="center" justify="center" className="h-fit w-fit gap-2">
-                        <span>Contraint:</span>
-                        <span>{contraintsIcon.find((icon) => icon.constraint === contraint.getConstraint())?.icon}</span>
+                        <span>Constraint:</span>
+                        <span>{constrainttsIcon.find((icon) => icon.constraintt === constraintt.getConstraint())?.icon}</span>
                     </HStack>
                     <VStack className="gap-2">
                         <HStack className="gap-2">
