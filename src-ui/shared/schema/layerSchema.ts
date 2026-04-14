@@ -3,40 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import { type } from "arktype";
 import { safeArray } from ".";
 
-const layerModule = type.module({
-    LayerType: "'tile' | 'group'",
-    TileRefSchema: {
-        tileId: type("number"),
-        tilesetIndex: type("number")
-    },
-    TileLayerSchema: {
-        id: type("string"),
-        layerType: "LayerType",
-        name: type("string"),
-        x: type("number").optional(),
-        y: type("number").optional(),
-        width: type("number"),
-        height: type("number"),
-        opacity: type("number").default(1),
-        visible: type("boolean").default(true),
-        locked: type("boolean").default(false),
-        offsetx: type("number").optional(),
-        offsety: type("number").optional(),
-        tilesData: "(TileRefSchema | null)[][]",
-    },
-    GroupLayerSchema: {
-        id: type("string"),
-        layerType: "LayerType",
-        name: type("string"),
-        opacity: type("number").default(1),
-        visible: type("boolean").default(true),
-        locked: type("boolean").default(false),
-        layers: "unknown[]",
-    },
-    LayerSchema: "GroupLayerSchema | TileLayerSchema",
-    RootSchema: "LayerSchema[]"
-});
-
 export type TileRefData = {
     tileId: number,
     tilesetIndex: number
