@@ -8,7 +8,7 @@ import { Result } from "@/shared/types/result";
 export class EraseTileCommand implements IBaseCommand {
     public readonly id: string = uuidv4()
 
-    private oldTilesetIndex: number | null = null;
+    private oldTilesetId: string | null = null;
     private oldTileId: number | null = null;
 
     constructor(
@@ -25,12 +25,11 @@ export class EraseTileCommand implements IBaseCommand {
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return Result.Error("Layer not found");
 
-        const tileRef = layer.getTileAt(this.coordinate);
+        const tileRef = layer.getTileRefAt(this.coordinate);
         if (!tileRef) return Result.Success();
 
-        const { tileId, tilesetIndex } = tileRef.getTile();
-        this.oldTileId = tileId;
-        this.oldTilesetIndex = tilesetIndex;
+        this.oldTileId = tileRef.tileId;
+        this.oldTilesetId = tileRef.tilesetId;
 
         const result = layer.removeTileAt(this.coordinate);
 
@@ -48,9 +47,9 @@ export class EraseTileCommand implements IBaseCommand {
         const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
         if (!layer) return Result.Error("Layer not found");
 
-        if (this.oldTileId == null || this.oldTilesetIndex == null) return Result.Success();
+        if (this.oldTileId == null || this.oldTilesetId == null) return Result.Success();
 
-        const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetIndex);
+        const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetId);
 
         if (result.status === Result.Status.Success) currentSession.markAsDirty();
 

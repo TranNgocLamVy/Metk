@@ -244,7 +244,7 @@ export class EraserBrush implements ITool {
                         continue;
                     }
 
-                    const tile = activeLayer.getTileAt({ col: targetX, row: targetY });
+                    const tile = activeLayer.getTileRefAt({ col: targetX, row: targetY });
                     if (!tile) continue;
 
                     const eraseCommand = new EraseTileCommand(activeLayer.id, { col: targetX, row: targetY });
