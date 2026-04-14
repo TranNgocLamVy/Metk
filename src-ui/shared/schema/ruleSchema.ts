@@ -2,33 +2,32 @@ import { type } from "arktype";
 import { safeArray } from ".";
 import { TilesetRefDataSchema } from "./tilesetSchema";
 
-export const atConstraint = type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'")
-export type ATConstraint = typeof atConstraint.infer;
+export const ruleConstraint = type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'")
+export type RuleConstraintType = typeof ruleConstraint.infer;
 
 export const RuleConstraintDataSchema = type({
-    constraint: atConstraint.default("ANY"),
+    constraintt: ruleConstraint.default("ANY"),
     targets: safeArray(type("string")).default(() => []),
 })
 export type RuleConstraintData = typeof RuleConstraintDataSchema.infer;
 
-export const ATOutputDataSchema = type({
+export const RuleOutputDataSchema = type({
     tileId: type("number"),
     tilesetIndex: type("number"),
     chance: type("number").default(1),
 })
-export type ATOutputData = {
+export type RuleOutputData = {
     tileId: number,
     tilesetIndex: number,
     chance: number,
 }
 
-export const RuleDataSchema = type({
+export const RuleData = type({
     id: type("string"),
-    size: type("number").default(1),
-    constraints: safeArray(RuleConstraintDataSchema).default(() => []),
+    constraintts: safeArray(RuleConstraintDataSchema).default(() => []),
     outputs: type("string").default(""),
 })
-export type RuleDataSchema = typeof RuleDataSchema.infer;
+export type RuleData = typeof RuleData.infer;
 
 export const RulesetRefDataSchema = type({
     index: type("number"),
@@ -42,7 +41,8 @@ export const RulesetDataSchema = type("string.json.parse").to({
     id: type("string"),
     name: type("string").default("Untitled AT Rule Set"),
     color: type("string").default("#ffffff"),
-    rules: safeArray(RuleDataSchema).default(() => []),
+    size: type("number").default(5),
+    rules: safeArray(RuleData).default(() => []),
     tilesets: safeArray(TilesetRefDataSchema).default(() => []),
     rulesets: safeArray(RulesetRefDataSchema).default(() => []),
 })

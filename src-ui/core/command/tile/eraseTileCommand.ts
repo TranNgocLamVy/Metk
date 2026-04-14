@@ -33,7 +33,14 @@ export class EraseTileCommand implements IBaseCommand {
 
         const result = layer.removeTileAt(this.coordinate);
 
-        if (result.status === Result.Status.Success) currentSession.markAsDirty();
+        if (result.status === Result.Status.Success) {
+            const tileRef = result.data;
+            if (tileRef) {
+                this.oldTileId = tileRef.tileId;
+                this.oldTilesetId = tileRef.tilesetId;
+            }
+            currentSession.markAsDirty()
+        }
 
         return result
     }

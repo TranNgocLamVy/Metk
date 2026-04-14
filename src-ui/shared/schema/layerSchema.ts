@@ -47,10 +47,10 @@ export const defaultTileLayerData = (data: Pick<TileLayerData, "parentId" | "wid
 }
 
 export type RulesetRefData = {
-    rulesetIndex: number,
+    rulesetId: string,
     output?: {
         tileId: number,
-        tilesetIndex: number
+        tilesetId: string
     }
 }
 

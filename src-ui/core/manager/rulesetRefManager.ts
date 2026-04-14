@@ -53,4 +53,10 @@ export class RulesetRefManager {
         if (!rulesetMetadata) return -1;
         return this.getRulesetIndex(rulesetMetadata);
     }
+
+    public getRulesetIdByIndex(index: number): string | null {
+        const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.index === index);
+        if (!rulesetRef) return null;
+        return rulesetRef.id;
+    }
 }
