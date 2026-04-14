@@ -23,7 +23,10 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         layersData.forEach((layerData) => {
             const parentLayer = groupLayerMap.get(layerData.parentId) ?? this;
             const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager);
-            if (layer) parentLayer.pushLayer(layer);
+            if (layer) {
+                parentLayer.pushLayer(layer)
+                if (layer instanceof GroupLayer) groupLayerMap.set(layer.id, layer);
+            }
         });
     }
 
