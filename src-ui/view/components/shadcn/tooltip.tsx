@@ -33,7 +33,7 @@ function TooltipContent({ className, sideOffset = 0, children, ...props }: React
 				)}
 				{...props}>
 				{children}
-				<TooltipPrimitive.Arrow className="size-2.5 rotate-45 rounded-none bg-background fill-background z-50 translate-y-[calc(-50%_-_2px)]" />
+				{/* <TooltipPrimitive.Arrow className="size-2.5 rotate-45 rounded-none bg-background fill-background z-50 translate-y-[calc(-50%_-_2px)]" /> */}
 			</TooltipPrimitive.Content>
 		</TooltipPrimitive.Portal>
 	);
