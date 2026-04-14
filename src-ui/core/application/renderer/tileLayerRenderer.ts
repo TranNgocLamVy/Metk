@@ -42,7 +42,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     };
 
     private async renderTile(x: number, y: number): Promise<void> {
-        const tileRef = this.layer.getTileAt({ col: x, row: y });
+        const tileRef = this.layer.getTileRefAt({ col: x, row: y });
         const key = `${x},${y}`;
         const currentSprite = this.sprites.get(key);
         if (!tileRef) {
@@ -54,12 +54,9 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             return;
         }
 
-        const tilesetRefData = this.layer.tilesetRefManager.tilesetRefs.find(r => r.index === tileRef.getTile().tilesetIndex);
-        if (!tilesetRefData) return;
-
         // TODO: Fix: Get textureManager from passing context
         const textureManager = AppCore.getIns().editorContext.textureManager;
-        const texture = textureManager.getTileTexture(tilesetRefData.id, tileRef.getTile().tileId);
+        const texture = textureManager.getTileTexture(tileRef.tilesetId, tileRef.tileId);
 
         // TODO: Handle unfound tileset, render error texture
         if (!texture) return;

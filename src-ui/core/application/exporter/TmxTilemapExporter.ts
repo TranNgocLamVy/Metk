@@ -130,9 +130,9 @@ export class TmxTilemapExporter implements ITilemapExporter {
                     '@encoding': 'csv',
                     '#text': tileLayer.tilesRef.map((row) => row.map((tileRef) => {
                         if (!tileRef) return 0;
-                        const tilesetFirstGid = this.tilesetFirstGidMap.get(tileRef.getTile().tilesetIndex)!;
+                        const tilesetFirstGid = this.tilesetFirstGidMap.get(tileRef.tilesetIndex)!;
                         if (tilesetFirstGid == undefined) return 0;
-                        return tileRef.getTile().tileId + tilesetFirstGid
+                        return tileRef.tileId + tilesetFirstGid
                     })).flat().join(',')
                 }
             }
