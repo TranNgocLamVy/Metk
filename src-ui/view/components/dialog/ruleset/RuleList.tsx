@@ -5,7 +5,7 @@ import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { Copy, EllipsisVertical, GripHorizontal, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
-import { ATRule } from "@/core/application/atrule/atRule";
+import { Rule } from "@/core/application/rule/rule";
 import { PixiImage } from "./OutputList";
 import { AppCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
@@ -35,7 +35,7 @@ export default function RuleList() {
     )
 }
 
-function RuleItem({ rule, index }: { rule: ATRule, index: number }) {
+function RuleItem({ rule, index }: { rule: Rule, index: number }) {
     const { session, version, setSelectedRule } = useEditRulesetStore();
 
     const selectedRuleId = useMemo(() => {
@@ -80,7 +80,7 @@ function RuleItem({ rule, index }: { rule: ATRule, index: number }) {
     )
 }
 
-function RuleDropdown({ rule }: { rule: ATRule }) {
+function RuleDropdown({ rule }: { rule: Rule }) {
     const { session, refresh } = useEditRulesetStore();
 
     const ruleset = useMemo(() => {
@@ -118,7 +118,7 @@ function RuleDropdown({ rule }: { rule: ATRule }) {
     )
 }
 
-function RuleToolTip({ rule, children }: { rule: ATRule, children: React.ReactNode }) {
+function RuleToolTip({ rule, children }: { rule: Rule, children: React.ReactNode }) {
 
     return (
         <Tooltip delayDuration={500}>

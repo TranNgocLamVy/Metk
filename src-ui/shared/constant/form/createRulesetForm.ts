@@ -1,6 +1,6 @@
 import { FormUtils } from "@/shared/utils/formUtils"
 
-export const createATRulesetForm = FormUtils.createForm({
+export const createRulesetForm = FormUtils.createForm({
     title: "Create new Ruleset",
     okText: "Create",
     cancelText: "Cancel",

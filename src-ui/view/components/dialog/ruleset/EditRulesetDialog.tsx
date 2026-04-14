@@ -9,33 +9,33 @@ import RuleList from "./RuleList";
 import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import RuleEditor from "./RuleEditor";
 import RuleHeader from "./RuleHeader";
-import { ATRulesetSession } from "@/core/application/session/atRulesetSession";
+import { RulesetSession } from "@/core/application/session/rulesetSession";
 import { ToastService } from "@/shared/services/toastService";
-import { useATRulesetManagerStore } from "@/view/stores/atRulesetManagerStore";
+import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import OutputSelector from "./OutputSelector";
 
-interface EditAtRulesetDialogProps extends BaseDialogProps {
+interface EditRulesetDialogProps extends BaseDialogProps {
     dialogId: string;
     rulesetId: string;
 }
 
-export function EditAtRulesetDialog({ dialogId, rulesetId }: EditAtRulesetDialogProps) {
+export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProps) {
     const { closeDialog } = useDialogStore();
 
     const { session, setSession } = useEditRulesetStore();
 
     useEffect(() => {
         const editorContext = AppCore.getIns().editorContext;
-        const atRulesetManager = editorContext.getCurrentProject().atRulesetManager;
+        const rulesetManager = editorContext.getCurrentProject().rulesetManager;
 
-        const clonedRuleset = atRulesetManager.cloneAtRuleset(rulesetId);
+        const clonedRuleset = rulesetManager.cloneRuleset(rulesetId);
 
         if (!clonedRuleset) {
             closeDialog(dialogId);
             return;
         }
 
-        const newSession = new ATRulesetSession(clonedRuleset, editorContext);
+        const newSession = new RulesetSession(clonedRuleset, editorContext);
         setSession(newSession);
 
         // TODO: Enable this after implement edit ruleset
@@ -48,10 +48,10 @@ export function EditAtRulesetDialog({ dialogId, rulesetId }: EditAtRulesetDialog
     const handleSave = async () => {
         if (!session) return;
         const editorContext = AppCore.getIns().editorContext;
-        const atRulesetManager = editorContext.getCurrentProject().atRulesetManager;
-        atRulesetManager.updateAtRuleset(session.ruleset.serialize());
-        await atRulesetManager.saveAtRuleset(session.ruleset.id);
-        useATRulesetManagerStore.getState().refresh();
+        const rulesetManager = editorContext.getCurrentProject().rulesetManager;
+        rulesetManager.updateRuleset(session.ruleset.serialize());
+        await rulesetManager.saveRuleset(session.ruleset.id);
+        useRulesetManagerStore.getState().refresh();
         ToastService.success({ message: "Ruleset saved successfully" });
         onClose();
     }

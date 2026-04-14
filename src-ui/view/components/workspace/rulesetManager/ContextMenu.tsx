@@ -1,4 +1,4 @@
-import { ATRulesetService } from "@/shared/services/atRulesetService";
+import { RulesetService } from "@/shared/services/rulesetService";
 import { Plus } from "lucide-react";
 
 const CreateActionGroup: MenuDropDownGroupType = [
@@ -7,12 +7,12 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		name: "Create Ruleset",
 		startIcon: <Plus />,
 		onClick() {
-			ATRulesetService.createATRuleset();
+			RulesetService.createRuleset();
 		},
 	}
 ];
 
-export const ATRulesetManagerContextMenu: MenuItemType = {
+export const RulesetManagerContextMenu: MenuItemType = {
 	name: "LayerManager",
 	className: "w-60 bg-secondary-background",
 	groups: [CreateActionGroup],

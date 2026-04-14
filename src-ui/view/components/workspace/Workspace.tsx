@@ -12,7 +12,7 @@ import ToolBar from "./ToolBar";
 import TilesetView from "./tilesetView/TilesetView";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
-import ATRulesetManager from "./atRulesetManager/AtRulesetManager";
+import RulesetManager from "./rulesetManager/RulesetManager";
 
 export default function Workspace() {
 	const layoutRef = useRef<Layout | null>(null);
@@ -30,8 +30,8 @@ export default function Workspace() {
 				return <LayerManager />;
 			case "tilemapEditor":
 				return <TilemapEditor />
-			case "atRulesetManager":
-				return <ATRulesetManager />
+			case "rulesetManager":
+				return <RulesetManager />
 			default:
 				return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 		}

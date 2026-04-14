@@ -25,10 +25,10 @@ export class DialogService {
         });
     }
 
-    public static async openEditAtRulesetDialog(id: string): Promise<void> {
-        const rulesetManager = AppCore.getIns().editorContext.getCurrentProject().atRulesetManager;
+    public static async openEditRulesetDialog(id: string): Promise<void> {
+        const rulesetManager = AppCore.getIns().editorContext.getCurrentProject().rulesetManager;
 
-        const ruleset = await rulesetManager.loadAtRuleset(id);
+        const ruleset = await rulesetManager.loadRuleset(id);
         if (!ruleset) {
             ToastService.error({ message: "Ruleset not found" });
             return;

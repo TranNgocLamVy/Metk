@@ -2,8 +2,8 @@
 import { Application, Container, Sprite, Graphics } from 'pixi.js';
 import { Tileset } from '@/core/application/tile/tileset';
 import { AppCore } from '@/core/appcore';
-import { ATRuleset } from '@/core/application/atrule/atRuleset';
-import { ATRule } from '@/core/application/atrule/atRule';
+import { Ruleset } from '@/core/application/rule/ruleset';
+import { Rule } from '@/core/application/rule/rule';
 import { Viewport } from 'pixi-viewport';
 import { DrawLineOption, GraphicUtils } from '@/shared/utils/graphicUtils';
 import { useEditRulesetStore } from '@/view/stores/editRulesetStore';
@@ -16,14 +16,14 @@ export class RulesetOutputSelector {
     private gridGraphics: Graphics;
 
     private currentTileset: Tileset | null = null;
-    private currentRule: ATRule | null = null;
+    private currentRule: Rule | null = null;
 
     private gridGap: number = 0;
 
     private isInit: boolean = false;
 
 
-    constructor(private currentRuleset: ATRuleset) { }
+    constructor(private currentRuleset: Ruleset) { }
 
     private initSession(pixiApp: Application) {
         this.pixiApp = pixiApp;
@@ -130,7 +130,7 @@ export class RulesetOutputSelector {
         this.renderGrid();
     }
 
-    public async setCurrentRule(rule: ATRule | null) {
+    public async setCurrentRule(rule: Rule | null) {
         this.currentRule = rule;
         this.renderHighlights();
     }

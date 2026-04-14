@@ -3,7 +3,7 @@ import { FormDialog } from "./FormDialog";
 import { PermissionDialog } from "./PermissionDialog";
 import { SaveDialog } from "./SaveDialog";
 import { EditTilesetDialog } from "./EditTilesetDialog";
-import { EditAtRulesetDialog } from "./ruleset/EditAtRulesetDialog";
+import { EditRulesetDialog } from "./ruleset/EditRulesetDialog";
 
 export const DIALOG_TYPES = {
     FORM: 'FORM_DIALOG',
@@ -22,7 +22,7 @@ export const DialogRegistry: Record<string, React.FC<any>> = {
     [DIALOG_TYPES.PERMISSION]: PermissionDialog,
     [DIALOG_TYPES.OPEM_FILE]: OpenFileDialog,
     [DIALOG_TYPES.EDIT_TILESET]: EditTilesetDialog,
-    [DIALOG_TYPES.EDIT_RULESET]: EditAtRulesetDialog
+    [DIALOG_TYPES.EDIT_RULESET]: EditRulesetDialog
 };
 
 export interface BaseDialogProps {
