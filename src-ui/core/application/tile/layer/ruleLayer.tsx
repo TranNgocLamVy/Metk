@@ -10,7 +10,8 @@ import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RuleLayerEvents extends BaseLayerEvents {
-    tileChanged: (x: number, y: number) => void
+    rulesetRefChanged: (x: number, y: number) => void
+    rulesetRefOutputChanged: (x: number, y: number) => void
 }
 
 export class RuleLayer extends BaseLayer<RuleLayerEvents> {
@@ -94,12 +95,11 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         }
 
         const setTileResult = tileRef.setRulesetRef(rulesetIndex);
-        this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
         if (setTileResult == -1) return Result.Success(null);
-
+        
         this.reCalculateOutputAt(coordinate);
         this.reCalculateOutputAround(coordinate);
-
+        
         const oldRulesetId = this.rulesetRefManager.getRulesetIdByIndex(setTileResult);
         if (!oldRulesetId) return Result.Success(null);
 
@@ -116,7 +116,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         if (!rulesetRef) return Result.Success(null);
 
         this.rulesetsRef[coordinate.row][coordinate.col] = null;
-        this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
 
         this.reCalculateOutputAround(coordinate);
         
@@ -154,44 +153,19 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
         const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(calculateResult.tilesetId);
         rulesetRef.setOutput(calculateResult.tileId, tilesetIndex);
+
+        this.eventEmitter.emit("rulesetRefOutputChanged", coordinate.col, coordinate.row);
     }
 
     public reCalculateAllOutputs(): void {
         for (let y = 0; y < this.size.height; y++) {
             for (let x = 0; x < this.size.width; x++) {
+                const rulesetRef = this.rulesetsRef[y][x];
+                if (!rulesetRef) continue;
                 this.reCalculateOutputAt({ col: x, row: y });
             }
         }
     }
-
-    // private reCalculateOutputAround(coordinate: Coordinate): void {
-    //     if (coordinate.col < 0 || coordinate.col >= this.size.width) return;
-    //     if (coordinate.row < 0 || coordinate.row >= this.size.height) return;
-
-    //     const row = this.rulesetsRef[coordinate.row]!;
-    //     const rulesetRef = row[coordinate.col]!;
-
-    //     const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
-    //     if (!rulesetId) return;
-
-    //     const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
-    //     if (!ruleset) return;
-
-    //     const size = ruleset.size;
-
-    //     for (let x = 0; x < size; x++) {
-    //         for (let y = 0; y < size; y++) {
-    //             const targetX = coordinate.col - Math.floor(size / 2) + x;
-    //             const targetY = coordinate.row - Math.floor(size / 2) + y;
-    //             if (targetX < 0 || targetX >= this.size.width || targetY < 0 || targetY >= this.size.height) {
-    //                 continue;
-    //             }
-
-    //             const targetCoordinate = { col: targetX, row: targetY };
-    //             this.reCalculateOutputAt(targetCoordinate);
-    //         }
-    //     }
-    // }
 
     private reCalculateOutputAround(coordinate: Coordinate): void {
         if (coordinate.col < 0 || coordinate.col >= this.size.width) return;

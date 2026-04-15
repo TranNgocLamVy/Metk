@@ -32,6 +32,7 @@ export class TilemapService {
             tileheight: form.options.tile.tileheight,
             infinite: form.options.map.infinite,
             tilesets: [],
+            rulesets: [],
             layers: [],
         }
 

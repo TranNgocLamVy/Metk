@@ -92,7 +92,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     }
 
     public addEmptyRule(): void {
-        const newRule = new Rule({ id: uuidv4(), constraintts: [], outputs: "" }, this.size, this.tilesetRefManager);
+        const newRule = new Rule({ id: uuidv4(), constraints: [], outputs: "" }, this.size, this.tilesetRefManager);
         this.rules.push(newRule);
     }
 

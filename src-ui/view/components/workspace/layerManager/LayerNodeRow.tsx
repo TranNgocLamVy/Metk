@@ -6,6 +6,8 @@ import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
 import { DropPosition, LayerView, useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { Button } from "../../shadcn/button";
+import { TileLayer } from "@/core/application/tile/layer/tileLayer";
+import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
 
 type LayerNodeRowProps = {
 	view: LayerView;
@@ -137,6 +139,13 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 		return {};
     }
 
+	const getIcon = () => {
+		if (layer instanceof TileLayer) return <Grid size={16} className="text-emerald-500" />;
+		if (layer instanceof RuleLayer) return <Grid size={16} className="text-yellow-300" />;
+		if (layer instanceof GroupLayer) return layer.isOpen ? <FolderOpen size={16} className="text-blue-500" /> : <Folder size={16} className="text-blue-500" />;
+		return null
+	}
+
 	return (
 		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full ${isSelected ? "bg-select-color/50" : "hover:bg-select-color/25"}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
@@ -148,7 +157,9 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 					<div className="w-4" />
 				)}
 				{/* Icon */}
-				<div className={`shrink-0 ${isGroup ? "text-blue-500" : "text-emerald-500"}`}>{isGroup ? (layer as GroupLayer).isOpen ? <FolderOpen size={16} /> : <Folder size={16} /> : <Grid size={16} />}</div>
+				<div>
+					{getIcon()}
+				</div>
 				{isRenaming ? (
 					<input
 						value={tempName}

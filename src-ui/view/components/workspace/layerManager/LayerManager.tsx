@@ -7,7 +7,7 @@ import { VStack } from "../../custom/stack/Stack";
 import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
 import { ScrollArea, ScrollBar } from "../../shadcn/scroll-area";
-import { LayerManagerContextMenu } from "./LayerContextMenuItem";
+import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerNodeRow from "./LayerNodeRow";
 
 export default function LayerManager() {

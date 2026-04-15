@@ -11,6 +11,7 @@ import { TilesetSession } from "./session/tilesetSession";
 import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
 import { TextureManager } from "../manager/textureManager";
+import { Ruleset } from "./rule/ruleset";
 
 type EditorContextEvent = {
     onOpenTilemapSession: () => void,
@@ -73,6 +74,12 @@ export class EditorContext {
         const currentTilesetSession = this.getCurrentTilesetSession();
         if (!currentTilesetSession) return null;
         return currentTilesetSession.sessionView.selector.getSelectedTiles();
+    }
+
+    public getSelectedRuleset(): Ruleset | null {
+        const selectedRuleId = this.workspaceManager.currentWorkspace?.rulesetSessionManager.getSelectedRuleId();
+        if (!selectedRuleId) return null;
+        return this.getCurrentProject().rulesetManager.getRulesetById(selectedRuleId);
     }
 
     public getPivot(): Coordinate | null {

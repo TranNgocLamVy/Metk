@@ -1,27 +1,22 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { EditorContext } from "@/core/application/editorContext";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { IBaseCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
+import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
 
-export class SetTileCommand implements IBaseCommand {
+export class SetRuleRefCommand implements IBaseCommand {
     public readonly id: string = uuidv4()
 
-    private tilesetId: string;
-    private tileId: number;
-
-    private oldTilesetId: string | null;
-    private oldTileId: number | null;
+    private rulesetId: string;
+    private oldRuleId: string | null;
 
     constructor(
         private readonly layerId: string,
         private readonly coordinate: Coordinate,
-        tileId: number,
-        tilesetId: string
+        rulesetId: string
     ) {
-        this.tileId = tileId;
-        this.tilesetId = tilesetId;
+        this.rulesetId = rulesetId;
     }
 
     public execute(context: EditorContext): Result {
@@ -30,19 +25,17 @@ export class SetTileCommand implements IBaseCommand {
 
         const tilemap = currentSession.tilemap;
 
-        const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer
+        const layer = tilemap.rootLayer.findLayer(this.layerId) as RuleLayer
         if (!layer) return Result.Error("Layer not found");
 
-        const tileRef = layer.getTileRefAt(this.coordinate);
+        const tileRef = layer.getRulesetRefAt(this.coordinate);
         if (tileRef) {
-            this.oldTileId = tileRef.tileId;
-            this.oldTilesetId = tileRef.tilesetId;
+            this.oldRuleId = tileRef.rulesetId;
         } else {
-            this.oldTilesetId = null;
-            this.oldTileId = null;
+            this.oldRuleId = null;
         }
 
-        const result = layer.setTileAt(this.coordinate, this.tileId, this.tilesetId);
+        const result = layer.setRuleRefAt(this.coordinate, this.rulesetId);
 
         if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
@@ -55,16 +48,16 @@ export class SetTileCommand implements IBaseCommand {
 
         const tilemap = currentSession.tilemap;
 
-        const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
+        const layer = tilemap.rootLayer.findLayer(this.layerId) as RuleLayer;
         if (!layer) return Result.Error("Layer not found");
 
-        if (this.oldTileId == null || this.oldTilesetId == null) {
+        if (this.oldRuleId == null) {
             const result = layer.removeTileAt(this.coordinate);
             if (result.status === Result.Status.Success) currentSession.markAsDirty();
             return result;
         }
 
-        const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetId);
+        const result = layer.setRuleRefAt(this.coordinate, this.oldRuleId);
         if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
         return result

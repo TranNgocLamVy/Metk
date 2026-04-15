@@ -2,6 +2,7 @@ import { type } from "arktype";
 import { RootLayerSchema } from "./layerSchema";
 import { safeArray } from ".";
 import { TilesetRefDataSchema } from "./tilesetSchema";
+import { RulesetRefDataSchema } from "./ruleSchema";
 
 export const TilemapMetadataSchema = type({
     name: type("string").default("Untitled Tilemap"),
@@ -21,6 +22,7 @@ export const TilemapDataSchema = type("string.json.parse").to(type({
     backgroundcolor: type("string").optional(),
     nextTilesetIndex: type("number").optional(),
     tilesets: safeArray(TilesetRefDataSchema).default(() => []),
+    rulesets: safeArray(RulesetRefDataSchema).default(() => []),
     layers: RootLayerSchema,
 }))
 export type TilemapData = typeof TilemapDataSchema.infer;

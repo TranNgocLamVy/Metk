@@ -6,6 +6,7 @@ import { Result } from "@/shared/types/result";
 
 import { RootLayer } from "./layer/rootLayer";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface TilemapEvent extends BaseObjectEvents {
     onChange: () => void
@@ -28,7 +29,8 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     constructor(
         tilemapData: TilemapData,
-        public readonly tilesetRefManager: TilesetRefManager
+        public readonly tilesetRefManager: TilesetRefManager,
+        public readonly rulesetRefManager: RulesetRefManager
     ) {
         super();
         this.tilemapPathSystem = tilesetRefManager.filePathSystem;
@@ -43,9 +45,10 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilewidth = tilemapData.tilewidth;
         this.tileheight = tilemapData.tileheight;
         
-        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager);
-        
         this.tilesetRefManager.load(tilemapData.tilesets);
+        this.rulesetRefManager.load(tilemapData.rulesets);
+
+        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager);
     }
 
     public serialize(): TilemapData {
@@ -59,6 +62,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
             infinite: this.infinite,
             backgroundcolor: this.backgroundcolor,
             tilesets: this.tilesetRefManager.serialize(),
+            rulesets: this.rulesetRefManager.serialize(),
             layers: this.rootLayer.serialize(),
         }
     }

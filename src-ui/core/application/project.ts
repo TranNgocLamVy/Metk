@@ -44,10 +44,8 @@ export class Project {
         this.updatedAt = data.updatedAt;
 
         this.tilesetManager = new TilesetManager(this.projectPathSystem);
-
-        this.tilemapManager = new TilemapManager(this.tilesetManager, this.projectPathSystem);
-
         this.rulesetManager = new RulesetManager(this.tilesetManager, this.projectPathSystem);
+        this.tilemapManager = new TilemapManager(this.tilesetManager, this.rulesetManager, this.projectPathSystem);
     }
 
     public async load() {

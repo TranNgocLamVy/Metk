@@ -10,7 +10,7 @@ interface RuleEvent extends BaseObjectEvents {
 
 export class Rule extends BaseObject<RuleEvent> {
     public readonly id: string;
-    private constraintts: RuleConstraint[];
+    private constraints: RuleConstraint[];
     private outputs: RuleOutputData[];
 
     constructor(
@@ -20,10 +20,10 @@ export class Rule extends BaseObject<RuleEvent> {
     ) {
         super();
         this.id = data.id;
-        this.constraintts = data.constraintts.map((constraintt) => new RuleConstraint(constraintt, this));
-        if (this.constraintts.length < this.size * this.size) {
-            for (let i = this.constraintts.length; i < this.size * this.size; i++) {
-                this.constraintts.push(new RuleConstraint({ constraintt: "ANY", targets: [] }, this));
+        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
+        if (this.constraints.length < this.size * this.size) {
+            for (let i = this.constraints.length; i < this.size * this.size; i++) {
+                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
             }
         }
         
@@ -38,11 +38,11 @@ export class Rule extends BaseObject<RuleEvent> {
     }
 
     public update(data: RuleData): void {
-        this.constraintts = data.constraintts.map((constraintt) => new RuleConstraint(constraintt, this));
+        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
         
-        if (this.constraintts.length < this.size * this.size) {
-            for (let i = this.constraintts.length; i < this.size * this.size; i++) {
-                this.constraintts.push(new RuleConstraint({ constraintt: "ANY", targets: [] }, this));
+        if (this.constraints.length < this.size * this.size) {
+            for (let i = this.constraints.length; i < this.size * this.size; i++) {
+                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
             }
         }
         
@@ -75,7 +75,7 @@ export class Rule extends BaseObject<RuleEvent> {
     }
 
     public getConstraint(index: number): RuleConstraint {
-        return this.constraintts[index];
+        return this.constraints[index];
     }
 
     public setChance(tileId: number, tilesetId: string, chance: number): void {
@@ -87,10 +87,10 @@ export class Rule extends BaseObject<RuleEvent> {
     public isSatisfied(input: (RulesetRefData | null)[][]): boolean {
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {
-                const constrainttIndex = y * this.size + x;
-                const constraintt = this.constraintts[constrainttIndex];
+                const constraintIndex = y * this.size + x;
+                const constraint = this.constraints[constraintIndex];
                 const targetSet = input[y]?.[x];
-                if (!constraintt.isSatisfied(targetSet ? targetSet.rulesetId : null)) {
+                if (!constraint.isSatisfied(targetSet ? targetSet.rulesetId : null)) {
                     return false;
                 }
             }
@@ -112,13 +112,13 @@ export class Rule extends BaseObject<RuleEvent> {
     }
 
     public getConstaints(): RuleConstraint[] {
-        return this.constraintts;
+        return this.constraints;
     }
 
     public serialize(): RuleData {
         return {
             id: this.id,
-            constraintts: this.constraintts.map((constraintt) => constraintt.serialize()),
+            constraints: this.constraints.map((constraint) => constraint.serialize()),
             outputs: this.outputs.map((output) => `${output.tileId}:${output.tilesetIndex}:${output.chance}`).join(" "),
         }
     }
@@ -126,11 +126,11 @@ export class Rule extends BaseObject<RuleEvent> {
 
 export class RuleConstraint {
     private targets: string[];
-    private constraintt: RuleConstraintType;
+    private constraint: RuleConstraintType;
     
     constructor(data: RuleConstraintData, private readonly rule: Rule) {
         this.targets = data.targets;
-        this.constraintt = data.constraintt;
+        this.constraint = data.constraint;
     }
 
     public getTargets(): string[] {
@@ -152,17 +152,17 @@ export class RuleConstraint {
         this.rule.eventEmitter.emit("onChange");
     }
 
-    public setConstraint(constraintt: RuleConstraintType): void {
-        this.constraintt = constraintt;
+    public setConstraint(constraint: RuleConstraintType): void {
+        this.constraint = constraint;
         this.rule.eventEmitter.emit("onChange");
     }
 
     public getConstraint(): RuleConstraintType {
-        return this.constraintt;
+        return this.constraint;
     }
 
     public isSatisfied(targetId: string | null): boolean {
-        switch (this.constraintt) {
+        switch (this.constraint) {
             case "EMPTY":
                 return targetId === null;
             case "ANY":
@@ -176,7 +176,7 @@ export class RuleConstraint {
 
     public serialize(): RuleConstraintData {
         return {
-            constraintt: this.constraintt,
+            constraint: this.constraint,
             targets: this.targets,
         }
     }
