@@ -1,5 +1,4 @@
 import { RuleData, RuleOutputData, RuleConstraintType, RuleConstraintData } from "@/shared/schema/ruleSchema";
-import { Ruleset } from "./ruleset";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
 import { RulesetRefData } from "@/shared/schema/layerSchema";
@@ -100,10 +99,15 @@ export class Rule extends BaseObject<RuleEvent> {
 
     public calculateOutput(): { tileId: number, tilesetId: string } | null {
         const outputs = this.getOutputs();
+        if (!outputs || outputs.length === 0) return null;
+
         //TODO: Randomly select one output base on its chance scale.
         const selectedOutput = outputs[0];
+        if (!selectedOutput) return null;
+
         const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(selectedOutput.tilesetIndex);
         if (!tilesetId) return null;
+        
         return { tileId: selectedOutput.tileId, tilesetId: tilesetId };
     }
 
