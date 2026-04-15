@@ -10,7 +10,6 @@ import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RuleLayerEvents extends BaseLayerEvents {
-    rulesetRefChanged: (x: number, y: number) => void
     rulesetRefOutputChanged: (x: number, y: number) => void
 }
 
@@ -30,7 +29,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         super(ruleLayerData.id, tilesetRefManager);
 
         this.parentLayer = parentLayer;
-
         this.name = ruleLayerData.name;
 
         this.coordinate.col = ruleLayerData.x;
@@ -48,9 +46,10 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const rulesetRefs = ruleLayerData.layerData.split("\n").map((tileRow) => {
             return tileRow.split(",").map((tileRef) => {
                 if (tileRef === "0") return null;
-                const rulesetIndex = parseInt(tileRef.split(":")[0]);
-                const tileId = parseInt(tileRef.split(":")[1]);
-                const tilesetIndex = parseInt(tileRef.split(":")[2]);
+                const parts = tileRef.split(":");
+                const rulesetIndex = parseInt(parts[0]);
+                const tileId = parseInt(parts[1]);
+                const tilesetIndex = parseInt(parts[2]);
                 if (isNaN(rulesetIndex)) return null;
                 return new RulesetRef(rulesetIndex, isNaN(tileId) ? -1 : tileId, isNaN(tilesetIndex) ? -1 : tilesetIndex);
             });
@@ -71,9 +70,8 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
         if (!rulesetId) return null;
 
-        
         const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(rulesetRef.tilesetIndex);
-        if (!tilesetId || rulesetRef.tileId == -1) return { rulesetId };
+        if (!tilesetId || rulesetRef.tileId === -1) return { rulesetId };
 
         return { rulesetId, output: { tileId: rulesetRef.tileId, tilesetId } };
     }
@@ -87,23 +85,22 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         let tileRef = this.rulesetsRef[coordinate.row][coordinate.col];
 
         const rulesetIndex = this.rulesetRefManager.getRulesetIndexById(rulesetId);
-        if (rulesetIndex === -1) return Result.Error("ruleset not found");
+        if (rulesetIndex === -1) return Result.Error("Ruleset not found");
 
-        if (tileRef === null || tileRef === undefined) {
+        if (!tileRef) {
             tileRef = new RulesetRef(-1, -1, -1);
             this.rulesetsRef[coordinate.row][coordinate.col] = tileRef;
         }
 
-        const setTileResult = tileRef.setRulesetRef(rulesetIndex);
-        if (setTileResult == -1) return Result.Success(null);
+        const oldRulesetIndex = tileRef.setRulesetRef(rulesetIndex);
         
         this.reCalculateOutputAt(coordinate);
         this.reCalculateOutputAround(coordinate);
         
-        const oldRulesetId = this.rulesetRefManager.getRulesetIdByIndex(setTileResult);
-        if (!oldRulesetId) return Result.Success(null);
-
-        return Result.Success(oldRulesetId);
+        if (oldRulesetIndex === -1) return Result.Success(null);
+        
+        const oldRulesetId = this.rulesetRefManager.getRulesetIdByIndex(oldRulesetIndex);
+        return Result.Success(oldRulesetId || null);
     }
 
     public removeTileAt(coordinate: Coordinate): Result<RulesetRefData | null> {
@@ -117,6 +114,8 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
         this.rulesetsRef[coordinate.row][coordinate.col] = null;
 
+        this.eventEmitter.emit("rulesetRefOutputChanged", coordinate.col, coordinate.row);
+        
         this.reCalculateOutputAround(coordinate);
         
         const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
@@ -134,6 +133,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
         const row = this.rulesetsRef[coordinate.row]!;
         const rulesetRef = row[coordinate.col]!;
+        if (!rulesetRef) return null;
 
         const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
         if (!rulesetId) return null;
@@ -145,14 +145,17 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     }
 
     private reCalculateOutputAt(coordinate: Coordinate): void {
-        const calculateResult = this.calculateOutputAt(coordinate);
-        if (!calculateResult) return;
-
-        const rulesetRef = this.rulesetsRef[coordinate.row][coordinate.col];
+        const rulesetRef = this.rulesetsRef[coordinate.row]?.[coordinate.col];
         if (!rulesetRef) return;
 
-        const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(calculateResult.tilesetId);
-        rulesetRef.setOutput(calculateResult.tileId, tilesetIndex);
+        const calculateResult = this.calculateOutputAt(coordinate);
+        
+        if (calculateResult) {
+            const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(calculateResult.tilesetId);
+            rulesetRef.setOutput(calculateResult.tileId, tilesetIndex);
+        } else {
+            rulesetRef.setOutput(-1, -1);
+        }
 
         this.eventEmitter.emit("rulesetRefOutputChanged", coordinate.col, coordinate.row);
     }
@@ -160,9 +163,9 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public reCalculateAllOutputs(): void {
         for (let y = 0; y < this.size.height; y++) {
             for (let x = 0; x < this.size.width; x++) {
-                const rulesetRef = this.rulesetsRef[y][x];
-                if (!rulesetRef) continue;
-                this.reCalculateOutputAt({ col: x, row: y });
+                if (this.rulesetsRef[y]?.[x]) {
+                    this.reCalculateOutputAt({ col: x, row: y });
+                }
             }
         }
     }
@@ -171,7 +174,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         if (coordinate.col < 0 || coordinate.col >= this.size.width) return;
         if (coordinate.row < 0 || coordinate.row >= this.size.height) return;
 
-        // PERFORMANCE GUARD: Define the absolute maximum radius any ruleset can have.
         const MAX_SEARCH_RADIUS = 9;
 
         const startX = Math.max(0, coordinate.col - MAX_SEARCH_RADIUS);
@@ -196,7 +198,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
                 if (!ruleset) continue;
 
                 const targetRadius = Math.floor(ruleset.size / 2);
-
                 const distanceX = Math.abs(targetX - coordinate.col);
                 const distanceY = Math.abs(targetY - coordinate.row);
 
@@ -212,7 +213,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         if (coordinate.row < 0 || coordinate.row >= this.size.height) return [];
 
         const row = this.rulesetsRef[coordinate.row]!;
-
         const rulesetRef = row[coordinate.col]!;
 
         const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
@@ -222,7 +222,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         if (!ruleset) return [];
 
         const size = ruleset.size;
-
         const rulesetRefs: (RulesetRefData | null)[][] = new Array(size).fill(null).map(() => new Array(size).fill(null));
 
         for (let x = 0; x < size; x++) {
@@ -237,7 +236,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
             }
         }
 
-        return rulesetRefs
+        return rulesetRefs;
     }
 
     public override serialize(): RuleLayerData {
@@ -292,13 +291,13 @@ export class RulesetRef {
     }
     
     public setRulesetRef(rulesetIndex: number): number {
-        const preRulesetRefData = this.rulesetIndex
+        const preRulesetRefData = this.rulesetIndex;
         this.rulesetIndex = rulesetIndex;
         return preRulesetRefData;
     }
 
     public setOutput(tileId: number, tilesetIndex: number): { tileId: number, tilesetIndex: number} {
-        const preTileRefData = { tileId: this.tileId, tilesetIndex: this.tilesetIndex }
+        const preTileRefData = { tileId: this.tileId, tilesetIndex: this.tilesetIndex };
         this.tileId = tileId;
         this.tilesetIndex = tilesetIndex;
         return preTileRefData;

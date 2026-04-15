@@ -30,9 +30,11 @@ export class TilesetRefManager {
         const tilesetRef = this.tilesetRefs.find(tilesetRef => tilesetRef.id === tileset.id);
         if (!tilesetRef) {
             const tilesetAbsPath = this.tilesetManager.getTilesetAbsById(tileset.id);
-            if (!tilesetAbsPath) return -1;   
+            if (!tilesetAbsPath) return -1;
         
-            const tilesetRelPath = PathUtils.relative(this.filePathSystem.relDir, tilesetAbsPath);
+            const absDir = this.filePathSystem.getFileAbsDir();
+
+            const tilesetRelPath = PathUtils.relative(absDir, tilesetAbsPath);
 
             const newTilesetRef: TilesetRefData = {
                 index: this.nextTilesetIndex,

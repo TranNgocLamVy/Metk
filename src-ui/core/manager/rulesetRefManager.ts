@@ -32,8 +32,10 @@ export class RulesetRefManager {
         if (!rulesetRef) {
             const rulesetAbsPath = this.rulesetManager.getRulesetAbsById(ruleset.id);
             if (!rulesetAbsPath) return -1;
+
+            const absDir = this.filePathSystem.getFileAbsDir();
         
-            const rulesetRelPath = PathUtils.relative(this.filePathSystem.relDir, rulesetAbsPath);
+            const rulesetRelPath = PathUtils.relative(absDir, rulesetAbsPath);
 
             const newRulesetRef: RulesetRefData = {
                 index: this.nextRulesetIndex,
