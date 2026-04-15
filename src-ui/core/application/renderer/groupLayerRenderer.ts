@@ -6,6 +6,8 @@ import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
 import { TileLayerRenderer } from "./tileLayerRenderer";
+import { RuleLayer } from "../tile/layer/ruleLayer";
+import { RuleLayerRenderer } from "./ruleLayerRenderer";
 
 type GroupLike = GroupLayer | RootLayer;
 
@@ -52,6 +54,8 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
         // Pass this.tilemap to children
         if (childLayer instanceof TileLayer) {
             renderer = new TileLayerRenderer({ layer: childLayer, tilemap: this.tilemap, gap: this.gap });
+        } else if (childLayer instanceof RuleLayer) {
+            renderer = new RuleLayerRenderer({ layer: childLayer, tilemap: this.tilemap, gap: this.gap });
         } else if (childLayer instanceof GroupLayer) {
             renderer = new GroupLayerRenderer({ layer: childLayer, tilemap: this.tilemap, gap: this.gap });
         }

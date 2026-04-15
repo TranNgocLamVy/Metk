@@ -112,7 +112,7 @@ export const defaultGroupLayerData = (data: Pick<GroupLayerData, "parentId">): G
     }
 }
 
-export const LayerSchema = type(TileLayerSchema).or(GroupLayerSchema);
+export const LayerSchema = type(TileLayerSchema).or(RuleLayerSchema).or(GroupLayerSchema);
 export type LayerData = typeof LayerSchema.infer
 
 export const RootLayerSchema = safeArray(LayerSchema);

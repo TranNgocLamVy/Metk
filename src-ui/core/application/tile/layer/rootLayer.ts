@@ -5,6 +5,7 @@ import { LayerUtils } from "@/shared/utils/layerUtils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { GroupLayer } from "./groupLayer";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RootLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -15,14 +16,17 @@ interface RootLayerEvents extends BaseLayerEvents {
 export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer {
     public layers: BaseLayer[] = [];
 
-    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager) {
+    private rulesetRefManager: RulesetRefManager;
+
+    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
         super("root", tilesetRefManager);
+        this.rulesetRefManager = rulesetRefManager;
 
         const groupLayerMap: Map<string, IGroupLayer> = new Map([["root", this]]);
         
         layersData.forEach((layerData) => {
             const parentLayer = groupLayerMap.get(layerData.parentId) ?? this;
-            const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager);
+            const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager, this.rulesetRefManager);
             if (layer) {
                 parentLayer.pushLayer(layer)
                 if (layer instanceof GroupLayer) groupLayerMap.set(layer.id, layer);

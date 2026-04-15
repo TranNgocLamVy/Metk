@@ -13,7 +13,8 @@ import { DropPosition, useLayerManagerStore } from "@/view/stores/layerManagerSt
 
 import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLayerCommand";
 import { WorkspaceService } from "./workspaceService";
-import { defaultGroupLayerData, defaultTileLayerData } from "../schema/layerSchema";
+import { defaultGroupLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layerSchema";
+import { CreateRuleLayerCommand } from "@/core/command/layer/createRuleLayerCommand";
 
 export class TilemapLayerService {
     public static async createNewTileLayer() {
@@ -35,6 +36,30 @@ export class TilemapLayerService {
 
         historyManager.startTransaction();
         historyManager.execute(createTileLayerCommand, editorContext)
+        historyManager.commitTransaction();
+
+        useLayerManagerStore.getState().setEditingId(payload.id);
+    }
+
+    public static async createNewRuleLayer() {
+        const editorContext = AppCore.getIns().editorContext;
+
+        const currentSession = editorContext.getCurrentTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+        if (!currentSession || !historyManager) return;
+
+        const root = currentSession.tilemap.rootLayer;
+
+        const targetLayer = useLayerManagerStore.getState().targetLayer;
+
+        const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
+
+        const payload = defaultRuleLayerData({ parentId: parent.id, width: currentSession.tilemap.width, height: currentSession.tilemap.height });
+
+        const createRuleLayerCommand = new CreateRuleLayerCommand(payload, parent.id);
+
+        historyManager.startTransaction();
+        historyManager.execute(createRuleLayerCommand, editorContext)
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().setEditingId(payload.id);

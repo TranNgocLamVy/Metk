@@ -7,6 +7,8 @@ import { TilesetManager } from "./tilesetManager";
 import { TilesetRefManager } from "./tilesetRefManager";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { TilemapStorageService } from "@/infrastructure/container";
+import { RulesetRefManager } from "./rulesetRefManager";
+import { RulesetManager } from "./rulesetManager";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -16,6 +18,7 @@ export class TilemapManager {
 
     public constructor(
         private readonly tilesetManager: TilesetManager,
+        private readonly rulesetManager: RulesetManager,
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
@@ -61,7 +64,8 @@ export class TilemapManager {
 
         const tilemapPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
-        const tilemap = new Tilemap(tilemapData, tilesetRefManager);
+        const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
+        const tilemap = new Tilemap(tilemapData, tilesetRefManager, rulesetRefManager);
 
         await tilemap.load();
 
@@ -76,6 +80,16 @@ export class TilemapManager {
                 const tilesetAbsPath = tilemapPathSystem.getAbsPathFromRelPath(tilesetRef.source);
                 const tilesetRelPathFromProject = this.projectPathSystem.getRelPathFromAbsPath(tilesetAbsPath);
                 return this.tilesetManager.loadTileset({ tilesetRelPath: tilesetRelPathFromProject });
+            }
+        }));
+
+        await Promise.all(tilemapData.rulesets.map(rulesetRef => {
+            if (this.rulesetManager.rulesetMetadata.has(rulesetRef.id)) {
+                return this.rulesetManager.loadRuleset(rulesetRef.id)
+            } else {
+                const rulesetAbsPath = tilemapPathSystem.getAbsPathFromRelPath(rulesetRef.source);
+                const rulesetRelPathFromProject = this.projectPathSystem.getRelPathFromAbsPath(rulesetAbsPath);
+                return this.rulesetManager.loadRuleset(rulesetRelPathFromProject);
             }
         }));
 
@@ -105,7 +119,7 @@ export class TilemapManager {
         return Array.from(this.tilemapMetadata.values()).map((metaData) => {
             const tilemap = this.loadedTilemaps.get(metaData.id);
             if (!tilemap) return metaData;
-        return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relPath };
+            return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relPath };
         });
     }
 }

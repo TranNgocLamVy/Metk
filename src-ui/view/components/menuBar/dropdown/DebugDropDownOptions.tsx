@@ -1,4 +1,5 @@
 import { AppCore } from "@/core/appcore";
+import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
 import { ToastService } from "@/shared/services/toastService";
 import { useNavigationStore } from "@/view/stores/navigationStore";
 
@@ -37,6 +38,25 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
         name: "print current project",
         async onClick() {
 			console.log(AppCore.getIns().projectManager.currentProject);
+        }
+    },
+    {
+        type: "option",
+        name: "print current tilemap",
+        async onClick() {
+			console.log(AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager.currentTilemapSession?.tilemap);
+        }
+    },
+    {
+        type: "option",
+        name: "recalculate rule layer",
+        async onClick() {
+			const tilemap = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager.currentTilemapSession?.tilemap;
+            tilemap?.rootLayer.getAllLayers().forEach((layer) => {
+                if (layer instanceof RuleLayer) {
+                    layer.reCalculateAllOutputs();
+                }
+            })
         }
     },
 ];

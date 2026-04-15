@@ -171,4 +171,12 @@ export class WorkspaceService {
         useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
+
+    public static async selectRuleset(rulesetId: string | null): Promise<void> {
+        const rulesetSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.rulesetSessionManager;
+        if (!rulesetSessionManager) return;
+        rulesetSessionManager.setSelectedRuleId(rulesetId);
+        useRulesetManagerStore.getState().refresh();
+        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+    }
 }

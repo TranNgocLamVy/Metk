@@ -11,6 +11,7 @@ type RuleManagerStoreState = {
     version: number,
     
     getRulesetDisplayData: () => RulesetDisplayData[],
+    getCurrentSelectedRuleId: () => string | null,
     refresh: () => void,
 }
 
@@ -22,6 +23,11 @@ export const useRulesetManagerStore = create<RuleManagerStoreState>((set) => ({
         if (!rulesetManager) return [];
         const metadata = rulesetManager.serialize();
         return metadata.map((metaData) => ({ id: metaData.id, name: metaData.name, color: metaData.color }));
+    },
+    getCurrentSelectedRuleId() {
+        const rulesetSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.rulesetSessionManager;
+        if (!rulesetSessionManager) return null;
+        return rulesetSessionManager.getSelectedRuleId();
     },
     refresh: () => set((state) => ({ version: (state.version + 1 ) % 100000 })),
 }));

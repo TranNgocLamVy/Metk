@@ -10,10 +10,12 @@ import { ToolSessionManager } from "../manager/toolSessionManager";
 import { EditorContext } from "./editorContext";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { ToastService } from "@/shared/services/toastService";
+import { RulesetSessionManager } from "../manager/rulesetSessionManager";
 
 export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;
     public tilemapSessionManager: TilemapSessionManager;
+    public rulesetSessionManager: RulesetSessionManager;
     public toolSessionManager: ToolSessionManager;
     public exportPathManager: ExportPathManager;
 
@@ -26,6 +28,7 @@ export class Workspace {
     ) {
         this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorContext);
         this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
+        this.rulesetSessionManager = new RulesetSessionManager(workspaceData.ruleset, this.editorContext);
         this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorContext);
         this.exportPathManager = new ExportPathManager(workspaceData.exportPaths);
     }
@@ -49,6 +52,7 @@ export class Workspace {
             tilemaps: this.tilemapSessionManager.serialize(),
             toolState: this.toolSessionManager.serialize(),
             exportPaths: this.exportPathManager.serialize(),
+            ruleset: this.rulesetSessionManager.serialize(),
         }
     }
 }

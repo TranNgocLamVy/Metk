@@ -6,7 +6,7 @@ export const ruleConstraint = type("'ANY' | 'REQUIRE' | 'EMPTY' | 'NOT'")
 export type RuleConstraintType = typeof ruleConstraint.infer;
 
 export const RuleConstraintDataSchema = type({
-    constraintt: ruleConstraint.default("ANY"),
+    constraint: ruleConstraint.default("ANY"),
     targets: safeArray(type("string")).default(() => []),
 })
 export type RuleConstraintData = typeof RuleConstraintDataSchema.infer;
@@ -24,7 +24,7 @@ export type RuleOutputData = {
 
 export const RuleData = type({
     id: type("string"),
-    constraintts: safeArray(RuleConstraintDataSchema).default(() => []),
+    constraints: safeArray(RuleConstraintDataSchema).default(() => []),
     outputs: type("string").default(""),
 })
 export type RuleData = typeof RuleData.infer;
@@ -33,13 +33,13 @@ export const RulesetRefDataSchema = type({
     index: type("number"),
     source: type("string"),
     id: type("string"),
-    name: type("string").default("Untitled Tileset"),
+    name: type("string").default("Untitled Ruleset"),
 })
 export type RulesetRefData = typeof RulesetRefDataSchema.infer
 
 export const RulesetDataSchema = type("string.json.parse").to({
     id: type("string"),
-    name: type("string").default("Untitled AT Rule Set"),
+    name: type("string").default("Untitled Rule Set"),
     color: type("string").default("#ffffff"),
     size: type("number").default(5),
     rules: safeArray(RuleData).default(() => []),

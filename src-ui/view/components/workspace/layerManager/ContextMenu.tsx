@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Brush, ClipboardPaste, Copy, Eraser, Folder, Grid3x3, PaintBucket, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Folder, Grid3x3, Plus, Trash2 } from "lucide-react";
 
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
 import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
@@ -14,13 +14,19 @@ const CreateActionGroup: MenuDropDownGroupType = [
 				{
 					type: "option",
 					name: "New Tile Layer",
-					startIcon: <Grid3x3 />,
+					startIcon: <Grid3x3 className="text-emerald-500" />,
 					onClick() { TilemapLayerService.createNewTileLayer() },
 				},
 				{
 					type: "option",
+					name: "New Rule Layer",
+					startIcon: <Grid3x3 className="text-yellow-300" />,
+					onClick() { TilemapLayerService.createNewRuleLayer() },
+				},
+				{
+					type: "option",
 					name: "New Group Layer",
-					startIcon: <Folder />,
+					startIcon: <Folder className="text-blue-500" />,
 					onClick() { TilemapLayerService.createNewGroupLayer() },
 				},
 			],
