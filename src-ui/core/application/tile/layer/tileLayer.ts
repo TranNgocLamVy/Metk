@@ -9,7 +9,13 @@ import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 
 interface TileLayerEvents extends BaseLayerEvents {
-    tileChanged: (x: number, y: number) => void
+    tilesChanged: (coords: Coordinate[]) => void
+}
+
+export type SetTilesData = {
+    coordinate: Coordinate;
+    tileId: number | null;
+    tilesetId: string | null;
 }
 
 export class TileLayer extends BaseLayer<TileLayerEvents> {
@@ -66,45 +72,60 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return { tileId: tileRef.tileId, tilesetId };
     }
 
-    public setTileAt(coordinate: Coordinate, tileId: number, tilesetId: string): Result<TileRefData | null> {
-        if (coordinate.col < 0 || coordinate.col >= this.size.width) return Result.Error("Tile not found, col is out of range");
-        if (coordinate.row < 0 || coordinate.row >= this.size.height) return Result.Error("Tile not found, row is out of range");
+    /**
+     * 
+     * @param payload 
+     * @returns previous tileRefsData
+     */
+    public setTilesAt(payload: SetTilesData[]): Result<SetTilesData[]> {
+        const result = payload.map((data) => {
+            const coordinate = data.coordinate;
+            const tileId = data.tileId;
+            const tilesetId = data.tilesetId;
 
-        if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
-        let tileRef = this.tilesRef[coordinate.row][coordinate.col];
+            if (coordinate.col < 0 || coordinate.col >= this.size.width) return null
+            if (coordinate.row < 0 || coordinate.row >= this.size.height) return null
 
-        const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
-        if (tilesetIndex === -1) return Result.Error("Tileset not found");
-        if (tileRef === null || tileRef === undefined) {
-            tileRef = new TileRef(tileId, tilesetIndex);
-            this.tilesRef[coordinate.row][coordinate.col] = tileRef;
-        }
-        const setTileResult = tileRef.setTile(tileId, tilesetIndex);
-        this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
-        if (!setTileResult) return Result.Success(null);
+            if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
+            let tileRef = this.tilesRef[coordinate.row][coordinate.col];
 
-        const resultTilesetId = this.tilesetRefManager.getTilesetIdByIndex(setTileResult.tilesetIndex);
-        if (!resultTilesetId) return Result.Error("Tileset not found");
+            const isRemove = tileId === null || tilesetId === null;
 
-        return Result.Success({ tileId: setTileResult.tileId, tilesetId: resultTilesetId });
-    }
+            if (!tileRef) {
+                if (isRemove) return null; 
+                
+                const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
+                if (tilesetIndex === -1) return null
 
-    public removeTileAt(coordinate: Coordinate): Result<TileRefData | null> {
-        if (coordinate.col < 0 || coordinate.col >= this.size.width) return Result.Error("Tile not found, col is out of range");
-        if (coordinate.row < 0 || coordinate.row >= this.size.height) return Result.Error("Tile not found, row is out of range");
+                tileRef = new TileRef(tileId, tilesetIndex);
+                this.tilesRef[coordinate.row][coordinate.col] = tileRef;
 
-        if (!this.tilesRef[coordinate.row]) this.tilesRef[coordinate.row] = [];
+                return { coordinate, tileId: null, tilesetId: null };
+            }
 
-        const tileRef = this.tilesRef[coordinate.row][coordinate.col];
-        if (!tileRef) return Result.Success(null);
+            if (isRemove) {
+                const oldTilesetId = this.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
+                if (!oldTilesetId) return null
 
-        this.tilesRef[coordinate.row][coordinate.col] = null;
-        this.eventEmitter.emit("tileChanged", coordinate.col, coordinate.row);
+                this.tilesRef[coordinate.row][coordinate.col] = null;
+                return { coordinate, tileId: tileRef.tileId, tilesetId: oldTilesetId };
+            }
 
-        const resultTilesetId = this.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
-        if (!resultTilesetId) return Result.Error("Tileset not found");
+            // Not empty to not empty
+            const newTilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
+            if (newTilesetIndex === -1) return null
 
-        return Result.Success({ tileId: tileRef.tileId, tilesetId: resultTilesetId });
+            const setTileRefResult = tileRef.setTile(tileId, newTilesetIndex);
+
+            const oldTilesetId = this.tilesetRefManager.getTilesetIdByIndex(setTileRefResult.tilesetIndex);
+
+            return { coordinate, tileId: setTileRefResult.tileId, tilesetId: oldTilesetId || null };
+        }).filter(r => r !== null) as SetTilesData[];
+
+        if (result.length === 0) return Result.Cancel("No tile changed");
+
+        this.eventEmitter.emit("tilesChanged", result.map(r => r.coordinate));
+        return Result.Success(result);
     }
 
     public override serialize(): TileLayerData {

@@ -6,9 +6,9 @@ import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { TileLayer } from "../application/tile/layer/tileLayer";
 import { Tile } from "../application/tile/tileset";
-import { SetTileCommand } from "../command/tile/setTileCommand";
 import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
+import { SetTilesCommand } from "../command/tile/setTilesCommand";
 
 type PreviewSpriteData = {
     sprite: Sprite;
@@ -292,13 +292,14 @@ export class StampBrush implements ITool {
         const targetLayer = this.getActiveTileLayer();
         if (!targetLayer || targetLayer.locked || !targetLayer.visible) return;
 
-        historyManager.startTransaction();
-        this.previewSpriteMap.forEach((spriteData, key) => {
+        const payload = Array.from(this.previewSpriteMap).map(([key, spriteData]) => {
             const col = parseInt(key.split(',')[0]);
             const row = parseInt(key.split(',')[1]);
-            const setTileCommand = new SetTileCommand(targetLayer.id, { col, row }, spriteData.tileId, spriteData.tilesetId);
-            historyManager.execute(setTileCommand, this.editorContext);
+            return { coordinate: { col, row }, tileId: spriteData.tileId, tilesetId: spriteData.tilesetId };
         })
+        
+        historyManager.startTransaction();
+        historyManager.execute(new SetTilesCommand(targetLayer.id, payload), this.editorContext);
         historyManager.commitTransaction();
 
         this.previewSpriteMap.forEach((spriteData) => {
