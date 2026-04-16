@@ -79,7 +79,6 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
     private onLayerRemoved = (layerId: string) => {
         const renderer = this.childRenderers.get(layerId);
         if (renderer) {
-            this.container.removeChild(renderer.container);
             renderer.destroy();
             this.childRenderers.delete(layerId);
         }
