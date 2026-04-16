@@ -53,9 +53,7 @@ export class SetRuleRefsCommand implements IBaseCommand {
         }));
 
         const result = layer.setRuleRefsAt(undoUpdates);
-        if (result.status === Result.Status.Success) {
-            currentSession.markAsDirty();
-        }
+        if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
         return result
     }

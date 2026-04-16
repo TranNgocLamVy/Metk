@@ -5,10 +5,13 @@ import eraser from "@/assets/icons/eraser.svg?raw";
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { TileLayer } from "../application/tile/layer/tileLayer";
+import { RuleLayer } from "../application/tile/layer/ruleLayer";
 import { BatchCommand } from "../command/batchCommand";
 import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
+import { IBaseCommand } from "../interface/IBaseCommand";
 import { SetTilesCommand } from "../command/tile/setTilesCommand";
+import { SetRuleRefsCommand } from "../command/tile/setRulesCommand";
 
 @Tool({
     id: "eraser",
@@ -38,7 +41,7 @@ export class EraserBrush implements ITool {
 
     private originalWheelEvent: (e: FederatedWheelEvent) => boolean;
 
-    private eraseCommandStack: SetTilesCommand[] = [];
+    private eraseCommandStack: IBaseCommand[] = [];
 
     constructor(private readonly editorContext: EditorContext) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
@@ -106,7 +109,7 @@ export class EraserBrush implements ITool {
     private onPointerDown(e: FederatedPointerEvent) {
         if (!this.currentSession) return;
         if (e.button !== 0) return;
-        if (!this.getActiveTileLayer()) return;
+        if (!this.getActiveLayer()) return;
         this.isDragging = true;
         this.previousPreviewCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
         this.eraseMove(e);
@@ -210,7 +213,7 @@ export class EraserBrush implements ITool {
         return coordinates;
     }
 
-    private getActiveTileLayer(): TileLayer | null {
+    private getActiveLayer(): TileLayer | RuleLayer | null {
         const selectedIds = this.currentSession!.layerState.selectedLayers;
         if (selectedIds.length == 0) return null;
 
@@ -220,14 +223,14 @@ export class EraserBrush implements ITool {
         const root = this.currentSession!.tilemap.rootLayer;
         const layer = root.findLayer(activeId);
 
-        if (layer && layer instanceof TileLayer) return layer;
+        if (layer && (layer instanceof TileLayer || layer instanceof RuleLayer)) return layer;
         return null;
     }
 
     private eraseMove(e: FederatedPointerEvent) {
         if (!this.isDragging) return;
 
-        const activeLayer = this.getActiveTileLayer();
+        const activeLayer = this.getActiveLayer();
         if (!activeLayer) return;
 
         const drawCoordinates = this.getDrawCoordinates();
@@ -244,21 +247,26 @@ export class EraserBrush implements ITool {
                         targetY < 0 || targetY >= this.currentSession!.tilemap.height) {
                         continue;
                     }
-
-                    const tile = activeLayer.getTileRefAt({ col: targetX, row: targetY });
-                    if (!tile) continue;
-
-                    eraseCoordinates.push({ col: targetX, row: targetY });
-
-                    // const eraseCommand = new EraseTileCommand(activeLayer.id, { col: targetX, row: targetY });
-                    // eraseCommand.execute(this.editorContext);
-                    // this.eraseCommandStack.push(eraseCommand);
+                    const coord = { col: targetX, row: targetY };
+                    if (activeLayer instanceof TileLayer) {
+                        if (!activeLayer.getTileRefAt(coord)) continue;
+                    } else if (activeLayer instanceof RuleLayer) {
+                        if (!activeLayer.getRulesetRefAt(coord)) continue;
+                    } // Expand to other layer types
+                    eraseCoordinates.push(coord);
                 }
             }
         })
 
         if (eraseCoordinates.length != 0) {
-            const eraseCommand = new SetTilesCommand(activeLayer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+            let eraseCommand: IBaseCommand;
+            
+            if (activeLayer instanceof TileLayer) {
+                eraseCommand = new SetTilesCommand(activeLayer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+            } else {
+                eraseCommand = new SetRuleRefsCommand(activeLayer.id, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
+            } // Expand to other layer types
+            
             eraseCommand.execute(this.editorContext);
             this.eraseCommandStack.push(eraseCommand);
         }
@@ -270,6 +278,7 @@ export class EraserBrush implements ITool {
         const historyManager = this.editorContext.getCurrentHistoryManager();
         if (!historyManager) {
             this.eraseCommandStack.reverse().forEach(cmd => cmd.undo(this.editorContext));
+            this.eraseCommandStack = [];
             return;
         }
 
