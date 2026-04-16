@@ -56,5 +56,14 @@ Compile a production-ready binary:
 npm run tauri build
 ```
 
-### License
-Metk is released under the GNU General Public License v2.0 (GPL-2.0). See the LICENSE file for the full license text.
+## License
+
+### QUICK SUMMARY:
+- You ARE allowed to **use, distribute, and modify this code for all intents and purposes.**
+- You ARE allowed to self-host this for your own personal use.
+- RECIPROCAL LICENSING: **If you modify this code or use it to power a website or service (SaaS)**, you MUST make your **entire source code** (including all edits) **publicly available** under this same AGPLv3 license.
+- You CANNOT use the "Metk" name or branding for your own project.
+
+Copyright (c) 2026 TranNgocLamVy
+
+Metk is released under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE.md](LICENSE.md) file for the full, official legal text.

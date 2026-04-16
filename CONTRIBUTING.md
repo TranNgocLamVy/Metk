@@ -14,7 +14,6 @@ Before submitting a bug report, ensure you are running the latest version of the
 
 - **Type Safety:** All new logic must be strictly typed. Use the schemas defined in `src-ui/shared/schema` for any data structures that require serialization.
 - **Architecture Adherence:** Ensure a strict separation between the `core` logic and `view` components. Business logic should reside in managers or commands, not within React hooks or components.
-- **Formatting:** - Rust: `cargo fmt`
   - TypeScript: Adhere to the project's ESLint and Prettier configurations.
 - **Validation:** Use ArkType for any new data models to ensure runtime integrity.
 
@@ -33,4 +32,4 @@ Before submitting a bug report, ensure you are running the latest version of the
 
 ## License
 
-By contributing to Metk, you agree that your contributions will be licensed under the GNU General Public License v2.0.
+By contributing to Metk, you agree that your contributions will be licensed under the GNU Affero General Public License v3.0. See the [LICENSE.md](LICENSE.md) file for the full, official legal text.
