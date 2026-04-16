@@ -1,4 +1,4 @@
-# Metk (Modern Editor Toolkit)
+# Metk (Map Editor Toolkit)
 
 Metk is a specialized tilemap editor designed for high-performance level design workflows. Built on the Tauri framework, it implements a decoupled architecture that separates native host operations from application logic and user interface concerns.
 
