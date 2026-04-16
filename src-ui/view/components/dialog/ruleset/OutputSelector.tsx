@@ -70,13 +70,13 @@ export default function OutputSelector() {
     }
 
     return (
-        <VStack className="w-full h-full gap-4">
+        <VStack className="w-full h-full gap-2">
             <HStack>
                 <TilesetSelector selectTileset={selectTileset} />
                 <ScrollArea className="flex-1 whitespace-nowrap">
-                    <HStack className="flex py-1">
+                    <HStack className="flex">
                         {usedTilesets.map((tilesetRef) => (
-                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} size={"sm"} className={`rounded-none text-foreground hover:bg-secondary-background cursor-pointer ${activeTilesetId === tilesetRef.id ? "border-b-2 border-b-foreground bg-secondary-background shadow-sm" : "bg-background"}`}>
+                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} size={"sm"} className={`rounded-none h-8 text-foreground hover:bg-background cursor-pointer ${activeTilesetId === tilesetRef.id ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
                                 {tilesetRef.name}
                             </Button>
                         ))}
@@ -84,7 +84,7 @@ export default function OutputSelector() {
                     <ScrollBar orientation="horizontal" className="invisible" />
                 </ScrollArea>
             </HStack>
-            <div ref={containerRef} className="flex-1 overflow-hidden bg-secondary-background">
+            <div ref={containerRef} className="flex-1 overflow-hidden bg-background">
                 <div className='flex w-full h-full overflow-hidden relative'>
                     <PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="rounded-lg border-2 shadow-sm w-full h-full absolute" />
                 </div>

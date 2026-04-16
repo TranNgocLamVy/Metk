@@ -13,6 +13,7 @@ function ScrollArea({
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
+      type="always"
       className={cn("relative", className)}
       {...props}
     >

@@ -1,38 +1,50 @@
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { Copy, EllipsisVertical, GripHorizontal, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
 import { Rule } from "@/core/application/rule/rule";
-import { PixiImage } from "./OutputList";
 import { AppCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
+import PixiImage from "../../custom/PixiImage";
 
 
 export default function RuleList() {
     const { version, session, setSelectedRule } = useEditRulesetStore();
+    
+    const bottomRef = useRef<HTMLDivElement>(null);
+    const prevLengthRef = useRef(0);
 
     const ruleList = useMemo(() => {
         const ruleset = session.ruleset;
         return ruleset.getAllRules();
-    }, [version, session])
+    }, [version, session]);
 
     useEffect(() => {
-        const ruleList = session.ruleset.getAllRules();
-        if (ruleList.length > 0) setSelectedRule(ruleList[0].id);
-    }, [])
+        const rules = session.ruleset.getAllRules();
+        if (rules.length > 0) setSelectedRule(rules[0].id);
+        prevLengthRef.current = rules.length;
+    }, []); 
+
+    useEffect(() => {
+        if (ruleList.length > prevLengthRef.current) {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+        prevLengthRef.current = ruleList.length;
+    }, [ruleList.length]);
 
     return (
         <ScrollArea className="w-auto h-full overflow-hidden">
-            <VStack className="w-full h-full gap-2">
+            <VStack className="w-full h-full">
                 {ruleList.map((rule, index) => {
-                    return <RuleItem key={rule.id} rule={rule} index={index} />
+                    return <RuleItem key={rule.id} rule={rule} index={index} />;
                 })}
+                <div ref={bottomRef} />
             </VStack>
         </ScrollArea>
-    )
+    );
 }
 
 function RuleItem({ rule, index }: { rule: Rule, index: number }) {
@@ -56,7 +68,7 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
             align="center"
             onClick={() => setSelectedRule(rule.id)}
             draggable
-            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-select-color/50" : "bg-secondary-background hover:bg-select-color/20"}`}
+            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-select-color/50" : "bg-background hover:bg-select-color/20"}`}
         >
             <GripHorizontal size={16} className="cursor-grab active:cursor-grabbing" />
             {index + 1}
@@ -69,9 +81,7 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
                         const textureManager = AppCore.getIns().editorContext.textureManager;
                         const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                         if (!tilesetTexture) return null;
-                        return (
-                            <PixiImage texture={tilesetTexture} pixiApp={pixiApp} />
-                        )
+                        return <PixiImage texture={tilesetTexture} pixiApp={pixiApp} />
                     })()}
                 </div>
             </RuleToolTip>

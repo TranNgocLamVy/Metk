@@ -54,7 +54,7 @@ export default function RuleHeader() {
                 onChange={(e) => setTempName(e.target.value)}
                 onBlur={handleRename}
                 onKeyDown={(e) => { if (e.key === "Enter") handleRename() }}
-                className="text-sm w-full border py-1 px-2 focus:outline-1 focus:outline-foreground bg-secondary-background"
+                className="text-sm w-full border py-1 px-2 focus:outline-1 focus:outline-foreground bg-background"
             />
             <Button size={"icon"} variant={"outline"} onClick={addRule} className="h-full aspect-square">
                 <Plus />
