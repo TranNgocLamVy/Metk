@@ -10,7 +10,7 @@ import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RuleLayerEvents extends BaseLayerEvents {
-    rulesetRefOutputChanged: (x: number, y: number) => void
+    rulesetRefsOutputChanged: (coordinates: Coordinate[]) => void
 }
 
 export class RuleLayer extends BaseLayer<RuleLayerEvents> {
@@ -76,55 +76,87 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         return { rulesetId, output: { tileId: rulesetRef.tileId, tilesetId } };
     }
 
-    public setRuleRefAt(coordinate: Coordinate, rulesetId: string): Result<string | null> {
-        if (coordinate.col < 0 || coordinate.col >= this.size.width) return Result.Error("Tile not found, col is out of range");
-        if (coordinate.row < 0 || coordinate.row >= this.size.height) return Result.Error("Tile not found, row is out of range");
+    public setRuleRefsAt(updates: { coordinate: Coordinate, rulesetId: string | null }[]): Result<{ coordinate: Coordinate, oldRulesetId: string | null }[]> {
+        const results: { coordinate: Coordinate, oldRulesetId: string | null }[] = [];
+        const affectedCoordinates = new Set<string>();
 
-        if (!this.rulesetsRef[coordinate.row]) this.rulesetsRef[coordinate.row] = [];
+        for (const update of updates) {
+            const { coordinate, rulesetId } = update;
+            if (coordinate.col < 0 || coordinate.col >= this.size.width) continue;
+            if (coordinate.row < 0 || coordinate.row >= this.size.height) continue;
 
-        let tileRef = this.rulesetsRef[coordinate.row][coordinate.col];
+            if (!this.rulesetsRef[coordinate.row]) this.rulesetsRef[coordinate.row] = [];
 
-        const rulesetIndex = this.rulesetRefManager.getRulesetIndexById(rulesetId);
-        if (rulesetIndex === -1) return Result.Error("Ruleset not found");
+            let tileRef = this.rulesetsRef[coordinate.row][coordinate.col];
 
-        if (!tileRef) {
-            tileRef = new RulesetRef(-1, -1, -1);
-            this.rulesetsRef[coordinate.row][coordinate.col] = tileRef;
+            const oldRulesetId = tileRef ? this.rulesetRefManager.getRulesetIdByIndex(tileRef.rulesetIndex) : null;
+            results.push({ coordinate, oldRulesetId: oldRulesetId || null });
+
+            if (rulesetId === null) {
+                this.rulesetsRef[coordinate.row][coordinate.col] = null;
+                this.markAffected(coordinate, affectedCoordinates);
+            } else {
+                const rulesetIndex = this.rulesetRefManager.getRulesetIndexById(rulesetId);
+                if (rulesetIndex === -1) continue;
+
+                if (!tileRef) {
+                    tileRef = new RulesetRef(-1, -1, -1);
+                    this.rulesetsRef[coordinate.row][coordinate.col] = tileRef;
+                }
+
+                tileRef.setRulesetRef(rulesetIndex);
+                this.markAffected(coordinate, affectedCoordinates);
+            }
         }
 
-        const oldRulesetIndex = tileRef.setRulesetRef(rulesetIndex);
+        const updatedCoords: Coordinate[] = [];
+        affectedCoordinates.forEach(key => {
+            const [col, row] = key.split(',').map(Number);
+            this.reCalculateOutputAtNoEmit({ col, row });
+            updatedCoords.push({ col, row });
+        });
+
+        this.eventEmitter.emit("rulesetRefsOutputChanged", updatedCoords);
         
-        this.reCalculateOutputAt(coordinate);
-        this.reCalculateOutputAround(coordinate);
-        
-        if (oldRulesetIndex === -1) return Result.Success(null);
-        
-        const oldRulesetId = this.rulesetRefManager.getRulesetIdByIndex(oldRulesetIndex);
-        return Result.Success(oldRulesetId || null);
+        return Result.Success(results);
     }
 
-    public removeTileAt(coordinate: Coordinate): Result<RulesetRefData | null> {
-        if (coordinate.col < 0 || coordinate.col >= this.size.width) return Result.Error("Tile not found, col is out of range");
-        if (coordinate.row < 0 || coordinate.row >= this.size.height) return Result.Error("Tile not found, row is out of range");
+    private markAffected(coordinate: Coordinate, affectedCoordinates: Set<string>): void {
+        const MAX_SEARCH_RADIUS = 9;
 
-        if (!this.rulesetsRef[coordinate.row]) this.rulesetsRef[coordinate.row] = [];
+        const startX = Math.max(0, coordinate.col - MAX_SEARCH_RADIUS);
+        const endX = Math.min(this.size.width - 1, coordinate.col + MAX_SEARCH_RADIUS);
+        const startY = Math.max(0, coordinate.row - MAX_SEARCH_RADIUS);
+        const endY = Math.min(this.size.height - 1, coordinate.row + MAX_SEARCH_RADIUS);
 
-        const rulesetRef = this.rulesetsRef[coordinate.row][coordinate.col];
-        if (!rulesetRef) return Result.Success(null);
+        for (let targetY = startY; targetY <= endY; targetY++) {
+            for (let targetX = startX; targetX <= endX; targetX++) {
+                if (targetX === coordinate.col && targetY === coordinate.row) {
+                    affectedCoordinates.add(`${targetX},${targetY}`);
+                    continue;
+                }
 
-        this.rulesetsRef[coordinate.row][coordinate.col] = null;
+                const targetRow = this.rulesetsRef[targetY];
+                if (!targetRow) continue;
 
-        this.eventEmitter.emit("rulesetRefOutputChanged", coordinate.col, coordinate.row);
-        
-        this.reCalculateOutputAround(coordinate);
-        
-        const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
-        if (!rulesetId) return Result.Error("Ruleset not found");
+                const targetRef = targetRow[targetX];
+                if (!targetRef) continue;
 
-        const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(rulesetRef.tilesetIndex);
-        if (!tilesetId) return Result.Success({ rulesetId: rulesetId });
-        
-        return Result.Success({ rulesetId: rulesetId, output: { tileId: rulesetRef.tileId, tilesetId: tilesetId } });
+                const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(targetRef.rulesetIndex);
+                if (!rulesetId) continue;
+
+                const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
+                if (!ruleset) continue;
+
+                const targetRadius = Math.floor(ruleset.size / 2);
+                const distanceX = Math.abs(targetX - coordinate.col);
+                const distanceY = Math.abs(targetY - coordinate.row);
+
+                if (distanceX <= targetRadius && distanceY <= targetRadius) {
+                    affectedCoordinates.add(`${targetX},${targetY}`);
+                }
+            }
+        }
     }
 
     private calculateOutputAt(coordinate: Coordinate): { tileId: number, tilesetId: string } | null {
@@ -144,7 +176,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         return ruleset.calculateOutput(this.getContext(coordinate));
     }
 
-    private reCalculateOutputAt(coordinate: Coordinate): void {
+    private reCalculateOutputAtNoEmit(coordinate: Coordinate): void {
         const rulesetRef = this.rulesetsRef[coordinate.row]?.[coordinate.col];
         if (!rulesetRef) return;
 
@@ -156,56 +188,19 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         } else {
             rulesetRef.setOutput(-1, -1);
         }
-
-        this.eventEmitter.emit("rulesetRefOutputChanged", coordinate.col, coordinate.row);
     }
 
     public reCalculateAllOutputs(): void {
+        const updatedCoords: Coordinate[] = [];
         for (let y = 0; y < this.size.height; y++) {
             for (let x = 0; x < this.size.width; x++) {
                 if (this.rulesetsRef[y]?.[x]) {
-                    this.reCalculateOutputAt({ col: x, row: y });
+                    this.reCalculateOutputAtNoEmit({ col: x, row: y });
+                    updatedCoords.push({ col: x, row: y });
                 }
             }
         }
-    }
-
-    private reCalculateOutputAround(coordinate: Coordinate): void {
-        if (coordinate.col < 0 || coordinate.col >= this.size.width) return;
-        if (coordinate.row < 0 || coordinate.row >= this.size.height) return;
-
-        const MAX_SEARCH_RADIUS = 9;
-
-        const startX = Math.max(0, coordinate.col - MAX_SEARCH_RADIUS);
-        const endX = Math.min(this.size.width - 1, coordinate.col + MAX_SEARCH_RADIUS);
-        const startY = Math.max(0, coordinate.row - MAX_SEARCH_RADIUS);
-        const endY = Math.min(this.size.height - 1, coordinate.row + MAX_SEARCH_RADIUS);
-
-        for (let targetY = startY; targetY <= endY; targetY++) {
-            for (let targetX = startX; targetX <= endX; targetX++) {
-                if (targetX === coordinate.col && targetY === coordinate.row) continue;
-
-                const targetRow = this.rulesetsRef[targetY];
-                if (!targetRow) continue;
-
-                const targetRef = targetRow[targetX];
-                if (!targetRef) continue;
-
-                const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(targetRef.rulesetIndex);
-                if (!rulesetId) continue;
-
-                const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
-                if (!ruleset) continue;
-
-                const targetRadius = Math.floor(ruleset.size / 2);
-                const distanceX = Math.abs(targetX - coordinate.col);
-                const distanceY = Math.abs(targetY - coordinate.row);
-
-                if (distanceX <= targetRadius && distanceY <= targetRadius) {
-                    this.reCalculateOutputAt({ col: targetX, row: targetY });
-                }
-            }
-        }
+        this.eventEmitter.emit("rulesetRefsOutputChanged", updatedCoords);
     }
 
     private getContext(coordinate: Coordinate): (RulesetRefData | null)[][] {

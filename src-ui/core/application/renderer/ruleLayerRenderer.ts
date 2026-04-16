@@ -13,16 +13,16 @@ type CreateRuleLayerRendererContext = {
 
 export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     private sprites: Map<string, Sprite> = new Map(); // Id -> Sprite
-    private bindOnTileChanged: (x: number, y: number) => void
+    private bindOnTilesChanged: (coordinates: Coordinate[]) => void
 
     constructor(context: CreateRuleLayerRendererContext) {
         super(context.layer, context.tilemap);
         this.gap = context.gap;
 
-        this.bindOnTileChanged = this.onTileChanged.bind(this);
+        this.bindOnTilesChanged = this.onTilesChanged.bind(this);
 
         this.renderLayer();
-        this.layer.eventEmitter.on("rulesetRefOutputChanged", this.bindOnTileChanged);
+        this.layer.eventEmitter.on("rulesetRefsOutputChanged", this.bindOnTilesChanged);
     }
 
     private renderLayer(): void {
@@ -34,8 +34,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         }
     }
 
-    private onTileChanged(x: number, y: number) {
-        this.renderTile(x, y);
+    private onTilesChanged(coordinates: Coordinate[]) {
+        coordinates.forEach(coord => this.renderTile(coord.col, coord.row));
     };
 
     private async renderTile(x: number, y: number): Promise<void> {
@@ -94,7 +94,7 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     }
 
     public override destroy(): void {
-        this.layer.eventEmitter.off("rulesetRefOutputChanged", this.bindOnTileChanged);
+        this.layer.eventEmitter.off("rulesetRefsOutputChanged", this.bindOnTilesChanged);
         super.destroy();
         this.sprites.clear();
     }

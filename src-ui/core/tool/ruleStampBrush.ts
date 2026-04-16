@@ -8,7 +8,7 @@ import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
 import { RuleLayer } from "../application/tile/layer/ruleLayer";
 import { Ruleset } from "../application/rule/ruleset";
-import { SetRuleRefCommand } from "../command/tile/setRuleCommand";
+import { SetRuleRefsCommand } from "../command/tile/setRulesCommand";
 
 type PreviewSpriteData = {
     sprite: Sprite;
@@ -267,14 +267,16 @@ export class RuleStampBrush implements ITool {
         const targetLayer = this.getActiveRuleLayer();
         if (!targetLayer || targetLayer.locked || !targetLayer.visible) return;
 
-        historyManager.startTransaction();
-        this.previewSpriteMap.forEach((spriteData, key) => {
-            const col = parseInt(key.split(',')[0]);
-            const row = parseInt(key.split(',')[1]);
-            const setTileCommand = new SetRuleRefCommand(targetLayer.id, { col, row }, spriteData.rulesetId);
-            historyManager.execute(setTileCommand, this.editorContext);
-        })
-        historyManager.commitTransaction();
+        const updates = Array.from(this.previewSpriteMap.entries()).map(([key, spriteData]) => {
+            const [col, row] = key.split(',').map(Number);
+            return {
+                coordinate: { col, row },
+                rulesetId: spriteData.rulesetId
+            };
+        });
+
+        const setRulesCommand = new SetRuleRefsCommand(targetLayer.id, updates);
+        historyManager.execute(setRulesCommand, this.editorContext);
 
         this.previewSpriteMap.forEach((spriteData) => {
             this.overlayContainer!.removeChild(spriteData.sprite);
