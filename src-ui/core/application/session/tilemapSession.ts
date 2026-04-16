@@ -7,7 +7,12 @@ import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
 import { TilemapSessionView } from "./tilemapSessionView";
-import { Tile, Tileset } from "../tile/tileset";
+import { Tileset } from "../tile/tileset";
+import EventEmitter from "eventemitter3";
+
+interface TilemapSessionEvents {
+    onSelectedLayersChanged: (layerIds: string[]) => void;
+}
 
 export class TilemapSession implements IBaseSession {
     public readonly id: string;
@@ -21,6 +26,8 @@ export class TilemapSession implements IBaseSession {
 
     public sessionView: TilemapSessionView;
 
+    public eventEmitter: EventEmitter<TilemapSessionEvents>;
+
     private bindOnTilemapChange: () => void;
 
     constructor(
@@ -32,6 +39,7 @@ export class TilemapSession implements IBaseSession {
         this.tilemap = tilemap;
 
         this.historyManager = new HistoryManager();
+        this.eventEmitter = new EventEmitter<TilemapSessionEvents>();
 
         this.viewState = tilemapSessionData.viewState ?? { x: null, y: null, zoom: 1 };
         this.layerState = tilemapSessionData.layerState ?? { selectedLayers: [] };
@@ -62,6 +70,7 @@ export class TilemapSession implements IBaseSession {
     //==========Layer State==========
     public updateLayerState(state: Partial<LayerState>) {
         this.layerState = { ...this.layerState, ...state };
+        this.eventEmitter.emit("onSelectedLayersChanged", this.layerState.selectedLayers);
     }
 
     public serialize(): TilemapSessionData {

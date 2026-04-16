@@ -1,20 +1,15 @@
 import { Container, FederatedPointerEvent, Point, Sprite } from "pixi.js";
 
 import stamp from "@/assets/icons/stamp.svg?raw";
-
-import { EditorContext } from "../application/editorContext";
-import { TilemapSession } from "../application/session/tilemapSession";
-import { TileLayer } from "../application/tile/layer/tileLayer";
-import { Tile } from "../application/tile/tileset";
-import { Tool } from "../decorator/tool";
-import { ITool } from "../interface/ITool";
-import { SetTilesCommand } from "../command/tile/setTilesCommand";
-
-type PreviewSpriteData = {
-    sprite: Sprite;
-    tileId: number;
-    tilesetId: string;
-}
+import { IStamp, StampPreviewData } from "./stamp/IStamp";
+import { ITool } from "@/core/interface/ITool";
+import { TilemapSession } from "@/core/application/session/tilemapSession";
+import { TileStamp } from "./stamp/tileStamp";
+import { RuleStamp } from "./stamp/ruleStamp";
+import { EditorContext } from "@/core/application/editorContext";
+import { Tool } from "@/core/decorator/tool";
+import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
+import { GroupLayer } from "../application/tile/layer/groupLayer";
 
 @Tool({
     id: "stamp",
@@ -27,37 +22,48 @@ type PreviewSpriteData = {
     shortcuts: ["B"],
 })
 export class StampBrush implements ITool {
+    private stampTypes: IStamp[];
+    private activeStamp: IStamp | null = null;
+
     private currentSession: TilemapSession | null = null;
     private overlayContainer: Container | null = null;
-
 
     private previousPreviewCoordinate: Coordinate = null!;
     private currentPreviewCoordinate: Coordinate = null!;
     private previewSprites: Sprite[] = [];
 
     private isDragging: boolean = false;
-    private previewSpriteMap: Map<string, PreviewSpriteData>;
+    private previewSpriteMap: Map<string, StampPreviewData> = new Map();
+
+    private cachedTargetLayer: BaseLayer<any> | null = null;
 
     private bindPointerOnDown: (event: FederatedPointerEvent) => void;
     private bindPointerOnMove: (event: FederatedPointerEvent) => void;
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
     private bindPointerOutside: (event: FederatedPointerEvent) => void;
+    private bindOnSelectedLayersChanged: () => void;
 
     constructor(private readonly editorContext: EditorContext) {
+        this.stampTypes = [
+            new TileStamp(),
+            new RuleStamp()
+        ];
+
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
         this.bindPointerOutside = this.onPointerOutside.bind(this);
+
+        this.bindOnSelectedLayersChanged = this.updateActiveStampType.bind(this);
     }
 
     public onEnable(): void {
-        this.previewSpriteMap = new Map<string, PreviewSpriteData>();
+        this.previewSpriteMap = new Map<string, StampPreviewData>();
     }
 
-
     public onDisable(): void {
-        this.previewSpriteMap.forEach((spriteData) => this.overlayContainer!.removeChild(spriteData.sprite));
-        this.previewSpriteMap = new Map<string, PreviewSpriteData>();
+        this.previewSpriteMap.forEach((spriteData) => spriteData.sprite.destroy());
+        this.previewSpriteMap.clear();
     }
 
     public attach(session: TilemapSession): void {
@@ -71,6 +77,10 @@ export class StampBrush implements ITool {
         viewport.on("pointerup", this.bindPointerOnUp);
         viewport.on("pointerupoutside", this.bindPointerOnUp);
         viewport.addEventListener("mouseleave", this.bindPointerOutside);
+
+        this.updateActiveStampType();
+        
+        this.currentSession.eventEmitter.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
     }
 
     public detach(): void {
@@ -83,16 +93,19 @@ export class StampBrush implements ITool {
         viewport.off("pointerupoutside", this.bindPointerOnUp);
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
+        this.currentSession.eventEmitter.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+
         this.currentSession = null;
 
-        if (this.overlayContainer) this.overlayContainer.removeChildren();
+        if (this.overlayContainer) this.overlayContainer.children.forEach(child => child.destroy());
         this.overlayContainer = null;
     }
 
     private onPointerDown(e: FederatedPointerEvent) {
-        if (!this.currentSession) return;
-        if (e.button !== 0) return;
-        if (!this.getActiveTileLayer()) return;
+        if (!this.currentSession || e.button !== 0) return;
+
+        if (!this.cachedTargetLayer || !this.activeStamp) return;
+
         this.isDragging = true;
         this.previousPreviewCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
         this.stampMove(e);
@@ -112,53 +125,16 @@ export class StampBrush implements ITool {
     }
 
     private onPointerUp(e: FederatedPointerEvent) {
-        if (!this.currentSession) return;
-        if (!this.isDragging) return;
+        if (!this.currentSession || !this.isDragging) return;
         this.isDragging = false;
         this.stampEnd(e);
     }
 
     private onPointerOutside(e: FederatedPointerEvent) {
         if (this.overlayContainer) {
-            this.previewSprites.forEach(sprite => this.overlayContainer!.removeChild(sprite));
+            this.previewSprites.forEach(sprite => sprite.destroy());
+            this.previewSprites = [];
         }
-    }
-
-    private drawPreviewTiles() {
-        const selectedTiles = this.getSelectedTiles();
-        const activeLayer = this.getActiveTileLayer();
-
-        if (!selectedTiles || !activeLayer) return;
-
-        if (this.overlayContainer) {
-            this.previewSprites.forEach(sprite => this.overlayContainer!.removeChild(sprite));
-        }
-
-        this.previewSprites = [];
-
-        for (let r = 0; r < selectedTiles.length; r++) {
-            const rowTiles = selectedTiles[r];
-            for (let c = 0; c < rowTiles.length; c++) {
-                const tile = rowTiles[c];
-                if (!tile) continue;
-                const col = this.currentPreviewCoordinate!.col + c;
-                const row = this.currentPreviewCoordinate!.row + r;
-                if (col < 0 || col >= this.currentSession!.tilemap.width ||
-                    row < 0 || row >= this.currentSession!.tilemap.height) continue;
-
-                const textureManager = this.editorContext.textureManager;
-                const texture = textureManager.getTileTexture(tile.tileset.id, tile.id);
-
-                // TODO: Handle unfound tileset, render error texture
-                if (!texture) continue;
-
-                const sprite = new Sprite(texture);
-                sprite.position.set(col * this.currentSession!.tilemap.tilewidth, row * this.currentSession!.tilemap.tileheight);
-                this.overlayContainer!.addChild(sprite);
-                this.previewSprites.push(sprite);
-            }
-        }
-
     }
 
     private getGridCoordinates(globalX: number, globalY: number): Coordinate {
@@ -202,109 +178,82 @@ export class StampBrush implements ITool {
         return coordinates;
     }
 
-    private getActiveTileLayer(): TileLayer | null {
-        const selectedIds = this.currentSession!.layerState.selectedLayers;
-        if (selectedIds.length == 0) return null;
+    private updateActiveStampType(): BaseLayer<any> | null {
+        if (!this.currentSession) return null;
 
-        const activeId = selectedIds.values().next().value;
-        if (!activeId) return null;
+        const selectedIds = this.currentSession.layerState.selectedLayers;
+        if (selectedIds.length === 0) return null; 
+        
+        this.cachedTargetLayer = null;
 
-        const root = this.currentSession!.tilemap.rootLayer;
-        const layer = root.findLayer(activeId);
+        for (const id of selectedIds) {
+            const layer = this.currentSession.tilemap.rootLayer.findLayer(id);
+            if (layer && !(layer instanceof GroupLayer)) {
+                this.cachedTargetLayer = layer;
+                break;
+            }
+        }
+        
+        if (!this.cachedTargetLayer || this.cachedTargetLayer.locked || !this.cachedTargetLayer.visible) {
+            this.activeStamp = null;
+            return null;
+        }
 
-        if (layer && layer instanceof TileLayer) return layer;
-        return null;
+        if (!this.cachedTargetLayer) return null;
+
+        this.activeStamp = this.stampTypes.find(s => s.canHandle(this.cachedTargetLayer!)) || null;
+        return this.cachedTargetLayer;
     }
 
-    private getSelectedTiles(): (Tile | null)[][] | null {
-        const selection = this.editorContext.getSelectedTile();
-        const pivot = this.editorContext.getPivot();
-        if (!selection || !pivot) return null;
-        return selection;
+    private drawPreviewTiles() {
+        if (!this.currentSession || !this.overlayContainer) return;
+
+        this.previewSprites.forEach(sprite => sprite.destroy());
+        this.previewSprites = [];
+
+        if (this.activeStamp && this.currentPreviewCoordinate) {
+            this.previewSprites = this.activeStamp.drawHoverPreview(
+                this.currentPreviewCoordinate,
+                this.editorContext,
+                this.currentSession,
+                this.overlayContainer
+            );
+        }
     }
 
     private stampMove(e: FederatedPointerEvent) {
-        if (!this.isDragging) return;
+        if (!this.isDragging || !this.activeStamp || !this.currentSession || !this.overlayContainer) return;
 
         const drawCoordinates = this.getDrawCoordinates();
-
         if (drawCoordinates.length == 0) drawCoordinates.push(this.currentPreviewCoordinate);
 
         drawCoordinates.forEach(drawCoordinate => {
-            const tiles = this.getSelectedTiles();
-            if (!tiles || !tiles.length) return;
-
-            for (let r = 0; r < tiles.length; r++) {
-                const row = tiles[r];
-                for (let c = 0; c < row.length; c++) {
-                    const tile = row[c];
-
-                    const targetX = drawCoordinate.col + c;
-                    const targetY = drawCoordinate.row + r;
-                    if (targetX < 0 || targetX >= this.currentSession!.tilemap.width ||
-                        targetY < 0 || targetY >= this.currentSession!.tilemap.height) {
-                        continue;
-                    }
-
-                    if (!tile) continue;
-
-                    const textureManager = this.editorContext.textureManager;
-                    const texture = textureManager.getTileTexture(tile.tileset.id, tile.id);
-
-                    // TODO: Handle unfound tileset, render error texture
-                    if (!texture) continue;
-                    
-
-                    const key = `${targetX},${targetY}`;
-                    let tileSpriteData: PreviewSpriteData;
-                    if (this.previewSpriteMap.has(key)) {
-                        tileSpriteData = this.previewSpriteMap.get(key)!;
-                        tileSpriteData.sprite.texture = texture;
-                        tileSpriteData.tileId = tile.id;
-                        tileSpriteData.tilesetId = tile.tileset.id;
-                    } else {
-                        tileSpriteData = {
-                            sprite: new Sprite(texture),
-                            tileId: tile.id,
-                            tilesetId: tile.tileset.id,
-                        }
-                        this.previewSpriteMap.set(key, tileSpriteData);
-                        this.overlayContainer!.addChild(tileSpriteData.sprite);
-                    }
-                    tileSpriteData.sprite.position.set(targetX * this.currentSession!.tilemap.tilewidth, targetY * this.currentSession!.tilemap.tileheight);
-                }
-            }
-        })
+            this.activeStamp!.stampAt(
+                drawCoordinate,
+                this.editorContext,
+                this.currentSession!,
+                this.overlayContainer!,
+                this.previewSpriteMap
+            );
+        });
 
         this.previousPreviewCoordinate = this.currentPreviewCoordinate;
     }
 
     private stampEnd(e: FederatedPointerEvent) {
         const historyManager = this.editorContext.getCurrentHistoryManager();
-        if (!historyManager) {
-            this.previewSpriteMap.forEach((spriteData) => {
-                this.overlayContainer!.removeChild(spriteData.sprite);
-            });
-            this.previewSpriteMap.clear();
-            return;
+
+
+        if (historyManager && this.activeStamp && this.cachedTargetLayer) {
+            this.activeStamp.commit(
+                this.cachedTargetLayer,
+                this.previewSpriteMap,
+                this.editorContext,
+                historyManager
+            );
         }
 
-        const targetLayer = this.getActiveTileLayer();
-        if (!targetLayer || targetLayer.locked || !targetLayer.visible) return;
-
-        const payload = Array.from(this.previewSpriteMap).map(([key, spriteData]) => {
-            const col = parseInt(key.split(',')[0]);
-            const row = parseInt(key.split(',')[1]);
-            return { coordinate: { col, row }, tileId: spriteData.tileId, tilesetId: spriteData.tilesetId };
-        })
-        
-        historyManager.startTransaction();
-        historyManager.execute(new SetTilesCommand(targetLayer.id, payload), this.editorContext);
-        historyManager.commitTransaction();
-
-        this.previewSpriteMap.forEach((spriteData) => {
-            this.overlayContainer!.removeChild(spriteData.sprite);
-        });
+        this.previewSpriteMap.forEach((data) => data.sprite.destroy());
         this.previewSpriteMap.clear();
     }
 }
