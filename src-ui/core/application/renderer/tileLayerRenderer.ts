@@ -49,7 +49,6 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         const currentSprite = this.sprites.get(key);
         if (!tileRef) {
             if (currentSprite) {
-                this.container.removeChild(currentSprite);
                 currentSprite.destroy();
                 this.sprites.delete(key);
             }

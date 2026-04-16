@@ -46,7 +46,6 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         if (!rulesetRef) {
             if (currentSprite) {
                 currentSprite.destroy();
-                this.container.removeChild(currentSprite);
                 this.sprites.delete(key);
             }
             return;
