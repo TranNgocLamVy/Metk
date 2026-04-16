@@ -7,6 +7,8 @@
 @plugin "tailwindcss-animate"; /* FIXED: Using standard Shadcn animation plugin */
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant data-vertical (&[data-orientation="vertical"]);
+@custom-variant data-horizontal (&[data-orientation="horizontal"]);
 
 @theme inline {
 	--font-family: "JetBrains Mono";

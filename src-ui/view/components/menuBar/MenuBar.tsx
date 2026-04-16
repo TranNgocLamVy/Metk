@@ -9,6 +9,8 @@ import { ProjectDropdownOptions } from "./dropdown/ProjectDropdownOptions";
 import { HelpDropdownOptions } from "./dropdown/HelpDropdownOptions";
 import { DebugDropdownOptions } from "./dropdown/DebugDropDownOptions";
 import MenuBarItem from "./MenuBarItem";
+import { Button } from '@/view/components/shadcn/button';
+import { SunMoon } from "lucide-react";
 
 export default function MenuBar() {
 	const { theme, setTheme } = useTheme();
@@ -32,9 +34,9 @@ export default function MenuBar() {
 			</HStack>
 
 			<HStack className="ml-auto">
-				{/* <Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
+				<Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
 					<SunMoon className="size-4" />
-				</Button> */}
+				</Button>
 				{/* <Button title="Minimize" size={"icon-sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().minimize()}>
 					<Minus className="size-4" />
 				</Button>

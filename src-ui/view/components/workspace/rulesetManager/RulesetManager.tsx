@@ -53,11 +53,11 @@ export default function RulesetManager() {
                                     className={`flex items-center justify-center gap-2 p-2 ${selectedRuleId === ruleset.id ? "bg-select-color/50" : "hover:bg-select-color/20"}`}
                                 >
                                     <div className="w-8 h-8" style={{ backgroundColor: ruleset.color ?? "#fff" }} />
-                                    <div className="text-xs font-bold text-white flex items-center">{ruleset.name}</div>
-                                    <Button className="ml-auto hover:bg-background" size={"icon"} variant={"ghost"} onClick={(e) => onEditRule(e, ruleset.id)}>
+                                    <div className="text-xs font-bold text-foreground flex items-center">{ruleset.name}</div>
+                                    <Button className="ml-auto hover:bg-background/20" size={"icon"} variant={"ghost"} onClick={(e) => onEditRule(e, ruleset.id)}>
                                         <Pen />
                                     </Button>
-                                    <Button className="hover:bg-background" size={"icon"} variant={"destructive"} onClick={(e) => onDeleteRule(e, ruleset.id)}>
+                                    <Button size={"icon"} variant={"destructive"} onClick={(e) => onDeleteRule(e, ruleset.id)}>
                                         <Trash />
                                     </Button>
                                 </HStack>

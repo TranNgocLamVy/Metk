@@ -3,22 +3,7 @@ import { Application, Sprite, Texture } from "pixi.js";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { AppCore } from "@/core/appcore";
-
-export function PixiImage({ texture, pixiApp }: { texture: Texture, pixiApp: Application }) {
-    const [imgSrc, setImgSrc] = useState<string>('');
-
-    useEffect(() => {
-        if (!texture) return;
-        const sprite = new Sprite(texture);
-        pixiApp.renderer.extract.base64(sprite).then((base64) => {
-            setImgSrc(base64);
-        })
-    }, [texture]);
-
-    if (!imgSrc) return null;
-    return <img src={imgSrc} alt="tile" className="w-full h-full object-contain" />;
-}
-
+import PixiImage from "../../custom/PixiImage";
 
 export default function OutputList() {
     const { session, version } = useEditRulesetStore();
@@ -34,7 +19,7 @@ export default function OutputList() {
     }, [session, version]);
 
     return (
-        <ScrollArea className='h-full w-full border border-foreground/20 bg-secondary-background'>
+        <ScrollArea className='h-full w-full border border-foreground/20 bg-background'>
             <div className="flex flex-wrap gap-2 p-2 w-full">
                 {pixiApp && selectedTiles.map((tileRef) => {
                     const tilesetId = session.ruleset.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
