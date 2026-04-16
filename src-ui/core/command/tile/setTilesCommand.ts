@@ -1,20 +1,22 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { EditorContext } from "@/core/application/editorContext";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
+import { SetTilesData, TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { IBaseCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
 
-export class EraseTileCommand implements IBaseCommand {
+export class SetTilesCommand implements IBaseCommand {
     public readonly id: string = uuidv4()
 
-    private oldTilesetId: string | null = null;
-    private oldTileId: number | null = null;
+    private data: SetTilesData[] = [];
+    private oldData: SetTilesData[] = [];
 
     constructor(
         private readonly layerId: string,
-        private readonly coordinate: Coordinate,
-    ) { }
+        data: SetTilesData[],
+    ) {
+        this.data = [...data];
+    }
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession();
@@ -22,24 +24,15 @@ export class EraseTileCommand implements IBaseCommand {
 
         const tilemap = currentSession.tilemap;
 
-        const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
+        const layer = tilemap.rootLayer.findLayer(this.layerId);
         if (!layer) return Result.Error("Layer not found");
+        if (!(layer instanceof TileLayer)) return Result.Error("Layer is not a tile layer");
 
-        const tileRef = layer.getTileRefAt(this.coordinate);
-        if (!tileRef) return Result.Success();
-
-        this.oldTileId = tileRef.tileId;
-        this.oldTilesetId = tileRef.tilesetId;
-
-        const result = layer.removeTileAt(this.coordinate);
+        const result = layer.setTilesAt(this.data);
 
         if (result.status === Result.Status.Success) {
-            const tileRef = result.data;
-            if (tileRef) {
-                this.oldTileId = tileRef.tileId;
-                this.oldTilesetId = tileRef.tilesetId;
-            }
-            currentSession.markAsDirty()
+            currentSession.markAsDirty();
+            this.oldData = result.data;
         }
 
         return result
@@ -51,12 +44,13 @@ export class EraseTileCommand implements IBaseCommand {
 
         const tilemap = currentSession.tilemap;
 
-        const layer = tilemap.rootLayer.findLayer(this.layerId) as TileLayer;
+        const layer = tilemap.rootLayer.findLayer(this.layerId);
         if (!layer) return Result.Error("Layer not found");
+        if (!(layer instanceof TileLayer)) return Result.Error("Layer is not a tile layer");
 
-        if (this.oldTileId == null || this.oldTilesetId == null) return Result.Success();
+        if (this.oldData.length === 0) return Result.Cancel("No tile changed");
 
-        const result = layer.setTileAt(this.coordinate, this.oldTileId, this.oldTilesetId);
+        const result = layer.setTilesAt(this.oldData);
 
         if (result.status === Result.Status.Success) currentSession.markAsDirty();
 
@@ -64,6 +58,7 @@ export class EraseTileCommand implements IBaseCommand {
     }
 
     public delete(): void {
-
+        this.data = [];
+        this.oldData = [];
     }
 }

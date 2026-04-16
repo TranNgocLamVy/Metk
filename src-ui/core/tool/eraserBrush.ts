@@ -6,9 +6,9 @@ import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { TileLayer } from "../application/tile/layer/tileLayer";
 import { BatchCommand } from "../command/batchCommand";
-import { EraseTileCommand } from "../command/tile/eraseTileCommand";
 import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
+import { SetTilesCommand } from "../command/tile/setTilesCommand";
 
 @Tool({
     id: "eraser",
@@ -38,7 +38,7 @@ export class EraserBrush implements ITool {
 
     private originalWheelEvent: (e: FederatedWheelEvent) => boolean;
 
-    private eraseCommandStack: EraseTileCommand[] = [];
+    private eraseCommandStack: SetTilesCommand[] = [];
 
     constructor(private readonly editorContext: EditorContext) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
@@ -233,8 +233,9 @@ export class EraserBrush implements ITool {
         const drawCoordinates = this.getDrawCoordinates();
         if (drawCoordinates.length == 0) drawCoordinates.push(this.currentPreviewCoordinate);
         
-        drawCoordinates.forEach(drawCoordinate => {
+        const eraseCoordinates = new Array<Coordinate>();
 
+        drawCoordinates.forEach(drawCoordinate => {
             for (let r = 0; r < EraserBrush.eraserSize; r++) {
                 for (let c = 0; c < EraserBrush.eraserSize; c++) {
                     const targetX = drawCoordinate.col + c;
@@ -247,12 +248,20 @@ export class EraserBrush implements ITool {
                     const tile = activeLayer.getTileRefAt({ col: targetX, row: targetY });
                     if (!tile) continue;
 
-                    const eraseCommand = new EraseTileCommand(activeLayer.id, { col: targetX, row: targetY });
-                    eraseCommand.execute(this.editorContext);
-                    this.eraseCommandStack.push(eraseCommand);
+                    eraseCoordinates.push({ col: targetX, row: targetY });
+
+                    // const eraseCommand = new EraseTileCommand(activeLayer.id, { col: targetX, row: targetY });
+                    // eraseCommand.execute(this.editorContext);
+                    // this.eraseCommandStack.push(eraseCommand);
                 }
             }
         })
+
+        if (eraseCoordinates.length != 0) {
+            const eraseCommand = new SetTilesCommand(activeLayer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+            eraseCommand.execute(this.editorContext);
+            this.eraseCommandStack.push(eraseCommand);
+        }
 
         this.previousPreviewCoordinate = this.currentPreviewCoordinate;
     }

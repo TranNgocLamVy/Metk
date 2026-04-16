@@ -1,6 +1,6 @@
 import { Sprite } from "pixi.js";
 
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
+import { SetTilesData, TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
@@ -13,37 +13,39 @@ type CreateTileLayerRendererContext = {
 }
 
 export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
-    private sprites: Map<string, Sprite> = new Map(); // Id -> Sprite
+    private sprites: Map<string, Sprite> = new Map(); // key: `${col},${row}` -> Sprite
 
-    private bindOnTileChanged: (x: number, y: number) => void
+    private bindOnTilesChanged: (coords: Coordinate[]) => void
 
     constructor(context: CreateTileLayerRendererContext) {
         super(context.layer, context.tilemap);
         this.gap = context.gap;
 
-        this.bindOnTileChanged = this.onTileChanged.bind(this);
+        this.bindOnTilesChanged = this.onTilesChanged.bind(this);
 
         // Initial render
         this.renderLayer();
-        this.layer.eventEmitter.on("tileChanged", this.bindOnTileChanged);
+        this.layer.eventEmitter.on("tilesChanged", this.bindOnTilesChanged);
     }
 
     private renderLayer(): void {
         const { width, height } = this.layer.size;
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                this.renderTile(x, y);
+        for (let row = 0; row < height; row++) {
+            for (let col = 0; col < width; col++) {
+                this.renderTile(col, row);
             }
         }
     }
 
-    private onTileChanged(x: number, y: number) {
-        this.renderTile(x, y);
-    };
+    private onTilesChanged(coordinates: Coordinate[]) {
+        for (const coordinate of coordinates) {
+            this.renderTile(coordinate.col, coordinate.row);
+        }
+    }
 
-    private async renderTile(x: number, y: number): Promise<void> {
-        const tileRef = this.layer.getTileRefAt({ col: x, row: y });
-        const key = `${x},${y}`;
+    private async renderTile(col: number, row: number): Promise<void> {
+        const tileRef = this.layer.getTileRefAt({ col: col, row: row });
+        const key = `${col},${row}`;
         const currentSprite = this.sprites.get(key);
         if (!tileRef) {
             if (currentSprite) {
@@ -62,8 +64,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         if (!texture) return;
 
         // Calculate Position: (GridPos + LayerGridOffset) * (TileSize + Gap) + LayerPixelOffset
-        const posX = (x + this.layer.coordinate.col) * (this.tilemap.tilewidth + this.gap) + this.layer.offset.x;
-        const posY = (y + this.layer.coordinate.row) * (this.tilemap.tileheight + this.gap) + this.layer.offset.y;
+        const posX = (col + this.layer.coordinate.col) * (this.tilemap.tilewidth + this.gap) + this.layer.offset.x;
+        const posY = (row + this.layer.coordinate.row) * (this.tilemap.tileheight + this.gap) + this.layer.offset.y;
 
         if (currentSprite) {
             currentSprite.texture = texture;
@@ -85,7 +87,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     }
 
     public override destroy(): void {
-        this.layer.eventEmitter.off("tileChanged", this.bindOnTileChanged);
+        this.layer.eventEmitter.off("tilesChanged", this.bindOnTilesChanged);
         super.destroy();
         this.sprites.clear();
     }
