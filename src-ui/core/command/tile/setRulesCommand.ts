@@ -1,22 +1,19 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { EditorContext } from "@/core/application/editorContext";
-import { SetTilesData, TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { IBaseCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
+import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
 
-export class SetTilesCommand implements IBaseCommand {
+export class SetRuleRefsCommand implements IBaseCommand {
     public readonly id: string = uuidv4()
 
-    private data: SetTilesData[] = [];
-    private oldData: SetTilesData[] = [];
+    private oldRules: { coordinate: Coordinate, oldRulesetId: string | null }[] = [];
 
     constructor(
         private readonly layerId: string,
-        data: SetTilesData[],
-    ) {
-        this.data = [...data];
-    }
+        private readonly updates: { coordinate: Coordinate, rulesetId: string | null }[]
+    ) {}
 
     public execute(context: EditorContext): Result {
         const currentSession = context.getCurrentTilemapSession();
@@ -24,22 +21,22 @@ export class SetTilesCommand implements IBaseCommand {
 
         const tilemap = currentSession.tilemap;
 
-        const layer = tilemap.rootLayer.findLayer(this.layerId);
+        const layer = tilemap.rootLayer.findLayer(this.layerId)
         if (!layer) return Result.Error("Layer not found");
-        if (!(layer instanceof TileLayer)) return Result.Error("Layer is not a tile layer");
+        if (!(layer instanceof RuleLayer)) return Result.Error("Layer is not a rule layer");
 
-        const result = layer.setTilesAt(this.data);
+        const result = layer.setRuleRefsAt(this.updates);
 
-        if (result.status === Result.Status.Success) {
+        if (result.status === Result.Status.Success && result.data) {
+            this.oldRules = result.data;
             currentSession.markAsDirty();
-            this.oldData = result.data;
         }
 
         return result
     }
 
     public undo(context: EditorContext): Result {
-        if (this.oldData.length === 0) return Result.Cancel("No tile changed");
+        if (this.oldRules.length === 0) return Result.Cancel("No rule changed");
 
         const currentSession = context.getCurrentTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
@@ -48,19 +45,22 @@ export class SetTilesCommand implements IBaseCommand {
 
         const layer = tilemap.rootLayer.findLayer(this.layerId);
         if (!layer) return Result.Error("Layer not found");
-        if (!(layer instanceof TileLayer)) return Result.Error("Layer is not a tile layer");
+        if (!(layer instanceof RuleLayer)) return Result.Error("Layer is not a rule layer");
 
-        if (this.oldData.length === 0) return Result.Cancel("No tile changed");
+        const undoUpdates = this.oldRules.map(old => ({
+            coordinate: old.coordinate,
+            rulesetId: old.oldRulesetId
+        }));
 
-        const result = layer.setTilesAt(this.oldData);
-
-        if (result.status === Result.Status.Success) currentSession.markAsDirty();
+        const result = layer.setRuleRefsAt(undoUpdates);
+        if (result.status === Result.Status.Success) {
+            currentSession.markAsDirty();
+        }
 
         return result
     }
 
     public delete(): void {
-        this.data = [];
-        this.oldData = [];
+        
     }
 }
