@@ -147,7 +147,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	}
 
 	return (
-		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full ${isSelected ? "bg-select-color/50" : "hover:bg-select-color/25"}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
+		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full ${isSelected ? "bg-accent/50" : "hover:bg-accent/25"}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
                     <div className="w-4 cursor-pointer" onClick={handleToggle}>

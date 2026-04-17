@@ -4,7 +4,7 @@ import TilesetViewTabs from "./TilesetViewTabs";
 
 export default function TilesetView() {
 	return (
-		<VStack className="tilesetView h-full bg-secondary-background pt-1">
+		<VStack className="tilesetView h-full px-1 py-2 bg-surface">
 			<TilesetViewTabs />
 			<TilesetViewCanvas />
 		</VStack>

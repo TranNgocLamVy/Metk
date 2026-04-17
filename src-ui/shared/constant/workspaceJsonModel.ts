@@ -4,32 +4,45 @@ const workspaceRowNode: IJsonRowNode = {
     type: "row",
     children: [
         {
-            type: "tabset",
+            type: "col",
             weight: 25,
             children: [
                 {
-                    type: "tab",
-                    name: "Tilesets",
-                    component: "tilesetView",
-                    enableClose: false,
+                    type: "tabset",
+                    weight: 50,
+                    children: [
+                        {
+                            type: "tab",
+                            name: "Tilesets",
+                            component: "tilesetView",
+                            enableClose: false,
+                        },
+                        {
+                            type: "tab",
+                            name: "Rulesets",
+                            component: "rulesetManager",
+                            enableClose: false,
+                        },
+                        
+                    ],
                 },
                 {
-                    type: "tab",
-                    name: "Rulesets",
-                    component: "rulesetManager",
-                    enableClose: false,
-                },
-                {
-                    type: "tab",
-                    name: "Layers",
-                    component: "layerManager",
-                    enableClose: false,
+                    type: "tabset",
+                    weight: 50,
+                    children: [
+                        {
+                            type: "tab",
+                            name: "Layers",
+                            component: "layerManager",
+                            enableClose: false,
+                        }
+                    ]
                 }
-            ],
+            ]
         },
         {
             type: "tabset",
-            weight: 75,
+            weight: 80,
             enableDrag: false,
             enableDrop: false,
             enableMaximize: false,
@@ -46,44 +59,17 @@ const workspaceRowNode: IJsonRowNode = {
     ],
 };
 
-const workspaceBorderNodes: IJsonBorderNode[] = [
-    {
-        type: "border",
-        location: "bottom",
-        size: 100,
-        enableDrop: false,
-        children: [
-            {
-                type: "tab",
-                name: "Terminal",
-                id: "Terminal",
-                icon: "Terminal",
-                component: "Terminal",
-                enableDrag: false,
-                enableClose: false,
-                helpText: "Terminal",
-            },
-            {
-                type: "tab",
-                name: "Debug",
-                id: "Debug",
-                component: "debug",
-                enableDrag: false,
-                enableClose: false,
-                helpText: "Debug",
-            },
-        ],
-    },
-];
-
 export const workspaceLayout: IJsonModel = {
     global: {
-        splitterSize: 3,
+        splitterSize: 0,
+        splitterExtra: 10,
         borderEnableDrop: false,
         tabSetEnableMaximize: false,
         splitterEnableHandle: true,
         tabEnableRename: false,
-        tabEnableRenderOnDemand: false,
+        tabEnableRenderOnDemand: true,
+        
+        
     },
     layout: workspaceRowNode,
 };

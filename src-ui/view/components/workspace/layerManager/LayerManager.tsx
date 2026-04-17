@@ -63,18 +63,16 @@ export default function LayerManager() {
 	};
 
 	return (
-		<VStack className="w-full h-full rounded-md no-scrollbar" onDrop={handleContainerDrop} onDragOver={handleDragOver}>
+		<VStack className="w-full h-full px-1 py-2 bg-surface" onDrop={handleContainerDrop} onDragOver={handleDragOver}>
 			<ContextMenu onOpenChange={onOpenChange}>
-				<ContextMenuTrigger className="w-full h-full no-scrollbar pt-1 bg-secondary-background">
-					<ScrollArea className="w-full h-full no-scrollbar bg-background rounded-lg border-2 shadow-sm">
-						<div className="flex-1 h-2 transition-colors" />
+				<ContextMenuTrigger className="w-full h-full no-scrollbar">
+					<ScrollArea className="w-full h-full shadow-sm bg-surface-overlay-raised">
 						<div className="flex flex-col w-full min-h-full pb-10">
 							{flatView.map((view) => (
 								<LayerNodeRow key={view.id} view={view} isSelected={selectedIds.includes(view.id)} />
 							))}
 						</div>
 						<div className="flex-1 min-h-[10px] h-full transition-colors" />
-						<ScrollBar className="w-2" />
 					</ScrollArea>
 				</ContextMenuTrigger>
 				<ContextMenuContent className={LayerManagerContextMenu.className}>

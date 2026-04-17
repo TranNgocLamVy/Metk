@@ -39,11 +39,12 @@
         "fitInView": "Fit Map in View"
     },
     "home": {
-        "welcome": "Welcome to Metk",
+        "welcome": "Map Editor Toolkit",
+        "description": "A free and open source editor for tilemap",
+        "start": "Start",
         "importProject": "Import Project",
         "newProject": "New Project",
         "recentProjects": "Recents Projects",
-        "description": "Description",
         "version": "Version",
         "createdAt": "Created At",
         "updatedAt": "Updated At"

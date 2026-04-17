@@ -42,7 +42,7 @@ export default function RuleHeader() {
                 <DropdownMenuTrigger asChild>
                     <div className="h-full aspect-square" style={{ backgroundColor: tempColor }} />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-background p-4">
+                <DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-surface-overlay shadow-lg p-4">
                     <VStack className="custom-sketch-picker w-fit">
                         <style>{`.custom-sketch-picker label { color: var(--foreground) !important; }`}</style>
                         <SketchPicker color={tempColor} onChange={(color) => setTempColor(color.hex)} styles={customStyles} disableAlpha presetColors={[]} />
@@ -54,7 +54,7 @@ export default function RuleHeader() {
                 onChange={(e) => setTempName(e.target.value)}
                 onBlur={handleRename}
                 onKeyDown={(e) => { if (e.key === "Enter") handleRename() }}
-                className="text-sm w-full border py-1 px-2 focus:outline-1 focus:outline-foreground bg-background"
+                className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-overlay-sunken"
             />
             <Button size={"icon"} variant={"outline"} onClick={addRule} className="h-full aspect-square">
                 <Plus />

@@ -155,6 +155,6 @@ const DeleteActionGroup: MenuDropDownGroupType = [
 
 export const LayerManagerContextMenu: MenuItemType = {
 	name: "LayerManager",
-	className: "w-60 bg-secondary-background",
+	className: "w-60",
 	groups: [CreateActionGroup, MoveLayerActionGroup, PropertiesActionGroup, DeleteActionGroup],
 };

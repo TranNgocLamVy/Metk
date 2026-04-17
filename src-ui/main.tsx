@@ -1,5 +1,6 @@
 import "@/assets/style/flexLayout/style.css";
 import "@/assets/style/global.css";
+import "@/assets/style/shadcn.css";
 
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";

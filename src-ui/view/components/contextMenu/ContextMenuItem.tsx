@@ -37,7 +37,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 	}
 
 	if (item.type === "subMenu") {
-		const subMenusClassName = twMerge("w-70 bg-secondary-background", item.subMenusClassName);
+		const subMenusClassName = twMerge("w-70 bg-surface-overlay border-0", item.subMenusClassName);
 		return (
 			<ContextMenuSub>
 				<ContextMenuSubTrigger className="gap-2 h-6 text-xs" disabled={disabled}>

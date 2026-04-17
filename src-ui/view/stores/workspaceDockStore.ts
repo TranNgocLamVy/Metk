@@ -12,7 +12,10 @@ const getModel = () => {
     const localStorageLayout = localStorage.getItem("workspaceLayout");
     if (localStorageLayout) {
         try {
-            return Model.fromJson(JSON.parse(localStorageLayout));
+            const localModel = JSON.parse(localStorageLayout)
+            const newModel = {...workspaceLayout}
+            newModel.layout = localModel.layout
+            return Model.fromJson(workspaceLayout);
         } catch (e) {
             console.error("Failed to parse workspace layout from localStorage", e);
         }
