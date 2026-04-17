@@ -23,7 +23,7 @@ function ScrollArea({
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar />
+      <ScrollBar className="w-2" />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   )
@@ -47,7 +47,7 @@ function ScrollBar({
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
         data-slot="scroll-area-thumb"
-        className="rounded-none bg-border relative flex-1"
+        className="rounded-none bg-foreground/20 relative flex-1"
       />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   )

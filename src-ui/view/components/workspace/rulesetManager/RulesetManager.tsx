@@ -43,18 +43,18 @@ export default function RulesetManager() {
     }, [])
 
     return (
-        <VStack className="w-full h-full rounded-md no-scrollbar">
+        <VStack className="w-full h-full px-1 py-2 bg-surface">
             <ContextMenu>
-                <ContextMenuTrigger className="w-full h-full no-scrollbar pt-1 bg-secondary-background">
-                    <ScrollArea className="w-full h-full no-scrollbar bg-background rounded-lg border-2 shadow-sm">
+                <ContextMenuTrigger className="w-full h-full">
+                    <ScrollArea className="w-full h-full no-scrollbar bg-surface-overlay-raised rounded-lg shadow-sm">
                         <div className="flex flex-col w-full min-h-full pb-10">
                             {rulesets.map((ruleset) => (
                                 <HStack onClick={() => onSelectRule(ruleset.id)} key={ruleset.id}
-                                    className={`flex items-center justify-center gap-2 p-2 ${selectedRuleId === ruleset.id ? "bg-select-color/50" : "hover:bg-select-color/20"}`}
+                                    className={`flex items-center justify-center gap-2 p-2 ${selectedRuleId === ruleset.id ? "bg-accent/50" : "hover:bg-accent/20"}`}
                                 >
                                     <div className="w-8 h-8" style={{ backgroundColor: ruleset.color ?? "#fff" }} />
-                                    <div className="text-xs font-bold text-foreground flex items-center">{ruleset.name}</div>
-                                    <Button className="ml-auto hover:bg-background/20" size={"icon"} variant={"ghost"} onClick={(e) => onEditRule(e, ruleset.id)}>
+                                    <div className="text-xs text-foreground flex items-center">{ruleset.name}</div>
+                                    <Button className="ml-auto" size={"icon"} variant={"ghost"} onClick={(e) => onEditRule(e, ruleset.id)}>
                                         <Pen />
                                     </Button>
                                     <Button size={"icon"} variant={"destructive"} onClick={(e) => onDeleteRule(e, ruleset.id)}>

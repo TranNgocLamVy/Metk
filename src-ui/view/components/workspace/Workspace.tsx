@@ -8,7 +8,6 @@ import { useWorkspaceDockStore } from "@/view/stores/workspaceDockStore";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import ContextBar from "./ContextBar";
-import ToolBar from "./ToolBar";
 import TilesetView from "./tilesetView/TilesetView";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
@@ -46,15 +45,14 @@ export default function Workspace() {
 	};
 
 	return (
-		<HStack className="w-full h-full bg-secondary-background">
-			<VStack className="w-full h-full">
-				<VStack className="workspace w-full h-full p-1 relative">
+		<HStack className="w-full h-full">
+			<VStack className="w-full h-full px-1 bg-surface">
+				<VStack className="workspace w-full h-full relative">
 					<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
-					<div className="top-0 left-0 w-full h-full absolute pointer-events-none shadow-[inset_0px_0px_10px_5px_rgba(0,_0,_0,_0.1)]" />
+					<div className="top-0 left-0 w-full h-full absolute pointer-events-none" />
 				</VStack>
 				<ContextBar />
 			</VStack>
-			<ToolBar />
 		</HStack>
 	);
 }

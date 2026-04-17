@@ -10,7 +10,7 @@ interface ContextMenuWrapperProps {
 }
 
 export default function ContextMenuWrapper({ item, children }: ContextMenuWrapperProps) {
-    const className = twMerge("w-40 bg-secondary-background", item.className);
+    const className = twMerge("w-40 bg-surface-overlay", item.className);
 	return (
 		<ContextMenu modal={true}>
 			<ContextMenuTrigger className="w-full h-full">

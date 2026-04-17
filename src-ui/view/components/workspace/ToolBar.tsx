@@ -1,14 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Fragment } from "react";
 
 import { AppCore } from "@/core/appcore";
 import { useToolbarStore } from "@/view/stores/toolbarStore";
 
-import SVGIcon from "../custom/icons/SvgIcon";
 import { VStack } from "../custom/stack/Stack";
-import { Separator } from "../shadcn/separator";
-import { Toggle } from "../shadcn/toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../shadcn/tooltip";
 
 export default function ToolBar() {
 	const { version, getTools, getActiceTool } = useToolbarStore();
@@ -23,8 +19,8 @@ export default function ToolBar() {
 	};
 
 	return (
-		<VStack className="h-full w-8 bg-background">
-			{tools.map((tool, index) => {
+		<VStack className="h-full w-8 bg-surface">
+			{/* {tools.map((tool, index) => {
 				return (
 					<Fragment key={tool.id}>
 						{index != 0 && <Separator />}
@@ -43,7 +39,7 @@ export default function ToolBar() {
 						</Tooltip>
 					</Fragment>
 				);
-			})}
+			})} */}
 		</VStack>
 	);
 }

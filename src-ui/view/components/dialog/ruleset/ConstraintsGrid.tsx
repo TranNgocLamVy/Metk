@@ -102,7 +102,7 @@ export default function ConstraintsGrid({ selectedGrid, setSelectedGrid, selecte
 
                 if (index === middleIndex) {
                     return (
-                        <div key={index} className={`aspect-square bg-secondary-background relative p-2 flex items-center justify-center border cursor-not-allowed`} >
+                        <div key={index} className={`aspect-square bg-surface-overlay relative p-2 flex items-center justify-center cursor-not-allowed`} >
                             <div className="w-full h-full" style={{ backgroundColor: currentRulesetColor }} />
                         </div>
                     )
@@ -117,7 +117,7 @@ export default function ConstraintsGrid({ selectedGrid, setSelectedGrid, selecte
                                 if (e.deltaY > 0) handleChangeSelectedTarget(1);
                                 if (e.deltaY < 0) handleChangeSelectedTarget(-1);
                             }}
-                            className={`aspect-square bg-background relative p-2 flex items-center justify-center border ${selectedGrid === index ? "border-select-color" : "border-foreground/20 hover:border-select-color/50"}`}
+                            className={`aspect-square bg-surface-overlay-raised relative p-2 flex items-center justify-center ${selectedGrid === index ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent hover:border-transparent"}`}
                         >
                             {firstConstraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstConstraintColor }} />}
                             <div className="absolute">
@@ -166,7 +166,7 @@ function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: num
             <TooltipContent
                 side="bottom"
                 sideOffset={8}
-                className="w-80 min-h-fit bg-secondary-background border border-foreground/20 shadow-md p-2"
+                className="w-80 min-h-fit bg-surface-overlay shadow-lg p-2"
             >
                 <VStack className="flex-1 gap-4">
                     <HStack align="center" justify="center" className="h-fit w-fit gap-2">
@@ -182,7 +182,7 @@ function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: num
                             {!isEmpty && targets.map((target) => {
                                 const ruleset = rulesetList.find((ruleset) => ruleset.id === target);
                                 return (
-                                    <div key={target} className="w-fit h-fit flex items-center justify-center bg-secondary-background hover:bg-select-color/20 border border-foreground/20 rounded-md">
+                                    <div key={target} className="w-fit h-fit flex items-center justify-center border border-foreground/20 rounded-md">
                                         <div className="size-8 aspect-square" style={{ backgroundColor: ruleset?.color ?? "#ffffff" }} />
                                         <span className="px-2">{ruleset?.name}</span>
                                     </div>

@@ -177,8 +177,8 @@ const GroupField = ({ field, value = {}, onChange }: { field: GroupFieldInput; v
     }
 
     return (
-        <div className="relative mt-3 rounded-md border border-input p-4 pt-6 h-full">
-            <label className="absolute -top-2.5 left-3 bg-background px-1 text-sm font-semibold text-foreground">{label}</label>
+        <div className="relative mt-3 rounded-md border border-foreground/40 p-4 pt-6 h-full">
+            <label className="absolute -top-2.5 left-3 bg-surface-overlay px-1 text-sm font-semibold text-foreground">{label}</label>
             {content}
         </div>
     );

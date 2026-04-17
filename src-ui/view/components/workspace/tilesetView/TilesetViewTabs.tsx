@@ -16,40 +16,37 @@ export default function TilesetViewTabs() {
 
 	const { version, getTilesetDisplayData, getCurrentTilesetSessionId } = useTilesetSessionStore();
 
-    const tilesetsDisplayData = useMemo(() => {
-        return getTilesetDisplayData();
-    }, [version, getTilesetDisplayData])
+	const tilesetsDisplayData = useMemo(() => {
+		return getTilesetDisplayData();
+	}, [version, getTilesetDisplayData])
 
-    const currentTilesetSessionId = useMemo(() => {
-        return getCurrentTilesetSessionId();
-    }, [version, getCurrentTilesetSessionId])
+	const currentTilesetSessionId = useMemo(() => {
+		return getCurrentTilesetSessionId();
+	}, [version, getCurrentTilesetSessionId])
 
 	return (
 		<HStack className="w-full h-fit" justify="start" align="center">
-			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar gap-0">
+			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar bg-surface-base w-full h-8">
 				{tilesetsDisplayData.map((tilesetSession) => {
 					const isCurrent = currentTilesetSessionId === tilesetSession.sessionId;
 					const openTilesetSession = () => {
 						if (isCurrent) return;
 						WorkspaceService.openTilesetSession(tilesetSession.sessionId);
 					};
-                    const closeTilesetSession = (e: any) => {
-                        e.stopPropagation();
-                        WorkspaceService.closeTilesetSession(tilesetSession.sessionId);
-                    };
+					const closeTilesetSession = (e: any) => {
+						e.stopPropagation();
+						WorkspaceService.closeTilesetSession(tilesetSession.sessionId);
+					};
 					return (
-						<Button key={tilesetSession.sessionId} onClick={openTilesetSession} size={"sm"} className={`pr-1 rounded-none text-foreground hover:bg-background cursor-pointer ${isCurrent ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
+						<Button key={tilesetSession.sessionId}
+							variant={"empty"}
+							onClick={openTilesetSession} size={"sm"}
+							className={`pr-1 h-full border-none ${isCurrent ? "text-foreground bg-surface tab relative" : "text-muted-foreground hover:text-foreground bg-transparent"}`}>
+							<style>{`.tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: var(--foreground); }`}</style>
 							{tilesetSession.name}
-							<Tooltip delayDuration={500}>
-								<TooltipTrigger asChild>
-									<div className="rounded-2xl hover:bg-background p-1" onClick={closeTilesetSession}>
-										<X />
-									</div>
-								</TooltipTrigger>
-								<TooltipContent side="top" className="bg-background p-1 rounded-lg">
-									<p>Close</p>
-								</TooltipContent>
-							</Tooltip>
+							<div className="hover:bg-surface-sunken p-1" onClick={closeTilesetSession}>
+								<X />
+							</div>
 						</Button>
 					);
 				})}

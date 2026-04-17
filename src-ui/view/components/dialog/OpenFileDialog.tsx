@@ -29,13 +29,13 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
 
     return (
         <CommandDialog open onOpenChange={onOpenChange} title="Open File" description="Open Tilemap or Tileset" className="w-fit h-fit">
-            <Command onClick={(e) => e.stopPropagation()} className={`h-90 w-90 shadow-md border bg-secondary-background p-4 rounded-md gap-2`}>
+            <Command onClick={(e) => e.stopPropagation()} className={`h-90 w-90 shadow-lg bg-surface-overlay p-4 rounded-md gap-2`}>
                 <CommandInput placeholder="Type to seach for files..." />
                 <CommandList>
                     {tilemaps.length > 0 && <CommandGroup heading="Tilemaps">
                         {tilemaps.map((tilemap) => {
                             return (
-                                <div key={tilemap.id} onClick={() => onOpenTilemap(tilemap.id)} className="w-full h-fit p-2 bg-secondary-background hover:bg-background cursor-pointer">
+                                <div key={tilemap.id} onClick={() => onOpenTilemap(tilemap.id)} className="w-full h-fit p-2 hover:bg-surface-overlay-sunken cursor-pointer">
                                     <span className="text-xs">{tilemap.name}</span>
                                 </div>
                             )
@@ -45,7 +45,7 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
                     {tilesets.length > 0 && <CommandGroup heading="Tilesets">
                         {tilesets.map((tileset) => {
                             return (
-                                <div key={tileset.id} onClick={() => onOpenTileset(tileset.id)} className="w-full h-fit p-2 bg-secondary-background hover:bg-background cursor-pointer">
+                                <div key={tileset.id} onClick={() => onOpenTileset(tileset.id)} className="w-full h-fit p-2 hover:bg-surface-overlay-sunken cursor-pointer">
                                     <span className="text-xs">{tileset.name}</span>
                                 </div>
                             )

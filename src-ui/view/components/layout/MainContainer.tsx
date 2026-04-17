@@ -42,7 +42,7 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 	}, [])
 
 	return (
-		<main id="main-container" {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-background">
+		<main id="main-container" {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-surface-base">
 			<SecurityShield />
 			{children}
 		</main>

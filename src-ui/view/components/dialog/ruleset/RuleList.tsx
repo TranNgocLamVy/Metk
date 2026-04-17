@@ -68,7 +68,7 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
             align="center"
             onClick={() => setSelectedRule(rule.id)}
             draggable
-            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-select-color/50" : "bg-background hover:bg-select-color/20"}`}
+            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-accent text-accent-foreground" : "bg-surface-overlay-raised hover:bg-accent/50 hover:text-accent-foreground"}`}
         >
             <GripHorizontal size={16} className="cursor-grab active:cursor-grabbing" />
             {index + 1}
@@ -114,12 +114,12 @@ function RuleDropdown({ rule }: { rule: Rule }) {
                     <EllipsisVertical size={16} />
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" className="bg-secondary-background w-40 gap-2" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onClick={handleDuplicate} className="h-dropdown-menu text-dropdown-menu">
+            <DropdownMenuContent side="right" className="bg-surface-overlay w-40 gap-2" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuItem onClick={handleDuplicate} className="h-7 text-xs">
                     <Copy className="size-4" />
                     Duplicate rule
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDelete} variant="destructive" className="h-dropdown-menu text-dropdown-menu">
+                <DropdownMenuItem onClick={handleDelete} variant="destructive" className="h-7 text-xs">
                     <Trash2 className="size-4" />
                     Delete
                 </DropdownMenuItem>
@@ -138,7 +138,7 @@ function RuleToolTip({ rule, children }: { rule: Rule, children: React.ReactNode
             <TooltipContent
                 side="bottom"
                 sideOffset={8}
-                className="w-80 h-40 bg-secondary-background border border-foreground/20 shadow-md"
+                className="w-80 h-40 bg-secondary-background border border-foreground/20 shadow-lg"
             >
                 <HStack>
 

@@ -73,10 +73,11 @@ export default function OutputSelector() {
         <VStack className="w-full h-full gap-2">
             <HStack>
                 <TilesetSelector selectTileset={selectTileset} />
-                <ScrollArea className="flex-1 whitespace-nowrap">
+                <ScrollArea className="flex-1 whitespace-nowrap bg-surface-base">
                     <HStack className="flex">
                         {usedTilesets.map((tilesetRef) => (
-                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} size={"sm"} className={`rounded-none h-8 text-foreground hover:bg-background cursor-pointer ${activeTilesetId === tilesetRef.id ? "border-b-2 border-b-foreground bg-background shadow-sm" : "bg-secondary-background"}`}>
+                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} size={"sm"} className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
+                                <style>{`.rs_tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: calc(100%); height: 2px; background-color: var(--foreground); }`}</style>
                                 {tilesetRef.name}
                             </Button>
                         ))}
@@ -84,9 +85,9 @@ export default function OutputSelector() {
                     <ScrollBar orientation="horizontal" className="invisible" />
                 </ScrollArea>
             </HStack>
-            <div ref={containerRef} className="flex-1 overflow-hidden bg-background">
+            <div ref={containerRef} className="flex-1 overflow-hidden">
                 <div className='flex w-full h-full overflow-hidden relative'>
-                    <PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="rounded-lg border-2 shadow-sm w-full h-full absolute" />
+                    <PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm w-full h-full absolute" />
                 </div>
             </div>
         </VStack>
@@ -116,12 +117,12 @@ function TilesetSelector({ selectTileset }: { selectTileset: (tilesetId: string)
                     <Plus className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48 bg-background">
+            <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
                 {allTilesets.length === 0 ? (
-                    <DropdownMenuItem disabled className="h-dropdown-menu">No available tilesets</DropdownMenuItem>
+                    <DropdownMenuItem disabled className="h-7">No available tilesets</DropdownMenuItem>
                 ) : (
                     allTilesets.map((ts) => (
-                        <DropdownMenuItem key={ts.id} onClick={() => handleAddTileset(ts.id)} className="h-dropdown-menu">
+                        <DropdownMenuItem key={ts.id} onClick={() => handleAddTileset(ts.id)} className="h-dropdown-menu text-xs">
                             {ts.name}
                         </DropdownMenuItem>
                     ))

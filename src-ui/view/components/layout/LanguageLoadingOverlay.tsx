@@ -22,7 +22,7 @@ export const LanguageLoadingOverlay: React.FC = () => {
 	if (!isChanging) return null;
 
 	return (
-		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm">
+		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-surface-base backdrop-blur-sm">
 			<Spinner />
 		</div>
 	);

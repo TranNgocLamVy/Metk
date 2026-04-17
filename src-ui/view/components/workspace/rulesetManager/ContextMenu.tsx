@@ -14,6 +14,6 @@ const CreateActionGroup: MenuDropDownGroupType = [
 
 export const RulesetManagerContextMenu: MenuItemType = {
 	name: "LayerManager",
-	className: "w-60 bg-secondary-background",
+	className: "w-60",
 	groups: [CreateActionGroup],
 };

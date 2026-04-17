@@ -24,16 +24,16 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
     const name = typeof item.name === "function" ? item.name() : item.name;
-	const className = twMerge("w-96 bg-secondary-background shadow-md", item.className);
+	const className = twMerge("w-96 bg-surface-overlay shadow-lg", item.className);
 
 	return (
-		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={true}>
-			<DropdownMenuTrigger disabled={disabled}>
-				<Button size={"sm"} variant={"ghost"} className="px-2 rounded-none" asChild>
+		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+			<DropdownMenuTrigger disabled={disabled} asChild>
+				<Button size={"sm"} variant={"empty"} className="px-2 rounded-none h-8 hover:bg-surface-sunken" asChild>
 					<p className="text-xs">{translate(name)}</p>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className={className} side="bottom" align="start" >
+			<DropdownMenuContent className={className} side="bottom" align="start" sideOffset={0} >
 				<MenuBarDropdownGroup groups={item.groups} />
 			</DropdownMenuContent>
 		</DropdownMenu>
@@ -88,7 +88,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 
 	if (item.type === "option") {
 		return (
-			<DropdownMenuItem className="gap-2 h-dropdown-menu text-dropdown-menu" disabled={disabled} onClick={item.onClick}>
+			<DropdownMenuItem className="gap-2 h-7 text-xs" disabled={disabled} onClick={item.onClick}>
 				{wrapIcon(item.startIcon)}
 				{name}
 				{wrapIcon(item.endIcon, false)}
@@ -102,12 +102,12 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 		const subMenusClassName = twMerge("w-70", item.subMenusClassName);
 		return (
 			<DropdownMenuSub>
-				<DropdownMenuSubTrigger className="gap-2 h-dropdown-menu text-dropdown-menu" disabled={disabled}>
+				<DropdownMenuSubTrigger className="gap-2 h-7 text-xs" disabled={disabled}>
 					{wrapIcon(item.startIcon)}
 					{name}
 					{wrapIcon(item.endIcon, false)}
 				</DropdownMenuSubTrigger>
-				<DropdownMenuSubContent className={subMenusClassName} sideOffset={5}>
+				<DropdownMenuSubContent className={subMenusClassName} sideOffset={0}>
 					<MenuBarDropdownGroup groups={item.subMenus} />
 				</DropdownMenuSubContent>
 			</DropdownMenuSub>
@@ -116,7 +116,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 
 	if (item.type === "check") {
 		return (
-			<DropdownMenuCheckboxItem className="gap-2 h-dropdown-menu text-dropdown-menu" checked={item.checked()} disabled={disabled} onSelect={(e) => {
+			<DropdownMenuCheckboxItem className="gap-2 h-7 text-xs" checked={item.checked()} disabled={disabled} onSelect={(e) => {
                 e.preventDefault();
                 item.toggle();
             }}>
@@ -135,7 +135,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 				{item.items.map((radioItem) => {
 					const disabled = (radioItem.disabled != undefined && radioItem.disabled()) || false;
 					return (
-						<DropdownMenuRadioItem onSelect={(e) => e.preventDefault()} className="gap-2 h-dropdown-menu text-dropdown-menu" key={radioItem.value} value={radioItem.value} disabled={disabled}>
+						<DropdownMenuRadioItem onSelect={(e) => e.preventDefault()} className="gap-2 h-7 text-xs" key={radioItem.value} value={radioItem.value} disabled={disabled}>
 							{wrapIcon(radioItem.startIcon, false)}
 							{radioItem.name}
 						</DropdownMenuRadioItem>

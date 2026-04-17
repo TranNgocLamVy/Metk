@@ -85,10 +85,10 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
                 showCloseButton={false}
             >
                 <DialogTitle className="hidden">Ruleset Editor</DialogTitle>
-                <VStack className="w-fit h-full bg-secondary-background p-2 rounded-md gap-2">
+                <VStack className="w-fit h-full bg-surface-overlay p-2 gap-2">
                     <RuleHeader />
                     <RuleList />
-                    <HStack className="w-full h-fit gap-4">
+                    <HStack className="w-full h-fit gap-2">
                         <DialogClose asChild>
                             <Button variant="outline" type="button" onClick={() => closeDialog(dialogId)} className="ml-auto">Discard change</Button>
                         </DialogClose>
@@ -97,7 +97,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
                 </VStack>
 
                 <HStack className="flex-1 gap-4">
-                    <HStack className="w-2/5 h-full p-2 gap-2 bg-secondary-background">
+                    <HStack className="w-2/5 h-full p-2 gap-2 bg-surface-overlay">
                             <VStack className="h-full gap-8">
                                 <div className="w-full aspect-[7/5] grid grid-cols-7">
                                     <div className="col-span-5">
@@ -118,7 +118,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
                             </VStack>
                         </HStack>
 
-                    <VStack className="w-3/5 h-full p-2 bg-secondary-background">
+                    <VStack className="w-3/5 h-full p-2 bg-surface-overlay">
                         <OutputSelector />
                     </VStack>
                 </HStack>

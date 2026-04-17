@@ -21,7 +21,7 @@ export default function MenuBar() {
 	};
 
 	return (
-		<HStack id="menu-bar" className="w-full h-fit pb-0.5 overflow-hidden bg-background shadow-md fixed top-0 z-50">
+		<HStack id="menu-bar" className="w-full h-fit overflow-hidden bg-surface fixed top-0 z-50">
 			<HStack className="text-foreground/70">
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />
@@ -37,15 +37,6 @@ export default function MenuBar() {
 				<Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
 					<SunMoon className="size-4" />
 				</Button>
-				{/* <Button title="Minimize" size={"icon-sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().minimize()}>
-					<Minus className="size-4" />
-				</Button>
-				<Button title="Toggle Maximize" size={"icon-sm"} variant={"ghost"} className="px-6 rounded-none" onClick={() => getCurrentWindow().toggleMaximize()}>
-					<Copy className="size-3" style={{ transform: "scaleX(-1)" }} />
-				</Button>
-				<Button title="Close" size={"icon-sm"} variant={"pseudo_destructive"} className="px-6 rounded-none" onClick={() => getCurrentWindow().close()}>
-					<X className="size-4" />
-				</Button> */}
 			</HStack>
 		</HStack>
 	);
