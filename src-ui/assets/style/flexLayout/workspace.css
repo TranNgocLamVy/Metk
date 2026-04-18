@@ -52,7 +52,7 @@
 }
 
 .workspace .flexlayout__mini_scrollbar_container {
-	background-color: var(--background-surface-base);
+	background-color: var(--background-surface);
 	padding-left: 4px;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .workspace .flexlayout__tabset_tabbar_inner {
-	background-color: var(--background-base);
+	background-color: var(--background-surface-sunken);
 }
 
 .workspace .flexlayout__tab_button {

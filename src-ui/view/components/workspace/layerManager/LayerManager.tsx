@@ -66,7 +66,7 @@ export default function LayerManager() {
 		<VStack className="w-full h-full px-1 py-2 bg-surface" onDrop={handleContainerDrop} onDragOver={handleDragOver}>
 			<ContextMenu onOpenChange={onOpenChange}>
 				<ContextMenuTrigger className="w-full h-full no-scrollbar">
-					<ScrollArea className="w-full h-full shadow-sm bg-surface-overlay-raised">
+					<ScrollArea className="w-full h-full shadow-sm bg-surface-base">
 						<div className="flex flex-col w-full min-h-full pb-10">
 							{flatView.map((view) => (
 								<LayerNodeRow key={view.id} view={view} isSelected={selectedIds.includes(view.id)} />
