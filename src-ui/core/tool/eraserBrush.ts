@@ -29,6 +29,7 @@ export class EraserBrush implements ITool {
 
     private previousPreviewCoordinate: Coordinate = null!;
     private currentPreviewCoordinate: Coordinate = null!;
+    private eraseCoordinateSet: Set<string> = new Set();
 
     private isDragging: boolean = false;
     private previewGraphics: Graphics | null = null;
@@ -248,11 +249,13 @@ export class EraserBrush implements ITool {
                         continue;
                     }
                     const coord = { col: targetX, row: targetY };
+                    if (this.eraseCoordinateSet.has(`${coord.col},${coord.row}`)) continue;
                     if (activeLayer instanceof TileLayer) {
                         if (!activeLayer.getTileRefAt(coord)) continue;
                     } else if (activeLayer instanceof RuleLayer) {
                         if (!activeLayer.getRulesetRefAt(coord)) continue;
                     } // Expand to other layer types
+                    this.eraseCoordinateSet.add(`${coord.col},${coord.row}`);
                     eraseCoordinates.push(coord);
                 }
             }
@@ -267,6 +270,7 @@ export class EraserBrush implements ITool {
                 eraseCommand = new SetRuleRefsCommand(activeLayer.id, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
             } // Expand to other layer types
             
+            if (!eraseCommand) return;
             eraseCommand.execute(this.editorContext);
             this.eraseCommandStack.push(eraseCommand);
         }
@@ -275,6 +279,8 @@ export class EraserBrush implements ITool {
     }
 
     private eraseEnd(e: FederatedPointerEvent) {
+        this.eraseCoordinateSet.clear();
+
         const historyManager = this.editorContext.getCurrentHistoryManager();
         if (!historyManager) {
             this.eraseCommandStack.reverse().forEach(cmd => cmd.undo(this.editorContext));

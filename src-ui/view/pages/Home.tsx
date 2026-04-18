@@ -19,7 +19,7 @@ export default function HomePage() {
 	const { t: translate } = useTranslation(['common', 'home']);
 
 	return (
-		<VStack align="start" justify="start" className="w-full h-full p-16 pt-32 gap-2 bg-surface">
+		<VStack align="start" justify="start" className="w-full h-full px-32 py-32 gap-2 bg-surface">
 			<h1 className="text-3xl text-foreground font-bold">{translate('home.welcome')}</h1>
 			<h2 className="text-base text-muted-foreground font-semibold" >{translate('home.description')}</h2>
 

@@ -13,25 +13,9 @@ export interface StampPreviewData {
 export interface IStamp {
     canHandle(layer: BaseLayer<any>): boolean;
 
-    drawHoverPreview(
-        coord: Coordinate,
-        editorContext: EditorContext,
-        session: TilemapSession,
-        overlayContainer: Container
-    ): Sprite[];
+    drawHoverPreview(coord: Coordinate,editorContext: EditorContext,session: TilemapSession,overlayContainer: Container): Sprite[];
 
-    stampAt(
-        coord: Coordinate,
-        editorContext: EditorContext,
-        session: TilemapSession,
-        overlayContainer: Container,
-        previewMap: Map<string, StampPreviewData>
-    ): void;
+    stampAt(coord: Coordinate,editorContext: EditorContext,session: TilemapSession,overlayContainer: Container,previewMap: Map<string, StampPreviewData>): void;
 
-    commit(
-        layer: BaseLayer<any>,
-        previewMap: Map<string, StampPreviewData>,
-        editorContext: EditorContext,
-        historyManager: HistoryManager,
-    ): void;
+    commit(layer: BaseLayer<any>, previewMap: Map<string, StampPreviewData>, editorContext: EditorContext, historyManager: HistoryManager): void;
 }

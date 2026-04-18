@@ -63,6 +63,10 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		name: "Duplicate layer",
 		startIcon: <Copy />,
+		disabled: () => {
+            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+            return numberOfLayers < 1;
+        },
 		onClick() {
             TilemapLayerService.duplicateLayer();
         },

@@ -54,6 +54,10 @@ export class RuleStamp implements IStamp {
             return { coordinate: { col, row }, rulesetId: data.rulesetId };
         });
 
+        if (updates.length == 0) return;
+
+        historyManager.startTransaction();
         historyManager.execute(new SetRuleRefsCommand(layer.id, updates), editorContext);
+        historyManager.commitTransaction();
     }
 }
