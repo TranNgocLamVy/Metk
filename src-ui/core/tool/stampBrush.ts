@@ -64,6 +64,9 @@ export class StampBrush implements ITool {
     public onDisable(): void {
         this.previewSpriteMap.forEach((spriteData) => spriteData.sprite.destroy());
         this.previewSpriteMap.clear();
+
+        this.previewSprites.forEach(sprite => sprite.destroy());
+        this.previewSprites = [];
     }
 
     public attach(session: TilemapSession): void {
@@ -79,7 +82,7 @@ export class StampBrush implements ITool {
         viewport.addEventListener("mouseleave", this.bindPointerOutside);
 
         this.updateActiveStampType();
-        
+
         this.currentSession.eventEmitter.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
     }
 
@@ -182,8 +185,8 @@ export class StampBrush implements ITool {
         if (!this.currentSession) return null;
 
         const selectedIds = this.currentSession.layerState.selectedLayers;
-        if (selectedIds.length === 0) return null; 
-        
+        if (selectedIds.length === 0) return null;
+
         this.cachedTargetLayer = null;
 
         for (const id of selectedIds) {
@@ -193,7 +196,7 @@ export class StampBrush implements ITool {
                 break;
             }
         }
-        
+
         if (!this.cachedTargetLayer || this.cachedTargetLayer.locked || !this.cachedTargetLayer.visible) {
             this.activeStamp = null;
             return null;
@@ -245,14 +248,8 @@ export class StampBrush implements ITool {
 
 
         if (historyManager && this.activeStamp && this.cachedTargetLayer) {
-            this.activeStamp.commit(
-                this.cachedTargetLayer,
-                this.previewSpriteMap,
-                this.editorContext,
-                historyManager
-            );
+            this.activeStamp.commit(this.cachedTargetLayer, this.previewSpriteMap, this.editorContext, historyManager);
         }
-
         this.previewSpriteMap.forEach((data) => data.sprite.destroy());
         this.previewSpriteMap.clear();
     }

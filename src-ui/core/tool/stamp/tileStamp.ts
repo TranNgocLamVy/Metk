@@ -76,6 +76,8 @@ export class TileStamp implements IStamp {
             const [col, row] = key.split(',').map(Number);
             return { coordinate: { col, row }, tileId: data.tileId, tilesetId: data.tilesetId };
         });
+
+        if (payload.length == 0) return;
         
         historyManager.startTransaction();
         historyManager.execute(new SetTilesCommand(layer.id, payload), editorContext);
