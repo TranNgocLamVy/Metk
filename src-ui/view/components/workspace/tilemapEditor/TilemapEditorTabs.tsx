@@ -29,7 +29,7 @@ export default function TilemapEditorTabs() {
 
 	return (
 		<HStack className="w-full h-fit bg-surface pr-1" justify="start" align="center">
-			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar w-full h-8 bg-surface-base">
+			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar w-full h-8 bg-surface-sunken">
 				{tilemapSession.map((session) => {
 					const isCurrent = currentSessionId === session.sessionId;
 					const isDirty = session.isDirty;

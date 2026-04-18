@@ -147,7 +147,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	}
 
 	return (
-		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full ${isSelected ? "bg-accent/50" : "hover:bg-accent/25"}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
+		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
                     <div className="w-4 cursor-pointer" onClick={handleToggle}>
@@ -180,7 +180,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				<Button
 					variant={"ghost"}
 					size={"icon-sm"}
-                    className="hover:bg-white/20 ml-auto"
+                    className={`ml-auto hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -191,7 +191,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				<Button
 					variant={"ghost"}
 					size={"icon-sm"}
-                    className="hover:bg-white/20"
+                    className={`hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
 					onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();

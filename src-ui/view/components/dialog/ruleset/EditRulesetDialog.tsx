@@ -98,7 +98,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
 
                 <HStack className="flex-1 gap-4">
                     <HStack className="w-2/5 h-full p-2 gap-2 bg-surface-overlay">
-                            <VStack className="h-full gap-8">
+                            <VStack className="w-full h-full gap-8 p-2 bg-surface-base">
                                 <div className="w-full aspect-[7/5] grid grid-cols-7">
                                     <div className="col-span-5">
                                         <ConstraintsGrid selectedGrid={selectedGrid} setSelectedGrid={setSelectedGrid} selectedTarget={selectedTarget} setSelectedTarget={setSelectedTarget} />

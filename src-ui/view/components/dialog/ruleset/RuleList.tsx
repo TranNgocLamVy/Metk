@@ -68,7 +68,7 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
             align="center"
             onClick={() => setSelectedRule(rule.id)}
             draggable
-            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-accent text-accent-foreground" : "bg-surface-overlay-raised hover:bg-accent/50 hover:text-accent-foreground"}`}
+            className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-accent text-accent-foreground" : "bg-surface-base hover:bg-accent/50 hover:text-accent-foreground"}`}
         >
             <GripHorizontal size={16} className="cursor-grab active:cursor-grabbing" />
             {index + 1}
