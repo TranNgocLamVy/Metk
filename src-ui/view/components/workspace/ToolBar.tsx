@@ -26,7 +26,7 @@ export default function ToolBar() {
 				{tools.map((tool, index) => {
 					const isActive = activeTool === tool.id;
 					return (
-						<Button onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}>
+						<Button key={tool.id + index} onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}>
 							<SVGIcon svgString={tool.icon} />
 						</Button>
 					);
