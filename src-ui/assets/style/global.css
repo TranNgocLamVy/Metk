@@ -98,7 +98,7 @@
 
 	--foreground: rgb(225, 225, 225);
 
-	--accent: rgb(22, 162, 255);
+	--accent: rgba(12, 158, 255, 0.685);
 	--accent-foreground: oklch(0.97 0.014 254.604);
 
 	--muted: oklch(0.269 0 0);

@@ -117,7 +117,7 @@ export default function ConstraintsGrid({ selectedGrid, setSelectedGrid, selecte
                                 if (e.deltaY > 0) handleChangeSelectedTarget(1);
                                 if (e.deltaY < 0) handleChangeSelectedTarget(-1);
                             }}
-                            className={`aspect-square bg-surface-overlay-raised relative p-2 flex items-center justify-center ${selectedGrid === index ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent hover:border-transparent"}`}
+                            className={`aspect-square bg-surface-overlay-sunken relative p-2 flex items-center justify-center ${selectedGrid === index ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent hover:border-transparent"}`}
                         >
                             {firstConstraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstConstraintColor }} />}
                             <div className="absolute">

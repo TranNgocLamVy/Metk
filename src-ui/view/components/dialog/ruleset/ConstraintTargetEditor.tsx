@@ -66,7 +66,7 @@ export default function ConstraintTargetEditor({ selectedGrid, selectedTarget, s
                     return (
                         <div
                             key={constraint.constraint}
-                            className={`aspect-square bg-surface-overlay-raised flex flex-col gap-1 items-center justify-center border border-foreground/20 cursor-pointer ${selectedConstraint.getConstraint() === constraint.constraint && "outline-2 outline-accent"}`}
+                            className={`aspect-square bg-surface-overlay-sunken flex flex-col gap-1 items-center justify-center border border-foreground/20 cursor-pointer ${selectedConstraint.getConstraint() === constraint.constraint && "outline-2 outline-accent"}`}
                             onClick={() => handleChangeConstraint(constraint.constraint as RuleConstraintType)}
                         >
                             {constraint.icon}
@@ -85,7 +85,7 @@ export default function ConstraintTargetEditor({ selectedGrid, selectedTarget, s
                     return (
                         <div
                             key={ruleset.id}
-                            className={`bg-surface-overlay-raised flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${outline && "outline-2 outline-accent"}`}
+                            className={`bg-surface-overlay-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${outline && "outline-2 outline-accent"}`}
                             onClick={() => {
                                 if (requiredTarget) handleSelectTarget(ruleset.id);
                                 setSelectedTarget(ruleset.id);

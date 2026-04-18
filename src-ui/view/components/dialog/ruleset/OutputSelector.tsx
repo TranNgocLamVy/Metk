@@ -76,7 +76,7 @@ export default function OutputSelector() {
                 <ScrollArea className="flex-1 whitespace-nowrap bg-surface-base">
                     <HStack className="flex">
                         {usedTilesets.map((tilesetRef) => (
-                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} size={"sm"} className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
+                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant={"empty"} size={"sm"} className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
                                 <style>{`.rs_tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: calc(100%); height: 2px; background-color: var(--foreground); }`}</style>
                                 {tilesetRef.name}
                             </Button>
@@ -113,7 +113,7 @@ function TilesetSelector({ selectTileset }: { selectTileset: (tilesetId: string)
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0 shrink-0">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0">
                     <Plus className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
