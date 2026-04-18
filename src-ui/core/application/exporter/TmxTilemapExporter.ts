@@ -6,8 +6,9 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 import { EditorContext } from "../editorContext";
 import { BaseLayer } from "../tile/layer/baseLayer";
 import { GroupLayer } from "../tile/layer/groupLayer";
-import { TileLayer, TileRef } from "../tile/layer/tileLayer";
+import { TileLayer } from "../tile/layer/tileLayer";
 import { Tilemap } from "../tile/tilemap";
+import { RuleLayer } from "../tile/layer/ruleLayer";
 
 type XMLBuilder = ReturnType<typeof create>;
 
@@ -97,6 +98,9 @@ export class TmxTilemapExporter implements ITilemapExporter {
             } else if (childLayer instanceof GroupLayer) {
                 layer = this.getGroupLayer(childLayer, index, tilemap);
                 index++;
+            } else if (childLayer instanceof RuleLayer) {
+                layer = this.getRuleLayer(childLayer, index, tilemap);
+                index++;
             }
             return layer;
         }).filter((layer) => layer != null).reverse();
@@ -107,10 +111,12 @@ export class TmxTilemapExporter implements ITilemapExporter {
         const layer = create({
             group: {
                 '@id': groupLayer.id,
-                '@name': groupLayer.name
+                '@name': groupLayer.name,
+                '@visible': groupLayer.visible ? 1 : 0,
+                '@locked': groupLayer.locked ? 1 : 0,
             }
         })
-        childLayers.forEach((childLayer) => layer.import(childLayer.root()));
+        childLayers.forEach((childLayer) => layer.root().import(childLayer.root()));
         return layer;
     }
 
@@ -124,8 +130,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 '@x': tileLayer.coordinate.col,
                 '@y': tileLayer.coordinate.row,
                 '@opacity': tileLayer.opacity,
-                // '@visible': tileLayer.visible,
-                // '@locked': tileLayer.locked,
+                '@visible': tileLayer.visible ? 1 : 0,
+                '@locked': tileLayer.locked ? 1 : 0,
                 data: {
                     '@encoding': 'csv',
                     '#text': tileLayer.tilesRef.map((row) => row.map((tileRef) => {
@@ -137,6 +143,39 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 }
             }
         })
+        return layer;
+    }
+
+    private getRuleLayer(ruleLayer: RuleLayer, index: number, tilemap: Tilemap): XMLBuilder {
+        ruleLayer.reCalculateAllOutputs();
+
+        const layer = create({
+            layer: {
+                '@id': ruleLayer.id,
+                '@name': ruleLayer.name,
+                '@width': ruleLayer.size.width,
+                '@height': ruleLayer.size.height,
+                '@x': ruleLayer.coordinate.col,
+                '@y': ruleLayer.coordinate.row,
+                '@opacity': ruleLayer.opacity,
+                '@visible': ruleLayer.visible ? 1 : 0,
+                '@locked': ruleLayer.locked ? 1 : 0,
+                data: {
+                    '@encoding': 'csv',
+                    '#text': ruleLayer.rulesetsRef.map((row) => row.map((rulesetRef) => {
+                        if (!rulesetRef || rulesetRef.tileId === -1 || rulesetRef.tilesetIndex === -1) {
+                            return 0;
+                        }
+                        
+                        const tilesetFirstGid = this.tilesetFirstGidMap.get(rulesetRef.tilesetIndex)!;
+                        if (tilesetFirstGid == undefined) return 0;
+                        
+                        return rulesetRef.tileId + tilesetFirstGid;
+                    })).flat().join(',')
+                }
+            }
+        });
+        
         return layer;
     }
 }
