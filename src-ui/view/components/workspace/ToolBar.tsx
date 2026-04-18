@@ -4,14 +4,16 @@ import { Fragment } from "react";
 import { AppCore } from "@/core/appcore";
 import { useToolbarStore } from "@/view/stores/toolbarStore";
 
-import { VStack } from "../custom/stack/Stack";
+import { HStack, VStack } from "../custom/stack/Stack";
+import SVGIcon from "../custom/icons/SvgIcon";
+import { Button } from "../shadcn/button";
 
 export default function ToolBar() {
 	const { version, getTools, getActiceTool } = useToolbarStore();
 
-    const tools = useMemo(() => getTools(), [version]);
+	const tools = useMemo(() => getTools(), [version]);
 
-    const activeTool = useMemo(() => getActiceTool(), [version]);
+	const activeTool = useMemo(() => getActiceTool(), [version]);
 
 	const changeTool = (toolId: string) => {
 		const toolManager = AppCore.getIns().toolManager;
@@ -19,27 +21,17 @@ export default function ToolBar() {
 	};
 
 	return (
-		<VStack className="h-full w-8 bg-surface">
-			{/* {tools.map((tool, index) => {
-				return (
-					<Fragment key={tool.id}>
-						{index != 0 && <Separator />}
-						<Tooltip delayDuration={250} disableHoverableContent>
-							<TooltipTrigger asChild>
-								<Toggle pressed={tool.id === activeTool} onPressedChange={() => changeTool(tool.id)} variant={"outline"} className="hover:bg-secondary-background">
-									<SVGIcon svgString={tool.icon} />
-								</Toggle>
-							</TooltipTrigger>
-							{tool.tooltip && (
-								<TooltipContent side="left" className="shadow">
-									{tool.tooltip}
-									{tool.shortcuts && ` (${tool.shortcuts.map((s) => s.toUpperCase()).join(" or ")})`}
-								</TooltipContent>
-							)}
-						</Tooltip>
-					</Fragment>
-				);
-			})} */}
+		<VStack className="w-fit h-fit px-1 pb-0 pt-2 bg-surface">
+			<HStack className="w-full h-8 bg-surface-sunken">
+				{tools.map((tool, index) => {
+					const isActive = activeTool === tool.id;
+					return (
+						<Button onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}>
+							<SVGIcon svgString={tool.icon} />
+						</Button>
+					);
+				})}
+			</HStack>
 		</VStack>
 	);
 }

@@ -24,7 +24,7 @@ export default function TilemapEditorCanvas() {
 	};
 
 	return (
-		<div ref={containerRef} className="w-full h-full overflow-hidden px-1 py-2 bg-surface">
+		<div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden px-1 py-2 gap-2 bg-surface">
 			<ContextMenuWrapper item={TilemapEditorContextMenu}>
 				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm" />
 			</ContextMenuWrapper>

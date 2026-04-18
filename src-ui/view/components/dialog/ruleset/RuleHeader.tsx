@@ -56,7 +56,7 @@ export default function RuleHeader() {
                 onKeyDown={(e) => { if (e.key === "Enter") handleRename() }}
                 className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-overlay-sunken"
             />
-            <Button size={"icon"} variant={"outline"} onClick={addRule} className="h-full aspect-square">
+            <Button size={"icon"} variant={"ghost"} onClick={addRule} className="h-full aspect-square">
                 <Plus />
             </Button>
         </HStack>

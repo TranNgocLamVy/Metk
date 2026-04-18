@@ -19,7 +19,7 @@ export default function OutputList() {
     }, [session, version]);
 
     return (
-        <ScrollArea className='h-full w-full border border-foreground/20 bg-surface-overlay-raised'>
+        <ScrollArea className='h-full w-full border border-foreground/20 bg-surface-overlay-sunken'>
             <div className="flex flex-wrap gap-2 p-2 w-full">
                 {pixiApp && selectedTiles.map((tileRef) => {
                     const tilesetId = session.ruleset.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
