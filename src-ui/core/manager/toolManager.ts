@@ -65,7 +65,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
     }
 
     public startTool(toolId: string) {
-        this.stopTool();
+        this.clearTool();
 
         const ToolConstructor = this.toolMap.get(toolId);
         if (ToolConstructor) {
@@ -82,13 +82,30 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         }
     }
 
-    public stopTool() {
+    private clearTool() {
         if (this.currentTool) {
             this.currentTool.detach();
             this.currentTool.onDisable();
             this.currentTool = null;
             this.currentToolId = null;
             this.emit("onToolChanged");
+        }
+    }
+
+    public stopTool() {
+        if (this.currentTool) {
+            this.currentTool.detach();
+            this.currentTool.onDisable();
+        }
+    }
+
+    public resumeTool() {
+        if (this.currentTool) {
+            this.currentTool.onEnable();
+            const activeTilemapSession = this.editorContext.getCurrentTilemapSession();
+            if (activeTilemapSession) {
+                this.currentTool.attach(activeTilemapSession);
+            }
         }
     }
 }
