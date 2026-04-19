@@ -14,7 +14,6 @@ type GroupLike = GroupLayer | RootLayer;
 type CreateGroupRendererContext = {
     layer: GroupLike;
     tilemap: Tilemap;
-    gap: number;
 }
 
 export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
@@ -26,7 +25,6 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
 
     constructor(context: CreateGroupRendererContext) {
         super(context.layer, context.tilemap);
-        this.gap = context.gap;
 
         this.rebuildChildren();
 
@@ -53,11 +51,11 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
 
         // Pass this.tilemap to children
         if (childLayer instanceof TileLayer) {
-            renderer = new TileLayerRenderer({ layer: childLayer, tilemap: this.tilemap, gap: this.gap });
+            renderer = new TileLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
         } else if (childLayer instanceof RuleLayer) {
-            renderer = new RuleLayerRenderer({ layer: childLayer, tilemap: this.tilemap, gap: this.gap });
+            renderer = new RuleLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
         } else if (childLayer instanceof GroupLayer) {
-            renderer = new GroupLayerRenderer({ layer: childLayer, tilemap: this.tilemap, gap: this.gap });
+            renderer = new GroupLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
         }
 
         if (renderer) {
@@ -96,12 +94,7 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
             }
         });
     }
-
-    public override setGap(gap: number): void {
-        super.setGap(gap)
-        this.childRenderers.forEach(r => r.setGap(gap));
-    }
-
+    
     public override destroy(): void {
         this.layer.eventEmitter.off("layerAdded", this.bindOnLayerAdded);
         this.layer.eventEmitter.off("layerRemoved", this.bindOnLayerRemoved);

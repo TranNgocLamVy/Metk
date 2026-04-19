@@ -89,7 +89,7 @@ export class TilemapSessionView implements IBaseSessionView {
 
         // Initialize Renderer
         this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
-        this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap, gap: this.grid.gridGap });
+        this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap });
         this.overlayerContainer = new Container();
 
         // Add Renderer
@@ -141,10 +141,8 @@ export class TilemapSessionView implements IBaseSessionView {
     public toggleGrid(): void {
         if (this.grid.gridEnabled) {
             this.grid.disableGrid();
-            this.renderer.setGap(0);
         } else {
             this.grid.enableGrid();
-            this.renderer.setGap(this.grid.gridGap);
         }
     }
 }

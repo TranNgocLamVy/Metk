@@ -7,7 +7,6 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
     public container: Container;
     public layer: T;
     public tilemap: Tilemap;
-    protected gap: number;
 
     private bindOnPropertyUpdate: (property: keyof BaseLayerEvents, value: any) => void
 
@@ -29,11 +28,6 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
     protected updateProperties(): void {
         this.container.visible = this.layer.visible;
         this.container.alpha = this.layer.opacity;
-    }
-
-
-    public setGap(gap: number): void {
-        this.gap = gap;
     }
 
     public destroy(): void {

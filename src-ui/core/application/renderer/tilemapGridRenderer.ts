@@ -13,7 +13,6 @@ export class TilemapGridRenderer {
     public readonly graphics: Graphics;
     private viewport: Viewport;
     private tilemap: Tilemap;
-    public readonly gridGap: number = 0;
     public gridEnabled: boolean = true;
 
     private bindDrawGrid: () => void;

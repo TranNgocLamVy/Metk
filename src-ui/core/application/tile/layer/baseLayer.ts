@@ -2,9 +2,17 @@ import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { Result } from "@/shared/types/result";
 
 import { BaseObject, BaseObjectEvents } from "../../baseObject";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
+import { TilemapOrientation } from "@/shared/schema/tilemapSchema";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
 
+}
+
+export type TilemapProps = {
+    tileWidth: number;
+    tileHeight: number;
+    orientation: TilemapOrientation;
 }
 
 export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends BaseObject<T> {
@@ -16,7 +24,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     public parentLayer: IGroupLayer;
 
-    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager) {
+    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly rulesetRefManager: RulesetRefManager, public readonly tilemapProps: TilemapProps) {
         super();
         this.id = id;
     }
@@ -71,6 +79,14 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         return false;
     }
 
+    public postoCoord(pos: Position): Coordinate {
+        throw new Error("Method not implemented.");
+    }
+
+    public coordToPos(coord: Coordinate): Position {
+        throw new Error("Method not implemented.");
+    }
+
     public traverse(cb: (layer: BaseLayer<any>) => void): void {
         throw new Error("Method not implemented.");
     }
@@ -87,7 +103,9 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 export interface IGroupLayer {
     id: string;
     parentLayer: IGroupLayer | null;
-    tilesetRefManager: TilesetRefManager
+    tilesetRefManager: TilesetRefManager;
+    rulesetRefManager: RulesetRefManager;
+    tilemapProps: TilemapProps;
     layers: BaseLayer<any>[];
     getLayerIndex(layerId: string): number;
     addLayer(newLayer: BaseLayer<any>): Result;

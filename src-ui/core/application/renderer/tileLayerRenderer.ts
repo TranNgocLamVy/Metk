@@ -1,6 +1,6 @@
 import { Sprite } from "pixi.js";
 
-import { SetTilesData, TileLayer } from "@/core/application/tile/layer/tileLayer";
+import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
@@ -9,7 +9,6 @@ import { AppCore } from "@/core/appcore";
 type CreateTileLayerRendererContext = {
     layer: TileLayer;
     tilemap: Tilemap;
-    gap: number;
 }
 
 export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
@@ -19,7 +18,6 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
 
     constructor(context: CreateTileLayerRendererContext) {
         super(context.layer, context.tilemap);
-        this.gap = context.gap;
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
 
@@ -62,32 +60,28 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         // TODO: Handle unfound tileset, render error texture
         if (!texture) return;
 
-        // Calculate Position: (GridPos + LayerGridOffset) * (TileSize + Gap) + LayerPixelOffset
-        const posX = (col + this.layer.coordinate.col) * (this.tilemap.tilewidth + this.gap) + this.layer.offset.x;
-        const posY = (row + this.layer.coordinate.row) * (this.tilemap.tileheight + this.gap) + this.layer.offset.y;
+        const coord = { col: col + this.layer.coordinate.col, row: row + this.layer.coordinate.row };
+        const drawPotision = this.layer.coordToPos(coord);
 
         if (currentSprite) {
             currentSprite.texture = texture;
-            currentSprite.x = posX;
-            currentSprite.y = posY;
+            currentSprite.x = drawPotision.x;
+            currentSprite.y = drawPotision.y;
         } else {
             const sprite = new Sprite(texture);
-            sprite.x = posX;
-            sprite.y = posY;
+            sprite.x = drawPotision.x;
+            sprite.y = drawPotision.y;
 
             this.container.addChild(sprite);
             this.sprites.set(key, sprite);
         }
     }
 
-    public override setGap(gap: number): void {
-        super.setGap(gap);
-        this.renderLayer();
-    }
-
     public override destroy(): void {
         this.layer.eventEmitter.off("tilesChanged", this.bindOnTilesChanged);
         super.destroy();
+        
+        this.sprites.forEach(s => s.destroy());
         this.sprites.clear();
     }
 }

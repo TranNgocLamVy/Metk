@@ -8,7 +8,6 @@ import { RuleLayer } from "../tile/layer/ruleLayer";
 type CreateRuleLayerRendererContext = {
     layer: RuleLayer;
     tilemap: Tilemap;
-    gap: number;
 }
 
 export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
@@ -17,7 +16,6 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
 
     constructor(context: CreateRuleLayerRendererContext) {
         super(context.layer, context.tilemap);
-        this.gap = context.gap;
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
 
@@ -57,13 +55,13 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
             this.sprites.set(key, currentSprite);
         }
 
-        const posX = (x + this.layer.coordinate.col) * (this.tilemap.tilewidth + this.gap) + this.layer.offset.x;
-        const posY = (y + this.layer.coordinate.row) * (this.tilemap.tileheight + this.gap) + this.layer.offset.y;
+        const coord = { col: x + this.layer.coordinate.col, row: y + this.layer.coordinate.row };
+        const drawPotision = this.layer.coordToPos(coord);
 
         currentSprite.width = this.tilemap.tilewidth;
         currentSprite.height = this.tilemap.tileheight;
-        currentSprite.x = posX;
-        currentSprite.y = posY;
+        currentSprite.x = drawPotision.x;
+        currentSprite.y = drawPotision.y;
 
         const textureManager = AppCore.getIns().editorContext.textureManager;
         const output = rulesetRef.output;
@@ -87,14 +85,11 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         }
     }
 
-    public override setGap(gap: number): void {
-        super.setGap(gap);
-        this.renderLayer();
-    }
-
     public override destroy(): void {
         this.layer.eventEmitter.off("rulesetRefsOutputChanged", this.bindOnTilesChanged);
         super.destroy();
+
+        this.sprites.forEach(s => s.destroy());
         this.sprites.clear();
     }
 }

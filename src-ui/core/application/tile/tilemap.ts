@@ -1,7 +1,7 @@
 
 import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
-import { TilemapData } from "@/shared/schema/tilemapSchema";
+import { TilemapData, TilemapOrientation } from "@/shared/schema/tilemapSchema";
 import { Result } from "@/shared/types/result";
 
 import { RootLayer } from "./layer/rootLayer";
@@ -15,7 +15,7 @@ interface TilemapEvent extends BaseObjectEvents {
 export class Tilemap extends BaseObject<TilemapEvent> {
     public id: string;
     public name: string;
-    public infinite: boolean;
+    public orientation: TilemapOrientation;
     public backgroundcolor: string;
 
     public width: number;
@@ -37,7 +37,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
         this.id = tilemapData.id;
         this.name = tilemapData.name;
-        this.infinite = tilemapData.infinite ?? false;
+        this.orientation = tilemapData.orientation;
         this.backgroundcolor = tilemapData.backgroundcolor ?? "#AARRGGBB";
 
         this.width = tilemapData.width;
@@ -48,18 +48,27 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilesetRefManager.load(tilemapData.tilesets);
         this.rulesetRefManager.load(tilemapData.rulesets);
 
-        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager);
+        this.rootLayer = new RootLayer(
+            tilemapData.layers, 
+            this.tilesetRefManager, 
+            this.rulesetRefManager, 
+            { 
+                tileWidth: this.tilewidth, 
+                tileHeight: this.tileheight,
+                orientation: this.orientation,
+            }
+        );
     }
 
     public serialize(): TilemapData {
         return {
             id: this.id,
             name: this.name,
+            orientation: this.orientation,
             height: this.height,
             width: this.width,
             tilewidth: this.tilewidth,
             tileheight: this.tileheight,
-            infinite: this.infinite,
             backgroundcolor: this.backgroundcolor,
             tilesets: this.tilesetRefManager.serialize(),
             rulesets: this.rulesetRefManager.serialize(),

@@ -27,7 +27,7 @@ export class CreateRuleLayerCommand implements IBaseCommand {
         const targetLayer = root.findLayer(this.parentLayerId);
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
 
-        const newRuleLayer = new RuleLayer(this.ruleLayerData, parent, parent.tilesetRefManager, tilemap.rulesetRefManager);
+        const newRuleLayer = new RuleLayer(this.ruleLayerData, parent, parent.tilesetRefManager, tilemap.rulesetRefManager, parent.tilemapProps);
         parent.addLayer(newRuleLayer);
         
         if (parent instanceof GroupLayer) parent.toggleOpen(true);
