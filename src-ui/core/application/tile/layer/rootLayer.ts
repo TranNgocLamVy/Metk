@@ -3,7 +3,7 @@ import { RootLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
 import { GroupLayer } from "./groupLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
@@ -16,17 +16,14 @@ interface RootLayerEvents extends BaseLayerEvents {
 export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer {
     public layers: BaseLayer[] = [];
 
-    private rulesetRefManager: RulesetRefManager;
-
-    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
-        super("root", tilesetRefManager);
-        this.rulesetRefManager = rulesetRefManager;
+    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager, tilemapProps: TilemapProps) {
+        super("root", tilesetRefManager, rulesetRefManager, tilemapProps);
 
         const groupLayerMap: Map<string, IGroupLayer> = new Map([["root", this]]);
         
         layersData.forEach((layerData) => {
             const parentLayer = groupLayerMap.get(layerData.parentId) ?? this;
-            const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager, this.rulesetRefManager);
+            const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
             if (layer) {
                 parentLayer.pushLayer(layer)
                 if (layer instanceof GroupLayer) groupLayerMap.set(layer.id, layer);

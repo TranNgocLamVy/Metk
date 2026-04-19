@@ -6,7 +6,8 @@ import { TileLayerData, TileRefData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface TileLayerEvents extends BaseLayerEvents {
     tilesChanged: (coords: Coordinate[]) => void
@@ -25,8 +26,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
 
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager) {
-        super(tileLayerData.id, tilesetRefManager);
+    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager, tilemapProps: TilemapProps) {
+        super(tileLayerData.id, tilesetRefManager, rulesetRefManager, tilemapProps);
 
         this.parentLayer = parentLayer;
 
@@ -92,8 +93,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             const isRemove = tileId === null || tilesetId === null;
 
             if (!tileRef) {
-                if (isRemove) return null; 
-                
+                if (isRemove) return null;
+
                 const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
                 if (tilesetIndex === -1) return null
 
@@ -128,6 +129,48 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return Result.Success(result);
     }
 
+    public override postoCoord(pos: Position): Coordinate {
+        switch (this.tilemapProps.orientation) {
+            case "orthogonal":
+                const col = Math.floor(pos.x / this.tilemapProps.tileWidth) - this.offset.x;
+                const row = Math.floor(pos.y / this.tilemapProps.tileHeight) - this.offset.y;
+                return { col, row };
+            case "isometric":
+                // TODO: Implement isometric
+                return { col: 0, row: 0 };
+            case "oblique":
+                // TODO: Implement oblique
+                return { col: 0, row: 0 };
+            case "staggered":
+                // TODO: Implement staggered
+                return { col: 0, row: 0 };
+            case "hexagonal":
+                // TODO: Implement hexagonal
+                return { col: 0, row: 0 };
+        }
+    }
+
+    public override coordToPos(coord: Coordinate): Position {
+        switch (this.tilemapProps.orientation) {
+            case "orthogonal":
+                const x = coord.col * this.tilemapProps.tileWidth + this.offset.x;
+                const y = coord.row * this.tilemapProps.tileHeight + this.offset.y;
+                return { x, y };
+            case "isometric":
+                // TODO: Implement isometric
+                return { x: 0, y: 0 };
+            case "oblique":
+                // TODO: Implement oblique
+                return { x: 0, y: 0 };
+            case "staggered":
+                // TODO: Implement staggered
+                return { x: 0, y: 0 };
+            case "hexagonal":
+                // TODO: Implement hexagonal
+                return { x: 0, y: 0 };
+        }
+    }
+
     public override serialize(): TileLayerData {
         const layerData = this.tilesRef.map(row => row.map(tileRef => {
             if (!tileRef) return "0";
@@ -155,7 +198,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override clone(): TileLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager);
+        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {
@@ -181,7 +224,7 @@ export class TileRef {
     public serialize(): string {
         return `${this.tileId}:${this.tilesetIndex}`;
     }
-    
+
     public setTile(tileId: number, tilesetIndex: number): { tileId: number, tilesetIndex: number } {
         const preTileRefData = { tileId: this.tileId, tilesetIndex: this.tilesetIndex }
         this.tileId = tileId;

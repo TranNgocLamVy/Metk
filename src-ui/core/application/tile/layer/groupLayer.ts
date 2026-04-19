@@ -5,7 +5,8 @@ import { GroupLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface GroupLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -17,8 +18,8 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public layers: BaseLayer[] = [];
     public isOpen: boolean = false;
 
-    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager) {
-        super(groupLayerData.id, tilesetRefManager);
+    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager, tilemapProps: TilemapProps) {
+        super(groupLayerData.id, tilesetRefManager, rulesetRefManager, tilemapProps);
 
         this.parentLayer = parentLayer;
 
@@ -109,6 +110,6 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override clone(): GroupLayer {
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
-        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager);
+        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
     }
 }

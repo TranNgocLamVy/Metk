@@ -6,7 +6,7 @@ import { RuleLayerData, RulesetRefData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RuleLayerEvents extends BaseLayerEvents {
@@ -24,9 +24,10 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         ruleLayerData: RuleLayerData, 
         parentLayer: IGroupLayer, 
         tilesetRefManager: TilesetRefManager, 
-        public readonly rulesetRefManager: RulesetRefManager
+        rulesetRefManager: RulesetRefManager,
+        tilemapProps: TilemapProps,
     ) {
-        super(ruleLayerData.id, tilesetRefManager);
+        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, tilemapProps);
 
         this.parentLayer = parentLayer;
         this.name = ruleLayerData.name;
@@ -173,7 +174,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
         if (!ruleset) return null;
 
-        return ruleset.calculateOutput(this.getContext(coordinate));
+        return ruleset.calculateOutput(this.getNeighborsContext(coordinate));
     }
 
     private reCalculateOutputAtNoEmit(coordinate: Coordinate): void {
@@ -203,7 +204,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         this.eventEmitter.emit("rulesetRefsOutputChanged", updatedCoords);
     }
 
-    private getContext(coordinate: Coordinate): (RulesetRefData | null)[][] {
+    private getNeighborsContext(coordinate: Coordinate): (RulesetRefData | null)[][] {
         if (coordinate.col < 0 || coordinate.col >= this.size.width) return [];
         if (coordinate.row < 0 || coordinate.row >= this.size.height) return [];
 
@@ -234,6 +235,48 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         return rulesetRefs;
     }
 
+    public override postoCoord(pos: Position): Coordinate {
+        switch (this.tilemapProps.orientation) {
+            case "orthogonal":
+                const col = Math.floor(pos.x / this.tilemapProps.tileWidth) - this.offset.x;
+                const row = Math.floor(pos.y / this.tilemapProps.tileHeight) - this.offset.y;
+                return { col, row };
+            case "isometric":
+                // TODO: Implement isometric
+                return { col: 0, row: 0 };
+            case "oblique":
+                // TODO: Implement oblique
+                return { col: 0, row: 0 };
+            case "staggered":
+                // TODO: Implement staggered
+                return { col: 0, row: 0 };
+            case "hexagonal":
+                // TODO: Implement hexagonal
+                return { col: 0, row: 0 };
+        }
+    }
+
+    public override coordToPos(coord: Coordinate): Position {
+        switch (this.tilemapProps.orientation) {
+            case "orthogonal":
+                const x = coord.col * this.tilemapProps.tileWidth + this.offset.x;
+                const y = coord.row * this.tilemapProps.tileHeight + this.offset.y;
+                return { x, y };
+            case "isometric":
+                // TODO: Implement isometric
+                return { x: 0, y: 0 };
+            case "oblique":
+                // TODO: Implement oblique
+                return { x: 0, y: 0 };
+            case "staggered":
+                // TODO: Implement staggered
+                return { x: 0, y: 0 };
+            case "hexagonal":
+                // TODO: Implement hexagonal
+                return { x: 0, y: 0 };
+        }
+    }
+
     public override serialize(): RuleLayerData {
         const layerData = this.rulesetsRef.map(row => row.map(tileRef => {
             if (!tileRef) return "0";
@@ -261,7 +304,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public override clone(): RuleLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
+        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

@@ -26,11 +26,11 @@ export class TilemapService {
         const tilemapData: TilemapData = {
             id: uuidv4(),
             name: form.name,
+            orientation: "orthogonal", // TODO: Implement other orientations
             height: form.options.map.mapheight,
             width: form.options.map.mapwidth,
             tilewidth: form.options.tile.tilewidth,
             tileheight: form.options.tile.tileheight,
-            infinite: form.options.map.infinite,
             tilesets: [],
             rulesets: [],
             layers: [],

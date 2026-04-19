@@ -6,7 +6,6 @@ import { GroupLayerRenderer } from "./groupLayerRenderer";
 
 type CreateTilemapRendererContext = {
     tilemap: Tilemap
-    gap: number
 }
 
 export class TilemapRenderer {
@@ -14,17 +13,15 @@ export class TilemapRenderer {
     public rootRenderer: GroupLayerRenderer;
     private borderGraphic: Graphics;
     public tilemap: Tilemap
-    private gap: number;
 
     constructor(context: CreateTilemapRendererContext) {
         this.tilemap = context.tilemap;
-        this.gap = context.gap;
 
         this.container = new Container({ isRenderGroup: true });
         this.container.label = "Tilemap-Root";
 
         // Pass tilemap to the root group renderer
-        this.rootRenderer = new GroupLayerRenderer({ layer: this.tilemap.rootLayer, tilemap: this.tilemap, gap: this.gap });
+        this.rootRenderer = new GroupLayerRenderer({ layer: this.tilemap.rootLayer, tilemap: this.tilemap });
         this.container.addChild(this.rootRenderer.container);
 
         this.borderGraphic = new Graphics();
@@ -43,11 +40,6 @@ export class TilemapRenderer {
         this.borderGraphic.moveTo(minX, minY).lineTo(maxX, minY).lineTo(maxX, maxY).lineTo(minX, maxY).lineTo(minX, minY);
 
         this.borderGraphic.stroke({ color: 0xffffff, pixelLine: true });
-    }
-
-    public setGap(gap: number): void {
-        this.gap = gap;
-        this.rootRenderer.setGap(gap);
     }
 
     public destroy(): void {
