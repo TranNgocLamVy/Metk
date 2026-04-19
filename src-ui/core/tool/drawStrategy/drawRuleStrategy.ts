@@ -4,41 +4,56 @@ import { EditorContext } from "@/core/application/editorContext";
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { Color, Container, Sprite, Texture } from "pixi.js";
 import { SetRuleRefsCommand } from "@/core/command/tile/setRulesCommand";
+import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
+import { ITool } from "@/core/interface/ITool";
 
 
 export class DrawRuleStrategy implements IDrawStrategy {
-    public canHandle(layer: any): boolean {
+    public canHandle(layer: BaseLayer<any>, tool: ITool): boolean {
         return layer instanceof RuleLayer;
     }
 
-    public getRefAt(coord: Coordinate, layer: RuleLayer): any {
+    public getRefAt(pos: Position, layer: RuleLayer): any {
+        const coord = layer.posToCoord(pos);
         return layer.getRulesetRefAt(coord);
+    }
+
+    public comparePosition(pos1: Position, pos2: Position, layer: RuleLayer): boolean {
+        if (!pos1 || !pos2 || !layer) return false;
+        const coord1 = layer.posToCoord(pos1);
+        const coord2 = layer.posToCoord(pos2);
+        return coord1.col === coord2.col && coord1.row === coord2.row;
     }
 
     public getBrushSize(editorContext: EditorContext): { width: number, height: number } {
         return { width: 1, height: 1 };
     }
 
-    public drawHoverPreview(coord: Coordinate, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
+    public drawHoverPreview(pos: Position, layer: RuleLayer, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
         const selectedRuleset = editorContext.getSelectedRuleset();
         if (!selectedRuleset) return [];
 
+        const coord = layer.posToCoord(pos); // TODO: Check again, very sus
+
         const { col, row } = coord;
-        if (col < 0 || col >= session.tilemap.width || row < 0 || row >= session.tilemap.height) return [];
+        if (!session.tilemap.isInBoundary({ col, row })) return [];
 
         const sprite = new Sprite(Texture.WHITE);
         sprite.tint = new Color(selectedRuleset.color);
         sprite.width = session.tilemap.tilewidth;
         sprite.height = session.tilemap.tileheight;
-        sprite.position.set(col * session.tilemap.tilewidth, row * session.tilemap.tileheight);
+        const drawPotision = layer.coordToPos({ col, row });
+        sprite.position.set(drawPotision.x, drawPotision.y);
         
         overlayContainer.addChild(sprite);
         return [sprite];
     }
 
-    public getPayload(coord: Coordinate, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
+    public getPayload(pos: Position, layer: RuleLayer, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
         const selectedRuleset = editorContext.getSelectedRuleset();
         if (!selectedRuleset) return [];
+
+        const coord = layer.posToCoord(pos);
 
         if (coord.col < 0 || coord.col >= session.tilemap.width || coord.row < 0 || coord.row >= session.tilemap.height) return [];
 
@@ -46,8 +61,10 @@ export class DrawRuleStrategy implements IDrawStrategy {
         sprite.tint = new Color(selectedRuleset.color);
         sprite.width = session.tilemap.tilewidth;
         sprite.height = session.tilemap.tileheight;
+        const drawPotision = layer.coordToPos({ col: coord.col, row: coord.row });
+        sprite.position.set(drawPotision.x, drawPotision.y);
         
-        return [{ sprite, coordinate: coord, rulesetId: selectedRuleset.id }];
+        return [{ key: `${coord.col},${coord.row}`, sprite, coordinate: coord, position: drawPotision, rulesetId: selectedRuleset.id }];
     }
 
     public commit(layer: RuleLayer, previewData: DrawPayload[], editorContext: EditorContext): void {

@@ -235,11 +235,11 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         return rulesetRefs;
     }
 
-    public override postoCoord(pos: Position): Coordinate {
+    public override posToCoord(pos: Position): Coordinate {
         switch (this.tilemapProps.orientation) {
             case "orthogonal":
-                const col = Math.floor(pos.x / this.tilemapProps.tileWidth) - this.offset.x;
-                const row = Math.floor(pos.y / this.tilemapProps.tileHeight) - this.offset.y;
+                const col = Math.floor((pos.x - this.offset.x) / this.tilemapProps.tileWidth) - this.coordinate.col;
+                const row = Math.floor((pos.y - this.offset.y) / this.tilemapProps.tileHeight) - this.coordinate.row;
                 return { col, row };
             case "isometric":
                 // TODO: Implement isometric
@@ -259,8 +259,8 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public override coordToPos(coord: Coordinate): Position {
         switch (this.tilemapProps.orientation) {
             case "orthogonal":
-                const x = coord.col * this.tilemapProps.tileWidth + this.offset.x;
-                const y = coord.row * this.tilemapProps.tileHeight + this.offset.y;
+                const x = (coord.col + this.coordinate.col) * this.tilemapProps.tileWidth + this.offset.x;
+                const y = (coord.row + this.coordinate.row) * this.tilemapProps.tileHeight + this.offset.y;
                 return { x, y };
             case "isometric":
                 // TODO: Implement isometric
@@ -275,6 +275,11 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
                 // TODO: Implement hexagonal
                 return { x: 0, y: 0 };
         }
+    }
+
+    public override posToSnapPos(pos: Position): Position {
+        const coord = this.posToCoord(pos);
+        return this.coordToPos(coord);
     }
 
     public override serialize(): RuleLayerData {
