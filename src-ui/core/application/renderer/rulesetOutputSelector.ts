@@ -92,7 +92,8 @@ export class RulesetOutputSelector {
 
         if (this.currentTileset) {
             textureManager.releaseTilesetGraphics(this.currentTileset.id);
-            this.spriteContainer.children.forEach((child) => child.destroy());
+            const childrenToDestroy = this.spriteContainer.removeChildren();
+            childrenToDestroy.forEach(child => child.destroy());
         }
 
         this.currentTileset = tileset;
