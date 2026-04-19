@@ -85,4 +85,10 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.eventEmitter.emit("updateProperty", "name", this.name);
         return Result.Success();
     }
+
+    public isInBoundary(coordinate: Coordinate): boolean {
+        if (coordinate.col < 0 || coordinate.col >= this.width) return false;
+        if (coordinate.row < 0 || coordinate.row >= this.height) return false;
+        return true;
+    }
 }
