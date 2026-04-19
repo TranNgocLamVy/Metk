@@ -4,15 +4,25 @@ import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { EditorContext } from "@/core/application/editorContext";
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { SetTilesCommand } from "@/core/command/tile/setTilesCommand";
+import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
+import { ITool } from "@/core/interface/ITool";
 
 
 export class DrawTileStrategy implements IDrawStrategy {
-    public canHandle(layer: any): boolean {
+    public canHandle(layer: BaseLayer<any>, tool: ITool): boolean {
         return layer instanceof TileLayer;
     }
 
-    public getRefAt(coord: Coordinate, layer: TileLayer): any {
+    public getRefAt(pos: Position, layer: TileLayer): any {
+        const coord = layer.posToCoord(pos);
         return layer.getTileRefAt(coord);
+    }
+
+    public comparePosition(pos1: Position, pos2: Position, layer: TileLayer): boolean {
+        if (!pos1 || !pos2 || !layer) return false;
+        const coord1 = layer.posToCoord(pos1);
+        const coord2 = layer.posToCoord(pos2);
+        return coord1.col === coord2.col && coord1.row === coord2.row;
     }
 
     public getBrushSize(editorContext: EditorContext): { width: number, height: number } {
@@ -23,9 +33,11 @@ export class DrawTileStrategy implements IDrawStrategy {
         return { width, height };
     }
 
-    public drawHoverPreview(coord: Coordinate, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
+    public drawHoverPreview(pos: Position, layer: TileLayer, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
         const selectedTiles = editorContext.getSelectedTile();
         if (!selectedTiles) return [];
+
+        const coord = layer.posToCoord(pos); // TODO: Check again, very sus
 
         const sprites: Sprite[] = [];
         for (let r = 0; r < selectedTiles.length; r++) {
@@ -42,7 +54,8 @@ export class DrawTileStrategy implements IDrawStrategy {
                 if (!texture) continue;
 
                 const sprite = new Sprite(texture);
-                sprite.position.set(col * session.tilemap.tilewidth, row * session.tilemap.tileheight);
+                const drawPotision = layer.coordToPos({ col, row });
+                sprite.position.set(drawPotision.x, drawPotision.y);
                 overlayContainer.addChild(sprite);
                 sprites.push(sprite);
             }
@@ -50,9 +63,11 @@ export class DrawTileStrategy implements IDrawStrategy {
         return sprites;
     }
 
-    public getPayload(coord: Coordinate, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
+    public getPayload(pos: Position, layer: TileLayer, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
         const selectedTiles = editorContext.getSelectedTile();
         if (!selectedTiles) return [];
+
+        const coord = layer.posToCoord(pos);
 
         const data: DrawPayload[] = [];
         for (let r = 0; r < selectedTiles.length; r++) {
@@ -69,7 +84,9 @@ export class DrawTileStrategy implements IDrawStrategy {
                 if (!texture) continue;
 
                 const sprite = new Sprite(texture);
-                data.push({ sprite, coordinate: { col, row }, tileId: tile.id, tilesetId: tile.tileset.id });
+                const drawPotision = layer.coordToPos({ col, row });
+                sprite.position.set(drawPotision.x, drawPotision.y);
+                data.push({ key: `${col},${row}`, sprite, coordinate: { col, row }, position: drawPotision, tileId: tile.id, tilesetId: tile.tileset.id });
             }
         }
         return data;

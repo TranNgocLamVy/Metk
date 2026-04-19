@@ -146,18 +146,16 @@ export class EraserTool implements ITool {
     }
 
     private onPointerDown(e: FederatedPointerEvent) {
-        if (!this.currentSession) return;
-        if (e.button !== 0) return;
-        if (!this.targetLayer || !this.activeDrawStrategy) return;
+        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
         this.isDragging = true;
-        this.previousPreviewCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
+        this.previousPreviewCoordinate = this.targetLayer.posToCoord(this.getLocalPos(e));
         this.eraseMove(e);
     }
 
     private onPointerMove(e: FederatedPointerEvent) {
-        if (!this.currentSession) return;
+        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
 
-        const newCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
+        const newCoordinate = this.targetLayer.posToCoord(this.getLocalPos(e));
         this.currentPreviewCoordinate = newCoordinate;
         this.drawPreviewErase();
 
@@ -209,14 +207,6 @@ export class EraserTool implements ITool {
         this.previewGraphics.rect(startPoint.x, startPoint.y, endPoint.x - startPoint.x, endPoint.y - startPoint.y).fill({ color: 0xff0000, alpha: 0.25 });
     }
 
-    // TODO: Use posToCoord from BaseLayer
-    private getGridCoordinates(globalX: number, globalY: number): Coordinate {
-        const worldPos = this.currentSession!.sessionView.viewport.toLocal(new Point(globalX, globalY));
-        const gridX = Math.floor(worldPos.x / this.currentSession!.tilemap.tilewidth);
-        const gridY = Math.floor(worldPos.y / this.currentSession!.tilemap.tileheight);
-        return { col: gridX, row: gridY };
-    }
-
     private eraseMove(e: FederatedPointerEvent) {
         if (!this.isDragging) return;
 
@@ -239,8 +229,7 @@ export class EraserTool implements ITool {
                     const coord = { col: targetX, row: targetY };
                     const key = `${coord.col},${coord.row}`;
                     if (this.eraseCoordinateSet.has(key)) continue;
-
-                    if (!this.activeDrawStrategy!.getRefAt(coord, this.targetLayer!)) continue;
+                    if (!this.activeDrawStrategy!.getRefAt(this.targetLayer!.coordToPos(coord), this.targetLayer!)) continue;
 
                     this.eraseCoordinateSet.add(key);
                     eraseCoordinates.push(coord);
@@ -304,7 +293,12 @@ export class EraserTool implements ITool {
 
         if (!this.targetLayer) return;
 
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!)) || null;
+        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!, this)) || null;
+    }
+
+    private getLocalPos(e: FederatedPointerEvent): Position {
+        const localPosition = this.currentSession!.sessionView.viewport.toLocal(new Point(e.global.x, e.global.y));
+        return { x: localPosition.x, y: localPosition.y };
     }
 
     private reverseErase() {

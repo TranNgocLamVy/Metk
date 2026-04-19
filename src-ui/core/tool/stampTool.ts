@@ -30,13 +30,13 @@ export class StampTool implements ITool {
     private currentSession: TilemapSession | null = null;
     private overlayContainer: Container | null = null;
 
-    private previousMouseCoordinate: Coordinate = null!;
-    private currentMouseCoordinate: Coordinate = null!;
+    private previousMousePosition: Position = null!;
+    private currentMousePosition: Position = null!;
 
     private isDragging: boolean = false;
 
     private hoverSprites: Sprite[] = [];
-    private drawPayloads: Map<string, DrawPayload> = new Map(); // ${col},${row} -> DrawPayload
+    private drawPayloads: Map<string, DrawPayload> = new Map();
 
     private targetLayer: BaseLayer<any> | null = null;
 
@@ -70,8 +70,8 @@ export class StampTool implements ITool {
         this.clearHoverPreview();
 
         this.isDragging = false;
-        this.previousMouseCoordinate = null!;
-        this.currentMouseCoordinate = null!;
+        this.previousMousePosition = null!;
+        this.currentMousePosition = null!;
     }
 
     public attach(session: TilemapSession): void {
@@ -119,18 +119,19 @@ export class StampTool implements ITool {
         if (!this.targetLayer || !this.activeDrawStrategy) return;
 
         this.isDragging = true;
-        this.previousMouseCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
+        this.previousMousePosition = this.currentMousePosition = this.getLocalPos(e);
         this.updateDrawPayload();
     }
 
     private onPointerMove(e: FederatedPointerEvent) {
-        if (!this.currentSession) return;
+        if (!this.currentSession || !this.activeDrawStrategy || !this.targetLayer) return;
 
-        const newCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
-        if (!this.currentMouseCoordinate || this.currentMouseCoordinate.col != newCoordinate.col || this.currentMouseCoordinate.row != newCoordinate.row) {
-            this.currentMouseCoordinate = newCoordinate;
-            this.drawHoverPreview(newCoordinate);
-        }
+        const newMousePosition = this.getLocalPos(e);
+        this.previousMousePosition = { ...this.currentMousePosition };
+        this.currentMousePosition = newMousePosition;
+
+        if (this.activeDrawStrategy.comparePosition(this.previousMousePosition, newMousePosition, this.targetLayer)) return;
+        this.drawHoverPreview(newMousePosition);
 
         if (!this.isDragging) return;
         this.updateDrawPayload();
@@ -149,15 +150,6 @@ export class StampTool implements ITool {
 
     private onPointerOutside(e: FederatedPointerEvent) {
         this.clearHoverPreview();
-    }
-
-
-    // TODO: Use posToCoord from BaseLayer
-    private getGridCoordinates(globalX: number, globalY: number): Coordinate {
-        const worldPos = this.currentSession!.sessionView.viewport.toLocal(new Point(globalX, globalY));
-        const gridX = Math.floor(worldPos.x / this.currentSession!.tilemap.tilewidth);
-        const gridY = Math.floor(worldPos.y / this.currentSession!.tilemap.tileheight);
-        return { col: gridX, row: gridY };
     }
 
     private updateActiveDrawStrategy(): void {
@@ -183,45 +175,45 @@ export class StampTool implements ITool {
 
         if (!this.targetLayer) return;
 
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!)) || null;
+        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!, this)) || null;
     }
 
-    private drawHoverPreview(coordinate: Coordinate) {
+    private drawHoverPreview(position: Position) {
         if (!this.currentSession || !this.overlayContainer) return;
 
         this.hoverSprites.forEach(sprite => sprite.destroy());
         this.hoverSprites = [];
 
         if (this.activeDrawStrategy) {
-            this.hoverSprites = this.activeDrawStrategy.drawHoverPreview(
-                coordinate,
-                this.editorContext,
-                this.currentSession,
-                this.overlayContainer
-            );
+            this.hoverSprites = this.activeDrawStrategy.drawHoverPreview(position, this.targetLayer!, this.editorContext, this.currentSession, this.overlayContainer);
         }
     }
 
     private updateDrawPayload() {
         if (!this.isDragging || !this.activeDrawStrategy || !this.currentSession || !this.overlayContainer) return;
 
-        const drawCoordinates = GeometryUtils.calculateLine(this.previousMouseCoordinate, this.currentMouseCoordinate);
-        if (drawCoordinates.length == 0) drawCoordinates.push(this.currentMouseCoordinate);
+        const startCoordinate = this.targetLayer!.posToCoord(this.previousMousePosition);
+        const endCoordinate = this.targetLayer!.posToCoord(this.currentMousePosition);
 
-        drawCoordinates.forEach((drawCoordinate) => {
-            const data = this.activeDrawStrategy!.getPayload(drawCoordinate, this.editorContext, this.currentSession!);
-            if (data.length <= 0) return;
-            data.forEach((stampData) => {
-                const key = `${stampData.coordinate.col},${stampData.coordinate.row}`;
-                if (this.drawPayloads.has(key)) this.drawPayloads.get(key)!.sprite.destroy();
-                // TODO: Use coordToPos from BaseLayer
-                stampData.sprite.position.set(stampData.coordinate.col * this.currentSession!.tilemap.tilewidth, stampData.coordinate.row * this.currentSession!.tilemap.tileheight);
-                this.overlayContainer!.addChild(stampData.sprite);
-                this.drawPayloads.set(key, stampData);
+        const drawCoordinates = GeometryUtils.calculateLine(startCoordinate, endCoordinate);
+        if (drawCoordinates.length == 0) drawCoordinates.push(endCoordinate);
+
+        const drawPositions = drawCoordinates.map(c => this.targetLayer!.coordToPos(c));
+
+        drawPositions.forEach((drawPosition) => {
+            const drawPayloads = this.activeDrawStrategy!.getPayload(drawPosition, this.targetLayer!, this.editorContext, this.currentSession!);
+            if (drawPayloads.length <= 0) return;
+            drawPayloads.forEach((drawPayload) => {
+                if (this.drawPayloads.has(drawPayload.key)) this.drawPayloads.get(drawPayload.key)!.sprite.destroy();
+                this.overlayContainer!.addChild(drawPayload.sprite);
+                this.drawPayloads.set(drawPayload.key, drawPayload);
             });
         });
+    }
 
-        this.previousMouseCoordinate = this.currentMouseCoordinate;
+    private getLocalPos(e: FederatedPointerEvent): Position {
+        const localPosition = this.currentSession!.sessionView.viewport.toLocal(new Point(e.global.x, e.global.y));
+        return { x: localPosition.x, y: localPosition.y };
     }
 
     private clearDrawPreview() {

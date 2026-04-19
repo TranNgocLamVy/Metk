@@ -29,8 +29,9 @@ export class RectangleTool implements ITool {
     private overlayContainer: Container | null = null;
 
     private isDragging: boolean = false;
-    private startMouseCoordinate: Coordinate = null!;
-    private currentMouseCoordinate: Coordinate = null!;
+    private startMousePosition: Position = null!;
+    private previousMousePosition: Position = null!;
+    private currentMousePosition: Position = null!;
 
     private drawPayloads: Map<string, DrawPayload> = new Map();
 
@@ -61,8 +62,8 @@ export class RectangleTool implements ITool {
         this.clearDrawPreview();
 
         this.isDragging = false;
-        this.startMouseCoordinate = null!;
-        this.currentMouseCoordinate = null!;
+        this.startMousePosition = null!;
+        this.currentMousePosition = null!;
         this.targetLayer = null;
     }
 
@@ -97,8 +98,8 @@ export class RectangleTool implements ITool {
         this.clearDrawPreview();
 
         this.isDragging = false;
-        this.startMouseCoordinate = null!;
-        this.currentMouseCoordinate = null!;
+        this.startMousePosition = null!;
+        this.currentMousePosition = null!;
         this.targetLayer = null;
     }
 
@@ -106,19 +107,20 @@ export class RectangleTool implements ITool {
         if (!this.currentSession || e.button !== 0 || !this.targetLayer || !this.activeDrawStrategy) return;
 
         this.isDragging = true;
-        this.startMouseCoordinate = this.getGridCoordinates(e.global.x, e.global.y);
-        this.currentMouseCoordinate = this.startMouseCoordinate;
+        this.currentMousePosition = this.startMousePosition = this.previousMousePosition = this.getLocalPos(e);
         this.updateDrawPayload(e.shiftKey);
     }
 
     private onPointerMove(e: FederatedPointerEvent): void {
-        if (!this.currentSession || !this.isDragging || !this.startMouseCoordinate) return;
-        
-        const newPos = this.getGridCoordinates(e.global.x, e.global.y);
-        if (this.currentMouseCoordinate?.col !== newPos.col || this.currentMouseCoordinate?.row !== newPos.row) {
-            this.currentMouseCoordinate = newPos;
-            this.updateDrawPayload(e.shiftKey);
-        }
+        if (!this.currentSession || !this.activeDrawStrategy || !this.targetLayer) return;
+
+        const newMousePosition = this.getLocalPos(e);
+        this.previousMousePosition = { ...this.currentMousePosition };
+        this.currentMousePosition = newMousePosition;
+
+        if (this.activeDrawStrategy.comparePosition(this.previousMousePosition, newMousePosition, this.targetLayer)) return;
+
+        this.updateDrawPayload(e.shiftKey);
     }
 
     private onPointerUp(e: FederatedPointerEvent): void {
@@ -133,28 +135,28 @@ export class RectangleTool implements ITool {
         this.clearDrawPreview();
 
         this.isDragging = false;
-        this.startMouseCoordinate = null!;
-        this.currentMouseCoordinate = null!;
+        this.startMousePosition = null!;
+        this.currentMousePosition = null!;
     }
 
-    private getBounds(start: Coordinate, current: Coordinate, isSquare: boolean) {
-        let minX = Math.min(start.col, current.col);
-        let maxX = Math.max(start.col, current.col);
-        let minY = Math.min(start.row, current.row);
-        let maxY = Math.max(start.row, current.row);
+    private getBounds(start: Position, current: Position, isSquare: boolean) {
+        let minX = Math.min(start.x, current.x);
+        let maxX = Math.max(start.x, current.x);
+        let minY = Math.min(start.y, current.y);
+        let maxY = Math.max(start.y, current.y);
 
         if (isSquare) {
-            const dx = current.col - start.col;
-            const dy = current.row - start.row;
+            const dx = current.x - start.x;
+            const dy = current.y - start.y;
             const size = Math.max(Math.abs(dx), Math.abs(dy));
 
-            maxX = start.col + (dx >= 0 ? size : -size);
-            maxY = start.row + (dy >= 0 ? size : -size);
+            maxX = start.x + (dx >= 0 ? size : -size);
+            maxY = start.y + (dy >= 0 ? size : -size);
 
-            minX = Math.min(start.col, maxX);
-            maxX = Math.max(start.col, maxX);
-            minY = Math.min(start.row, maxY);
-            maxY = Math.max(start.row, maxY);
+            minX = Math.min(start.x, maxX);
+            maxX = Math.max(start.x, maxX);
+            minY = Math.min(start.y, maxY);
+            maxY = Math.max(start.y, maxY);
         }
 
         return { minX, maxX, minY, maxY };
@@ -180,37 +182,67 @@ export class RectangleTool implements ITool {
     }
 
     private updateDrawPayload(shiftKey: boolean): void {
-        if (!this.activeDrawStrategy || !this.currentSession || !this.overlayContainer || !this.startMouseCoordinate || !this.currentMouseCoordinate) return;
+        if (!this.activeDrawStrategy || !this.currentSession || !this.overlayContainer || !this.startMousePosition || !this.currentMousePosition) return;
 
         this.clearDrawPreview();
 
-        const bounds = this.getBounds(this.startMouseCoordinate, this.currentMouseCoordinate, shiftKey);
-        const drawCoordinates = this.getDrawCoordinates(bounds);
+        const { boundary, drawPositions } = this.calculateDrawPositions(this.startMousePosition, this.currentMousePosition, shiftKey);
 
-        drawCoordinates.forEach((drawCoordinate) => {
-            const data = this.activeDrawStrategy!.getPayload(drawCoordinate, this.editorContext, this.currentSession!);
-            if (data.length <= 0) return;
-            data.forEach((stampData) => {
-                if (stampData.coordinate.col > bounds.maxX || stampData.coordinate.row > bounds.maxY) {
-                    stampData.sprite.destroy();
+        drawPositions.forEach((drawPosition) => {
+            const drawPayloads = this.activeDrawStrategy!.getPayload(drawPosition, this.targetLayer!, this.editorContext, this.currentSession!);
+            if (drawPayloads.length <= 0) return;
+            drawPayloads.forEach((drawPayload) => {
+                if (drawPayload.coordinate.col > boundary.maxX || drawPayload.coordinate.row > boundary.maxY) {
+                    drawPayload.sprite.destroy();
                     return;
                 }
-                const key = `${stampData.coordinate.col},${stampData.coordinate.row}`;
-                if (this.drawPayloads.has(key)) this.drawPayloads.get(key)!.sprite.destroy();
-                // TODO: Use coordToPos from BaseLayer
-                stampData.sprite.position.set(stampData.coordinate.col * this.currentSession!.tilemap.tilewidth, stampData.coordinate.row * this.currentSession!.tilemap.tileheight);
-                this.overlayContainer!.addChild(stampData.sprite);
-                this.drawPayloads.set(key, stampData);
+                if (this.drawPayloads.has(drawPayload.key)) this.drawPayloads.get(drawPayload.key)!.sprite.destroy();
+                this.overlayContainer!.addChild(drawPayload.sprite);
+                this.drawPayloads.set(drawPayload.key, drawPayload);
             });
         });
     }
 
-    // TODO: Use coordToPos from BaseLayer
-    private getGridCoordinates(globalX: number, globalY: number): Coordinate {
-        const worldPos = this.currentSession!.sessionView.viewport.toLocal(new Point(globalX, globalY));
-        const gridX = Math.floor(worldPos.x / this.currentSession!.tilemap.tilewidth);
-        const gridY = Math.floor(worldPos.y / this.currentSession!.tilemap.tileheight);
-        return { col: gridX, row: gridY };
+    private calculateDrawPositions(start: Position, end: Position, isSquare: boolean) {
+        // TODO: Handle special case for ObjectLayer
+        const startCoord = this.targetLayer!.posToCoord(start);
+        const endCoord = this.targetLayer!.posToCoord(end);
+
+        let minX = Math.min(startCoord.col, endCoord.col);
+        let maxX = Math.max(startCoord.col, endCoord.col);
+        let minY = Math.min(startCoord.row, endCoord.row);
+        let maxY = Math.max(startCoord.row, endCoord.row);
+
+        if (isSquare) {
+            const dx = endCoord.col - startCoord.col;
+            const dy = endCoord.row - startCoord.row;
+            const size = Math.max(Math.abs(dx), Math.abs(dy));
+
+            maxX = startCoord.col + (dx >= 0 ? size : -size);
+            maxY = startCoord.row + (dy >= 0 ? size : -size);
+
+            minX = Math.min(startCoord.col, maxX);
+            maxX = Math.max(startCoord.col, maxX);
+            minY = Math.min(startCoord.row, maxY);
+            maxY = Math.max(startCoord.row, maxY);
+        }
+
+        const size = this.activeDrawStrategy!.getBrushSize(this.editorContext);
+
+        const width = Math.ceil(Math.abs(maxX - minX + 1) / size.width);
+        const height = Math.ceil(Math.abs(maxY - minY + 1) / size.height);
+
+        const drawPositions: Position[] = [];
+
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                const col = minX + x * size.width;
+                const row = minY + y * size.height;
+                drawPositions.push(this.targetLayer!.coordToPos({ col, row }));
+            }
+        }
+
+        return { boundary: { minX, maxX, minY, maxY }, drawPositions };
     }
 
     private updateActiveDrawStrategy(): void {
@@ -236,9 +268,14 @@ export class RectangleTool implements ITool {
 
         if (!this.targetLayer) return;
 
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!)) || null;
+        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!, this)) || null;
     }
 
+    private getLocalPos(e: FederatedPointerEvent): Position {
+        const localPosition = this.currentSession!.sessionView.viewport.toLocal(new Point(e.global.x, e.global.y));
+        return { x: localPosition.x, y: localPosition.y };
+    }
+    
     private clearDrawPreview(): void {
         this.drawPayloads.forEach((data) => data.sprite.destroy());
         this.drawPayloads.clear();

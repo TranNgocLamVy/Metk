@@ -27,7 +27,7 @@ export class BucketTool implements ITool {
 
     private currentSession: TilemapSession | null = null;
     private overlayContainer: Container | null = null;
-    
+
     private currentFloodRegion: Set<string> = new Set();
     private stampsDataMap: Map<string, DrawPayload> = new Map();
 
@@ -102,13 +102,14 @@ export class BucketTool implements ITool {
     }
 
     private onPointerDown(e: FederatedPointerEvent): void {
-        if (!this.currentSession || e.button !== 0 || !this.targetLayer || !this.activeDrawStrategy) return;
+        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
 
-        const pos = this.getGridCoordinates(e.global.x, e.global.y);
-        const key = `${pos.col},${pos.row}`;
+        const pos = this.getLocalPos(e);
+        const coord = this.targetLayer.posToCoord(pos);
+        const key = `${coord.col},${coord.row}`;
 
         if (!this.currentFloodRegion.has(key)) {
-            this.updateDrawPayload(pos);
+            this.updateDrawPayload(coord);
         }
 
         const historyManager = this.editorContext.getCurrentHistoryManager();
@@ -147,7 +148,7 @@ export class BucketTool implements ITool {
 
         if (start.col < 0 || start.col >= layerWidth || start.row < 0 || start.row >= layerHeight) return;
 
-        const targetRef = this.activeDrawStrategy!.getRefAt(start, layer);
+        const targetRef = this.activeDrawStrategy!.getRefAt(layer.coordToPos(start), layer);
         const startKey = `${start.col},${start.row}`;
         this.currentFloodRegion.add(startKey);
 
@@ -178,7 +179,7 @@ export class BucketTool implements ITool {
                 this.endRegionCoordinate.col = Math.max(this.endRegionCoordinate.col, n.col);
                 this.endRegionCoordinate.row = Math.max(this.endRegionCoordinate.row, n.row);
 
-                const ref = this.activeDrawStrategy!.getRefAt(n, layer);
+                const ref = this.activeDrawStrategy!.getRefAt(layer.coordToPos(n), layer);
                 if (ref === targetRef) {
                     this.currentFloodRegion.add(nKey);
                     queue.push(n);
@@ -197,19 +198,16 @@ export class BucketTool implements ITool {
         const drawCoordinates = this.getDrawCoordinates(bounds);
 
         drawCoordinates.forEach((drawCoordinate) => {
-            const data = this.activeDrawStrategy!.getPayload(drawCoordinate, this.editorContext, this.currentSession!);
-            if (data.length <= 0) return;
-            data.forEach((stampData) => {
-                const key = `${stampData.coordinate.col},${stampData.coordinate.row}`;
-                if (stampData.coordinate.col > bounds.maxX || stampData.coordinate.row > bounds.maxY || !this.currentFloodRegion.has(key)) {
-                    stampData.sprite.destroy();
+            const drawPayloads = this.activeDrawStrategy!.getPayload(this.targetLayer!.coordToPos(drawCoordinate), this.targetLayer!, this.editorContext, this.currentSession!);
+            if (drawPayloads.length <= 0) return;
+            drawPayloads.forEach((drawPayload) => {
+                if (!this.currentFloodRegion.has(drawPayload.key)) {
+                    drawPayload.sprite.destroy();
                     return;
                 }
-                if (this.stampsDataMap.has(key)) this.stampsDataMap.get(key)!.sprite.destroy();
-                // TODO: Use coordToPos from BaseLayer
-                stampData.sprite.position.set(stampData.coordinate.col * this.currentSession!.tilemap.tilewidth, stampData.coordinate.row * this.currentSession!.tilemap.tileheight);
-                this.overlayContainer!.addChild(stampData.sprite);
-                this.stampsDataMap.set(key, stampData);
+                if (this.stampsDataMap.has(drawPayload.key)) this.stampsDataMap.get(drawPayload.key)!.sprite.destroy();
+                this.overlayContainer!.addChild(drawPayload.sprite);
+                this.stampsDataMap.set(drawPayload.key, drawPayload);
             });
         });
     }
@@ -272,7 +270,12 @@ export class BucketTool implements ITool {
 
         if (!this.targetLayer) return;
 
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!)) || null;
+        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!, this)) || null;
+    }
+
+    private getLocalPos(e: FederatedPointerEvent): Position {
+        const localPosition = this.currentSession!.sessionView.viewport.toLocal(new Point(e.global.x, e.global.y));
+        return { x: localPosition.x, y: localPosition.y };
     }
 
     private clearDrawPreview(): void {

@@ -79,11 +79,15 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         return false;
     }
 
-    public postoCoord(pos: Position): Coordinate {
+    public posToCoord(pos: Position): Coordinate {
         throw new Error("Method not implemented.");
     }
 
     public coordToPos(coord: Coordinate): Position {
+        throw new Error("Method not implemented.");
+    }
+
+    public posToSnapPos(pos: Position): Position {
         throw new Error("Method not implemented.");
     }
 
