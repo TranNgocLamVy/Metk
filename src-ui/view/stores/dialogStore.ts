@@ -6,7 +6,7 @@ import { AppCore } from '@/core/appcore';
 
 interface DialogState {
     dialogs: DialogItem[];
-    // Actions
+    
     openDialog: <T>(type: DialogType, config: DialogConfig, params?: T) => string;
     closeDialog: (id: string) => void;
     closeTopDialog: () => void;

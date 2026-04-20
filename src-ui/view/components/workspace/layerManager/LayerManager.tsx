@@ -14,7 +14,7 @@ import LayerMenuBar from "./LayerMenuBar";
 export default function LayerManager() {
 	const { currentSession, version, getFlatView, setTargetLayer } = useLayerManagerStore();
 	useLayerManagerStore((s) => s.version);
-	
+
 	const selectedIds = useLayerManagerStore((s) => s.selectedIds);
 
 	const [isMounted, setIsMounted] = useState(false);
@@ -58,8 +58,10 @@ export default function LayerManager() {
 
 	if (!isMounted || !currentSession) {
 		return (
-			<VStack className="w-full h-full" justify="center" align="center">
-				Select a tilemap
+			<VStack className="w-full h-full px-1 py-2 bg-surface" justify="center" align="center">
+				<VStack className="w-full h-full bg-surface-base" justify="center" align="center">
+					Select a tilemap
+				</VStack>
 			</VStack>
 		);
 	}

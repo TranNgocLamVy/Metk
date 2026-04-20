@@ -170,3 +170,15 @@
     box-shadow: 0 -5px 0 0 var(--dot-color), 0 5px 0 0 var(--dot-color), 0 -10px 0 0 var(--dot-color), 0 10px 0 0 var(--dot-color);
 }
 
+.flexlayout__splitter[style*="ew-resize"],
+.flexlayout__splitter_extra[style*="ew-resize"],
+.flexlayout__splitter_drag[style*="ew-resize"] {
+    cursor: col-resize !important;
+}
+
+.flexlayout__splitter[style*="ns-resize"],
+.flexlayout__splitter_extra[style*="ns-resize"],
+.flexlayout__splitter_drag[style*="ns-resize"] {
+    cursor: row-resize !important;
+}
+
