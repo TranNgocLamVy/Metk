@@ -46,8 +46,8 @@ export default function Workspace() {
 
 	return (
 		<HStack className="w-full h-full">
-			<VStack className="w-full h-full px-1 bg-surface">
-				<VStack className="workspace w-full h-full relative">
+			<VStack className="w-full h-full bg-surface">
+				<VStack className="workspace w-full h-full px-1 relative">
 					<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
 					<div className="top-0 left-0 w-full h-full absolute pointer-events-none" />
 				</VStack>

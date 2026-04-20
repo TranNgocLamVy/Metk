@@ -102,6 +102,7 @@ export class BucketTool implements ITool {
     }
 
     private onPointerDown(e: FederatedPointerEvent): void {
+        if (e.button !== 0) return;
         if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
 
         const pos = this.getLocalPos(e);

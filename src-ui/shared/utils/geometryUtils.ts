@@ -2,6 +2,12 @@
 
 
 export class GeometryUtils {
+    /**
+     * Calculate line between two points or coordinates using Bresenham's algorithm
+     * @param start Coordinate or Position
+     * @param end Coordinate or Position
+     * @returns Position[] or Coordinate[]
+     */
     public static calculateLine(start: Position, end: Position): Position[];
     public static calculateLine(start: Coordinate, end: Coordinate): Coordinate[];
     public static calculateLine(start: Coordinate | Position, end: Coordinate | Position): Coordinate[] | Position[] {

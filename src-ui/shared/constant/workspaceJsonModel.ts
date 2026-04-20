@@ -15,6 +15,7 @@ const workspaceRowNode: IJsonRowNode = {
                             type: "tab",
                             name: "Tilesets",
                             minHeight: 200,
+                            minWidth: 300,
                             component: "tilesetView",
                             enableClose: false,
                         },
@@ -22,20 +23,22 @@ const workspaceRowNode: IJsonRowNode = {
                             type: "tab",
                             name: "Rulesets",
                             minHeight: 200,
+                            minWidth: 300,
                             component: "rulesetManager",
                             enableClose: false,
                         },
-                        
+
                     ],
                 },
                 {
                     type: "tabset",
                     weight: 50,
-                    minHeight: 200,
                     children: [
                         {
                             type: "tab",
                             name: "Layers",
+                            minHeight: 200,
+                            minWidth: 300,
                             component: "layerManager",
                             enableClose: false,
                         }
@@ -56,6 +59,8 @@ const workspaceRowNode: IJsonRowNode = {
                     name: "TilemapEditor",
                     component: "tilemapEditor",
                     enableClose: false,
+                    minHeight: 400,
+                    minWidth: 800,
                 },
             ],
         },
@@ -71,8 +76,8 @@ export const workspaceLayout: IJsonModel = {
         splitterEnableHandle: true,
         tabEnableRename: false,
         tabEnableRenderOnDemand: true,
-        
-        
+
+
     },
     layout: workspaceRowNode,
 };
