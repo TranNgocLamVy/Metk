@@ -60,8 +60,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         // TODO: Handle unfound tileset, render error texture
         if (!texture) return;
 
-        const coord = { col: col + this.layer.coordinate.col, row: row + this.layer.coordinate.row };
-        const drawPotision = this.layer.coordToPos(coord);
+        const drawPotision = this.layer.coordToPos({ col, row });
 
         if (currentSprite) {
             currentSprite.texture = texture;

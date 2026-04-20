@@ -123,12 +123,12 @@ export class BucketTool implements ITool {
     private onPointerMove(e: FederatedPointerEvent): void {
         if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
 
-        const pos = this.getGridCoordinates(e.global.x, e.global.y);
-        const key = `${pos.col},${pos.row}`;
+        const coord = this.targetLayer.posToCoord(this.getLocalPos(e));
+        const key = `${coord.col},${coord.row}`;
 
         if (this.currentFloodRegion.has(key)) return;
 
-        this.updateDrawPayload(pos);
+        this.updateDrawPayload(coord);
     }
 
     private onPointerUp(e: FederatedPointerEvent): void { }
@@ -237,14 +237,6 @@ export class BucketTool implements ITool {
             }
         }
         return points;
-    }
-
-    // TODO: Use posToCoord from BaseLayer
-    private getGridCoordinates(globalX: number, globalY: number): Coordinate {
-        const worldPos = this.currentSession!.sessionView.viewport.toLocal(new Point(globalX, globalY));
-        const gridX = Math.floor(worldPos.x / this.currentSession!.tilemap.tilewidth);
-        const gridY = Math.floor(worldPos.y / this.currentSession!.tilemap.tileheight);
-        return { col: gridX, row: gridY };
     }
 
     private updateActiveDrawStrategy(): void {

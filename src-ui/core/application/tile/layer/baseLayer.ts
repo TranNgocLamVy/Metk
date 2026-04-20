@@ -87,10 +87,6 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         throw new Error("Method not implemented.");
     }
 
-    public posToSnapPos(pos: Position): Position {
-        throw new Error("Method not implemented.");
-    }
-
     public traverse(cb: (layer: BaseLayer<any>) => void): void {
         throw new Error("Method not implemented.");
     }

@@ -9,6 +9,9 @@ import { ITool } from "@/core/interface/ITool";
 
 
 export class DrawTileStrategy implements IDrawStrategy {
+    // TODO: Get this from config in the future
+    public static readonly spriteAlpha = 0.9;
+
     public canHandle(layer: BaseLayer<any>, tool: ITool): boolean {
         return layer instanceof TileLayer;
     }
@@ -28,8 +31,8 @@ export class DrawTileStrategy implements IDrawStrategy {
     public getBrushSize(editorContext: EditorContext): { width: number, height: number } {
         const selectedTiles = editorContext.getSelectedTile();
         if (!selectedTiles) return { width: 1, height: 1 };
-        const width = selectedTiles.length;
-        const height = selectedTiles[0].length;
+        const height = selectedTiles.length;
+        const width = selectedTiles[0].length;
         return { width, height };
     }
 
@@ -54,6 +57,7 @@ export class DrawTileStrategy implements IDrawStrategy {
                 if (!texture) continue;
 
                 const sprite = new Sprite(texture);
+                sprite.alpha = DrawTileStrategy.spriteAlpha;
                 const drawPotision = layer.coordToPos({ col, row });
                 sprite.position.set(drawPotision.x, drawPotision.y);
                 overlayContainer.addChild(sprite);
@@ -84,6 +88,7 @@ export class DrawTileStrategy implements IDrawStrategy {
                 if (!texture) continue;
 
                 const sprite = new Sprite(texture);
+                sprite.alpha = DrawTileStrategy.spriteAlpha;
                 const drawPotision = layer.coordToPos({ col, row });
                 sprite.position.set(drawPotision.x, drawPotision.y);
                 data.push({ key: `${col},${row}`, sprite, coordinate: { col, row }, position: drawPotision, tileId: tile.id, tilesetId: tile.tileset.id });

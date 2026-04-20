@@ -5,7 +5,6 @@ import eraser from "@/assets/icons/eraser.svg?raw";
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { TileLayer } from "../application/tile/layer/tileLayer";
-import { RuleLayer } from "../application/tile/layer/ruleLayer";
 import { BatchCommand } from "../command/batchCommand";
 import { Tool } from "../decorator/tool";
 import { ITool } from "../interface/ITool";
@@ -182,20 +181,16 @@ export class EraserTool implements ITool {
     }
 
     private drawPreviewErase() {
-        if (!this.currentSession) return;
-        if (!this.previewGraphics) return;
+        if (!this.currentSession || !this.previewGraphics || !this.targetLayer) return;
 
         this.previewGraphics.clear();
 
-        const startPoint = {
-            x: this.currentPreviewCoordinate.col * this.currentSession.tilemap.tilewidth,
-            y: this.currentPreviewCoordinate.row * this.currentSession.tilemap.tileheight
-        }
+        const startPoint = this.targetLayer.coordToPos(this.currentPreviewCoordinate);
 
-        const endPoint = {
-            x: (this.currentPreviewCoordinate.col + EraserTool.eraserSize) * this.currentSession.tilemap.tilewidth,
-            y: (this.currentPreviewCoordinate.row + EraserTool.eraserSize) * this.currentSession.tilemap.tileheight
-        }
+        const endPoint = this.targetLayer.coordToPos({
+            col: this.currentPreviewCoordinate.col + EraserTool.eraserSize,
+            row: this.currentPreviewCoordinate.row + EraserTool.eraserSize
+        });
 
         this.previewGraphics.moveTo(startPoint.x, startPoint.y)
             .lineTo(endPoint.x, startPoint.y)
@@ -240,6 +235,7 @@ export class EraserTool implements ITool {
         if (eraseCoordinates.length != 0) {
             let eraseCommand: IBaseCommand;
 
+            // TODO: Move this into strategy
             if (this.targetLayer instanceof TileLayer) {
                 eraseCommand = new SetTilesCommand(this.targetLayer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
             } else {

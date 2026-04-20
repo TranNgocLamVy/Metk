@@ -9,6 +9,9 @@ import { ITool } from "@/core/interface/ITool";
 
 
 export class DrawRuleStrategy implements IDrawStrategy {
+    // TODO: Get this from config in the future
+    public static readonly spriteAlpha = 0.9;
+
     public canHandle(layer: BaseLayer<any>, tool: ITool): boolean {
         return layer instanceof RuleLayer;
     }
@@ -40,6 +43,7 @@ export class DrawRuleStrategy implements IDrawStrategy {
 
         const sprite = new Sprite(Texture.WHITE);
         sprite.tint = new Color(selectedRuleset.color);
+        sprite.alpha = DrawRuleStrategy.spriteAlpha;
         sprite.width = session.tilemap.tilewidth;
         sprite.height = session.tilemap.tileheight;
         const drawPotision = layer.coordToPos({ col, row });
@@ -59,6 +63,7 @@ export class DrawRuleStrategy implements IDrawStrategy {
 
         const sprite = new Sprite(Texture.WHITE);
         sprite.tint = new Color(selectedRuleset.color);
+        sprite.alpha = DrawRuleStrategy.spriteAlpha;
         sprite.width = session.tilemap.tilewidth;
         sprite.height = session.tilemap.tileheight;
         const drawPotision = layer.coordToPos({ col: coord.col, row: coord.row });
