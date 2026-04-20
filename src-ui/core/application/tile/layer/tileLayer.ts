@@ -171,11 +171,6 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         }
     }
 
-    public override posToSnapPos(pos: Position): Position {
-        const coord = this.posToCoord(pos);
-        return this.coordToPos(coord);
-    }
-
     public override serialize(): TileLayerData {
         const layerData = this.tilesRef.map(row => row.map(tileRef => {
             if (!tileRef) return "0";

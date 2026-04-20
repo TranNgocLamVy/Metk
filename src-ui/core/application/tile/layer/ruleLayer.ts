@@ -277,11 +277,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         }
     }
 
-    public override posToSnapPos(pos: Position): Position {
-        const coord = this.posToCoord(pos);
-        return this.coordToPos(coord);
-    }
-
     public override serialize(): RuleLayerData {
         const layerData = this.rulesetsRef.map(row => row.map(tileRef => {
             if (!tileRef) return "0";

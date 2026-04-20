@@ -55,8 +55,7 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
             this.sprites.set(key, currentSprite);
         }
 
-        const coord = { col: x + this.layer.coordinate.col, row: y + this.layer.coordinate.row };
-        const drawPotision = this.layer.coordToPos(coord);
+        const drawPotision = this.layer.coordToPos({ col: x, row: y});
 
         currentSprite.width = this.tilemap.tilewidth;
         currentSprite.height = this.tilemap.tileheight;

@@ -139,48 +139,6 @@ export class RectangleTool implements ITool {
         this.currentMousePosition = null!;
     }
 
-    private getBounds(start: Position, current: Position, isSquare: boolean) {
-        let minX = Math.min(start.x, current.x);
-        let maxX = Math.max(start.x, current.x);
-        let minY = Math.min(start.y, current.y);
-        let maxY = Math.max(start.y, current.y);
-
-        if (isSquare) {
-            const dx = current.x - start.x;
-            const dy = current.y - start.y;
-            const size = Math.max(Math.abs(dx), Math.abs(dy));
-
-            maxX = start.x + (dx >= 0 ? size : -size);
-            maxY = start.y + (dy >= 0 ? size : -size);
-
-            minX = Math.min(start.x, maxX);
-            maxX = Math.max(start.x, maxX);
-            minY = Math.min(start.y, maxY);
-            maxY = Math.max(start.y, maxY);
-        }
-
-        return { minX, maxX, minY, maxY };
-    }
-
-    private getDrawCoordinates(bounds: { minX: number, maxX: number, minY: number, maxY: number }): Coordinate[] {
-        const points: Coordinate[] = [];
-        const { minX, maxX, minY, maxY } = bounds;
-
-        let size = this.activeDrawStrategy!.getBrushSize(this.editorContext);
-
-        const width = Math.ceil(Math.abs(maxX - minX + 1) / size.width);
-        const height = Math.ceil(Math.abs(maxY - minY + 1) / size.height);
-
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                const col = minX + x * size.width;
-                const row = minY + y * size.height;
-                points.push({ col, row });
-            }
-        }
-        return points;
-    }
-
     private updateDrawPayload(shiftKey: boolean): void {
         if (!this.activeDrawStrategy || !this.currentSession || !this.overlayContainer || !this.startMousePosition || !this.currentMousePosition) return;
 
