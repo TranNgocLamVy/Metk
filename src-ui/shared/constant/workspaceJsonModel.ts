@@ -14,12 +14,14 @@ const workspaceRowNode: IJsonRowNode = {
                         {
                             type: "tab",
                             name: "Tilesets",
+                            minHeight: 200,
                             component: "tilesetView",
                             enableClose: false,
                         },
                         {
                             type: "tab",
                             name: "Rulesets",
+                            minHeight: 200,
                             component: "rulesetManager",
                             enableClose: false,
                         },
@@ -29,6 +31,7 @@ const workspaceRowNode: IJsonRowNode = {
                 {
                     type: "tabset",
                     weight: 50,
+                    minHeight: 200,
                     children: [
                         {
                             type: "tab",
