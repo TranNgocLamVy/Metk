@@ -48,7 +48,7 @@ function DropdownMenuItem({
 	variant?: "default" | "destructive";
 }) {
 	const dataClassName = "data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive not-data-[variant=destructive]:focus:**:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 group/dropdown-menu-item data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0";
-	const className = "gap-2 rounded-none px-2 py-2 text-foreground text-xs relative flex cursor-default items-center outline-hidden select-none focus:bg-accent focus:text-accent-foreground";
+	const className = "gap-2 rounded-none px-2 py-2 text-foreground text-xs h-7 relative flex cursor-default items-center outline-hidden select-none focus:bg-accent focus:text-accent-foreground";
 	return (
 		<DropdownMenuPrimitive.Item
 			data-slot="dropdown-menu-item"

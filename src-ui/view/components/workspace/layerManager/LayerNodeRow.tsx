@@ -22,13 +22,8 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	const isGroup = layer instanceof GroupLayer;
 	const isRenaming = editingId === layer.id;
 
-	const [tempName, setTempName] = useState(layer.name);
     const isRenameByUI = useRef(false);
 	const [dragOverPos, setDragOverPos] = useState<DropPosition | null>(null);
-
-	useEffect(() => {
-		if (isRenaming) setTempName(layer.name);
-	}, [isRenaming, layer.name]);
 
 	const handleClick = (e: MouseEvent) => {
 		e.stopPropagation();
@@ -47,12 +42,6 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 			(layer as GroupLayer).toggleOpen();
 			store.refresh();
 		}
-	};
-
-	const handleRename = () => {
-		if (tempName.trim()) TilemapLayerService.renameLayer(layer.id, tempName, isRenameByUI.current);
-        isRenameByUI.current = false;
-		store.setEditingId(null);
 	};
 
 	// Drag Handlers
@@ -161,25 +150,13 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 					{getIcon()}
 				</div>
 				{isRenaming ? (
-					<input
-						value={tempName}
-						onChange={(e) => setTempName(e.target.value)}
-						onBlur={handleRename}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") handleRename();
-							if (e.key === "Escape") store.setEditingId(null);
-						}}
-						autoFocus
-                        onFocus={(e) => e.currentTarget.select()}
-						onClick={(e) => e.stopPropagation()}
-						className="truncate w-40 text-sm border rounded"
-					/>
+					<RenameLayerInput layerId={layer.id} initialName={layer.name} isRenameByUIRef={isRenameByUI} />
 				) : (
-					<span onDoubleClick={handleDoubleClick} className="truncate text-sm font-medium border border-transparent flex-1">{layer.name}</span>
+					<span onDoubleClick={handleDoubleClick} className="truncate text-xs font-medium border border-transparent flex-1">{layer.name}</span>
 				)}
 				<Button
 					variant={"ghost"}
-					size={"icon-sm"}
+					size={"icon-xs"}
                     className={`ml-auto hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
 					onClick={(e) => {
                         e.stopPropagation();
@@ -190,7 +167,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				</Button>
 				<Button
 					variant={"ghost"}
-					size={"icon-sm"}
+					size={"icon-xs"}
                     className={`hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
 					onClick={(e) => {
                         e.stopPropagation();
@@ -201,5 +178,50 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				</Button>
 			</div>
 		</div>
+	);
+}
+
+type RenameLayerInputProps = {
+	layerId: string;
+	initialName: string;
+	isRenameByUIRef: React.MutableRefObject<boolean>;
+};
+
+export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: RenameLayerInputProps) {
+	const store = useLayerManagerStore();
+	const [tempName, setTempName] = useState(initialName);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		const timeOut = setTimeout(() => {
+			if (inputRef.current) {
+				inputRef.current.focus();
+				inputRef.current.select();
+			}
+		}, 100);
+		return () => clearTimeout(timeOut);
+	}, []);
+
+	const handleRename = () => {
+		if (tempName.trim()) {
+			TilemapLayerService.renameLayer(layerId, tempName, isRenameByUIRef.current);
+		}
+		isRenameByUIRef.current = false;
+		store.setEditingId(null);
+	};
+
+	return (
+		<input
+			ref={inputRef}
+			value={tempName}
+			onChange={(e) => setTempName(e.target.value)}
+			onBlur={handleRename}
+			onKeyDown={(e) => {
+				if (e.key === "Enter") handleRename();
+				if (e.key === "Escape") store.setEditingId(null);
+			}}
+			onClick={(e) => e.stopPropagation()}
+			className="truncate w-40 text-xs border bg-surface-base/50"
+		/>
 	);
 }

@@ -123,6 +123,7 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().refresh();
+        useLayerManagerStore.getState().removeIdsFromSelectedIds(selectedIds);
     }
 
     public static selectLayer(id: string, multi: boolean) {
