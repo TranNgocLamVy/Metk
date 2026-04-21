@@ -23,6 +23,13 @@ export class TilesetSessionView implements IBaseSessionView {
         this.session = session;
     }
 
+    private handleNativePointerState = (e: PointerEvent | WheelEvent) => {
+        const target = e.target as HTMLElement;
+        const isOverUI = target !== this.pixiApp?.canvas && target.tagName !== 'HTML' && target.tagName !== 'BODY';
+        this.viewport.pause = isOverUI;
+        this.pixiApp.stage.eventMode = isOverUI ? 'none' : 'auto';
+    };
+
     private initSession(pixiApp: Application) {
         this.pixiApp = pixiApp;
 
@@ -34,6 +41,11 @@ export class TilesetSessionView implements IBaseSessionView {
             allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
         });
+
+        window.addEventListener('pointerdown', this.handleNativePointerState);
+        window.addEventListener('pointermove', this.handleNativePointerState);
+        window.addEventListener('pointerup', this.handleNativePointerState);
+        window.addEventListener('wheel', this.handleNativePointerState, { passive: true });
 
         this.viewport
             .drag({ mouseButtons: "middle " })
@@ -139,5 +151,10 @@ export class TilesetSessionView implements IBaseSessionView {
 
         this.selector.destroy();
         this.selector = null!;
+
+        window.removeEventListener('pointerdown', this.handleNativePointerState);
+        window.removeEventListener('pointermove', this.handleNativePointerState);
+        window.removeEventListener('pointerup', this.handleNativePointerState);
+        window.removeEventListener('wheel', this.handleNativePointerState);
     }
 }

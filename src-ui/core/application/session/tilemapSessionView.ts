@@ -1,5 +1,5 @@
 import { Viewport } from "pixi-viewport";
-import { Application, Container, FederatedWheelEvent } from "pixi.js";
+import { Application, Container } from "pixi.js";
 
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { IBaseSessionView } from "@/core/interface/IBaseSession";
@@ -23,6 +23,13 @@ export class TilemapSessionView implements IBaseSessionView {
         this.session = session;
     }
 
+    private handleNativePointerState = (e: PointerEvent | WheelEvent) => {
+        const target = e.target as HTMLElement;
+        const isOverUI = target !== this.pixiApp?.canvas && target.tagName !== 'HTML' && target.tagName !== 'BODY';
+        this.viewport.pause = isOverUI;
+        this.pixiApp.stage.eventMode = isOverUI ? 'none' : 'auto';
+    };
+
     private initSession(pixiApp: Application) {
         this.pixiApp = pixiApp;
 
@@ -33,26 +40,20 @@ export class TilemapSessionView implements IBaseSessionView {
             worldHeight: this.session.tilemap.height * this.session.tilemap.tileheight,
             passiveWheel: false,
             stopPropagation: true,
-            allowPreserveDragOutside: true,
+            allowPreserveDragOutside: false,
             events: pixiApp.renderer.events,
         });
 
+        window.addEventListener('pointerdown', this.handleNativePointerState);
+        window.addEventListener('pointermove', this.handleNativePointerState);
+        window.addEventListener('pointerup', this.handleNativePointerState);
+        window.addEventListener('wheel', this.handleNativePointerState, { passive: true });
+
         this.viewport
-            .drag({ mouseButtons: "middle" }) // Drag with middle mouse button
+            .drag({ mouseButtons: "middle" })
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
             .clampZoom({ minScale: 0.05, maxScale: 50 });
-
-        const wheelPlugin = this.viewport.plugins.get('wheel');
-
-        // // 3. Save the original wheel function
-        // const originalWheel = wheelPlugin!.wheel;
-        // wheelPlugin!.wheel = function (e: FederatedWheelEvent) {
-        //     if (e.ctrlKey) {
-        //         return false;
-        //     }
-        //     return originalWheel.call(this, e);
-        // };
 
         setTimeout(() => this.updateViewport(), 0);
 
@@ -125,6 +126,11 @@ export class TilemapSessionView implements IBaseSessionView {
     public destroy() {
         if (!this.isInit) return;
         this.unActivateSession();
+
+        window.removeEventListener('pointerdown', this.handleNativePointerState);
+        window.removeEventListener('pointermove', this.handleNativePointerState);
+        window.removeEventListener('pointerup', this.handleNativePointerState);
+        window.removeEventListener('wheel', this.handleNativePointerState);
 
         if (this.renderer) this.renderer.destroy();
 
