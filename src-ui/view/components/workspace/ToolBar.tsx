@@ -31,9 +31,6 @@ export default function ToolBar() {
 							<Button onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}>
 								<SVGIcon svgString={tool.icon} />
 							</Button>
-							{(index != tools.length - 1) && <VStack justify="center">
-								<Separator orientation="vertical" className="bg-foreground/20 h-6" />
-							</VStack>}
 						</Fragment>
 					);
 				})}

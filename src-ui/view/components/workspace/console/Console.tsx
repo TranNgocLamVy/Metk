@@ -4,12 +4,12 @@ import { useConsoleStore } from "@/view/stores/consoleStore";
 import { Button } from "../../shadcn/button";
 import { Ban, ChevronsDown, Info, TriangleAlert } from "lucide-react";
 import QuickToolTip from "../../custom/QuickToolTip";
-import Error from "./Error";
-import Log from "./Log";
+import ErrorConsole from "./ErrorConsole";
+import LogConsole from "./LogConsole";
 
 
 export default function Console() {
-    const { isConsoleOpen, consoleType, closeConsole, setConsoleType } = useConsoleStore();
+    const { isConsoleOpen, consoleType, closeConsole, setConsoleType, clearErrors, clearLogs } = useConsoleStore();
 
     const [height, setHeight] = useState<number>(150);
 
@@ -42,11 +42,16 @@ export default function Console() {
         document.addEventListener('mouseup', handleMouseUp);
     }, []);
 
+    const clearCurrentConsole = useCallback(() => {
+        if (consoleType === "log") clearLogs();
+        else clearErrors();
+    }, [consoleType]);
+
     if (!isConsoleOpen) return null;
     return (
-        <div ref={consoleRef} className="w-full bg-transparent absolute bottom-0 pb-5 px-4" style={{ height: `${height}px` }} >
-            <div className="bg-surface-overlay-sunken flex flex-col w-full h-full shadow-md">
-                <div className="draggable-resize w-full h-2 cursor-row-resize z-10 bg-surface transition-colors shrink-0 flex justify-center items-center gap-0.5" onMouseDown={handleMouseDown}>
+        <div ref={consoleRef} className="w-full bg-transparent absolute bottom-0 pb-4 px-3" style={{ height: `${height}px` }} >
+            <div className="bg-surface-overlay flex flex-col w-full h-full shadow-md">
+                <div className="draggable-resize w-full h-2 cursor-row-resize z-10 bg-surface-overlay-sunken transition-colors shrink-0 flex justify-center items-center gap-0.5" onMouseDown={handleMouseDown}>
                     <div className="size-[4px] bg-foreground/20 rounded-full" />
                     <div className="size-[4px] bg-foreground/20 rounded-full" />
                     <div className="size-[4px] bg-foreground/20 rounded-full" />
@@ -66,7 +71,7 @@ export default function Console() {
 
 
                         <QuickToolTip toolTip="Clear Console">
-                            <Button variant={"ghost"} size={"icon-xs"} className="ml-auto">
+                            <Button variant={"ghost"} size={"icon-xs"} className="ml-auto" onClick={clearCurrentConsole}>
                                 <Ban />
                             </Button>
                         </QuickToolTip>
@@ -77,8 +82,8 @@ export default function Console() {
                         </QuickToolTip>
                     </HStack>
                     <VStack className="relative flex-1 p-2 min-h-0 overflow-hidden bg-surface-base">
-                        {consoleType === "log" && <Log />}
-                        {consoleType === "error" && <Error />}
+                        {consoleType === "log" && <LogConsole />}
+                        {consoleType === "error" && <ErrorConsole />}
                     </VStack>
                 </VStack>
             </div>

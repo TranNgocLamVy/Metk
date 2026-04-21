@@ -268,28 +268,27 @@ export class EraserTool implements ITool {
 
     private updateActiveDrawStrategy(): void {
         if (!this.currentSession) return;
+        
+        this.targetLayer = null;
+        this.activeDrawStrategy = null;
 
         const selectedIds = this.currentSession.layerState.selectedLayers;
         if (selectedIds.length === 0) return;
 
-        this.targetLayer = null;
-
+        let targetLayer: BaseLayer<any> | null = null;
         for (const id of selectedIds) {
             const layer = this.currentSession.tilemap.rootLayer.findLayer(id);
             if (layer && !(layer instanceof GroupLayer)) {
-                this.targetLayer = layer;
+                targetLayer = layer;
                 break;
             }
         }
 
-        if (!this.targetLayer || this.targetLayer.locked || !this.targetLayer.visible) {
-            this.activeDrawStrategy = null;
-            return;
-        }
+        if (!targetLayer || targetLayer?.locked || !targetLayer?.visible) return;
 
-        if (!this.targetLayer) return;
-
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(this.targetLayer!, this)) || null;
+        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(targetLayer!, this)) || null;
+        if (!this.activeDrawStrategy) return;
+        this.targetLayer = targetLayer;
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {
