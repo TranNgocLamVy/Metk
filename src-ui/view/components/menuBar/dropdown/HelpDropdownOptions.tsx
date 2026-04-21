@@ -1,16 +1,18 @@
-import { Book, HeartPlus, MessageSquare, Star } from "lucide-react";
+import { Book, HeartPlus, KeyboardIcon, MessageSquare, MessageSquareMore, Star } from "lucide-react";
 
 const HelpDropdownOptionGroup1: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "User Manual",
+        label: "menu.help.actions.userManual",
         startIcon: <Book />,
+        disabled: () => true,
         onClick() { },
     },
     {
         type: "option",
-        name: "Community Forum",
-        startIcon: <MessageSquare />,
+        label: "menu.help.actions.reportIssue",
+        startIcon: <MessageSquareMore />,
+        disabled: () => true,
         onClick() { },
     }
 ]
@@ -18,21 +20,23 @@ const HelpDropdownOptionGroup1: MenuDropDownGroupType = [
 const HelpDropdownOptionGroup2: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Support developer",
+        label: "menu.help.actions.supportDeveloper",
         startIcon: <HeartPlus />,
+        disabled: () => true,
         onClick() { },
     },
     {
         type: "option",
-        name: "About application",
-        startIcon: <Star />,
+        label: "menu.help.actions.shortcuts",
+        startIcon: <KeyboardIcon />,
+        disabled: () => true,
         onClick() { },
     }
 ]
 
 
 export const HelpDropdownOptions: MenuItemType = {
-    name: "menuBar.help",
+    label: "menu.help.label",
     className: "w-80",
     groups: [
         HelpDropdownOptionGroup1,

@@ -25,7 +25,6 @@ type TilemapViewStore = {
 export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
     return {
         pixiApp: null,
-        tilemapSessionManager: null,
         version: 0,
 
         setPixiApp: (pixiApp: Application) => {

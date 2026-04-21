@@ -6,8 +6,19 @@ import { Application as PixiApplication } from "@pixi/react";
 
 import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
 import { TilemapEditorContextMenu } from "./ContextMenu";
+import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
+import { VStack } from "../../custom/stack/Stack";
+import { Button } from "../../shadcn/button";
+import { DialogZLevel } from "@/shared/types/dialog";
+import { useDialogStore } from "@/view/stores/dialogStore";
 
 export default function TilemapEditorCanvas() {
+	const { t: translate } = useTranslation([]);
+
+	const { version, getCurrentTilemapSessionId } = useTilemapSessionStore();
+	const currentTilemapSessionId = useMemo(() => getCurrentTilemapSessionId(), [version]);
+
 	const { pixiApp, setPixiApp } = useTilemapSessionStore();
 	const containerRef = useResizeObserver<HTMLDivElement>(
 		(entry) => {
@@ -28,6 +39,14 @@ export default function TilemapEditorCanvas() {
 			<ContextMenuWrapper item={TilemapEditorContextMenu}>
 				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm" />
 			</ContextMenuWrapper>
+			{currentTilemapSessionId == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0">
+				<span className="text-sm">
+					{translate("workspace.tilemapEditor.empty")}
+				</span>
+				<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
+					{translate("workspace.tilemapEditor.open")}
+				</Button>
+			</VStack>}
 		</div>
 	);
 }

@@ -16,7 +16,7 @@ export class TilesetService {
     public static async createTileset(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const currentProject = editorContext.getCurrentProject();
-        const form = await DialogService.openFormDialog(createTilesetForm)
+        const form = await DialogService.openFormDialog(createTilesetForm())
         if (!form) return;
 
         const tilesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tileset", filters: [{ name: "Tileset", extensions: ["ts.json"] }] });

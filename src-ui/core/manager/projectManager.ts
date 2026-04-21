@@ -42,6 +42,12 @@ export class ProjectManager {
         return Result.Success(this.currentProject);
     }
 
+    public async unLoadProject() {
+        if (!this.currentProject) return;
+        await this.currentProject.unload();
+        this.currentProject = null;
+    }
+
     public async saveCurrrentProject(): Promise<Result> {
         const project = this.currentProject;
         if (!project) return Result.Error("No project selected");

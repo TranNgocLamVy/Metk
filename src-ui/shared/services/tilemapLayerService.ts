@@ -127,7 +127,9 @@ export class TilemapLayerService {
     }
 
     public static selectLayer(id: string, multi: boolean) {
-        const currentSession = useLayerManagerStore.getState().currentSession;
+        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        if (!tilemapSessionManager) return;
+        const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
         let selectedLayers = [...currentSession.layerState.selectedLayers];
         if (!multi) selectedLayers = [];
@@ -142,7 +144,9 @@ export class TilemapLayerService {
     }
 
     public static selectAllLayers() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
+        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        if (!tilemapSessionManager) return;
+        const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
         const root = currentSession.tilemap.rootLayer;
         const selectedLayers = Array.from(root.getAllIds());
@@ -152,7 +156,9 @@ export class TilemapLayerService {
     }
 
     public static deselectAllLayers() {
-        const currentSession = useLayerManagerStore.getState().currentSession;
+        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        if (!tilemapSessionManager) return;
+        const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
         currentSession.updateLayerState({ selectedLayers: [] });
         useLayerManagerStore.getState().setSelectedLayers([]);

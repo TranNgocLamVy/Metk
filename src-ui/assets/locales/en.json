@@ -1,0 +1,382 @@
+{
+    "menu": {
+        "file": {
+            "label": "File",
+            "actions": {
+                "new": {
+                    "label": "New",
+                    "project": "New project",
+                    "tilemap": "New Tilemap",
+                    "tileset": "New tileset",
+                    "ruleset": "New ruleset"
+                },
+                "open": {
+                    "file": "Open File",
+                    "project": "Open Project"
+                },
+                "recentFiles": {
+                    "label": "Recent Files",
+                    "clear": "Clear Recent Files"
+                },
+                "recentProjects": {
+                    "label": "Recent Projects",
+                    "clear": "Clear Recent Projects"
+                },
+                "save": "Save",
+                "saveAs": "Save As",
+                "saveAll": "Save All",
+                "import": {
+                    "label": "Import",
+                    "tilemap": "Import Tilemap",
+                    "tileset": "Import Tileset",
+                    "ruleset": "Import Ruleset"
+                },
+                "export": {
+                    "label": "Export",
+                    "exportTMX": "Export as TMX",
+                    "exportImage": "Export as Image"
+                },
+                "command": "Command",
+                "close": "Close",
+                "closeAll": "Close All",
+                "closeProject": "Close Project",
+                "quit": "Quit"
+            }
+        },
+        "edit": {
+            "label": "Edit",
+            "actions": {
+                "undo": "Undo",
+                "redo": "Redo",
+                "cut": "Cut",
+                "copy": "Copy",
+                "paste": "Paste",
+                "delete": "Delete",
+                "selectAll": "Select All",
+                "invertSelection": "Invert Selection",
+                "selectNone": "Select None",
+                "settings": "Settings"
+            }
+        },
+        "view": {
+            "label": "View",
+            "actions": {
+                "viewAndToolbars": {
+                    "label": "View and Toolbars",
+                    "project": "Project",
+                    "console": "Console",
+                    "issues": "Issues",
+                    "properties": "Properties",
+                    "layer": "Layer",
+                    "history": "History",
+                    "objects": "Objects",
+                    "templateEditor": "Template Editor",
+                    "tilesets": "Tilesets",
+                    "terrainSets": "Terrain Sets",
+                    "minimap": "Mini-map",
+                    "tileStamps": "Tile Stamps",
+                    "mainToolbar": "Main Toolbar",
+                    "tools": "Tools",
+                    "toolOptions": "Tool Options",
+                    "lockLayout": "Lock Layout",
+                    "resetToDefaultLayout": "Reset to Default Layout"
+                },
+                "searchActions": "Search Actions",
+                "showGrid": "Show Grid",
+                "showTileObjectOutlines": "Show Tile Object Outlines",
+                "showObjectReferences": "Show Object References",
+                "showObjectNames": {
+                    "label": "Show Object Names",
+                    "never": "Never",
+                    "forSelectedObjects": "For Selected Objects",
+                    "forAllObjects": "For All Objects",
+                    "forHoveredObjects": "For Hovered Objects"
+                },
+                "showTileAnimations": "Show Tile Animations",
+                "showTileCollisionShapes": "Show Tile Collision Shapes",
+                "showWorld": "Show World",
+                "enableParallax": "Enable Parallax",
+                "highlightCurrentLayer": "Highlight Current Layer",
+                "highlightHoveredObject": "Highlight Hovered Object",
+                "snapping": {
+                    "label": "Snapping",
+                    "noSnapping": "No Snapping",
+                    "snapToGrid": "Snap to Grid",
+                    "snapToFineGrid": "Snap to Fine Grid",
+                    "snapToPixel": "Snap to Pixel"
+                },
+                "zoomIn": "Zoom In",
+                "zoomOut": "Zoom Out",
+                "normalSize": "Normal Size",
+                "fitMapInView": "Fit Map in View",
+                "clearView": "Clear View"
+            }
+        },
+        "map": {
+            "label": "Map",
+            "actions": {
+                "resizeMap": "Resize Map",
+                "cropToSelection": "Crop to Selection",
+                "autoCrop": "Auto Crop",
+                "offsetMap": "Offset Map",
+                "selectNextTileset": "Select Next Tileset",
+                "selectPreviousTileset": "Select Previous Tileset",
+                "mapProperties": "Map Properties"
+            }
+        },
+        "layer": {
+            "label": "Layer",
+            "actions": {
+                "newLayer": {
+                    "label": "New Layer",
+                    "tileLayer": "Tile Layer",
+                    "ruleLayer": "Rule Layer",
+                    "objectLayer": "Object Layer",
+                    "imageLayer": "Image Layer",
+                    "groupLayer": "Group Layer",
+                    "layerViaCopy": "Layer via Copy",
+                    "layerViaCut": "Layer via Cut"
+                },
+                "group": {
+                    "label": "Group",
+                    "groupLayer": "Group Layer",
+                    "ungroupLayer": "Ungroup Layer"
+                },
+                "duplicateLayer": "Duplicate Layer",
+                "mergeLayerUp": "Merge Layer Up",
+                "mergeLayerDown": "Merge Layer Down",
+                "deleteLayer": "Delete Layer",
+                "selectNextLayer": "Select Next Layer",
+                "selectPreviousLayer": "Select Previous Layer",
+                "selectAllLayers": "Select All Layers",
+                "raiseLayer": "Raise Layer",
+                "lowerLayer": "Lower Layer",
+                "showHideLayer": "Show/Hide Layer",
+                "lockUnlockLayer": "Lock/Unlock Layer",
+                "showHideOtherLayers": "Show/Hide other Layers",
+                "lockUnlockOtherLayers": "Lock/Unlock other Layers",
+                "layerProperties": "Layer Properties"
+            }
+        },
+        "project": {
+            "label": "Project",
+            "actions": {
+                "addFolderToProject": "Add Folder to Project",
+                "refreshProject": "Refresh Project",
+                "projectProperties": "Project Properties"
+            }
+        },
+        "help": {
+            "label": "Help",
+            "actions": {
+                "userManual": "User Manual",
+                "reportIssue": "Report Issue",
+                "supportDeveloper": "Support developer",
+                "shortcuts": "Shortcuts"
+            }
+        }
+    },
+    "home": {
+        "welcome": "Map Editor Toolkit",
+        "description": "A free and open source editor for tilemaps",
+        "start": "Start",
+        "importProject": "Import Project",
+        "newProject": "New Project",
+        "recentProjects": "Recent Projects"
+    },
+    "workspace": {
+        "label": "Workspace",
+        "tool": {
+            "stamp": {
+                "label": "Stamp",
+                "description": "Stamp or paint onto the map"
+            },
+            "line": {
+                "label": "Line",
+                "description": "Draw straight lines"
+            },
+            "rectangle": {
+                "label": "Rectangle",
+                "description": "Draw rectangular shapes"
+            },
+            "bucket": {
+                "label": "Bucket",
+                "description": "Fill enclosed areas"
+            },
+            "eraser": {
+                "label": "Eraser",
+                "description": "Erase from the map"
+            }
+        },
+        "tilesetSelector": {
+            "label": "Tileset",
+            "empty": "No tileset selected",
+            "open": "Open Tileset",
+            "menu": {
+                "new": "New Tileset",
+                "edit": "Edit Tileset",
+                "delete": "Delete Tileset"
+            },
+            "contextMenu": {
+                "new": "New Tileset",
+                "edit": "Edit Tileset",
+                "showGrid": "Show Grid",
+                "delete": "Delete Tileset"
+            }
+        },
+        "tilemapEditor": {
+            "label": "Tilemap Editor",
+            "empty": "No tilemap selected",
+            "open": "Open Tilemap",
+            "contextMenu": {
+                "new": "New Tilemap",
+                "currentTool": "Current Tool",
+                "undo": "Undo",
+                "redo": "Redo",
+                "cut": "Cut",
+                "copy": "Copy",
+                "paste": "Paste",
+                "showGrid": "Show Grid",
+                "delete": "Delete Tilemap"
+            }
+        },
+        "layerManager": {
+            "label": "Layer",
+            "menu": {
+                "new": {
+                    "label": "New Layer",
+                    "tileLayer": "Tile Layer",
+                    "ruleLayer": "Rule Layer",
+                    "objectLayer": "Object Layer",
+                    "imageLayer": "Image Layer",
+                    "groupLayer": "Group Layer"
+                },
+                "raiseLayer": "Raise Layer",
+                "lowerLayer": "Lower Layer",
+                "duplicate": "Duplicate Layer",
+                "delete": "Delete Layer",
+                "showHideSelected": "Show/Hide selected Layers",
+                "lockUnlockSelected": "Lock/Unlock selected Layers",
+                "showHideOther": "Show/Hide other Layers",
+                "lockUnlockOther": "Lock/Unlock other Layers"
+            },
+            "contextMenu": {
+                "label": "Layer Manager",
+                "new": {
+                    "label": "New Layer",
+                    "tileLayer": "Tile Layer",
+                    "ruleLayer": "Rule Layer",
+                    "objectLayer": "Object Layer",
+                    "imageLayer": "Image Layer",
+                    "groupLayer": "Group Layer"
+                },
+                "group": {
+                    "label": "Group",
+                    "groupLayer": "Group Layer",
+                    "ungroupLayer": "Ungroup Layer"
+                },
+                "duplicate": "Duplicate Layer",
+                "selectAll": "Select All Layers",
+                "unselectAll": "Unselect All Layers",
+                "raiseLayer": "Raise Layer",
+                "lowerLayer": "Lower Layer",
+                "showHide": "Show/Hide selected Layers",
+                "lockUnlock": "Lock/Unlock selected Layers",
+                "delete": "Delete Layer"
+            }
+        },
+        "rulesetManager": {
+            "label": "Ruleset",
+            "menu": {
+                "new": "New Ruleset",
+                "edit": "Edit Ruleset",
+                "delete": "Delete Ruleset"
+            },
+            "contextMenu": {
+                "new": "New Ruleset"
+            }
+        },
+        "properties": {
+            "label": "Properties"
+        }
+    },
+    "form": {
+        "project": {
+            "title": "Create new Project",
+            "name": {
+                "label": "Project Name",
+                "placeholder": "e.g., My Awesome Game"
+            },
+            "destination": {
+                "label": "Destination",
+                "placeholder": "Select a folder"
+            },
+            "action": {
+                "create": "Create",
+                "cancel": "Cancel"
+            },
+            "message": {
+                "folderExists": "Folder already exists."
+            }
+        },
+        "tilemap": {
+            "title": "Create new Tilemap",
+            "action": {
+                "create": "Create",
+                "cancel": "Cancel"
+            },
+            "name": {
+                "label": "Tilemap Name",
+                "placeholder": "e.g., Level 1"
+            },
+            "size": {
+                "label": "Tilemap Size",
+                "width": "Width",
+                "height": "Height"
+            },
+            "tileSize": {
+                "label": "Tile Size",
+                "width": "Width",
+                "height": "Height"
+            }
+        },
+        "tileset": {
+            "title": "Create new Tileset",
+            "action": {
+                "saveAs": "Save As",
+                "cancel": "Cancel"
+            },
+            "tileset": "Tileset",
+            "name": {
+                "label": "Tileset Name",
+                "placeholder": "e.g., Forest Props"
+            },
+            "image": {
+                "label": "Image",
+                "source": "Source",
+                "useTransparentColor": "Use Transparent Color"
+            },
+            "size": {
+                "label": "Size",
+                "width": "Width",
+                "height": "Height"
+            },
+            "margin": "Margin",
+            "spacing": "Spacing"
+        },
+        "ruleset": {
+            "title": "Create new Ruleset",
+            "action": {
+                "create": "Create",
+                "cancel": "Cancel"
+            },
+            "name": {
+                "label": "Ruleset Name",
+                "placeholder": "e.g., Auto-Tiling Rule"
+            },
+            "color": {
+                "label": "Ruleset Color"
+            }
+        }
+    }
+}

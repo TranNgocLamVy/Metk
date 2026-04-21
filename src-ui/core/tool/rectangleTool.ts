@@ -13,10 +13,10 @@ import icon from "@/assets/icons/rect.svg?raw";
 
 @Tool({
     id: "tool.rectangle",
-    name: "Rectangle",
+    label: "workspace.tool.rectangle.label",
     displayOnToolbar: {
         icon: icon,
-        tooltip: "Rectangle",
+        tooltip: "workspace.tool.rectangle.description",
         index: 2,
     },
     shortcuts: ["R"],

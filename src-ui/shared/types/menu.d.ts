@@ -2,7 +2,7 @@
 
 declare global {
     type MenuItemType = {
-        name: string | (() => string);
+        label: string | (() => string);
         visible?: () => boolean;
         disabled?: () => boolean;
         className?: string;
@@ -15,7 +15,7 @@ declare global {
 
     type MenuDropDownOptionItemType = {
         type: 'option';
-        name: string | (() => string);
+        label: string | (() => string);
         startIcon?: React.ReactNode;
         endIcon?: React.ReactNode;
         shortCut?: string;
@@ -27,19 +27,19 @@ declare global {
 
     type MenuDropDownSubMenuItemType = {
         type: 'subMenu';
-        name: string | (() => string);
+        label: string | (() => string);
         startIcon?: React.ReactNode;
         endIcon?: React.ReactNode;
         shortCut?: string;
         visible?: () => boolean;
         disabled?: () => boolean;
-        subMenus: MenuDropDownGroupType[];
+        subMenus: MenuDropDownGroupType[] | (() => MenuDropDownGroupType[]);
         subMenusClassName?: string;
     }
 
     type MenuDropDownCheckItemType = {
         type: 'check';
-        name: string | (() => string);
+        label: string | (() => string);
         startIcon?: React.ReactNode;
         endIcon?: React.ReactNode;
         shortCut?: string;
@@ -51,7 +51,7 @@ declare global {
 
     type MenuDropDownRadioItemType = {
         type: 'radio';
-        name: string | (() => string);
+        label: string | (() => string);
         startIcon?: React.ReactNode;
         endIcon?: React.ReactNode;
         shortCut?: string;
@@ -61,7 +61,7 @@ declare global {
         onValueChange: (value: any) => void;
         preventDefault?: boolean;
         items: {
-            name: string;
+            label: string;
             value: string;
             startIcon?: React.ReactNode;
             visible?: () => boolean;

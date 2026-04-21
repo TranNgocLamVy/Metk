@@ -1,12 +1,12 @@
 import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
+import { useTranslation } from "react-i18next";
 
 interface NumberInputProps {
 	id: string;
 	name: string;
 	label: string;
 	placeholder?: string;
-	defaultValue?: string;
 	required?: boolean;
     min?: number;
     max?: number;
@@ -15,7 +15,8 @@ interface NumberInputProps {
 }
 
 export function NumberInputField(props: NumberInputProps) {
-	const { id, name, label, placeholder, defaultValue, required, min, max, value, handleChange } = props;
+    const { t: translate } = useTranslation([]);
+	const { id, name, label, placeholder, required, min, max, value, handleChange } = props;
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value;
@@ -42,8 +43,8 @@ export function NumberInputField(props: NumberInputProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{label}</Label>
-			<Input id={id} name={name} type="text" placeholder={placeholder} defaultValue={defaultValue} required={required} value={value ?? ""} onChange={onChange} onBlur={onBlur} className="w-full" />
+			<Label htmlFor={id}>{translate(label)}</Label>
+			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} value={value ?? ""} onChange={onChange} onBlur={onBlur} className="w-full" />
 		</div>
 	);
 }

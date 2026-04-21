@@ -6,7 +6,7 @@ import { TilemapService } from "@/shared/services/tilemapService";
 const ActionGroup: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Create new Tilemap",
+        label: "workspace.tilemapEditor.contextMenu.new",
         startIcon: <Plus className="stroke-1" />,
         onClick() {
             TilemapService.createTilemap();
@@ -17,7 +17,7 @@ const ActionGroup: MenuDropDownGroupType = [
 const UndoRedoGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Undo",
+		label: "workspace.tilemapEditor.contextMenu.undo",
 		startIcon: <Undo />,
 		disabled() {
 			const editorContext = AppCore.getIns().editorContext;
@@ -31,7 +31,7 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		name: "Redo",
+		label: "workspace.tilemapEditor.contextMenu.redo",
 		startIcon: <Redo />,
 		disabled() {
 			const editorContext = AppCore.getIns().editorContext;
@@ -48,20 +48,29 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 const EditGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Cut",
+		label: "workspace.tilemapEditor.contextMenu.cut",
 		startIcon: <Scissors />,
+		disabled() {
+			return true;
+		},
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Copy",
+		label: "workspace.tilemapEditor.contextMenu.copy",
 		startIcon: <Copy />,
+		disabled() {
+			return true;
+		},
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Paste",
+		label: "workspace.tilemapEditor.contextMenu.paste",
 		startIcon: <ClipboardPaste />,
+		disabled() {
+			return true;
+		},
         onClick() { },
 	},
 ];
@@ -69,31 +78,31 @@ const EditGroup: MenuDropDownGroupType = [
 const SnappingGroup: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		name: "Snapping",
+		label: "Snapping",
 		startIcon: <Grid3x3 className="stroke-1" />,
         subMenusClassName: "w-60",
 		subMenus: [
 			[
 				{
 					type: "radio",
-					name: "Snapping",
+					label: "Snapping",
 					value: () => "Pixel",
 					onValueChange(value) {},
 					items: [
 						{
-							name: "No Snapping",
+							label: "No Snapping",
 							value: "None",
 						},
 						{
-							name: "Snap to Grid",
+							label: "Snap to Grid",
 							value: "Grid",
 						},
 						{
-							name: "Snap to Fine Grid",
+							label: "Snap to Fine Grid",
 							value: "FineGrid",
 						},
 						{
-							name: "Snap to Pixel",
+							label: "Snap to Pixel",
 							value: "Pixel",
 						},
 					],
@@ -106,27 +115,27 @@ const SnappingGroup: MenuDropDownGroupType = [
 const BrushGroup: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		name: "Brush",
+		label: "workspace.tilemapEditor.contextMenu.currentTool",
 		startIcon: <Brush className="stroke-1" />,
         subMenusClassName: "w-60",
 		subMenus: [
 			[
 				{
 					type: "radio",
-					name: "Brush Types",
+					label: "workspace.tilemapEditor.contextMenu.currentTool",
 					value: () => AppCore.getIns().toolManager.getCurrentToolId()!,
 					onValueChange(value) {
 						AppCore.getIns().toolManager.startTool(value);
 					},
 					items: [
 						{
-							name: "Stamp",
-							value: "stamp",
+							label: "workspace.tool.stamp.label",
+							value: "tool.stamp",
                             startIcon: <Stamp className="stroke-1" />,
 						},
                         {
-                            name: "Eraser",
-                            value: "eraser",
+                            label: "workspace.tool.eraser.label",
+                            value: "tool.eraser",
                             startIcon: <Eraser className="stroke-1" />,
                         },
 					],
@@ -139,7 +148,7 @@ const BrushGroup: MenuDropDownGroupType = [
 const GridGroup: MenuDropDownGroupType = [
     {
         type: "check",
-        name: "Show Grid",
+        label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
             const session = AppCore.getIns().editorContext.getCurrentTilemapSession();
@@ -157,9 +166,12 @@ const GridGroup: MenuDropDownGroupType = [
 const DeleteGroup: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Delete Tilemap",
+        label: "workspace.tilemapEditor.contextMenu.delete",
         startIcon: <Trash2 />,
         variant: "destructive",
+		disabled() {
+			return true;
+		},
         onClick() {
             // TODO: Implement
         }
@@ -167,7 +179,7 @@ const DeleteGroup: MenuDropDownGroupType = [
 ];
 
 export const TilemapEditorContextMenu: MenuItemType = {
-	name: "Edit",
+	label: "Edit",
 	className: "w-60",
 	groups: [BrushGroup, UndoRedoGroup, GridGroup, ActionGroup, DeleteGroup],
 };

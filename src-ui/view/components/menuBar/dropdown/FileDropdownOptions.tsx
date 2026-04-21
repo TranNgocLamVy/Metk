@@ -1,20 +1,21 @@
-import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquareArrowOutUpRight, SquarePlus, SquareX, X } from "lucide-react";
+import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
 
 import { ProjectService } from "@/shared/services/projectService";
 import { TilemapService } from "@/shared/services/tilemapService";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { RulesetService } from "@/shared/services/rulesetService";
+import { AppCore } from "@/core/appcore";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		name: "New",
+		label: "menu.file.actions.new.label",
 		startIcon: <FolderPlus className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					name: "New Project",
+					label: "menu.file.actions.new.project",
 					startIcon: <FolderPlus />,
                     onClick() {
                         ProjectService.createProject();
@@ -24,24 +25,33 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 			[
 				{
 					type: "option",
-					name: "New Map",
+					label: "menu.file.actions.new.tilemap",
 					startIcon: <SquarePlus />,
+					disabled: () => {
+						return AppCore.getIns().projectManager.currentProject == null;
+					},
                     onClick() {
 						TilemapService.createTilemap();
 					},
 				},
 				{
 					type: "option",
-					name: "New Tileset",
+					label: "menu.file.actions.new.tileset",
 					startIcon: <Grid2x2Plus />,
+					disabled: () => {
+						return AppCore.getIns().projectManager.currentProject == null;
+					},
                     onClick() {
 						TilesetService.createTileset();
 					},
 				},
 				{
 					type: "option",
-					name: "New Ruleset",
+					label: "menu.file.actions.new.ruleset",
 					startIcon: <Grid2x2Plus />,
+					disabled: () => {
+						return AppCore.getIns().projectManager.currentProject == null;
+					},
                     onClick() {
 						RulesetService.createRuleset();
 					},
@@ -51,34 +61,29 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		name: "Open File / Project",
+		label: "menu.file.actions.open.file",
 		startIcon: <FolderOpen />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Open File in Project",
+		label: "menu.file.actions.open.project",
 		startIcon: <FolderOpenDot />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "subMenu",
-		name: "Recent Files",
+		label: "menu.file.actions.recentFiles.label",
 		startIcon: <FileClock className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					name: "Reopen Closed File",
-					startIcon: <SquareArrowOutUpRight />,
-                    onClick() { },
-				},
-			],
-			[
-				{
-					type: "option",
-					name: "Clear Recent Files",
+					label: "menu.file.actions.recentFiles.clear",
 					startIcon: <BrushCleaning />,
+					disabled: () => true,
                     onClick() { },
 				},
 			],
@@ -86,14 +91,15 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		name: "Recent Project",
+		label: "menu.file.actions.recentProjects.label",
 		startIcon: <FolderClock className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					name: "Clear Recent Projects",
+					label: "menu.file.actions.recentProjects.clear",
 					startIcon: <BrushCleaning />,
+					disabled: () => true,
                     onClick() { },
 				},
 			],
@@ -104,53 +110,92 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Save",
+		label: "menu.file.actions.save",
 		startIcon: <Save />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Save As",
+		label: "menu.file.actions.saveAs",
 		startIcon: <Save />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Save All",
+		label: "menu.file.actions.saveAll",
 		startIcon: <SaveAll />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
-		type: "option",
-		name: "Export",
-		startIcon: <FolderUp />,
-        onClick() { },
+		type: "subMenu",
+		label: "menu.file.actions.import.label",
+		startIcon: <FolderUp className=" stroke-2" />,
+		subMenus: [
+			[
+				{
+					type: "option",
+					label: "menu.file.actions.import.tilemap",
+					startIcon: <FolderUp />,
+					disabled: () => true,
+                    onClick() { },
+				},
+				{
+					type: "option",
+					label: "menu.file.actions.import.tileset",
+					startIcon: <ImageUp />,
+					disabled: () => true,
+                    onClick() { },
+				},
+				{
+					type: "option",
+					label: "menu.file.actions.import.ruleset",
+					startIcon: <ImageUp />,
+					disabled: () => true,
+                    onClick() { },
+				}
+			],
+		],
 	},
 	{
-		type: "option",
-		name: "Export as",
-		startIcon: <FolderUp />,
-        onClick() { },
-	},
-	{
-		type: "option",
-		name: "Export as Image",
-		startIcon: <ImageUp />,
-        onClick() { },
+		type: "subMenu",
+		label: "menu.file.actions.export.label",
+		startIcon: <FolderUp className=" stroke-2" />,
+		subMenus: [
+			[
+				{
+					type: "option",
+					label: "menu.file.actions.export.exportTMX",
+					startIcon: <FolderUp />,
+					disabled: () => true,
+                    onClick() { },
+				},
+				{
+					type: "option",
+					label: "menu.file.actions.export.exportImage",
+					startIcon: <ImageUp />,
+					disabled: () => true,
+                    onClick() { },
+				},
+			],
+		],
 	},
 ];
 
 const FileDropdownOptionGroup3: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		name: "Command",
+		label: "Command",
 		startIcon: <Command className=" stroke-[1.25]" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					name: "Edit Command",
+					label: "Edit Command",
 					startIcon: <PenLine />,
+					disabled: () => true,
                     onClick() { },
 				},
 			],
@@ -161,32 +206,36 @@ const FileDropdownOptionGroup3: MenuDropDownGroupType = [
 const FileDropdownOptionGroup4: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Close",
+		label: "menu.file.actions.close",
 		startIcon: <X />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Close All",
+		label: "menu.file.actions.closeAll",
 		startIcon: <SquareX />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Close Project",
+		label: "menu.file.actions.closeProject",
 		startIcon: <FolderX />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Quit",
+		label: "menu.file.actions.quit",
 		startIcon: <LogOut />,
+		disabled: () => true,
         onClick() { },
 	},
 ];
 
 export const FileDropdownOptions: MenuItemType = {
-	name: "menuBar.file",
+	label: "menu.file.label",
     className: "w-100",
-	groups: [FileDropdownOptionGroup1, FileDropdownOptionGroup2, FileDropdownOptionGroup3, FileDropdownOptionGroup4],
+	groups: [FileDropdownOptionGroup1, FileDropdownOptionGroup2, FileDropdownOptionGroup4],
 };

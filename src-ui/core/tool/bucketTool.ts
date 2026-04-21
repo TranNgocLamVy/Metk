@@ -13,10 +13,10 @@ import icon from "@/assets/icons/bucket.svg?raw";
 
 @Tool({
     id: "tool.bucket",
-    name: "Bucket",
+    label: "workspace.tool.bucket.label",
     displayOnToolbar: {
         icon: icon,
-        tooltip: "Bucket",
+        tooltip: "workspace.tool.bucket.description",
         index: 3,
     },
     shortcuts: ["F"],

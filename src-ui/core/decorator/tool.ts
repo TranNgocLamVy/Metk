@@ -2,7 +2,7 @@ import { ToolManager } from "../manager/toolManager";
 
 export type ToolContext = {
     id: string;
-    name: string;
+    label: string;
     description?: string;
     shortcuts?: string[];
     constructor: any;

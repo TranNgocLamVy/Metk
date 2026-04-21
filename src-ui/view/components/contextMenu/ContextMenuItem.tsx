@@ -3,16 +3,19 @@ import { twMerge } from "tailwind-merge";
 import { ContextMenuCheckboxItem, ContextMenuItem as ShadContextMenuItem, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuShortcut, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger } from "@/view/components/shadcn/context-menu";
 
 import MenuBarDropdownGroup from "./ContextMenuItemGroup";
+import { useTranslation } from "react-i18next";
 
 type ContextMenuItemProps = {
 	item: MenuDropDownItemType;
 };
 
 export function ContextMenuItem({ item }: ContextMenuItemProps) {
+	const { t: translate } = useTranslation([]);
+
 	if (item.visible != undefined && !item.visible()) return null;
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
-	const name = typeof item.name === "function" ? item.name() : item.name;
+	const label = translate(typeof item.label === "function" ? item.label() : item.label);
 
 	const wrapIcon = (icon: React.ReactNode, placeholder: boolean = true) => {
 		if (!placeholder && !icon) return null;
@@ -28,7 +31,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 		return (
 			<ShadContextMenuItem variant={item.variant} className="gap-2 h-6 text-xs" disabled={disabled} onClick={item.onClick}>
 				{wrapIcon(item.startIcon)}
-				{name}
+				{label}
 				{wrapIcon(item.endIcon, false)}
 				<ContextMenuShortcut>{item.shortCut ? item.shortCut : null}</ContextMenuShortcut>
 				{wrapIcon(null, item.shortCut ? false : true)}
@@ -38,15 +41,16 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 
 	if (item.type === "subMenu") {
 		const subMenusClassName = twMerge("w-70 bg-surface-overlay border-0", item.subMenusClassName);
+		const subMenus = typeof item.subMenus === "function" ? item.subMenus() : item.subMenus;
 		return (
 			<ContextMenuSub>
 				<ContextMenuSubTrigger className="gap-2 h-6 text-xs" disabled={disabled}>
 					{wrapIcon(item.startIcon)}
-					{name}
+					{label}
 					{wrapIcon(item.endIcon, false)}
 				</ContextMenuSubTrigger>
 				<ContextMenuSubContent className={subMenusClassName} sideOffset={4} alignOffset={-1}>
-					<MenuBarDropdownGroup groups={item.subMenus} />
+					<MenuBarDropdownGroup groups={subMenus} />
 				</ContextMenuSubContent>
 			</ContextMenuSub>
 		);
@@ -56,7 +60,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 		return (
 			<ContextMenuCheckboxItem className="gap-2 h-6 text-xs" checked={item.checked()} onCheckedChange={item.toggle} disabled={disabled} >
 				{wrapIcon(item.startIcon, false)}
-				{name}
+				{label}
 				{wrapIcon(item.endIcon, false)}
 				<ContextMenuShortcut>{item.shortCut ? item.shortCut : null}</ContextMenuShortcut>
 				{wrapIcon(null, item.shortCut ? false : true)}
@@ -72,7 +76,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 					return (
 						<ContextMenuRadioItem className="gap-2 h-6 text-xs" key={radioItem.value} onSelect={(e) => {if(item.preventDefault) e.preventDefault()}} value={radioItem.value} disabled={disabled}>
 							{wrapIcon(radioItem.startIcon, false)}
-							{radioItem.name}
+							{translate(radioItem.label)}
 						</ContextMenuRadioItem>
 					);
 				})}

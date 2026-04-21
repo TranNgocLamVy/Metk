@@ -1,5 +1,5 @@
 import { FolderPlus, SquareArrowOutUpRight, X } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +7,7 @@ import { ProjectService } from "@/shared/services/projectService";
 import { HStack, VStack } from "@/view/components/custom/stack/Stack";
 import { Button } from "@/view/components/shadcn/button";
 import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
+import { AppCore } from "@/core/appcore";
 
 export default function HomePage() {
 	const navigate = useNavigate();
@@ -16,7 +17,11 @@ export default function HomePage() {
 		return getProjects();
 	}, [version])
 
-	const { t: translate } = useTranslation(['common', 'home']);
+	useEffect(() => {
+		AppCore.getIns().projectManager.unLoadProject();
+	}, [])
+
+	const { t: translate } = useTranslation([]);
 
 	return (
 		<VStack align="center" justify="center" className="w-full h-full bg-surface-base">
@@ -24,8 +29,8 @@ export default function HomePage() {
 				<h1 className="text-3xl text-foreground font-bold">{translate('home.welcome')}</h1>
 				<h2 className="text-base text-muted-foreground font-semibold" >{translate('home.description')}</h2>
 
-				<h2 className="mt-8 font-semibold text-foreground">{translate('home.start')}</h2>
-				<VStack align="start" className="w-40 h-fit gap-4">
+				<h2 className="mt-6 font-semibold text-foreground">{translate('home.start')}</h2>
+				<VStack align="start" className="w-40 h-fit">
 					<Button variant={"link"} onClick={ProjectService.importProject}>
 						<SquareArrowOutUpRight />
 						{translate('home.importProject')}
@@ -35,8 +40,8 @@ export default function HomePage() {
 						{translate('home.newProject')}
 					</Button>
 				</VStack>
-				<h2 className="mt-8 font-semibold text-foreground">{translate('home.recentProjects')}</h2>
-				<VStack className="gap-4">
+				<h2 className="mt-2 font-semibold text-foreground">{translate('home.recentProjects')}</h2>
+				<VStack className="w-fit">
 					{projects.map((project) => {
 						return (
 							<HStack align="center" justify="start" key={project.id} className="gap-4 min-w-160 group">

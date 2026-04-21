@@ -3,47 +3,60 @@ import { ArrowBigLeft, ArrowBigRight, ArrowDown, ArrowDownToLine, ArrowUp, Arrow
 const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		name: "New Layer",
+		label: "menu.layer.actions.newLayer.label",
         startIcon: <Layers className="stroke-1" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					name: "Tile Layer",
+					label: "menu.layer.actions.newLayer.tileLayer",
                     startIcon: <Grid2X2 />,
+					disabled: () => true,
 					onClick() {},
 				},
 				{
 					type: "option",
-					name: "Object Layer",
+					label: "menu.layer.actions.newLayer.ruleLayer",
+                    startIcon: <Grid2X2 />,
+					disabled: () => true,
+					onClick() {},
+				},
+				{
+					type: "option",
+					label: "menu.layer.actions.newLayer.objectLayer",
                     startIcon: <Shapes />,
+					disabled: () => true,
 					onClick() {},
 
 				},
 				{
 					type: "option",
-					name: "Image Layer",
-					onClick() {},
+					label: "menu.layer.actions.newLayer.imageLayer",
                     startIcon: <Image />,
+					disabled: () => true,
+					onClick() {},
 				},
 				{
 					type: "option",
-					name: "Group Layer",
+					label: "menu.layer.actions.newLayer.groupLayer",
                     startIcon: <Folder />,
+					disabled: () => true,
 					onClick() {},
 				},
 			],
 			[
 				{
 					type: "option",
-					name: "Layer via Copy",
+					label: "menu.layer.actions.newLayer.layerViaCopy",
                     startIcon: <Copy />,
+					disabled: () => true,
 					onClick() {},
 				},
 				{
 					type: "option",
-					name: "Layer via Cut",
+					label: "menu.layer.actions.newLayer.layerViaCut",
                     startIcon: <Scissors />,
+					disabled: () => true,
 					onClick() {},
 				},
 			],
@@ -51,20 +64,22 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		name: "Group",
+		label: "menu.layer.actions.group.label",
         startIcon: <Group className="stroke-1" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					name: "Group Layer",
+					label: "menu.layer.actions.group.groupLayer",
                     startIcon: <Group />,
+					disabled: () => true,
 					onClick() {},
 				},
 				{
 					type: "option",
-					name: "Ungroup Layer",
+					label: "menu.layer.actions.group.ungroupLayer",
                     startIcon: <Ungroup />,
+					disabled: () => true,
 					onClick() {},
 				},
 			],
@@ -72,26 +87,30 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		name: "Duplicate Layer",
+		label: "menu.layer.actions.duplicateLayer",
         startIcon: <Layers2 />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Merge Layer Up",
+		label: "menu.layer.actions.mergeLayerUp",
         startIcon: <ArrowUpToLine />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Merge Layer Down",
+		label: "menu.layer.actions.mergeLayerDown",
         startIcon: <ArrowDownToLine />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Delete Layer",
+		label: "menu.layer.actions.deleteLayer",
         startIcon: <Trash2 />,
+		disabled: () => true,
 		onClick() {},
 	},
 ];
@@ -99,32 +118,37 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 const LayerDropdownOptionGroup2: MenuDropDownGroupType = [
     {
 		type: "option",
-		name: "Select Next Layer",
+		label: "menu.layer.actions.selectNextLayer",
         startIcon: <ArrowBigRight />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
         type: "option",
-		name: "Select Previous Layer",
+		label: "menu.layer.actions.selectPreviousLayer",
         startIcon: <ArrowBigLeft />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Select All Layers",
+		label: "menu.layer.actions.selectAllLayers",
         startIcon: <Scan />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Raise Layer",
+		label: "menu.layer.actions.raiseLayer",
         startIcon: <ArrowUp />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Lower Layer",
+		label: "menu.layer.actions.lowerLayer",
         startIcon: <ArrowDown />,
+		disabled: () => true,
 		onClick() {},
 	},
 ];
@@ -132,26 +156,30 @@ const LayerDropdownOptionGroup2: MenuDropDownGroupType = [
 const LayerDropdownOptionGroup3: MenuDropDownGroupType = [
     {
 		type: "option",
-		name: "Show/Hide Layer",
+		label: "menu.layer.actions.showHideLayer",
         startIcon: <Eye />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Lock/Unlock Layer",
+		label: "menu.layer.actions.lockUnlockLayer",
         startIcon: <Lock />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Show/Hide other Layers",
+		label: "menu.layer.actions.showHideOtherLayers",
         startIcon: <Eye />,
+		disabled: () => true,
 		onClick() {},
 	},
     {
 		type: "option",
-		name: "Lock/Unlock other Layers",
+		label: "menu.layer.actions.lockUnlockOtherLayers",
         startIcon: <Lock />,
+		disabled: () => true,
 		onClick() {},
 	},
 ]
@@ -159,14 +187,15 @@ const LayerDropdownOptionGroup3: MenuDropDownGroupType = [
 const LayerDropdownOptionGroup4: MenuDropDownGroupType = [
     {
 		type: "option",
-		name: "Layer Properties",
+		label: "menu.layer.actions.layerProperties",
         startIcon: <Columns3Cog />,
+		disabled: () => true,
 		onClick() {},
 	},
 ]
 
 export const LayerDropdownOptions: MenuItemType = {
-	name: "menuBar.layer",
+	label: "menu.layer.label",
 	className: "w-100",
 	groups: [LayerDropdownOptionGroup1, LayerDropdownOptionGroup2, LayerDropdownOptionGroup3, LayerDropdownOptionGroup4],
 };

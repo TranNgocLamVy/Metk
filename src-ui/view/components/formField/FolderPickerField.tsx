@@ -3,6 +3,7 @@ import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
 import { Tooltip, TooltipContent } from "@/view/components/shadcn/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useTranslation } from "react-i18next";
 
 type FolderPickerProps = {
 	id: string;
@@ -16,7 +17,8 @@ type FolderPickerProps = {
 };
 
 export default function FolderPickerField(props: FolderPickerProps) {
-	const { id, name, label, placeholder, defaultValue, required, value, handleChange } = props;
+	const { t: translate } = useTranslation([]);
+	const { id, name, label, placeholder, required, value, handleChange } = props;
 
 	const selectFolder = async () => {
 		const path = await FileDialogUtils.open({
@@ -45,10 +47,10 @@ export default function FolderPickerField(props: FolderPickerProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{label}</Label>
+			<Label htmlFor={id}>{translate(label)}</Label>
 			<Tooltip delayDuration={500}>
 				<TooltipTrigger asChild>
-					<Input id={id} name={name} type="text" placeholder={placeholder} defaultValue={value ?? ""} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFolder} onKeyDown={onKeyDown} />
+					<Input id={id} name={name} type="text" placeholder={translate(placeholder)} defaultValue={value ?? ""} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFolder} onKeyDown={onKeyDown} />
 				</TooltipTrigger>
 				{value && (
 					<TooltipContent side="bottom">

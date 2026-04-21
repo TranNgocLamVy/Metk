@@ -12,7 +12,7 @@ interface MenuBarItemProps {
 export default function MenuBarItem({ item }: MenuBarItemProps) {
     const [isOpen, setIsOpen] = useState(false);
 
-    const { t: translate } = useTranslation(['common', 'menuBar']);
+    const { t: translate } = useTranslation([]);
 
     useEffect(() => {
         const onWindowLoseFocus = () => setIsOpen(false);
@@ -23,14 +23,14 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 	if (item.visible != undefined && !item.visible()) return null;
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
-    const name = typeof item.name === "function" ? item.name() : item.name;
-	const className = twMerge("w-96 bg-surface-overlay shadow-lg", item.className);
+    const label = typeof item.label === "function" ? item.label() : item.label;
+	const className = twMerge("w-96 bg-surface-overlay-sunken shadow-lg", item.className);
 
 	return (
-		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false} >
 			<DropdownMenuTrigger disabled={disabled} asChild>
 				<Button size={"sm"} variant={"empty"} className="px-2 rounded-none h-8 hover:bg-surface-sunken" asChild>
-					<p className="text-xs">{translate(name)}</p>
+					<p className="text-xs">{translate(label)}</p>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={className} side="bottom" align="start" sideOffset={0} >
@@ -70,11 +70,13 @@ type MenuBarDropdownItemProps = {
 
 function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
     const [, forceUpdate] = useReducer(x => x + 1, 0)
+	
+	const { t: translate } = useTranslation([]);
 
 	if (item.visible != undefined && !item.visible()) return null;
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
-	const name = typeof item.name === "function" ? item.name() : item.name;
+	const label = translate(typeof item.label === "function" ? item.label() : item.label)
 
 	const wrapIcon = (icon: React.ReactNode, placeholder: boolean = true) => {
 		if (!placeholder && !icon) return null;
@@ -90,7 +92,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 		return (
 			<DropdownMenuItem className="gap-2 h-7 text-xs" disabled={disabled} onClick={item.onClick}>
 				{wrapIcon(item.startIcon)}
-				{name}
+				{label}
 				{wrapIcon(item.endIcon, false)}
 				<DropdownMenuShortcut>{item.shortCut ? item.shortCut : null}</DropdownMenuShortcut>
 				{wrapIcon(null, item.shortCut ? false : true)}
@@ -100,15 +102,16 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 
 	if (item.type === "subMenu") {
 		const subMenusClassName = twMerge("w-70", item.subMenusClassName);
+		const subMenus = typeof item.subMenus === "function" ? item.subMenus() : item.subMenus;
 		return (
 			<DropdownMenuSub>
 				<DropdownMenuSubTrigger className="gap-2 h-7 text-xs" disabled={disabled}>
 					{wrapIcon(item.startIcon)}
-					{name}
+					{label}
 					{wrapIcon(item.endIcon, false)}
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className={subMenusClassName} sideOffset={0}>
-					<MenuBarDropdownGroup groups={item.subMenus} />
+					<MenuBarDropdownGroup groups={subMenus} />
 				</DropdownMenuSubContent>
 			</DropdownMenuSub>
 		);
@@ -121,7 +124,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
                 item.toggle();
             }}>
 				{wrapIcon(item.startIcon, false)}
-				{name}
+				{label}
 				{wrapIcon(item.endIcon, false)}
 				<DropdownMenuShortcut>{item.shortCut ? item.shortCut : null}</DropdownMenuShortcut>
 				{wrapIcon(null, item.shortCut ? false : true)}
@@ -137,7 +140,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 					return (
 						<DropdownMenuRadioItem onSelect={(e) => e.preventDefault()} className="gap-2 h-7 text-xs" key={radioItem.value} value={radioItem.value} disabled={disabled}>
 							{wrapIcon(radioItem.startIcon, false)}
-							{radioItem.name}
+							{translate(radioItem.label)}
 						</DropdownMenuRadioItem>
 					);
 				})}

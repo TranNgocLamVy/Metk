@@ -17,7 +17,7 @@ export class TilemapService {
     public static async createTilemap(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
         const currentProject = editorContext.getCurrentProject();
-        const form = await DialogService.openFormDialog(createTilemapForm);
+        const form = await DialogService.openFormDialog(createTilemapForm());
         if (!form) return;
 
         const tilemapAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });

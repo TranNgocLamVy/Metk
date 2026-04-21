@@ -4,7 +4,7 @@ import { ClipboardPaste, Copy, Redo, Scissors, SquareDashed, SquareDashedMousePo
 const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Undo",
+		label: "menu.edit.actions.undo",
 		startIcon: <Undo />,
         onClick() {
 			const editorContext = AppCore.getIns().editorContext;
@@ -13,7 +13,7 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		name: "Redo",
+		label: "menu.edit.actions.redo",
 		startIcon: <Redo />,
         onClick() {
 			const editorContext = AppCore.getIns().editorContext;
@@ -25,32 +25,30 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 const EditDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Cut",
+		label: "menu.edit.actions.cut",
 		startIcon: <Scissors />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Copy",
+		label: "menu.edit.actions.copy",
 		startIcon: <Copy />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Paste",
+		label: "menu.edit.actions.paste",
 		startIcon: <ClipboardPaste />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Paste in Place",
-		startIcon: <ClipboardPaste />,
-        onClick() { },
-	},
-	{
-		type: "option",
-		name: "Delete",
+		label: "menu.edit.actions.delete",
 		startIcon: <Trash2 />,
+		disabled: () => true,
         onClick() { },
 	},
 ];
@@ -58,20 +56,23 @@ const EditDropdownOptionGroup2: MenuDropDownGroupType = [
 const EditDropdownOptionGroup3: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Select All",
+		label: "menu.edit.actions.selectAll",
 		startIcon: <SquareMousePointer />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Invert Selection",
+		label: "menu.edit.actions.invertSelection",
 		startIcon: <SquareDashedMousePointer />,
+		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		name: "Select None",
+		label: "menu.edit.actions.selectNone",
 		startIcon: <SquareDashed />,
+		disabled: () => true,
         onClick() { },
 	},
 ];
@@ -79,14 +80,15 @@ const EditDropdownOptionGroup3: MenuDropDownGroupType = [
 const EditDropdownOptionGroup4: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Preferences",
+		label: "menu.edit.actions.settings",
 		startIcon: <UserRoundCog />,
+		disabled: () => true,
         onClick() { },
 	},
 ];
 
 export const EditDropdownOptions: MenuItemType = {
-	name: "menuBar.edit",
+	label: "menu.edit.label",
 	className: "w-100",
 	groups: [EditDropdownOptionGroup1, EditDropdownOptionGroup2, EditDropdownOptionGroup3, EditDropdownOptionGroup4],
 };
