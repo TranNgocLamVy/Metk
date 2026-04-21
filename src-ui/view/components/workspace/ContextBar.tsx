@@ -1,10 +1,10 @@
 import { Info, TriangleAlert } from "lucide-react";
 import { HStack } from "../custom/stack/Stack";
 import { Button } from "../shadcn/button";
-import { useTerminalStore } from "@/view/stores/terminalStore";
+import { useConsoleStore } from "@/view/stores/consoleStore";
 
 export default function ContextBar() {
-    const { toggleWithType } = useTerminalStore();
+    const { toggleWithType } = useConsoleStore();
 
     return (
         <HStack align="center" className="w-full h-8 bg-surface-base">

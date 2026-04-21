@@ -2,17 +2,17 @@ import { EditorContext } from "@/core/application/editorContext";
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
-import { useTerminalStore } from "@/view/stores/terminalStore";
+import { useConsoleStore } from "@/view/stores/consoleStore";
 
 @SystemCommand({
-    id: "project.toggleTerminal",
-    name: "Toggle Terminal",
+    id: "project.toggleConsole",
+    name: "Toggle Console",
     description: "",
     shortcuts: ["Ctrl+`"],
 })
-export class ToggleTerminalCommand implements ISystemCommand {
+export class ToggleConsoleCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {
-        useTerminalStore.getState().toggleTerminal();
+        useConsoleStore.getState().toggleConsole();
         return Result.Success();
     }
 }
