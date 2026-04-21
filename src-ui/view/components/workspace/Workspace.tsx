@@ -1,6 +1,6 @@
 import "@/assets/style/flexLayout/workspace.css";
 
-import { ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
+import { Action, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
 import { useRef } from "react";
 
 import { useRelativeFlexLayout } from "@/view/hooks/useRelativeFlexLayout";
@@ -12,11 +12,14 @@ import TilesetView from "./tilesetView/TilesetView";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
+import { useTranslation } from "react-i18next";
 
 export default function Workspace() {
 	const layoutRef = useRef<Layout | null>(null);
 
 	const { model } = useWorkspaceDockStore();
+
+	const { t: translate } = useTranslation([]);
 
 	useRelativeFlexLayout(layoutRef);
 
@@ -37,10 +40,30 @@ export default function Workspace() {
 	}
 
 	const onRenderTab = (node: TabNode, renderValues: ITabRenderValues) => {
-		
+		const component = node.getComponent();
+		switch (component) {
+			case "tilesetView":
+				renderValues.content = translate("workspace.tilesetSelector.label");
+				break;
+			case "layerManager":
+				renderValues.content = translate("workspace.layerManager.label");
+				break;
+			case "tilemapEditor":
+				renderValues.content = translate("workspace.tilemapEditor.label");
+				break;
+			case "rulesetManager":
+				renderValues.content = translate("workspace.rulesetManager.label");
+				break;
+			case "properties":
+				renderValues.content = translate("workspace.properties.label");
+				break;
+			default:
+				renderValues.content = "Unknow";
+				break;
+		}
 	}
 
-	const onModelChange = (model: Model, action: any) => {
+	const onModelChange = (model: Model, action: Action) => {
 		localStorage.setItem("workspaceLayout", JSON.stringify(model.toJson()));
 	};
 

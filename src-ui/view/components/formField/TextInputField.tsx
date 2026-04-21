@@ -1,12 +1,12 @@
 import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
+import { useTranslation } from "react-i18next";
 
 interface TextInputProps {
 	id: string;
 	name: string;
 	label: string;
 	placeholder?: string;
-	defaultValue?: string;
 	required?: boolean;
 	minLength?: number;
 	maxLength?: number;
@@ -15,7 +15,8 @@ interface TextInputProps {
 }
 
 export function TextInputField(props: TextInputProps) {
-	const { id, name, label, placeholder, defaultValue, required, minLength, maxLength, value, handleChange } = props;
+	const { t: translate } = useTranslation([]);
+	const { id, name, label, placeholder, required, minLength, maxLength, value, handleChange } = props;
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value;
@@ -24,8 +25,8 @@ export function TextInputField(props: TextInputProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{label}</Label>
-			<Input id={id} name={name} type="text" placeholder={placeholder} defaultValue={defaultValue} required={required} minLength={minLength} maxLength={maxLength} value={value ?? ""} onChange={onChange} className="w-full" />
+			<Label htmlFor={id}>{translate(label)}</Label>
+			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} minLength={minLength} maxLength={maxLength} value={value ?? ""} onChange={onChange} className="w-full" />
 		</div>
 	);
 }

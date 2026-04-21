@@ -8,7 +8,7 @@ import { DialogZLevel } from "@/shared/types/dialog";
 const Group1: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Create new Tileset",
+        label: "workspace.tilesetSelector.contextMenu.new",
         startIcon: <Plus className="stroke-1" />,
         onClick() {
             TilesetService.createTileset();
@@ -16,7 +16,7 @@ const Group1: MenuDropDownGroupType = [
     },
     {
         type: "option",
-        name: "Edit Tileset",
+        label: "workspace.tilesetSelector.contextMenu.edit",
         startIcon: <Pen className="stroke-1" />,
         disabled() {
             return true;
@@ -30,7 +30,7 @@ const Group1: MenuDropDownGroupType = [
 const Group2: MenuDropDownGroupType = [
     {
         type: "check",
-        name: "Show Grid",
+        label: "workspace.tilesetSelector.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
             const session = AppCore.getIns().editorContext.getCurrentTilesetSession();
@@ -48,9 +48,12 @@ const Group2: MenuDropDownGroupType = [
 const Group3: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Delete Tileset",
+        label: "workspace.tilesetSelector.contextMenu.delete",
         startIcon: <Trash2/>,
         variant: "destructive",
+        disabled() {
+            return true;
+        },
         onClick() {
             // TODO: Implement
         }
@@ -58,7 +61,7 @@ const Group3: MenuDropDownGroupType = [
 ];
 
 export const TilesetViewContextMenu: MenuItemType = {
-    name: "Edit",
+    label: "Edit",
     className: "w-60",
     groups: [Group1, Group2, Group3],
 };

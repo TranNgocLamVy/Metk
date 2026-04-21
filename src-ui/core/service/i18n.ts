@@ -2,21 +2,13 @@ import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
-import enBackend from "@/assets/locales/en/backend.json";
-import enCommon from "@/assets/locales/en/common.json";
-import viBackend from "@/assets/locales/vi/backend.json";
-import viCommon from "@/assets/locales/vi/common.json";
+import en from "@/assets/locales/en.json";
+import vi from "@/assets/locales/vi.json";
 
-const defaultNS = 'common';
+const defaultNS = 'translation';
 const resources = {
-    en: {
-        common: enCommon,
-        backend: enBackend,
-    },
-    vi: {
-        common: viCommon,
-        backend: viBackend,
-    }
+    en: { translation: en },
+    vi: { translation: vi }
 } as const;
 
 class I18nService {
@@ -29,7 +21,7 @@ class I18nService {
                 resources,
                 fallbackLng: 'en',
                 defaultNS,
-                ns: ['common', 'editor', 'explorer', 'backend'],
+                ns: ['translation'],
                 interpolation: {
                     escapeValue: false,
                 },
@@ -63,7 +55,7 @@ class I18nService {
     }
 
     public tBackendError(errorCode: string, fallback?: string): string {
-        return i18n.t(errorCode, { ns: 'backend', defaultValue: fallback ?? i18n.t('errors.unknown', { ns: 'common' }) });
+        return i18n.t(`backend.errors.${errorCode}`, { ns: defaultNS, defaultValue: fallback ?? i18n.t('backend.errors.unknown', { ns: defaultNS }) });
     }
 }
 

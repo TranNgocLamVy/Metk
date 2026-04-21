@@ -3,14 +3,16 @@ import { FolderCog, FolderPlus, FolderSync } from "lucide-react";
 const ProjectDropdownOptionGroup1: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Add Folder to Project",
+        label: "menu.project.actions.addFolderToProject",
         startIcon: <FolderPlus />,
+        disabled: () => true,
         onClick() { },
     },
     {
         type: "option",
-        name: "Refresh Project",
+        label: "menu.project.actions.refreshProject",
         startIcon: <FolderSync />,
+        disabled: () => true,
         onClick() { },
     }
 ]
@@ -18,15 +20,16 @@ const ProjectDropdownOptionGroup1: MenuDropDownGroupType = [
 const ProjectDropdownOptionGroup2: MenuDropDownGroupType = [
     {
         type: "option",
-        name: "Project Properties",
+        label: "menu.project.actions.projectProperties",
         startIcon: <FolderCog />,
+        disabled: () => true,
         onClick() { },
     },
 ]
 
 
 export const ProjectDropdownOptions: MenuItemType = {
-    name: "menuBar.project",
+    label: "menu.project.label",
     className: "w-100",
     groups: [
         ProjectDropdownOptionGroup1,

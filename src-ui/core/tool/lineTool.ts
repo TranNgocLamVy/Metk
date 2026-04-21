@@ -14,10 +14,10 @@ import { GeometryUtils } from "@/shared/utils/geometryUtils";
 
 @Tool({
     id: "tool.line",
-    name: "Line",
+    label: "workspace.tool.line.label",
     displayOnToolbar: {
         icon: icon,
-        tooltip: "Line",
+        tooltip: "workspace.tool.line.description",
         index: 1,
     },
     shortcuts: ["L"],

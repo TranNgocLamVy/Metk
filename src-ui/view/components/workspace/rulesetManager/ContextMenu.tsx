@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 const CreateActionGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
-		name: "Create Ruleset",
+		label: "workspace.rulesetManager.contextMenu.new",
 		startIcon: <Plus />,
 		onClick() {
 			RulesetService.createRuleset();
@@ -13,7 +13,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 ];
 
 export const RulesetManagerContextMenu: MenuItemType = {
-	name: "LayerManager",
+	label: "LayerManager",
 	className: "w-60",
 	groups: [CreateActionGroup],
 };

@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
+import { AppCore } from "@/core/appcore";
 
 export type LayerView = {
     id: string;
@@ -13,14 +14,12 @@ export type LayerView = {
 export type DropPosition = 'top' | 'bottom' | 'inside';
 
 type LayerManagerState = {
-    currentSession: TilemapSession | null;
-    version: number; // Used to trigger re-renders on deep class mutations
+    version: number;
     selectedIds: string[];
     editingId: string | null;
     targetLayer: BaseLayer | null;
 
     // Actions
-    setSession: (session: TilemapSession | null) => void;
     setTargetLayer: (layer: BaseLayer | null) => void;
     refresh: () => void;
     setSelectedLayers: (ids: string[]) => void;
@@ -30,25 +29,18 @@ type LayerManagerState = {
 }
 
 export const useLayerManagerStore = create<LayerManagerState>((set, get) => ({
-    currentSession: null,
     version: 0,
     selectedIds: [],
     editingId: null,
     targetLayer: null,
 
-    setSession: (session) => {
-        if (session) {
-            set({ currentSession: session, selectedIds: session.layerState.selectedLayers })
-        } else {
-            set({ currentSession: null });
-        }
-    },
     setTargetLayer: (layer) => set({ targetLayer: layer }),
     refresh: () => set((state) => ({ version: state.version + 1 })),
     setSelectedLayers: (ids) => set({ selectedIds: [...ids] }),
-
     getFlatView: (filter: string = '') => {
-        const currentSession = get().currentSession;
+        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        if (!tilemapSessionManager) return [];
+        const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return [];
         const root = currentSession.tilemap.rootLayer;
         if (!root) return [];

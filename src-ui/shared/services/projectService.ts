@@ -38,7 +38,7 @@ export class ProjectService {
     }
 
     public static async createProject(): Promise<void> {
-        const form = await DialogService.openFormDialog(createProjectForm);
+        const form = await DialogService.openFormDialog(createProjectForm());
 
         if (!form) return;
 

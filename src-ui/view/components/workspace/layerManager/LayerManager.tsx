@@ -10,10 +10,25 @@ import { ScrollArea } from "../../shadcn/scroll-area";
 import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerNodeRow from "./LayerNodeRow";
 import LayerMenuBar from "./LayerMenuBar";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
+import { AppCore } from "@/core/appcore";
+import { useTranslation } from "react-i18next";
+import { Button } from "../../shadcn/button";
+import { useDialogStore } from "@/view/stores/dialogStore";
+import { DialogZLevel } from "@/shared/types/dialog";
 
 export default function LayerManager() {
-	const { currentSession, version, getFlatView, setTargetLayer } = useLayerManagerStore();
+	const { t: translate } = useTranslation([]);
+
+	const { version, getFlatView, setTargetLayer } = useLayerManagerStore();
 	useLayerManagerStore((s) => s.version);
+
+	const { version: tilemapVersion } = useTilemapSessionStore();
+	const currentTilemapSession = useMemo(() => {
+		const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+		if (!tilemapSessionManager) return null;
+		return tilemapSessionManager.currentTilemapSession;
+	}, [tilemapVersion]);
 
 	const selectedIds = useLayerManagerStore((s) => s.selectedIds);
 
@@ -25,14 +40,14 @@ export default function LayerManager() {
 
 	const flatView = useMemo(() => {
 		return getFlatView();
-	}, [currentSession, version]);
+	}, [version, tilemapVersion]);
 
 	const handleContainerDrop = (e: DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (!currentSession) return;
-		const root = currentSession.tilemap.rootLayer;
+		if (!currentTilemapSession) return;
+		const root = currentTilemapSession.tilemap.rootLayer;
 
 		const data = e.dataTransfer.getData("application/json");
 		if (!data) return;
@@ -56,11 +71,16 @@ export default function LayerManager() {
 		if (!open) setTargetLayer(null);
 	};
 
-	if (!isMounted || !currentSession) {
+	if (!isMounted || !currentTilemapSession) {
 		return (
 			<VStack className="w-full h-full px-1 py-2 bg-surface" justify="center" align="center">
-				<VStack className="w-full h-full bg-surface-base" justify="center" align="center">
-					Select a tilemap
+				<VStack className="w-full h-full bg-surface-base shadow-sm" justify="center" align="center">
+					<span className="text-sm">
+						{translate("workspace.tilemapEditor.empty")}
+					</span>
+					<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
+						{translate("workspace.tilemapEditor.open")}
+					</Button>
 				</VStack>
 			</VStack>
 		);

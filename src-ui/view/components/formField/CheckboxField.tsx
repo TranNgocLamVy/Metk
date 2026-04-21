@@ -20,7 +20,7 @@ export function CheckBoxField(props: CheckBoxProps) {
 
 	return (
 		<div className="flex gap-3">
-			<Checkbox id={id} name={name} defaultChecked={defaultChecked} checked={value} onChange={onChange} required={required} />
+			<Checkbox id={id} name={name} checked={value} onChange={onChange} required={required} />
 			<Label htmlFor={id}>{label}</Label>
 		</div>
 	);

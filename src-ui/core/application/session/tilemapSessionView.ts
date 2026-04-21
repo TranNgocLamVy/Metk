@@ -26,7 +26,6 @@ export class TilemapSessionView implements IBaseSessionView {
     private handleNativePointerState = (e: PointerEvent | WheelEvent) => {
         const target = e.target as HTMLElement;
         const isOverUI = target !== this.pixiApp?.canvas && target.tagName !== 'HTML' && target.tagName !== 'BODY';
-        this.viewport.pause = isOverUI;
         this.pixiApp.stage.eventMode = isOverUI ? 'none' : 'auto';
     };
 

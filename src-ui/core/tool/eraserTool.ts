@@ -20,10 +20,10 @@ import { DrawRuleStrategy } from "./drawStrategy/drawRuleStrategy";
 
 @Tool({
     id: "tool.eraser",
-    name: "Eraser",
+    label: "workspace.tool.eraser.label",
     displayOnToolbar: {
         icon: eraser,
-        tooltip: "Eraser",
+        tooltip: "workspace.tool.eraser.description",
         index: 10,
     },
     shortcuts: ["E"],

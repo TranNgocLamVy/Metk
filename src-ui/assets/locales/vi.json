@@ -1,0 +1,382 @@
+{
+    "menu": {
+        "file": {
+            "label": "Tệp",
+            "actions": {
+                "new": {
+                    "label": "Mới",
+                    "project": "Dự án mới",
+                    "tilemap": "Tilemap mới",
+                    "tileset": "Tileset mới",
+                    "ruleset": "Ruleset mới"
+                },
+                "open": {
+                    "file": "Mở tệp...",
+                    "project": "Mở dự án..."
+                },
+                "recentFiles": {
+                    "label": "Tệp mở gần đây",
+                    "clear": "Xóa danh sách tệp"
+                },
+                "recentProjects": {
+                    "label": "Dự án mở gần đây",
+                    "clear": "Xóa danh sách dự án"
+                },
+                "save": "Lưu",
+                "saveAs": "Lưu thành...",
+                "saveAll": "Lưu tất cả",
+                "import": {
+                    "label": "Nhập (Import)",
+                    "tilemap": "Nhập Tilemap",
+                    "tileset": "Nhập Tileset",
+                    "ruleset": "Nhập Ruleset"
+                },
+                "export": {
+                    "label": "Xuất (Export)",
+                    "exportTMX": "Xuất file TMX",
+                    "exportImage": "Xuất ra Hình ảnh"
+                },
+                "command": "Chạy lệnh",
+                "close": "Đóng",
+                "closeAll": "Đóng tất cả",
+                "closeProject": "Đóng dự án",
+                "quit": "Thoát"
+            }
+        },
+        "edit": {
+            "label": "Chỉnh sửa",
+            "actions": {
+                "undo": "Hoàn tác (Undo)",
+                "redo": "Làm lại (Redo)",
+                "cut": "Cắt",
+                "copy": "Sao chép",
+                "paste": "Dán",
+                "delete": "Xóa",
+                "selectAll": "Chọn tất cả",
+                "invertSelection": "Đảo ngược vùng chọn",
+                "selectNone": "Bỏ chọn",
+                "settings": "Cài đặt"
+            }
+        },
+        "view": {
+            "label": "Giao diện",
+            "actions": {
+                "viewAndToolbars": {
+                    "label": "Giao diện và Thanh công cụ",
+                    "project": "Dự án",
+                    "console": "Bảng điều khiển (Console)",
+                    "issues": "Thông báo lỗi",
+                    "properties": "Thuộc tính (Properties)",
+                    "layer": "Quản lý Layer",
+                    "history": "Lịch sử thao tác",
+                    "objects": "Đối tượng (Objects)",
+                    "templateEditor": "Chỉnh sửa Template",
+                    "tilesets": "Quản lý Tileset",
+                    "terrainSets": "Quản lý Terrain",
+                    "minimap": "Bản đồ thu nhỏ (Minimap)",
+                    "tileStamps": "Cọ tem (Tile Stamps)",
+                    "mainToolbar": "Thanh công cụ chính",
+                    "tools": "Công cụ",
+                    "toolOptions": "Tùy chọn công cụ",
+                    "lockLayout": "Khóa bố cục",
+                    "resetToDefaultLayout": "Khôi phục bố cục mặc định"
+                },
+                "searchActions": "Tìm kiếm chức năng",
+                "showGrid": "Hiển thị lưới (Grid)",
+                "showTileObjectOutlines": "Hiển thị viền Đối tượng",
+                "showObjectReferences": "Hiển thị liên kết Đối tượng",
+                "showObjectNames": {
+                    "label": "Hiển thị tên Đối tượng",
+                    "never": "Không bao giờ",
+                    "forSelectedObjects": "Chỉ các đối tượng đang chọn",
+                    "forAllObjects": "Tất cả đối tượng",
+                    "forHoveredObjects": "Khi rê chuột vào"
+                },
+                "showTileAnimations": "Bật Animation cho Tile",
+                "showTileCollisionShapes": "Hiển thị vùng va chạm (Collision)",
+                "showWorld": "Hiển thị toàn thế giới (World)",
+                "enableParallax": "Bật hiệu ứng Parallax",
+                "highlightCurrentLayer": "Làm nổi bật Layer hiện tại",
+                "highlightHoveredObject": "Làm nổi bật Đối tượng khi rê chuột",
+                "snapping": {
+                    "label": "Chế độ bắt dính (Snapping)",
+                    "noSnapping": "Tắt bắt dính",
+                    "snapToGrid": "Bắt dính vào lưới",
+                    "snapToFineGrid": "Bắt dính vào lưới nhỏ",
+                    "snapToPixel": "Bắt dính theo Pixel"
+                },
+                "zoomIn": "Phóng to",
+                "zoomOut": "Thu nhỏ",
+                "normalSize": "Kích thước thực",
+                "fitMapInView": "Vừa màn hình",
+                "clearView": "Dọn dẹp giao diện"
+            }
+        },
+        "map": {
+            "label": "Bản đồ",
+            "actions": {
+                "resizeMap": "Đổi kích thước bản đồ",
+                "cropToSelection": "Cắt theo vùng chọn",
+                "autoCrop": "Tự động cắt",
+                "offsetMap": "Dịch chuyển bản đồ (Offset)",
+                "selectNextTileset": "Chọn Tileset tiếp theo",
+                "selectPreviousTileset": "Chọn Tileset trước đó",
+                "mapProperties": "Thuộc tính bản đồ"
+            }
+        },
+        "layer": {
+            "label": "Layer",
+            "actions": {
+                "newLayer": {
+                    "label": "Tạo Layer mới",
+                    "tileLayer": "Tile Layer",
+                    "ruleLayer": "Rule Layer",
+                    "objectLayer": "Object Layer",
+                    "imageLayer": "Image Layer",
+                    "groupLayer": "Group Layer (Nhóm)",
+                    "layerViaCopy": "Tạo Layer từ bản sao chép",
+                    "layerViaCut": "Tạo Layer từ bản cắt"
+                },
+                "group": {
+                    "label": "Nhóm",
+                    "groupLayer": "Gộp thành Group Layer",
+                    "ungroupLayer": "Bỏ gộp Group Layer"
+                },
+                "duplicateLayer": "Nhân bản Layer",
+                "mergeLayerUp": "Gộp với Layer phía trên",
+                "mergeLayerDown": "Gộp với Layer phía dưới",
+                "deleteLayer": "Xóa Layer",
+                "selectNextLayer": "Chọn Layer tiếp theo",
+                "selectPreviousLayer": "Chọn Layer trước đó",
+                "selectAllLayers": "Chọn tất cả Layer",
+                "raiseLayer": "Đưa Layer lên trên",
+                "lowerLayer": "Đưa Layer xuống dưới",
+                "showHideLayer": "Hiện/Ẩn Layer",
+                "lockUnlockLayer": "Khóa/Mở khóa Layer",
+                "showHideOtherLayers": "Hiện/Ẩn các Layer khác",
+                "lockUnlockOtherLayers": "Khóa/Mở khóa các Layer khác",
+                "layerProperties": "Thuộc tính Layer"
+            }
+        },
+        "project": {
+            "label": "Dự án",
+            "actions": {
+                "addFolderToProject": "Thêm thư mục vào Dự án",
+                "refreshProject": "Làm mới Dự án",
+                "projectProperties": "Thuộc tính Dự án"
+            }
+        },
+        "help": {
+            "label": "Trợ giúp",
+            "actions": {
+                "userManual": "Hướng dẫn sử dụng",
+                "reportIssue": "Báo lỗi",
+                "supportDeveloper": "Ủng hộ nhà phát triển",
+                "shortcuts": "Phím tắt"
+            }
+        }
+    },
+    "home": {
+        "welcome": "Map Editor Toolkit",
+        "description": "Công cụ chỉnh sửa Tilemap mã nguồn mở và miễn phí",
+        "start": "Bắt đầu",
+        "importProject": "Nhập dự án",
+        "newProject": "Dự án mới",
+        "recentProjects": "Dự án gần đây"
+    },
+    "workspace": {
+        "label": "Không gian làm việc",
+        "tool": {
+            "stamp": {
+                "label": "Cọ",
+                "description": "Công cụ đóng dấu"
+            },
+            "line": {
+                "label": "Đường thẳng",
+                "description": "Công cụ vẽ đường thẳng"
+            },
+            "rectangle": {
+                "label": "Hình chữ nhật",
+                "description": "Công cụ vẽ hình chữ nhật"
+            },
+            "bucket": {
+                "label": "Thùng sơn",
+                "description": "Công cụ đổ màu"
+            },
+            "eraser": {
+                "label": "Cục tẩy",
+                "description": "Công cụ xóa"
+            }
+        },
+        "tilesetSelector": {
+            "label": "Tileset",
+            "empty": "Chưa chọn Tileset nào",
+            "open": "Mở Tileset",
+            "menu": {
+                "new": "Tileset mới",
+                "edit": "Chỉnh sửa Tileset",
+                "delete": "Xóa Tileset"
+            },
+            "contextMenu": {
+                "new": "Tileset mới",
+                "edit": "Chỉnh sửa Tileset",
+                "showGrid": "Hiển thị lưới",
+                "delete": "Xóa Tileset"
+            }
+        },
+        "tilemapEditor": {
+            "label": "Tilemap",
+            "empty": "Chưa chọn Tilemap nào",
+            "open": "Mở Tilemap",
+            "contextMenu": {
+                "new": "Tilemap mới",
+                "currentTool": "Công cụ hiện tại",
+                "undo": "Hoàn tác",
+                "redo": "Làm lại",
+                "cut": "Cắt",
+                "copy": "Sao chép",
+                "paste": "Dán",
+                "showGrid": "Hiển thị lưới",
+                "delete": "Xóa Tilemap"
+            }
+        },
+        "layerManager": {
+            "label": "Layer",
+            "menu": {
+                "new": {
+                    "label": "Layer mới",
+                    "tileLayer": "Tile Layer",
+                    "ruleLayer": "Rule Layer",
+                    "objectLayer": "Object Layer",
+                    "imageLayer": "Image Layer",
+                    "groupLayer": "Group Layer (Nhóm)"
+                },
+                "raiseLayer": "Đưa lên trên",
+                "lowerLayer": "Đưa xuống dưới",
+                "duplicate": "Nhân bản Layer",
+                "delete": "Xóa Layer",
+                "showHideSelected": "Hiện/Ẩn Layer đang chọn",
+                "lockUnlockSelected": "Khóa/Mở khóa Layer đang chọn",
+                "showHideOther": "Hiện/Ẩn các Layer khác",
+                "lockUnlockOther": "Khóa/Mở khóa các Layer khác"
+            },
+            "contextMenu": {
+                "label": "Menu Layer",
+                "new": {
+                    "label": "Layer mới",
+                    "tileLayer": "Tile Layer",
+                    "ruleLayer": "Rule Layer",
+                    "objectLayer": "Object Layer",
+                    "imageLayer": "Image Layer",
+                    "groupLayer": "Group Layer"
+                },
+                "group": {
+                    "label": "Nhóm",
+                    "groupLayer": "Gộp thành Group Layer",
+                    "ungroupLayer": "Bỏ gộp Group Layer"
+                },
+                "duplicate": "Nhân bản Layer",
+                "selectAll": "Chọn tất cả Layer",
+                "unselectAll": "Bỏ chọn tất cả",
+                "raiseLayer": "Đưa lên trên",
+                "lowerLayer": "Đưa xuống dưới",
+                "showHide": "Hiện/Ẩn Layer",
+                "lockUnlock": "Khóa/Mở khóa Layer",
+                "delete": "Xóa Layer"
+            }
+        },
+        "rulesetManager": {
+            "label": "Ruleset",
+            "menu": {
+                "new": "Ruleset mới",
+                "edit": "Chỉnh sửa Ruleset",
+                "delete": "Xóa Ruleset"
+            },
+            "contextMenu": {
+                "new": "Ruleset mới"
+            }
+        },
+        "properties": {
+            "label": "Thuộc tính"
+        }
+    },
+    "form": {
+        "project": {
+            "title": "Tạo dự án mới",
+            "name": {
+                "label": "Tên dự án",
+                "placeholder": "Ví dụ: My Awesome Game"
+            },
+            "destination": {
+                "label": "Đường dẫn lưu",
+                "placeholder": "Chọn một thư mục"
+            },
+            "action": {
+                "create": "Tạo mới",
+                "cancel": "Hủy"
+            },
+            "message": {
+                "folderExists": "Thư mục này đã tồn tại."
+            }
+        },
+        "tilemap": {
+            "title": "Tạo Tilemap mới",
+            "action": {
+                "create": "Tạo mới",
+                "cancel": "Hủy"
+            },
+            "name": {
+                "label": "Tên Tilemap",
+                "placeholder": "Ví dụ: Level 1"
+            },
+            "size": {
+                "label": "Kích thước Tilemap",
+                "width": "Chiều rộng",
+                "height": "Chiều cao"
+            },
+            "tileSize": {
+                "label": "Kích thước mỗi Tile",
+                "width": "Rộng",
+                "height": "Cao"
+            }
+        },
+        "tileset": {
+            "title": "Tạo Tileset mới",
+            "action": {
+                "saveAs": "Lưu thành...",
+                "cancel": "Hủy"
+            },
+            "tileset": "Tileset",
+            "name": {
+                "label": "Tên Tileset",
+                "placeholder": "Ví dụ: Forest Props"
+            },
+            "image": {
+                "label": "Hình ảnh",
+                "source": "Đường dẫn",
+                "useTransparentColor": "Sử dụng màu trong suốt (Transparent)"
+            },
+            "size": {
+                "label": "Kích thước",
+                "width": "Rộng",
+                "height": "Cao"
+            },
+            "margin": "Lề (Margin)",
+            "spacing": "Khoảng cách (Spacing)"
+        },
+        "ruleset": {
+            "title": "Tạo Ruleset mới",
+            "action": {
+                "create": "Tạo mới",
+                "cancel": "Hủy"
+            },
+            "name": {
+                "label": "Tên Ruleset",
+                "placeholder": "Ví dụ: Auto-Tiling Rule"
+            },
+            "color": {
+                "label": "Màu Ruleset"
+            }
+        }
+    }
+}

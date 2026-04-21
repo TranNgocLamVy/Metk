@@ -15,10 +15,10 @@ import icon from "@/assets/icons/stamp.svg?raw";
 
 @Tool({
     id: "tool.stamp",
-    name: "Stamp",
+    label: "workspace.tool.stamp.label",
     displayOnToolbar: {
         icon: icon,
-        tooltip: "Stamp",
+        tooltip: "workspace.tool.stamp.description",
         index: 0,
     },
     shortcuts: ["S"],

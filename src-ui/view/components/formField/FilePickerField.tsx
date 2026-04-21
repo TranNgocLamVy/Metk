@@ -4,6 +4,7 @@ import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
 import { Tooltip, TooltipContent } from "@/view/components/shadcn/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useTranslation } from "react-i18next";
 
 type FilePickerProps = {
 	id: string;
@@ -19,7 +20,8 @@ type FilePickerProps = {
 };
 
 export default function FilePickerField(props: FilePickerProps) {
-	const { id, name, label, placeholder, defaultValue, required, multiple, filter, value, handleChange } = props;
+	const { t: translate } = useTranslation([]);
+	const { id, name, label, placeholder, required, multiple, filter, value, handleChange } = props;
 
 	const selectFile = async () => {
 		const path = await FileDialogUtils.open({
@@ -54,10 +56,10 @@ export default function FilePickerField(props: FilePickerProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{label}</Label>
+			<Label htmlFor={id}>{translate(label)}</Label>
 			<Tooltip delayDuration={500}>
 				<TooltipTrigger asChild>
-					<Input id={id} name={name} type="text" placeholder={placeholder} defaultValue={inputValue} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFile} onKeyDown={onKeyDown} />
+					<Input id={id} name={name} type="text" placeholder={translate(placeholder)} defaultValue={inputValue} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFile} onKeyDown={onKeyDown} />
 				</TooltipTrigger>
 				{value && (
 					<TooltipContent side="bottom">
