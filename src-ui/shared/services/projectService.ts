@@ -69,4 +69,11 @@ export class ProjectService {
         if (openProject) useNavigationStore.getState().navigate!(`/project/${project.id}`);
         useProjectManagerStore.getState().refresh();
     }
+
+    public static removeProject(projectId: string): void {
+        const projectManager = AppCore.getIns().projectManager;
+        projectManager.removeProjectMetadata(projectId);
+        projectManager.saveCurrrentProject();
+        useProjectManagerStore.getState().refresh();
+    }
 }

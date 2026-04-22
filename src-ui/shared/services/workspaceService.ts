@@ -4,8 +4,6 @@ import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
-import { TilemapService } from "./tilemapService";
-import { TilesetService } from "./tilesetService";
 import { ToastService } from "./toastService";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 
@@ -29,18 +27,20 @@ export class WorkspaceService {
             return loadWorkspaceResult;
         }
 
+        const workspace = loadWorkspaceResult.data;
+
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
-        const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
+        const tilesetSessionManager = workspace.tilesetSessionManager;
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
         useTilesetSessionStore.getState().refresh();
 
         const tilemapPixiApp = useTilemapSessionStore.getState().pixiApp;
-        const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
+        const tilemapSessionManager = workspace.tilemapSessionManager;
         const currentTilemapSessionId = tilemapSessionManager.tilemapSessionManagerData.currentTilemapSessionId;
         if (currentTilemapSessionId && tilemapPixiApp) await WorkspaceService.openTilemapSession(currentTilemapSessionId);
+        
         useTilemapSessionStore.getState().refresh();
-
         useLayerManagerStore.getState().refresh();
         useRulesetManagerStore.getState().refresh();
 
@@ -78,7 +78,10 @@ export class WorkspaceService {
             return;
         }
 
-        const tilesetResult = await AppCore.getIns().editorContext.getCurrentProject().tilesetManager.loadTileset({ id: tilesetId });
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return;
+
+        const tilesetResult = await currentProject.tilesetManager.loadTileset({ id: tilesetId });
         if (tilesetResult.status !== Result.Status.Success) {
             ToastService.error({ message: tilesetResult.message });
             return;
@@ -86,7 +89,10 @@ export class WorkspaceService {
 
         const tileset = tilesetResult.data;
 
-        const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
+        const workspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!workspace) return;
+
+        const tilesetSessionManager = workspace.tilesetSessionManager;
         await tilesetSessionManager.createTilesetSession(tileset, tilesetPixiApp);
         useTilesetSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
@@ -94,12 +100,12 @@ export class WorkspaceService {
 
     public static async openTilesetSession(sessionId: string): Promise<void> {
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
-        if (!tilesetPixiApp) {
-            ToastService.error({ message: "Tileset pixi app not found" });
-            return;
-        }
+        if (!tilesetPixiApp) return;
 
-        const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
+        const workspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!workspace) return;
+
+        const tilesetSessionManager = workspace.tilesetSessionManager;
         tilesetSessionManager.openTilesetSession(sessionId, tilesetPixiApp);
 
         useTilesetSessionStore.getState().refresh();
@@ -107,7 +113,10 @@ export class WorkspaceService {
     }
 
     public static async closeTilesetSession(sessionId: string): Promise<void> {
-        const tilesetSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilesetSessionManager;
+        const workspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!workspace) return;
+
+        const tilesetSessionManager = workspace.tilesetSessionManager;
         tilesetSessionManager.closeTilesetSession(sessionId);
 
         const lastSessionId = tilesetSessionManager.getLastTilesetSessionId();
@@ -126,7 +135,10 @@ export class WorkspaceService {
             return;
         }
 
-        const tilemapResult = await AppCore.getIns().editorContext.getCurrentProject().tilemapManager.loadTilemap(tilemapId);
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return;
+
+        const tilemapResult = await currentProject.tilemapManager.loadTilemap(tilemapId);
         if (tilemapResult.status !== Result.Status.Success) {
             ToastService.error({ message: tilemapResult.message });
             return;
@@ -134,7 +146,10 @@ export class WorkspaceService {
 
         const tilemap = tilemapResult.data;
 
-        const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
+        const workspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!workspace) return;
+
+        const tilemapSessionManager = workspace.tilemapSessionManager;
         await tilemapSessionManager.createTilemapSession(tilemap, tilesetPixiApp);
 
         useTilemapSessionStore.getState().refresh();
@@ -148,7 +163,10 @@ export class WorkspaceService {
             return;
         }
 
-        const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
+        const workspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!workspace) return;
+
+        const tilemapSessionManager = workspace.tilemapSessionManager;
         tilemapSessionManager.openTilemapSession(sessionId, tilemapPixiApp);
 
         useTilemapSessionStore.getState().refresh();
@@ -156,7 +174,10 @@ export class WorkspaceService {
     }
 
     public static async closeTilemapSession(sessionId: string): Promise<void> {
-        const tilemapSessionManager = AppCore.getIns().editorContext.getCurrentWorkspace().tilemapSessionManager;
+        const workspace = AppCore.getIns().workspaceManager.currentWorkspace;
+        if (!workspace) return;
+        
+        const tilemapSessionManager = workspace.tilemapSessionManager;
         tilemapSessionManager.closeTilemapSession(sessionId);
 
         const lastSessionId = tilemapSessionManager.getLastTilemapSessionId();

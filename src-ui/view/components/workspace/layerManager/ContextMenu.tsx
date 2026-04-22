@@ -42,7 +42,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					type: "option",
 					label: "workspace.layerManager.contextMenu.group.groupLayer",
 					disabled: () => {
-						const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+						const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
 						return numberOfLayers < 1;
 					},
 					onClick() {},
@@ -51,7 +51,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					type: "option",
 					label: "workspace.layerManager.contextMenu.group.ungroupLayer",
 					disabled: () => {
-						const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+						const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
 						return numberOfLayers < 1;
 					},
 					onClick() {},
@@ -64,7 +64,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		label: "workspace.layerManager.contextMenu.duplicate",
 		startIcon: <Copy />,
 		disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+            const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
             return numberOfLayers < 1;
         },
 		onClick() {
@@ -83,7 +83,7 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		label: "workspace.layerManager.contextMenu.unselectAll",
         disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+            const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
             return numberOfLayers < 1;
         },
 		onClick() { TilemapLayerService.deselectAllLayers() },
@@ -93,7 +93,7 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 		label: "workspace.layerManager.contextMenu.raiseLayer",
 		startIcon: <ArrowUp />,
 		disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
 			return numberOfLayers != 1;
 		},
 		onClick() {
@@ -105,7 +105,7 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 		label: "workspace.layerManager.contextMenu.lowerLayer",
 		startIcon: <ArrowDown />,
 		disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
 			return numberOfLayers != 1;
 		},
 		onClick() {
@@ -119,11 +119,11 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		label: "workspace.layerManager.contextMenu.showHide",
         disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
 			return numberOfLayers < 1;
 		},
 		onClick() {
-            const selectedLayers = useLayerManagerStore.getState().selectedIds
+            const selectedLayers = useLayerManagerStore.getState().getSelectedLayers()
             TilemapLayerService.toggleVisibility([...selectedLayers]);
         },
 	},
@@ -131,11 +131,11 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		label: "workspace.layerManager.contextMenu.lockUnlock",
         disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
 			return numberOfLayers < 1;
 		},
 		onClick() {
-            const selectedLayers = useLayerManagerStore.getState().selectedIds
+            const selectedLayers = useLayerManagerStore.getState().getSelectedLayers()
             TilemapLayerService.toggleLock([...selectedLayers]);
         },
 	},
@@ -148,7 +148,7 @@ const DeleteActionGroup: MenuDropDownGroupType = [
 		startIcon: <Trash2 />,
 		variant: "destructive",
         disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().selectedIds.length;
+            const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
             return numberOfLayers < 1;
         },
 		onClick() {

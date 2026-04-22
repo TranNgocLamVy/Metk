@@ -9,6 +9,7 @@ import { useConsoleStore } from "@/view/stores/consoleStore";
     name: "Toggle Console",
     description: "",
     shortcuts: ["Ctrl+`"],
+    when: "inWorkspace",
 })
 export class ToggleConsoleCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {

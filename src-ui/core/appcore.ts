@@ -11,6 +11,7 @@ import { ProjectMetadataRepo } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 import { TextureManager } from "./manager/textureManager";
 
+
 export class AppCore {
     private static _instance: AppCore;
     private isLoaded: boolean = false;
@@ -18,7 +19,7 @@ export class AppCore {
     public readonly workspaceManager: WorkspaceManager;
     public systemCommandManager: SystemCommandManager;
     public readonly toolManager: ToolManager;
-    private readonly keybindingManager: KeybindingManager;
+    public readonly keybindingManager: KeybindingManager;
     public readonly textureManager: TextureManager;
 
     public readonly editorContext: EditorContext;
@@ -82,3 +83,5 @@ export class AppCore {
         return await ProjectMetadataRepo.save("projects.json", data);
     }
 }
+
+export const appCore = AppCore.getIns();

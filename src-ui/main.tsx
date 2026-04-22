@@ -20,25 +20,23 @@ import { appRoutes } from "./view/pages";
 import DialogRoot from "./view/components/dialog/DialogRoot";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <I18nextProvider i18n={i18n}>
-	<ThemeProvider>
-		<MenuBar />
-		<Router>
-			<MainContainer>
-				<Toaster position="bottom-right" richColors closeButton={false} />
-				<DialogRoot />
-                <LanguageLoadingOverlay />
-				<ErrorBoundary fallbackRender={FallbackRender}>
-					<Routes>
-						{appRoutes.map(({ path, element }, index) => (
-							<Route key={index} path={path} element={element} />
-						))}
-					</Routes>
-				</ErrorBoundary>
-			</MainContainer>
-		</Router>
-	</ThemeProvider>
-    </I18nextProvider>,
+	<I18nextProvider i18n={i18n}>
+		<ErrorBoundary fallbackRender={FallbackRender}>
+			<ThemeProvider>
+				<MenuBar />
+				<Router>
+					<MainContainer>
+						<Toaster position="bottom-right" richColors closeButton={false} />
+						<DialogRoot />
+						<LanguageLoadingOverlay />
+						<Routes>
+							{appRoutes.map(({ path, element }, index) => (
+								<Route key={index} path={path} element={element} />
+							))}
+						</Routes>
+					</MainContainer>
+				</Router>
+			</ThemeProvider>
+		</ErrorBoundary>
+	</I18nextProvider>,
 );
-
-AppCore.initialize();

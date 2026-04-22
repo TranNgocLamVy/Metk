@@ -12,7 +12,9 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 					label: "menu.layer.actions.newLayer.tileLayer",
                     startIcon: <Grid2X2 />,
 					disabled: () => true,
-					onClick() {},
+					onClick() {
+						
+					},
 				},
 				{
 					type: "option",

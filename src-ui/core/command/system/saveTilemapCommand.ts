@@ -13,7 +13,7 @@ import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 })
 export class SaveTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {
-        const currentProject = context.getCurrentProject();
+        const currentProject = context.currentProject;
         const tilemapSession = context.getCurrentTilemapSession();
         if (!currentProject) return Result.Error("Project not found");
         if (!tilemapSession) return Result.Error("Tilemap not found");

@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Eye, EyeOff, File, Folder, FolderOpen, Grid, Lock, LockKeyhole, LockOpen } from "lucide-react";
-import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import { DragEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
@@ -15,9 +15,10 @@ type LayerNodeRowProps = {
 };
 
 export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
-	const store = useLayerManagerStore();
-	const editingId = useLayerManagerStore((s) => s.editingId);
-	const selectedIds = useLayerManagerStore((s) => s.selectedIds);
+	const { version, editingId, getSelectedLayers, setEditingId, setTargetLayer, refresh } = useLayerManagerStore();
+
+	const selectedIds = useMemo(() => getSelectedLayers(), [version]);
+
 	const layer = view.layer;
 	const isGroup = layer instanceof GroupLayer;
 	const isRenaming = editingId === layer.id;
@@ -32,7 +33,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 
 	const handleDoubleClick = (e: MouseEvent) => {
 		e.stopPropagation();
-		store.setEditingId(layer.id);
+		setEditingId(layer.id);
         isRenameByUI.current = true;
 	};
 
@@ -40,7 +41,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 		e.stopPropagation();
 		if (isGroup) {
 			(layer as GroupLayer).toggleOpen();
-			store.refresh();
+			refresh();
 		}
 	};
 
@@ -105,7 +106,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	};
 
     const onContextMenu = (e: MouseEvent) => {
-        store.setTargetLayer(layer);
+        setTargetLayer(layer);
         if (!selectedIds.includes(layer.id)) {
             TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
         }

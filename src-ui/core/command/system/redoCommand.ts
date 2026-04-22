@@ -8,6 +8,7 @@ import { Result } from "@/shared/types/result";
     name: "Redo",
     description: "",
     shortcuts: ["Ctrl+Y"],
+    when: "inWorkspace",
 })
 export class RedoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {

@@ -36,7 +36,10 @@ export default function OutputSelector() {
         const renderer = session.renderer;
         if (!renderer) return;
 
-        const tilesetManager = AppCore.getIns().editorContext.getCurrentProject().tilesetManager;
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return;
+
+        const tilesetManager = currentProject.tilesetManager;
         const tilesetResult = await tilesetManager.loadTileset({ id: tilesetId });
         if (tilesetResult.status !== Result.Status.Success) {
             ToastService.error({ message: tilesetResult.message });
@@ -100,7 +103,9 @@ function TilesetSelector({ selectTileset }: { selectTileset: (tilesetId: string)
     const { session, refresh } = useEditRulesetStore();
 
     const allTilesets = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().tilesetManager.serialize()
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return [];
+        return currentProject.tilesetManager.serialize()
     }, [session])
 
     const handleAddTileset = async (tilesetId: string) => {

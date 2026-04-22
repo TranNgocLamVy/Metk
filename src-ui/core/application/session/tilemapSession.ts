@@ -52,7 +52,9 @@ export class TilemapSession implements IBaseSession {
 
     public async loadTilemapSession(): Promise<void> {
         const tilesetIds = this.tilemap.tilesetRefManager.serialize().map(r => r.id);
-        const tilesetManager = this.editorContext.getCurrentProject().tilesetManager;
+        const currentProject = this.editorContext.currentProject;
+        if (!currentProject) return;
+        const tilesetManager = currentProject.tilesetManager;
         const tilesets: Tileset[] = [];
         for (const id of tilesetIds) {
             const tileset = tilesetManager.getTilesetById(id);

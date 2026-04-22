@@ -11,8 +11,11 @@ interface OpenFileModalProps extends BaseDialogProps {
 export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
     const { closeDialog } = useDialogStore();
 
-    const tilemaps = AppCore.getIns().editorContext.getCurrentProject().tilemapManager.serialize()
-    const tilesets = AppCore.getIns().editorContext.getCurrentProject().tilesetManager.serialize()
+    const currentProject = AppCore.getIns().editorContext.currentProject;
+    if (!currentProject) return null;
+
+    const tilemaps = currentProject.tilemapManager.serialize();
+    const tilesets = currentProject.tilesetManager.serialize();
 
     const onOpenTilemap = (tilemapId: string) => {
         WorkspaceService.createTilemapSession(tilemapId);

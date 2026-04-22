@@ -8,6 +8,7 @@ import { Result } from "@/shared/types/result";
     name: "Undo",
     description: "",
     shortcuts: ["Ctrl+Z"],
+    when: "inWorkspace",
 })
 export class UndoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {

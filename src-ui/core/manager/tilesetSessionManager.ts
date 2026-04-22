@@ -44,7 +44,7 @@ export class TilesetSessionManager {
         return Result.Success();
     }
 
-    public async unloadAll(): Promise<void> {
+    public async destroy(): Promise<void> {
         Array.from(this.tilesetSessionMap.values()).forEach(session => session.destroy());
         this.tilesetSessionMap.clear();
         this.tilesetMap.clear();
