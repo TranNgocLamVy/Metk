@@ -21,6 +21,7 @@ import { GeometryUtils } from "@/shared/utils/geometryUtils";
         index: 1,
     },
     shortcuts: ["L"],
+    when: "inWorkspace && !isModalOpen",
 })
 export class LineTool implements ITool {
     private drawStrategys: IDrawStrategy[];

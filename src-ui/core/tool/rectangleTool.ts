@@ -20,6 +20,7 @@ import icon from "@/assets/icons/rect.svg?raw";
         index: 2,
     },
     shortcuts: ["R"],
+    when: "inWorkspace && !isModalOpen",
 })
 export class RectangleTool implements ITool {
     private drawStrategys: IDrawStrategy[] = [];

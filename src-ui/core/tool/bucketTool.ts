@@ -20,6 +20,7 @@ import icon from "@/assets/icons/bucket.svg?raw";
         index: 3,
     },
     shortcuts: ["F"],
+    when: "inWorkspace && !isModalOpen",
 })
 export class BucketTool implements ITool {
     private drawStrategys: IDrawStrategy[] = [];

@@ -22,6 +22,7 @@ import icon from "@/assets/icons/stamp.svg?raw";
         index: 0,
     },
     shortcuts: ["S"],
+    when: "inWorkspace && !isModalOpen",
 })
 export class StampTool implements ITool {
     private drawStrategys: IDrawStrategy[];

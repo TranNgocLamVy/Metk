@@ -8,11 +8,14 @@ import { HStack, VStack } from "@/view/components/custom/stack/Stack";
 import { Button } from "@/view/components/shadcn/button";
 import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
 import { appCore } from "@/core/appcore";
+import { useContextScope } from "../hooks/useContextScope";
 
 export default function HomePage() {
 	const navigate = useNavigate();
 	const { getProjects, version } = useProjectManagerStore()
 
+	useContextScope("inHome", true);
+	
 	const projects = useMemo(() => {
 		return getProjects();
 	}, [version])

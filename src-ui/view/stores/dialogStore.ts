@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { DialogConfig, DialogItem } from '@/shared/types/dialog';
 import { DialogType } from '../components/dialog/dialogRegistry';
+import { appCore } from '@/core/appcore';
 
 interface DialogState {
     dialogs: DialogItem[];
@@ -18,11 +19,13 @@ export const useDialogStore = create<DialogState>((set, get) => ({
     openDialog: (type, config, params) => {
         const id = uuidv4();
         set((state) => ({ dialogs: [...state.dialogs, { id, type, params, config }], }));
+        appCore.keybindingManager.setFlag("isModalOpen", true, id);
         return id;
     },
 
     closeDialog: (id) => {
         set((state) => ({ dialogs: state.dialogs.filter((dialog) => dialog.id !== id), }));
+        appCore.keybindingManager.setFlag("isModalOpen", false, id);
     },
 
     closeTopDialog: () => {
@@ -31,6 +34,6 @@ export const useDialogStore = create<DialogState>((set, get) => ({
     },
 
     closeAll: () => {
-        set({ dialogs: [] });
+        get().dialogs.forEach(dialog => get().closeDialog(dialog.id));
     },
 }));
