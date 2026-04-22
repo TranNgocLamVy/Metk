@@ -1,7 +1,20 @@
 import { ArrowDown, ArrowUp, Copy, Folder, Grid3x3, Plus, Trash2 } from "lucide-react";
 
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
+import { appCore } from "@/core/appcore";
+
+const isTilemapSessionOpen = (): boolean => {
+	const editorContext = appCore.editorContext;
+	const tilemapSession = editorContext.getCurrentTilemapSession();
+	return !!tilemapSession;
+}
+
+const numSelectedLayers = (): number => {
+	const editorContext = appCore.editorContext;
+	const tilemapSession = editorContext.getCurrentTilemapSession();
+	if (!tilemapSession) return 0;
+	return tilemapSession.layerState.selectedLayers.length;
+}
 
 const CreateActionGroup: MenuDropDownGroupType = [
 	{
@@ -15,18 +28,21 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.tileLayer",
 					startIcon: <Grid3x3 className="text-emerald-500" />,
+					disabled: () => !isTilemapSessionOpen(),
 					onClick() { TilemapLayerService.createNewTileLayer() },
 				},
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.ruleLayer",
 					startIcon: <Grid3x3 className="text-yellow-300" />,
+					disabled: () => !isTilemapSessionOpen(),
 					onClick() { TilemapLayerService.createNewRuleLayer() },
 				},
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.groupLayer",
 					startIcon: <Folder className="text-blue-500" />,
+					disabled: () => !isTilemapSessionOpen(),
 					onClick() { TilemapLayerService.createNewGroupLayer() },
 				},
 			],
@@ -41,19 +57,13 @@ const CreateActionGroup: MenuDropDownGroupType = [
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.group.groupLayer",
-					disabled: () => {
-						const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-						return numberOfLayers < 1;
-					},
+					disabled: () => numSelectedLayers() == 0,
 					onClick() {},
 				},
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.group.ungroupLayer",
-					disabled: () => {
-						const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-						return numberOfLayers < 1;
-					},
+					disabled: () => numSelectedLayers() == 0,
 					onClick() {},
 				},
 			],
@@ -63,10 +73,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		label: "workspace.layerManager.contextMenu.duplicate",
 		startIcon: <Copy />,
-		disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-            return numberOfLayers < 1;
-        },
+		disabled: () => numSelectedLayers() == 0,
 		onClick() {
             TilemapLayerService.duplicateLayer();
         },
@@ -82,20 +89,14 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
     {
 		type: "option",
 		label: "workspace.layerManager.contextMenu.unselectAll",
-        disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-            return numberOfLayers < 1;
-        },
+        disabled: () => numSelectedLayers() == 0,
 		onClick() { TilemapLayerService.deselectAllLayers() },
 	},
 	{
 		type: "option",
 		label: "workspace.layerManager.contextMenu.raiseLayer",
 		startIcon: <ArrowUp />,
-		disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-			return numberOfLayers != 1;
-		},
+		disabled: () => numSelectedLayers() != 1,
 		onClick() {
             TilemapLayerService.moveLayersUp();
         },
@@ -104,10 +105,7 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 		type: "option",
 		label: "workspace.layerManager.contextMenu.lowerLayer",
 		startIcon: <ArrowDown />,
-		disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-			return numberOfLayers != 1;
-		},
+		disabled: () => numSelectedLayers() != 1,
 		onClick() {
             TilemapLayerService.moveLayersDown();
         },
@@ -118,25 +116,17 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
 		label: "workspace.layerManager.contextMenu.showHide",
-        disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-			return numberOfLayers < 1;
-		},
+        disabled: () => numSelectedLayers() == 0,
 		onClick() {
-            const selectedLayers = useLayerManagerStore.getState().getSelectedLayers()
-            TilemapLayerService.toggleVisibility([...selectedLayers]);
+            TilemapLayerService.toggleSelectedLayersVisibility();
         },
 	},
 	{
 		type: "option",
 		label: "workspace.layerManager.contextMenu.lockUnlock",
-        disabled: () => {
-			const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-			return numberOfLayers < 1;
-		},
+        disabled: () => numSelectedLayers() == 0,
 		onClick() {
-            const selectedLayers = useLayerManagerStore.getState().getSelectedLayers()
-            TilemapLayerService.toggleLock([...selectedLayers]);
+            TilemapLayerService.toggleSelectedLayersLock();
         },
 	},
 ];
@@ -147,10 +137,7 @@ const DeleteActionGroup: MenuDropDownGroupType = [
 		label: "workspace.layerManager.contextMenu.delete",
 		startIcon: <Trash2 />,
 		variant: "destructive",
-        disabled: () => {
-            const numberOfLayers = useLayerManagerStore.getState().getSelectedLayers().length;
-            return numberOfLayers < 1;
-        },
+        disabled: () => numSelectedLayers() == 0,
 		onClick() {
             TilemapLayerService.deleteLayer();
         },

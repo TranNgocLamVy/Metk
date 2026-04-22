@@ -11,6 +11,7 @@ import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import { remove } from "@tauri-apps/plugin-fs";
 import { DialogService } from "./dialogService";
 import { createRulesetForm } from "../constant/form/createRulesetForm";
+import { WorkspaceService } from "./workspaceService";
 
 export class RulesetService {
     public static async createRuleset(): Promise<void> {
@@ -76,6 +77,13 @@ export class RulesetService {
         await appCore.projectManager.saveCurrrentProject();
 
         useRulesetManagerStore.getState().refresh();
+
+        const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
+        if (rulesetSessionManager) {
+            const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
+            if (selectedRuleId === id) rulesetSessionManager.setSelectedRuleId(null);
+            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        }
 
         ToastService.success({ message: "Ruleset deleted" });
     }

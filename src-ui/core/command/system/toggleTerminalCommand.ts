@@ -5,7 +5,7 @@ import { Result } from "@/shared/types/result";
 import { useConsoleStore } from "@/view/stores/consoleStore";
 
 @SystemCommand({
-    id: "project.toggleConsole",
+    id: "workspace.toggleConsole",
     name: "Toggle Console",
     description: "",
     shortcuts: ["Ctrl+`"],

@@ -10,6 +10,7 @@ import { WorkspaceManager } from "./manager/workspaceManager";
 import { ProjectMetadataRepo } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 import { TextureManager } from "./manager/textureManager";
+import { ContextManager } from "./manager/contextManager";
 
 
 export class AppCore {
@@ -19,6 +20,7 @@ export class AppCore {
     public readonly workspaceManager: WorkspaceManager;
     public systemCommandManager: SystemCommandManager;
     public readonly toolManager: ToolManager;
+    public readonly contextManager: ContextManager;
     public readonly keybindingManager: KeybindingManager;
     public readonly textureManager: TextureManager;
 
@@ -33,7 +35,8 @@ export class AppCore {
         this.textureManager = new TextureManager();
         this.editorContext = new EditorContext(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager);
 
-        this.systemCommandManager = new SystemCommandManager(this.editorContext);
+        this.contextManager = new ContextManager();
+        this.systemCommandManager = new SystemCommandManager(this.contextManager, this.editorContext);
         this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);""
         
         // Set Context

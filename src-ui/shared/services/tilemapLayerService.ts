@@ -122,6 +122,8 @@ export class TilemapLayerService {
         })
         historyManager.commitTransaction();
 
+        currentSession.updateSelectedLayers();
+
         useLayerManagerStore.getState().refresh();
     }
 
@@ -167,6 +169,24 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().refresh();
     }
 
+    public static toggleSelectedLayersVisibility() {
+        const editorContext = appCore.editorContext;
+        const currentSession = editorContext.getCurrentTilemapSession();
+        if (!currentSession) return;
+        const selectedIds = currentSession.layerState.selectedLayers;
+        this.toggleVisibility(selectedIds);
+    }
+
+    public static toggleNonSelectedLayersVisibility() {
+        const editorContext = appCore.editorContext;
+        const currentSession = editorContext.getCurrentTilemapSession();
+        if (!currentSession) return;
+        const root = currentSession.tilemap.rootLayer;
+        const selectedIds = currentSession.layerState.selectedLayers;
+        const nonSelectedIds = Array.from(root.getAllIds()).filter(id => !selectedIds.includes(id));
+        this.toggleVisibility(nonSelectedIds);
+    }
+
     public static toggleVisibility(ids: string[], force?: boolean) {
         const editorContext = appCore.editorContext;
 
@@ -186,6 +206,24 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().refresh();
+    }
+
+    public static toggleSelectedLayersLock() {
+        const editorContext = appCore.editorContext;
+        const currentSession = editorContext.getCurrentTilemapSession();
+        if (!currentSession) return;
+        const selectedIds = currentSession.layerState.selectedLayers;
+        this.toggleLock(selectedIds);
+    }
+
+    public static toggleNonSelectedLayersLock() {
+        const editorContext = appCore.editorContext;
+        const currentSession = editorContext.getCurrentTilemapSession();
+        if (!currentSession) return;
+        const root = currentSession.tilemap.rootLayer;
+        const selectedIds = currentSession.layerState.selectedLayers;
+        const nonSelectedIds = Array.from(root.getAllIds()).filter(id => !selectedIds.includes(id));
+        this.toggleLock(nonSelectedIds);
     }
 
     public static toggleLock(ids: string[], force?: boolean) {

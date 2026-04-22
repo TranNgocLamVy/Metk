@@ -4,7 +4,7 @@ import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
 
 @SystemCommand({
-    id: "project.redo",
+    id: "workspace.tilemap.redo",
     name: "Redo",
     description: "",
     shortcuts: ["Ctrl+Y"],
