@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import { create } from "zustand";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 type TilesetSessionDisplayData = {
     sessionId: string;
@@ -25,18 +25,18 @@ export const useTilesetSessionStore = create<TilesetViewStore>((set, get) => {
 
         setPixiApp: (pixiApp: Application) => {
             set({ pixiApp })
-            const tilesetSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilesetSessionManager;
+            const tilesetSessionManager = appCore.workspaceManager.currentWorkspace?.tilesetSessionManager;
             if (!tilesetSessionManager) return;
             const currentSession = tilesetSessionManager.currentTilesetSession;
             if (currentSession) currentSession.sessionView.activateSession(pixiApp);
         },
         getTilesetDisplayData: () => {
-            const tilesetSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilesetSessionManager;
+            const tilesetSessionManager = appCore.workspaceManager.currentWorkspace?.tilesetSessionManager;
             if (!tilesetSessionManager) return [];
             return tilesetSessionManager.tilesetsSession.map(session => ({ sessionId: session.id, name: session.tileset.name }));
         },
         getCurrentTilesetSessionId: () => {
-            const tilesetSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilesetSessionManager;
+            const tilesetSessionManager = appCore.workspaceManager.currentWorkspace?.tilesetSessionManager;
             if (!tilesetSessionManager) return null;
             return tilesetSessionManager.currentTilesetSession?.id || null;
         },

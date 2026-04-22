@@ -1,25 +1,25 @@
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 
 
 export class MenuBarUtils {
     public static isProjectOpened(): boolean {
-        return AppCore.getIns().projectManager.currentProject != null;
+        return appCore.projectManager.currentProject != null;
     }
 
     public static isTilemapOpened(): boolean {
-        const currentTilemapSession = AppCore.getIns().editorContext.getCurrentTilemapSession();
+        const currentTilemapSession = appCore.editorContext.getCurrentTilemapSession();
         return currentTilemapSession != null;
     }
 
     public static canUndo(): boolean {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const historyManager = editorContext.getCurrentHistoryManager();
         return historyManager?.canUndo ?? false;
     }
 
     public static canRedo(): boolean {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const historyManager = editorContext.getCurrentHistoryManager();
         return historyManager?.canRedo ?? false;
     }

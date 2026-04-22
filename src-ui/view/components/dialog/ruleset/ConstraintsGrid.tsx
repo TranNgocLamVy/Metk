@@ -3,7 +3,7 @@ import { HStack, VStack } from "../../custom/stack/Stack";
 import { ReactNode, useCallback, useMemo } from "react";
 import { Rule } from "@/core/application/rule/rule";
 import { CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 
 
@@ -35,7 +35,7 @@ export default function ConstraintsGrid({ selectedGrid, setSelectedGrid, selecte
     }, [rule, selectedGrid, version]);
 
     const rulesetList = useMemo(() => {
-        const currentProject = AppCore.getIns().editorContext.currentProject;
+        const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return [];
         return currentProject.rulesetManager.serialize();
     }, [version]) 
@@ -146,7 +146,7 @@ function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: num
     }, [constraint, version])
 
     const rulesetList = useMemo(() => {
-        const currentProject = AppCore.getIns().editorContext.currentProject;
+        const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return [];
         return currentProject.rulesetManager.serialize();
     }, [version])

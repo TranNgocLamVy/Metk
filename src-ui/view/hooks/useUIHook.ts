@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 import { useToolbarStore } from "../stores/toolbarStore";
 
@@ -8,7 +8,7 @@ import { useToolbarStore } from "../stores/toolbarStore";
 export function useUIHook() {
     const { refresh } = useToolbarStore();
     useEffect(() => {
-        const toolManager = AppCore.getIns().toolManager;
+        const toolManager = appCore.toolManager;
 
         toolManager.on("onToolChanged", refresh);
 

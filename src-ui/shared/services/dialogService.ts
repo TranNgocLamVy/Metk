@@ -2,7 +2,7 @@ import { useDialogStore } from "@/view/stores/dialogStore";
 import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/types/formDialog";
 import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "../types/confirmationDialog";
 import { DialogZLevel } from "../types/dialog";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { ToastService } from "./toastService";
 
 
@@ -26,7 +26,7 @@ export class DialogService {
     }
 
     public static async openEditRulesetDialog(id: string): Promise<void> {
-        const currentProject = AppCore.getIns().editorContext.currentProject;
+        const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
 
         const rulesetManager = currentProject.rulesetManager;

@@ -1,4 +1,4 @@
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
@@ -27,9 +27,9 @@ export class ProjectService {
         const projectAbsDir = PathUtils.dirname(projectAbsPath);
         const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
 
-        const projectManager = AppCore.getIns().projectManager;
+        const projectManager = appCore.projectManager;
         projectManager.addProjectMetadata(project.metaData);
-        await AppCore.getIns().saveProjectManager();
+        await appCore.saveProjectManager();
 
         const openProject = await DialogService.openPermissionDialog({ title: "Project opened successfully", description: "Do you want to open this project?" })
 
@@ -60,9 +60,9 @@ export class ProjectService {
             return;
         }
 
-        const projectManager = AppCore.getIns().projectManager;
+        const projectManager = appCore.projectManager;
         projectManager.addProjectMetadata(project.metaData);
-        await AppCore.getIns().saveProjectManager();
+        await appCore.saveProjectManager();
 
         const openProject = await DialogService.openPermissionDialog({ title: "Project created successfully", description: "Do you want to open the project?" })
 
@@ -71,7 +71,7 @@ export class ProjectService {
     }
 
     public static removeProject(projectId: string): void {
-        const projectManager = AppCore.getIns().projectManager;
+        const projectManager = appCore.projectManager;
         projectManager.removeProjectMetadata(projectId);
         projectManager.saveCurrrentProject();
         useProjectManagerStore.getState().refresh();

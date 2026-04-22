@@ -4,7 +4,7 @@ import { Result } from "@/shared/types/result";
 import { RulesetMetadata, RulesetData } from "@/shared/schema/ruleSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { ToastService } from "./toastService";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
@@ -14,7 +14,7 @@ import { createRulesetForm } from "../constant/form/createRulesetForm";
 
 export class RulesetService {
     public static async createRuleset(): Promise<void> {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
         if (!currentProject) return;
 
@@ -56,7 +56,7 @@ export class RulesetService {
     }
 
     public static async deleteRuleset(id: string): Promise<void> {
-        const rulesetManager = AppCore.getIns().projectManager.currentProject?.rulesetManager;
+        const rulesetManager = appCore.projectManager.currentProject?.rulesetManager;
         if (!rulesetManager) return;
 
         const rulesetMetadata = rulesetManager.getRulesetMetadataById(id);
@@ -73,7 +73,7 @@ export class RulesetService {
         remove(rulesetManager.getRulesetAbsById(id)!);
         
         rulesetManager.removeRule(id);
-        await AppCore.getIns().projectManager.saveCurrrentProject();
+        await appCore.projectManager.saveCurrrentProject();
 
         useRulesetManagerStore.getState().refresh();
 

@@ -1,4 +1,4 @@
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { useEffect, useId } from "react";
 
 export function useContextScope(flag: string, isActive: boolean = true) {
@@ -6,7 +6,6 @@ export function useContextScope(flag: string, isActive: boolean = true) {
 
     useEffect(() => {
         if (!flag) return;
-        const appCore = AppCore.getIns();
         appCore.keybindingManager.setFlag(flag, isActive, instigatorId);
 
         return () => {

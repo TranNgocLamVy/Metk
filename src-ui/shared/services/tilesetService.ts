@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { TilesetData, TilesetMetadata } from "@/shared/schema/tilesetSchema";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
@@ -14,7 +14,7 @@ import { createTilesetForm } from "../constant/form/createTilesetForm";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
         if (!currentProject) return;
         

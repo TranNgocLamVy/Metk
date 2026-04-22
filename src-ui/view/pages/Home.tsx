@@ -7,7 +7,7 @@ import { ProjectService } from "@/shared/services/projectService";
 import { HStack, VStack } from "@/view/components/custom/stack/Stack";
 import { Button } from "@/view/components/shadcn/button";
 import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 export default function HomePage() {
 	const navigate = useNavigate();
@@ -18,8 +18,8 @@ export default function HomePage() {
 	}, [version])
 
 	useEffect(() => {
-		AppCore.getIns().projectManager.unLoadProject();
-		AppCore.getIns().workspaceManager.unloadWorkspace();
+		appCore.projectManager.unLoadProject();
+		appCore.workspaceManager.unloadWorkspace();
 	}, [])
 
 	const { t: translate } = useTranslation([]);

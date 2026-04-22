@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 import { useProjectManagerStore } from "./projectManagerStore";
 
@@ -10,7 +10,7 @@ export type AppcoreState = {
 }
 
 export const useAppcore = create<AppcoreState>((set, get) => {
-    AppCore.getIns().load().then((result) => {
+    appCore.load().then((result) => {
         set({ isAppcoreLoaded: true });
         useProjectManagerStore.getState().refresh();
     })

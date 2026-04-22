@@ -5,7 +5,7 @@ import { useNavigationStore } from "@/view/stores/navigationStore";
 
 import SecurityShield from "./SecurityShield";
 import { useToolbarStore } from "@/view/stores/toolbarStore";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: React.ReactNode;
@@ -32,7 +32,7 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 
 	const { refresh } = useToolbarStore();
 	useLayoutEffect(() => {
-		const toolManager = AppCore.getIns().toolManager;
+		const toolManager = appCore.toolManager;
 
 		toolManager.on("onToolChanged", refresh);
 

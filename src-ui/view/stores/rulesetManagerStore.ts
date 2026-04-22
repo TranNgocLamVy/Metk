@@ -1,4 +1,4 @@
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { create } from "zustand"
 
 type RulesetDisplayData = {
@@ -19,13 +19,13 @@ export const useRulesetManagerStore = create<RuleManagerStoreState>((set) => ({
     version: 0,
 
     getRulesetDisplayData: () => {
-        const rulesetManager = AppCore.getIns().projectManager.currentProject?.rulesetManager;
+        const rulesetManager = appCore.projectManager.currentProject?.rulesetManager;
         if (!rulesetManager) return [];
         const metadata = rulesetManager.serialize();
         return metadata.map((metaData) => ({ id: metaData.id, name: metaData.name, color: metaData.color }));
     },
     getCurrentSelectedRuleId() {
-        const rulesetSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.rulesetSessionManager;
+        const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
         if (!rulesetSessionManager) return null;
         return rulesetSessionManager.getSelectedRuleId();
     },

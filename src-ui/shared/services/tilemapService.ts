@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 import { TilemapData, TilemapMetadata } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
@@ -15,7 +15,7 @@ import { createTilemapForm } from "../constant/form/createTilemapForm";
 export class TilemapService {
 
     public static async createTilemap(): Promise<void> {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
         if (!currentProject) return;
         

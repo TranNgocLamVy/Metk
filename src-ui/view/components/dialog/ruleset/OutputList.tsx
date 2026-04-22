@@ -2,7 +2,7 @@ import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { Application, Sprite, Texture } from "pixi.js";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import PixiImage from "../../custom/PixiImage";
 
 export default function OutputList() {
@@ -25,7 +25,7 @@ export default function OutputList() {
                     const tilesetId = session.ruleset.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
                     if (!tilesetId) return null;
                     
-                    const textureManager = AppCore.getIns().editorContext.textureManager;
+                    const textureManager = appCore.editorContext.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, tileRef.tileId);
                     if (!tilesetTexture) return null;
                     

@@ -1,4 +1,4 @@
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { MenuBarUtils } from "@/shared/utils/menuBarUtils";
 import { ClipboardPaste, Copy, Redo, Scissors, SquareDashed, SquareDashedMousePointer, SquareMousePointer, Trash2, Undo, UserRoundCog } from "lucide-react";
 
@@ -9,7 +9,7 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 		startIcon: <Undo />,
 		disabled: () =>!MenuBarUtils.canUndo(),
         onClick() {
-			const editorContext = AppCore.getIns().editorContext;
+			const editorContext = appCore.editorContext;
 			editorContext.getCurrentHistoryManager()?.undo(editorContext);
 		},
 	},
@@ -19,7 +19,7 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 		startIcon: <Redo />,
 		disabled: () => !MenuBarUtils.canRedo(),
         onClick() {
-			const editorContext = AppCore.getIns().editorContext;
+			const editorContext = appCore.editorContext;
 			editorContext.getCurrentHistoryManager()?.redo(editorContext);
 		},
 	},

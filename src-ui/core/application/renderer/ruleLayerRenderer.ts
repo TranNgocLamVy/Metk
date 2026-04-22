@@ -2,7 +2,7 @@ import { Color, Sprite, Texture } from "pixi.js";
 
 import { Tilemap } from "@/core/application/tile/tilemap";
 import { BaseLayerRenderer } from "./baseLayerRenderer";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { RuleLayer } from "../tile/layer/ruleLayer";
 
 type CreateRuleLayerRendererContext = {
@@ -62,7 +62,7 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         currentSprite.x = drawPotision.x;
         currentSprite.y = drawPotision.y;
 
-        const textureManager = AppCore.getIns().editorContext.textureManager;
+        const textureManager = appCore.editorContext.textureManager;
         const output = rulesetRef.output;
         
         let hasRenderedTexture = false;
