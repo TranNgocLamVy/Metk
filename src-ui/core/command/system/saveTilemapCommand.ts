@@ -10,6 +10,7 @@ import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
     name: "Save",
     description: "",
     shortcuts: ["Ctrl+S"],
+    when: "inWorkspace && !isModalOpen",
 })
 export class SaveTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {

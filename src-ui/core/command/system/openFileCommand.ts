@@ -10,7 +10,7 @@ import { useDialogStore } from "@/view/stores/dialogStore";
     name: "Open File",
     description: "",
     shortcuts: ["Ctrl+P", "Ctrl+O"],
-    when: "inWorkspace",
+    when: "inWorkspace && !isModalOpen",
 })
 export class OpenFileCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {

@@ -13,7 +13,7 @@ import { ExportStorageService } from "../../../infrastructure/exportStorageServi
     name: "Export Tilemap",
     description: "",
     shortcuts: ["Ctrl+E"],
-    when: "inWorkspace",
+    when: "inWorkspace && !isModalOpen",
 })
 export class ExportTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {

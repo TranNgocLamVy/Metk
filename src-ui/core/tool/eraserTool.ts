@@ -27,6 +27,7 @@ import { DrawRuleStrategy } from "./drawStrategy/drawRuleStrategy";
         index: 10,
     },
     shortcuts: ["E"],
+    when: "inWorkspace && !isModalOpen",
 })
 export class EraserTool implements ITool {
     private drawStrategys: IDrawStrategy[];
