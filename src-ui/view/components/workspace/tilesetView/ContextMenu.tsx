@@ -1,6 +1,6 @@
 import { Grid3x3, Pen, Plus, Trash2 } from "lucide-react";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { DialogZLevel } from "@/shared/types/dialog";
@@ -33,12 +33,12 @@ const Group2: MenuDropDownGroupType = [
         label: "workspace.tilesetSelector.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const session = AppCore.getIns().editorContext.getCurrentTilesetSession();
+            const session = appCore.editorContext.getCurrentTilesetSession();
             if (!session) return false;
             return session.sessionView.gridEnabled;
         },
         toggle() {
-            const session = AppCore.getIns().editorContext.getCurrentTilesetSession();
+            const session = appCore.editorContext.getCurrentTilesetSession();
             if (!session) return;
             session.sessionView.toggleGrid();
         },

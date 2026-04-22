@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { ProjectMetadata } from "@/shared/schema/projectSchema";
 
 type ProjectManagerState = {
@@ -16,7 +16,7 @@ export const useProjectManagerStore = create<ProjectManagerState>((set, get) => 
         projects: [],
         currentProject: null,
         getProjects: () => {
-            return AppCore.getIns().projectManager.serialize();
+            return appCore.projectManager.serialize();
         },
         refresh: () => { set({ version: (get().version + 1) % 100000 }) }
     }

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 export type ToolbarItemDisplayData = {
     id: string;
@@ -22,7 +22,7 @@ export const useToolbarStore = create<ToolbarStore>((set, get) => ({
     version: 0,
 
     getTools: () => {
-        const toolManager = AppCore.getIns().toolManager;
+        const toolManager = appCore.toolManager;
         const toolData: ToolbarItemDisplayData[] = [];
         toolManager.getToolContexts().forEach((toolContext) => {
             if (toolContext.displayOnToolbar) {
@@ -38,7 +38,7 @@ export const useToolbarStore = create<ToolbarStore>((set, get) => ({
         return toolData.sort((a, b) => a.index - b.index);
     },
     getActiceTool: () => {
-        const toolManager = AppCore.getIns().toolManager;
+        const toolManager = appCore.toolManager;
         return toolManager.getCurrentToolId();
     },
     refresh: () => set((state) => ({ version: (state.version + 1) % 100000 })) 

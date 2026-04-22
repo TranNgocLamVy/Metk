@@ -2,7 +2,7 @@ import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { VStack } from "../../custom/stack/Stack";
 import { useCallback, useMemo } from "react";
 import { Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { RuleConstraintType } from "@/shared/schema/ruleSchema";
 
 type ConstraintTargetEditorProps = {
@@ -27,7 +27,7 @@ export default function ConstraintTargetEditor({ selectedGrid, selectedTarget, s
     }, [selectedConstraint, version]);
 
     const rulesetList = useMemo(() => {
-        const currentProject = AppCore.getIns().editorContext.currentProject;
+        const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return [];
         return currentProject.rulesetManager.serialize();
     }, [version]);

@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ScrollArea, ScrollBar } from '@/view/components/shadcn/scroll-area';
 import { Plus } from 'lucide-react';
 
-import { AppCore } from '@/core/appcore';
+import { appCore } from '@/core/appcore';
 import { useEditRulesetStore } from '@/view/stores/editRulesetStore';
 import { HStack, VStack } from '../../custom/stack/Stack';
 import { Result } from '@/shared/types/result';
@@ -36,7 +36,7 @@ export default function OutputSelector() {
         const renderer = session.renderer;
         if (!renderer) return;
 
-        const currentProject = AppCore.getIns().editorContext.currentProject;
+        const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
 
         const tilesetManager = currentProject.tilesetManager;
@@ -103,7 +103,7 @@ function TilesetSelector({ selectTileset }: { selectTileset: (tilesetId: string)
     const { session, refresh } = useEditRulesetStore();
 
     const allTilesets = useMemo(() => {
-        const currentProject = AppCore.getIns().editorContext.currentProject;
+        const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return [];
         return currentProject.tilesetManager.serialize()
     }, [session])

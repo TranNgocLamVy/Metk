@@ -6,7 +6,7 @@ import { HStack, VStack } from "../../custom/stack/Stack";
 import { Copy, EllipsisVertical, GripHorizontal, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
 import { Rule } from "@/core/application/rule/rule";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 import PixiImage from "../../custom/PixiImage";
 
@@ -78,7 +78,7 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
                         const firstOutput = ruleOutputs[0];
                         const tilesetId = session.ruleset.tilesetRefManager.getTilesetIdByIndex(firstOutput.tilesetIndex);
                         if (!tilesetId) return null;
-                        const textureManager = AppCore.getIns().editorContext.textureManager;
+                        const textureManager = appCore.editorContext.textureManager;
                         const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                         if (!tilesetTexture) return null;
                         return <PixiImage texture={tilesetTexture} pixiApp={pixiApp} />

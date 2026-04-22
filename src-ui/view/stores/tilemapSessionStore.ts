@@ -2,7 +2,7 @@
 import { Application } from "pixi.js";
 import { create } from "zustand";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { TilemapSessionManager } from "@/core/manager/tilemapSessionManager";
 
 type TilemapSessionDisplayData = {
@@ -29,18 +29,18 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
 
         setPixiApp: (pixiApp: Application) => {
             set({ pixiApp })
-            const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+            const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
             if (!tilemapSessionManager) return;
             const currentSession = tilemapSessionManager.currentTilemapSession;
             if (currentSession) currentSession.sessionView.activateSession(pixiApp);
         },
         getTileamapDisplayData: () => {
-            const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+            const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
             if (!tilemapSessionManager) return [];
             return tilemapSessionManager.tilemapsSession.map(session => ({ name: session.tilemap.name, sessionId: session.id, isDirty: session.isDirty }));
         },
         getCurrentTilemapSessionId: () => {
-            const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+            const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
             if (!tilemapSessionManager) return null;
             return tilemapSessionManager.currentTilemapSession?.id || null;
         },

@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 export type LayerView = {
     id: string;
@@ -32,14 +32,14 @@ export const useLayerManagerStore = create<LayerManagerState>((set, get) => ({
 
     refresh: () => set((state) => ({ version: state.version + 1 })),
     getSelectedLayers: () => {
-        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return [];
         const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return [];
         return currentSession.layerState.selectedLayers
     },
     getFlatView: (filter: string = '') => {
-        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return [];
         const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return [];

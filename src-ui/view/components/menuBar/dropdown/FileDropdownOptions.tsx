@@ -4,7 +4,7 @@ import { ProjectService } from "@/shared/services/projectService";
 import { TilemapService } from "@/shared/services/tilemapService";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { RulesetService } from "@/shared/services/rulesetService";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { MenuBarUtils } from "@/shared/utils/menuBarUtils";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
@@ -171,7 +171,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 					label: "menu.file.actions.export.exportTMX",
 					startIcon: <FolderUp />,
                     onClick() {
-						AppCore.getIns().systemCommandManager.execute("project.export");
+						appCore.systemCommandManager.execute("project.export");
 					},
 				},
 				{

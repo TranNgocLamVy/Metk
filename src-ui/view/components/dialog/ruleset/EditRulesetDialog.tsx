@@ -3,7 +3,7 @@ import { BaseDialogProps } from "../dialogRegistry";
 import { DialogContent, Dialog, DialogClose, DialogTitle } from "../../shadcn/dialog";
 import { Button } from "../../shadcn/button";
 import { useEffect, useMemo, useState } from "react";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import RuleList from "./RuleList";
 import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
@@ -31,7 +31,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
     const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
 
     useEffect(() => {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
         if (!currentProject) return;
         const rulesetManager = currentProject.rulesetManager;
@@ -60,7 +60,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
 
     const handleSave = async () => {
         if (!session) return;
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
         if (!currentProject) return;
 

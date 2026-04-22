@@ -1,6 +1,6 @@
 import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { TilemapService } from "@/shared/services/tilemapService";
 
 const ActionGroup: MenuDropDownGroupType = [
@@ -20,12 +20,12 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		label: "workspace.tilemapEditor.contextMenu.undo",
 		startIcon: <Undo />,
 		disabled() {
-			const editorContext = AppCore.getIns().editorContext;
+			const editorContext = appCore.editorContext;
 			const historyManager = editorContext.getCurrentHistoryManager();
 			return !historyManager?.canUndo;
 		},
 		onClick() {
-			const editorContext = AppCore.getIns().editorContext;
+			const editorContext = appCore.editorContext;
 			editorContext.getCurrentHistoryManager()?.undo(editorContext);
 		},
 	},
@@ -34,12 +34,12 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		label: "workspace.tilemapEditor.contextMenu.redo",
 		startIcon: <Redo />,
 		disabled() {
-			const editorContext = AppCore.getIns().editorContext;
+			const editorContext = appCore.editorContext;
 			const historyManager = editorContext.getCurrentHistoryManager();
 			return !historyManager?.canRedo;
 		},
 		onClick() {
-			const editorContext = AppCore.getIns().editorContext;
+			const editorContext = appCore.editorContext;
 			editorContext.getCurrentHistoryManager()?.redo(editorContext);
 		},
 	},
@@ -123,9 +123,9 @@ const BrushGroup: MenuDropDownGroupType = [
 				{
 					type: "radio",
 					label: "workspace.tilemapEditor.contextMenu.currentTool",
-					value: () => AppCore.getIns().toolManager.getCurrentToolId()!,
+					value: () => appCore.toolManager.getCurrentToolId()!,
 					onValueChange(value) {
-						AppCore.getIns().toolManager.startTool(value);
+						appCore.toolManager.startTool(value);
 					},
 					items: [
 						{
@@ -151,12 +151,12 @@ const GridGroup: MenuDropDownGroupType = [
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const session = AppCore.getIns().editorContext.getCurrentTilemapSession();
+            const session = appCore.editorContext.getCurrentTilemapSession();
             if (!session) return false;
             return session.sessionView.grid.gridEnabled
         },
         toggle() {
-            const session = AppCore.getIns().editorContext.getCurrentTilemapSession();
+            const session = appCore.editorContext.getCurrentTilemapSession();
             if (!session) return;
             session.sessionView.toggleGrid();
         },

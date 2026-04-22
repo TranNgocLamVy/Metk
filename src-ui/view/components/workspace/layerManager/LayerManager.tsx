@@ -11,7 +11,7 @@ import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerNodeRow from "./LayerNodeRow";
 import LayerMenuBar from "./LayerMenuBar";
 import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../shadcn/button";
 import { useDialogStore } from "@/view/stores/dialogStore";
@@ -26,7 +26,7 @@ export default function LayerManager() {
 	const { version: tilemapVersion } = useTilemapSessionStore();
 	
 	const currentTilemapSession = useMemo(() => {
-		const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+		const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
 		if (!tilemapSessionManager) return null;
 		return tilemapSessionManager.currentTilemapSession;
 	}, [tilemapVersion, version]);

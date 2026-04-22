@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Fragment } from "react";
 
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { useToolbarStore } from "@/view/stores/toolbarStore";
 
 import { HStack, VStack } from "../custom/stack/Stack";
@@ -21,7 +21,7 @@ export default function ToolBar() {
 	const activeTool = useMemo(() => getActiceTool(), [version]);
 
 	const changeTool = (toolId: string) => {
-		const toolManager = AppCore.getIns().toolManager;
+		const toolManager = appCore.toolManager;
 		toolManager.startTool(toolId);
 	};
 

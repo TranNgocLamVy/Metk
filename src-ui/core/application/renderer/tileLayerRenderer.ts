@@ -4,7 +4,7 @@ import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 type CreateTileLayerRendererContext = {
     layer: TileLayer;
@@ -54,7 +54,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         }
 
         // TODO: Fix: Get textureManager from passing context
-        const textureManager = AppCore.getIns().editorContext.textureManager;
+        const textureManager = appCore.editorContext.textureManager;
         const texture = textureManager.getTileTexture(tileRef.tilesetId, tileRef.tileId);
 
         // TODO: Handle unfound tileset, render error texture

@@ -1,7 +1,7 @@
 // src-ui/core/application/renderer/tilesetSelectorRenderer.ts
 import { Application, Container, Sprite, Graphics } from 'pixi.js';
 import { Tileset } from '@/core/application/tile/tileset';
-import { AppCore } from '@/core/appcore';
+import { appCore } from '@/core/appcore';
 import { Ruleset } from '@/core/application/rule/ruleset';
 import { Rule } from '@/core/application/rule/rule';
 import { Viewport } from 'pixi-viewport';
@@ -88,7 +88,7 @@ export class RulesetOutputSelector {
     public async setTileset(tileset: Tileset | null) {
         if (this.currentTileset === tileset) return;
 
-        const textureManager = AppCore.getIns().editorContext.textureManager;
+        const textureManager = appCore.editorContext.textureManager;
 
         if (this.currentTileset) {
             textureManager.releaseTilesetGraphics(this.currentTileset.id);
@@ -211,7 +211,7 @@ export class RulesetOutputSelector {
 
     public destroy() {
         if (!this.isInit) return;
-        if (this.currentTileset) AppCore.getIns().editorContext.textureManager.releaseTilesetGraphics(this.currentTileset.id)
+        if (this.currentTileset) appCore.editorContext.textureManager.releaseTilesetGraphics(this.currentTileset.id)
         if (this.pixiApp) this.pixiApp.stage.removeChild(this.viewport);
         this.viewport.destroy({ children: true });
     }

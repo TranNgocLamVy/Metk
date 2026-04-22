@@ -1,7 +1,7 @@
 import { Container, Sprite, Texture } from "pixi.js";
 
 import { Tileset } from "@/core/application/tile/tileset";
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 
 export type CreateTilesetRendererContext = {
     tileset: Tileset;
@@ -24,7 +24,7 @@ export class TilesetRenderer {
         this.container.position.set(0, 0);
 
         // TODO: Fix: Get textureManager from passing context
-        const textureManager = AppCore.getIns().editorContext.textureManager;
+        const textureManager = appCore.editorContext.textureManager;
 
         this.tileset.tiles.forEach((tile, index) => {
             const tex = textureManager.getTileTexture(this.tileset.id, index);

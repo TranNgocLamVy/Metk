@@ -1,4 +1,4 @@
-import { AppCore } from "@/core/appcore";
+import { appCore } from "@/core/appcore";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { RootLayer } from "@/core/application/tile/layer/rootLayer";
@@ -18,7 +18,7 @@ import { CreateRuleLayerCommand } from "@/core/command/layer/createRuleLayerComm
 
 export class TilemapLayerService {
     public static async createNewTileLayer() {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -42,7 +42,7 @@ export class TilemapLayerService {
     }
 
     public static async createNewRuleLayer() {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -66,7 +66,7 @@ export class TilemapLayerService {
     }
 
     public static async createNewGroupLayer() {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -90,7 +90,7 @@ export class TilemapLayerService {
     }
 
     public static async duplicateLayer() {
-       const editorContext = AppCore.getIns().editorContext;
+       const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -107,10 +107,10 @@ export class TilemapLayerService {
     }
 
     public static async deleteLayer() {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
-        const historyManager = AppCore.getIns().editorContext.getCurrentHistoryManager();
+        const historyManager = appCore.editorContext.getCurrentHistoryManager();
         if (!currentSession || !historyManager) return;
 
         const selectedIds = currentSession.layerState.selectedLayers;
@@ -126,7 +126,7 @@ export class TilemapLayerService {
     }
 
     public static selectLayer(id: string, multi: boolean) {
-        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return;
         const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
@@ -144,7 +144,7 @@ export class TilemapLayerService {
     }
 
     public static selectAllLayers() {
-        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return;
         const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
@@ -157,7 +157,7 @@ export class TilemapLayerService {
     }
 
     public static deselectAllLayers() {
-        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return;
         const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
@@ -168,7 +168,7 @@ export class TilemapLayerService {
     }
 
     public static toggleVisibility(ids: string[], force?: boolean) {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -189,7 +189,7 @@ export class TilemapLayerService {
     }
 
     public static toggleLock(ids: string[], force?: boolean) {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -210,7 +210,7 @@ export class TilemapLayerService {
     }
 
     public static moveLayers(draggedIds: string[], targetId: string, position: DropPosition) {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -260,7 +260,7 @@ export class TilemapLayerService {
     }
 
     public static moveLayersUp() {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -309,7 +309,7 @@ export class TilemapLayerService {
     }
 
     public static moveLayersDown() {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
@@ -358,7 +358,7 @@ export class TilemapLayerService {
     }
 
     public static renameLayer(id: string, name: string, recordUndo: boolean = true) {
-        const editorContext = AppCore.getIns().editorContext;
+        const editorContext = appCore.editorContext;
 
         const currentSession = editorContext.getCurrentTilemapSession();
         const historyManager = editorContext.getCurrentHistoryManager();
