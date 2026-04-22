@@ -27,16 +27,12 @@ export class EditorContext {
         public readonly textureManager: TextureManager
     ) { }
 
-    public getCurrentProject(): Project {
-        const currentProject = this.projectManager.currentProject;
-        if (!currentProject) throw new Error("Current project not found");
-        return currentProject;
+    public get currentProject(): Project | null {
+        return this.projectManager.currentProject;
     }
 
-    public getCurrentWorkspace(): Workspace {
-        const currentWorkspace = this.workspaceManager.currentWorkspace;
-        if (!currentWorkspace) throw new Error("Current workspace not found");
-        return currentWorkspace;
+    public get currentWorkspace(): Workspace | null {
+        return this.workspaceManager.currentWorkspace;
     }
 
     public getToolManager(): ToolManager {
@@ -45,7 +41,7 @@ export class EditorContext {
 
     public getCurrentTilemapSession(): TilemapSession | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
-        if (!currentWorkspace) throw new Error("Current workspace not found");
+        if (!currentWorkspace) return null;
         const currentTilemapSession = currentWorkspace.tilemapSessionManager.currentTilemapSession;
         if (!currentTilemapSession) return null;
         return currentTilemapSession;
@@ -53,7 +49,7 @@ export class EditorContext {
 
     public getCurrentTilesetSession(): TilesetSession | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
-        if (!currentWorkspace) throw new Error("Current workspace not found");
+        if (!currentWorkspace) return null;
         const currentTilesetSession = currentWorkspace.tilesetSessionManager.currentTilesetSession;
         if (!currentTilesetSession) return null;
         return currentTilesetSession;
@@ -61,7 +57,7 @@ export class EditorContext {
 
     public getCurrentHistoryManager(): HistoryManager | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
-        if (!currentWorkspace) throw new Error("Current workspace not found");
+        if (!currentWorkspace) return null;
         const currentMapSession = currentWorkspace.tilemapSessionManager.currentTilemapSession;
         if (!currentMapSession) return null;
         const historyManager = currentMapSession.historyManager;
@@ -79,7 +75,9 @@ export class EditorContext {
     public getSelectedRuleset(): Ruleset | null {
         const selectedRuleId = this.workspaceManager.currentWorkspace?.rulesetSessionManager.getSelectedRuleId();
         if (!selectedRuleId) return null;
-        return this.getCurrentProject().rulesetManager.getRulesetById(selectedRuleId);
+        const currentProject = this.currentProject;
+        if (!currentProject) return null;
+        return currentProject.rulesetManager.getRulesetById(selectedRuleId);
     }
 
     public getPivot(): Coordinate | null {

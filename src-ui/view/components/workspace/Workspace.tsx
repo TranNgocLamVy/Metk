@@ -13,9 +13,12 @@ import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
 import { useTranslation } from "react-i18next";
+import { useContextScope } from "@/view/hooks/useContextScope";
 
 export default function Workspace() {
 	const layoutRef = useRef<Layout | null>(null);
+
+	useContextScope("inWorkspace", true);
 
 	const { model } = useWorkspaceDockStore();
 

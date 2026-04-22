@@ -15,28 +15,29 @@ export type DropPosition = 'top' | 'bottom' | 'inside';
 
 type LayerManagerState = {
     version: number;
-    selectedIds: string[];
     editingId: string | null;
     targetLayer: BaseLayer | null;
 
-    // Actions
-    setTargetLayer: (layer: BaseLayer | null) => void;
     refresh: () => void;
-    setSelectedLayers: (ids: string[]) => void;
+    getSelectedLayers: () => string[];
     getFlatView: (filter?: string) => LayerView[];
-    removeIdsFromSelectedIds: (id: string[]) => void;
     setEditingId: (id: string | null) => void;
+    setTargetLayer: (layer: BaseLayer | null) => void;
 }
 
 export const useLayerManagerStore = create<LayerManagerState>((set, get) => ({
     version: 0,
-    selectedIds: [],
     editingId: null,
     targetLayer: null,
 
-    setTargetLayer: (layer) => set({ targetLayer: layer }),
     refresh: () => set((state) => ({ version: state.version + 1 })),
-    setSelectedLayers: (ids) => set({ selectedIds: [...ids] }),
+    getSelectedLayers: () => {
+        const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
+        if (!tilemapSessionManager) return [];
+        const currentSession = tilemapSessionManager.currentTilemapSession;
+        if (!currentSession) return [];
+        return currentSession.layerState.selectedLayers
+    },
     getFlatView: (filter: string = '') => {
         const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return [];
@@ -60,6 +61,7 @@ export const useLayerManagerStore = create<LayerManagerState>((set, get) => ({
         root.layers.forEach(c => processLayer(c, 0));
         return result;
     },
-    removeIdsFromSelectedIds: (ids) => set({ selectedIds: get().selectedIds.filter(id => !ids.includes(id)) }),
-    setEditingId: (id) => set({ editingId: id })
+    setEditingId: (id) => set({ editingId: id }),
+    setTargetLayer: (layer) => set({ targetLayer: layer }),
+
 }));

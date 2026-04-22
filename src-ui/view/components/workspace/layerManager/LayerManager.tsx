@@ -20,22 +20,26 @@ import { DialogZLevel } from "@/shared/types/dialog";
 export default function LayerManager() {
 	const { t: translate } = useTranslation([]);
 
-	const { version, getFlatView, setTargetLayer } = useLayerManagerStore();
+	const { version, getFlatView, getSelectedLayers, setTargetLayer, refresh } = useLayerManagerStore();
 	useLayerManagerStore((s) => s.version);
 
 	const { version: tilemapVersion } = useTilemapSessionStore();
+	
 	const currentTilemapSession = useMemo(() => {
 		const tilemapSessionManager = AppCore.getIns().workspaceManager.currentWorkspace?.tilemapSessionManager;
 		if (!tilemapSessionManager) return null;
 		return tilemapSessionManager.currentTilemapSession;
-	}, [tilemapVersion]);
+	}, [tilemapVersion, version]);
 
-	const selectedIds = useLayerManagerStore((s) => s.selectedIds);
+	const selectedIds = useMemo(() => {
+		return getSelectedLayers();
+	}, [version, tilemapVersion]);
 
 	const [isMounted, setIsMounted] = useState(false);
 
 	useEffect(() => {
 		setIsMounted(true);
+		refresh();
 	}, []);
 
 	const flatView = useMemo(() => {

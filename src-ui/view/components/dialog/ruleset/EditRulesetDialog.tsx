@@ -32,7 +32,9 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
 
     useEffect(() => {
         const editorContext = AppCore.getIns().editorContext;
-        const rulesetManager = editorContext.getCurrentProject().rulesetManager;
+        const currentProject = editorContext.currentProject;
+        if (!currentProject) return;
+        const rulesetManager = currentProject.rulesetManager;
 
         const clonedRuleset = rulesetManager.cloneRuleset(rulesetId);
 
@@ -59,10 +61,14 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
     const handleSave = async () => {
         if (!session) return;
         const editorContext = AppCore.getIns().editorContext;
-        const rulesetManager = editorContext.getCurrentProject().rulesetManager;
+        const currentProject = editorContext.currentProject;
+        if (!currentProject) return;
+
+        const rulesetManager = currentProject.rulesetManager;
         rulesetManager.updateRuleset(session.ruleset.serialize());
         await rulesetManager.saveRuleset(session.ruleset.id);
         useRulesetManagerStore.getState().refresh();
+        
         ToastService.success({ message: "Ruleset saved successfully" });
         onClose();
     }

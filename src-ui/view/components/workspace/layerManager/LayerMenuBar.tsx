@@ -12,20 +12,16 @@ import { useTranslation } from "react-i18next";
 export default function LayerMenuBar() {
     const { t: translate } = useTranslation([]);
 
-    const { selectedIds, version, getFlatView } = useLayerManagerStore();
+    const { version, getFlatView, getSelectedLayers } = useLayerManagerStore();
 
-    const nonSelectedIds = useMemo(() => {
-        const allLayer = getFlatView().map(layer => layer.id);
-        return allLayer.filter(id => !selectedIds.includes(id));
-    }, [selectedIds, version]);
-
-    const hasSelectedLayer = useMemo(() => {
-        return selectedIds.length > 0;
-    }, [selectedIds, version]);
-
-    const singleSelected = useMemo(() => {
-        return selectedIds.length === 1;
-    }, [selectedIds, version]);
+    const { selectedLayers, nonSelectedLayers, hasSelectedLayer, singleSelected } = useMemo(() => {
+        const allLayers = getFlatView();
+        const selectedLayers = getSelectedLayers();
+        const nonSelectedLayers = allLayers.filter(layer => !selectedLayers.includes(layer.id)).map(layer => layer.id);
+        const hasSelectedLayer = selectedLayers.length > 0;
+        const singleSelected = selectedLayers.length === 1;
+        return { selectedLayers, nonSelectedLayers, hasSelectedLayer, singleSelected };
+    }, [version])
 
     return (
         <HStack className="bg-surface absolute bottom-1 w-full px-1 py-1 gap-0.5">
@@ -76,23 +72,23 @@ export default function LayerMenuBar() {
                 <Separator orientation="vertical" className="bg-foreground/20 h-4" />
             </VStack>
             <QuickToolTip toolTip={translate("workspace.layerManager.menu.showHideSelected")}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerService.toggleVisibility(selectedIds)}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerService.toggleVisibility(selectedLayers)}>
                     <Eye />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={translate("workspace.layerManager.menu.lockUnlockSelected")}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerService.toggleLock(selectedIds)}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerService.toggleLock(selectedLayers)}>
                     <Lock />
                 </Button>
             </QuickToolTip>
             <VStack className="ml-auto" />
             <QuickToolTip toolTip={translate("workspace.layerManager.menu.showHideOther")}>
-                <Button variant={"ghost"} size={"icon-sm"} onClick={() => TilemapLayerService.toggleVisibility(nonSelectedIds)}>
+                <Button variant={"ghost"} size={"icon-sm"} onClick={() => TilemapLayerService.toggleVisibility(nonSelectedLayers)}>
                     <Eye />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={translate("workspace.layerManager.menu.lockUnlockOther")}>
-                <Button variant={"ghost"} size={"icon-sm"} onClick={() => TilemapLayerService.toggleLock(nonSelectedIds)}>
+                <Button variant={"ghost"} size={"icon-sm"} onClick={() => TilemapLayerService.toggleLock(nonSelectedLayers)}>
                     <Lock />
                 </Button>
             </QuickToolTip>

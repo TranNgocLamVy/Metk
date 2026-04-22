@@ -15,7 +15,9 @@ import { createTilesetForm } from "../constant/form/createTilesetForm";
 export class TilesetService {
     public static async createTileset(): Promise<void> {
         const editorContext = AppCore.getIns().editorContext;
-        const currentProject = editorContext.getCurrentProject();
+        const currentProject = editorContext.currentProject;
+        if (!currentProject) return;
+        
         const form = await DialogService.openFormDialog(createTilesetForm())
         if (!form) return;
 

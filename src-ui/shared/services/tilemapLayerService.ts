@@ -113,7 +113,7 @@ export class TilemapLayerService {
         const historyManager = AppCore.getIns().editorContext.getCurrentHistoryManager();
         if (!currentSession || !historyManager) return;
 
-        const selectedIds = useLayerManagerStore.getState().selectedIds
+        const selectedIds = currentSession.layerState.selectedLayers;
 
         historyManager.startTransaction();
         selectedIds.forEach((id) => {
@@ -123,7 +123,6 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().refresh();
-        useLayerManagerStore.getState().removeIdsFromSelectedIds(selectedIds);
     }
 
     public static selectLayer(id: string, multi: boolean) {
@@ -139,8 +138,9 @@ export class TilemapLayerService {
             selectedLayers.push(id);
         }
         currentSession.updateLayerState({ selectedLayers });
-        useLayerManagerStore.getState().setSelectedLayers(selectedLayers);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+
+        useLayerManagerStore.getState().refresh();
     }
 
     public static selectAllLayers() {
@@ -151,8 +151,9 @@ export class TilemapLayerService {
         const root = currentSession.tilemap.rootLayer;
         const selectedLayers = Array.from(root.getAllIds());
         currentSession.updateLayerState({ selectedLayers });
-        useLayerManagerStore.getState().setSelectedLayers(selectedLayers);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+
+        useLayerManagerStore.getState().refresh();
     }
 
     public static deselectAllLayers() {
@@ -161,8 +162,9 @@ export class TilemapLayerService {
         const currentSession = tilemapSessionManager.currentTilemapSession;
         if (!currentSession) return;
         currentSession.updateLayerState({ selectedLayers: [] });
-        useLayerManagerStore.getState().setSelectedLayers([]);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+
+        useLayerManagerStore.getState().refresh();
     }
 
     public static toggleVisibility(ids: string[], force?: boolean) {
@@ -253,6 +255,8 @@ export class TilemapLayerService {
                 }
             }
         }
+
+        useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayersUp() {
@@ -300,6 +304,8 @@ export class TilemapLayerService {
             }
         });
         historyManager.commitTransaction();
+
+        useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayersDown() {
@@ -347,6 +353,8 @@ export class TilemapLayerService {
             }
         });
         historyManager.commitTransaction();
+
+        useLayerManagerStore.getState().refresh();
     }
 
     public static renameLayer(id: string, name: string, recordUndo: boolean = true) {
@@ -365,5 +373,7 @@ export class TilemapLayerService {
             if (!layer) return;
             layer.rename(name);
         }
+
+        useLayerManagerStore.getState().refresh();
     }
 }

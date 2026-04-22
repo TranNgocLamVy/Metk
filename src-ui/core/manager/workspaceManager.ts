@@ -15,8 +15,8 @@ export class WorkspaceManager {
         this.editorContext = editorContext;
     }
 
-    public async loadProjectWorkspace(project: Project): Promise<Result> {
-        if (this.currentWorkspace) await this.currentWorkspace.unload();
+    public async loadProjectWorkspace(project: Project): Promise<Result<Workspace>> {
+        if (this.currentWorkspace) await this.currentWorkspace.destroy();
         this.currentWorkspace = null;
 
         const workspaceAbsPath = project.projectPathSystem.getAbsPathFromRelPath("session.ss.json");
@@ -27,7 +27,13 @@ export class WorkspaceManager {
             this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
         }
         await this.currentWorkspace.loadSession();
-        return Result.Success();
+        return Result.Success(this.currentWorkspace!);
+    }
+
+    public async unloadWorkspace(): Promise<void> {
+        if (!this.currentWorkspace) return;
+        await this.currentWorkspace.destroy();
+        this.currentWorkspace = null;
     }
 
     public async saveCurrentWorkspace(): Promise<Result> {

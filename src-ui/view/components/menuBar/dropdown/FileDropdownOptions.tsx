@@ -1,10 +1,13 @@
-import { BrushCleaning, Command, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
+import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
 
 import { ProjectService } from "@/shared/services/projectService";
 import { TilemapService } from "@/shared/services/tilemapService";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { RulesetService } from "@/shared/services/rulesetService";
 import { AppCore } from "@/core/appcore";
+import { MenuBarUtils } from "@/shared/utils/menuBarUtils";
+import { DialogZLevel } from "@/shared/types/dialog";
+import { useDialogStore } from "@/view/stores/dialogStore";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -27,9 +30,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.new.tilemap",
 					startIcon: <SquarePlus />,
-					disabled: () => {
-						return AppCore.getIns().projectManager.currentProject == null;
-					},
+					disabled: () => !MenuBarUtils.isProjectOpened(),
                     onClick() {
 						TilemapService.createTilemap();
 					},
@@ -38,9 +39,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.new.tileset",
 					startIcon: <Grid2x2Plus />,
-					disabled: () => {
-						return AppCore.getIns().projectManager.currentProject == null;
-					},
+					disabled: () => !MenuBarUtils.isProjectOpened(),
                     onClick() {
 						TilesetService.createTileset();
 					},
@@ -49,9 +48,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.new.ruleset",
 					startIcon: <Grid2x2Plus />,
-					disabled: () => {
-						return AppCore.getIns().projectManager.currentProject == null;
-					},
+					disabled: () => !MenuBarUtils.isProjectOpened(),
                     onClick() {
 						RulesetService.createRuleset();
 					},
@@ -63,15 +60,19 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.file.actions.open.file",
 		startIcon: <FolderOpen />,
-		disabled: () => true,
-        onClick() { },
+		disabled: () => !MenuBarUtils.isProjectOpened(),
+        onClick() { 
+			useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal });
+		},
 	},
 	{
 		type: "option",
 		label: "menu.file.actions.open.project",
 		startIcon: <FolderOpenDot />,
 		disabled: () => true,
-        onClick() { },
+        onClick() {
+			// TODO: Implement open project
+		},
 	},
 	{
 		type: "subMenu",
@@ -169,32 +170,14 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.export.exportTMX",
 					startIcon: <FolderUp />,
-					disabled: () => true,
-                    onClick() { },
+                    onClick() {
+						AppCore.getIns().systemCommandManager.execute("project.export");
+					},
 				},
 				{
 					type: "option",
 					label: "menu.file.actions.export.exportImage",
 					startIcon: <ImageUp />,
-					disabled: () => true,
-                    onClick() { },
-				},
-			],
-		],
-	},
-];
-
-const FileDropdownOptionGroup3: MenuDropDownGroupType = [
-	{
-		type: "subMenu",
-		label: "Command",
-		startIcon: <Command className=" stroke-[1.25]" />,
-		subMenus: [
-			[
-				{
-					type: "option",
-					label: "Edit Command",
-					startIcon: <PenLine />,
 					disabled: () => true,
                     onClick() { },
 				},

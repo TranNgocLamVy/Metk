@@ -20,7 +20,7 @@ export class ToolSessionManager {
         toolManager.on("onToolChanged", this.bindOnToolChanged);
     }
 
-    public async unload() {
+    public async destroy() {
         const toolManager = this.editorContext.getToolManager();
         toolManager.off("onToolChanged", this.bindOnToolChanged);
     }

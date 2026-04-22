@@ -45,7 +45,7 @@ export class TilemapSessionManager {
         return Result.Success();
     }
 
-    public async unloadAll(): Promise<void> {
+    public async detroy(): Promise<void> {
         Array.from(this.tilemapSessionMap.values()).forEach(session => session.destroy());
         this.tilemapSessionMap.clear();
         this.tilemapMap.clear();
@@ -96,7 +96,10 @@ export class TilemapSessionManager {
         this.tilemapMap.delete(tilemapSession.tilemap.id);
         this.tilemapSessionIdStack = this.tilemapSessionIdStack.filter(id => id !== sessionId);
 
-        const tilemapManager = this.editorContext.getCurrentProject().tilemapManager;
+        const currentProject = this.editorContext.currentProject;
+        if (!currentProject) return;
+
+        const tilemapManager = currentProject.tilemapManager;
         tilemapManager.unloadTilemap(tilemapSession.tilemap.id);
         
         if (this.currentTilemapSession?.id === sessionId) {

@@ -6,6 +6,7 @@ export type ToolContext = {
     description?: string;
     shortcuts?: string[];
     constructor: any;
+    when?: string;
     displayOnToolbar?: {
         icon: string;
         tooltip?: string;

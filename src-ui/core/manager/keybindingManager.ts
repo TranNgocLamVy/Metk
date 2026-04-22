@@ -11,6 +11,11 @@ export class KeybindingManager {
     private userOverrides: Map<string, Keybinding> = new Map();
     private lookupTable: Map<string, Keybinding> = new Map();
 
+    private static activeContexts: Set<string> = new Set();
+    
+    private flags: Map<string, Set<string>> = new Map();
+    private values: Map<string, string | number | boolean> = new Map();
+
     private bindOnKeyDown: (e: KeyboardEvent) => void
 
     constructor(
@@ -23,14 +28,14 @@ export class KeybindingManager {
         SystemCommandManager.COMMAND_REGISTRY.forEach((commandData: CommandContext) => {
             if (commandData.shortcuts == undefined) return;
             commandData.shortcuts.forEach((s) => {
-                defaultKeyBinding.push({ key: s, id: commandData.id, type: "command" });
+                defaultKeyBinding.push({ key: s, id: commandData.id, type: "command", when: commandData.when });
             })
         })
 
         ToolManager.TOOL_REGISTRY.forEach((toolContext: ToolContext) => {
             if (toolContext.shortcuts == undefined) return;
             toolContext.shortcuts.forEach((s) => {
-                defaultKeyBinding.push({ key: s, id: toolContext.id, type: "tool" });
+                defaultKeyBinding.push({ key: s, id: toolContext.id, type: "tool", when: toolContext.when });
             })
         })
 
@@ -61,6 +66,56 @@ export class KeybindingManager {
         });
     }
 
+    public setFlag(flag: string, isActive: boolean, instigatorId: string) {
+        if (!this.flags.has(flag)) {
+            this.flags.set(flag, new Set());
+        }
+
+        const instigators = this.flags.get(flag)!;
+        
+        if (isActive) {
+            instigators.add(instigatorId);
+        } else {
+            instigators.delete(instigatorId);
+        }
+    }
+
+    public setValue(key: string, value: string | number | boolean) {
+        this.values.set(key, value);
+    }
+
+    private evaluateWhen(when?: string): boolean {
+        if (!when) return true; 
+
+        const orConditions = when.split('||').map(c => c.trim());
+        
+        return orConditions.some(orCondition => {
+            const andConditions = orCondition.split('&&').map(c => c.trim());
+            
+            return andConditions.every(condition => {
+                if (condition.includes('==')) {
+                    const [key, val] = condition.split('==').map(s => s.trim());
+                    const cleanVal = val.replace(/^["'](.+(?=["']$))["']$/, '$1'); 
+                    return this.values.get(key) === cleanVal;
+                }
+                if (condition.includes('!=')) {
+                    const [key, val] = condition.split('!=').map(s => s.trim());
+                    const cleanVal = val.replace(/^["'](.+(?=["']$))["']$/, '$1');
+                    return this.values.get(key) !== cleanVal;
+                }
+
+                if (condition.startsWith('!')) {
+                    const flag = condition.substring(1).trim();
+                    const instigators = this.flags.get(flag);
+                    return !instigators || instigators.size === 0;
+                }
+
+                const instigators = this.flags.get(condition);
+                return instigators && instigators.size > 0;
+            });
+        });
+    }
+
     public handleKeyDown(e: KeyboardEvent) {
         if (this.isEditableElement(document.activeElement)) {
             return;
@@ -71,6 +126,9 @@ export class KeybindingManager {
         if (this.lookupTable.has(keystroke)) {
             const binding = this.lookupTable.get(keystroke);
             if (!binding) return;
+
+            if (!this.evaluateWhen(binding.when)) return;
+
             e.preventDefault();
             e.stopPropagation();
             if (binding.type == "command") {

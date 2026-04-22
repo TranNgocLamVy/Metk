@@ -27,7 +27,9 @@ export default function ConstraintTargetEditor({ selectedGrid, selectedTarget, s
     }, [selectedConstraint, version]);
 
     const rulesetList = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return [];
+        return currentProject.rulesetManager.serialize();
     }, [version]);
 
     const handleChangeConstraint = useCallback((constraint: RuleConstraintType) => {

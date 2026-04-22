@@ -19,6 +19,7 @@ export default function HomePage() {
 
 	useEffect(() => {
 		AppCore.getIns().projectManager.unLoadProject();
+		AppCore.getIns().workspaceManager.unloadWorkspace();
 	}, [])
 
 	const { t: translate } = useTranslation([]);
@@ -50,7 +51,9 @@ export default function HomePage() {
 									{project.name}
 								</Button>
 								<h3 className="text-xs text-foreground cursor-default">{project.directory}</h3>
-								<X size={20} className="text-foreground/50 hover:text-foreground ml-auto hidden group-hover:block" />
+								<Button size={"icon-xs"} variant={"ghost"} onClick={() => ProjectService.removeProject(project.id)}>
+									<X size={20} className="text-foreground/50 hover:text-foreground ml-auto hidden group-hover:block" />
+								</Button>
 							</HStack>
 						);
 					})}

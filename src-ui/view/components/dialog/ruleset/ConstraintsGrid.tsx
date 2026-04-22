@@ -35,7 +35,9 @@ export default function ConstraintsGrid({ selectedGrid, setSelectedGrid, selecte
     }, [rule, selectedGrid, version]);
 
     const rulesetList = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return [];
+        return currentProject.rulesetManager.serialize();
     }, [version]) 
 
     const constraintsIcon = useMemo(() => {
@@ -144,7 +146,9 @@ function CellToolTip({ rule, gridIndex, children }: { rule: Rule, gridIndex: num
     }, [constraint, version])
 
     const rulesetList = useMemo(() => {
-        return AppCore.getIns().editorContext.getCurrentProject().rulesetManager.serialize();
+        const currentProject = AppCore.getIns().editorContext.currentProject;
+        if (!currentProject) return [];
+        return currentProject.rulesetManager.serialize();
     }, [version])
 
     const constraintsIcon = useMemo(() => {

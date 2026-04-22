@@ -5,6 +5,7 @@ export type CommandContext = {
     name: string;
     description?: string;
     shortcuts?: string[];
+    when?: string;
     constructor: any;
 }
 

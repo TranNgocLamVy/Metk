@@ -59,6 +59,10 @@ export class ProjectManager {
         this.projectMetadataMap.set(projectMetadata.id, projectMetadata);
     }
 
+    public removeProjectMetadata(projectId: string): void {
+        this.projectMetadataMap.delete(projectId);
+    }
+
     public serialize(): ProjectMetadata[] {
         return Array.from(this.projectMetadataMap.values()).map((metaData) => {
             if (this.currentProject && this.currentProject.id === metaData.id) return this.currentProject.metaData;

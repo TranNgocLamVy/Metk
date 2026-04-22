@@ -13,10 +13,12 @@ import { ExportStorageService } from "../../../infrastructure/exportStorageServi
     name: "Export Tilemap",
     description: "",
     shortcuts: ["Ctrl+E"],
+    when: "inWorkspace",
 })
 export class ExportTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {
-        const workspace = context.getCurrentWorkspace();
+        const workspace = context.currentWorkspace;
+        if (!workspace) return Result.Error("No workspace");
 
         const tilemapSession = workspace.tilemapSessionManager.currentTilemapSession;
         if (!tilemapSession) return Result.Cancel();

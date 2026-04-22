@@ -39,10 +39,10 @@ export class Workspace {
         return Result.Success();
     }
 
-    public async unload(): Promise<void> {
-        await this.tilesetSessionManager.unloadAll();
-        await this.tilemapSessionManager.unloadAll();
-        await this.toolSessionManager.unload();
+    public async destroy(): Promise<void> {
+        await this.tilesetSessionManager.destroy();
+        await this.tilemapSessionManager.detroy();
+        await this.toolSessionManager.destroy();
     }
 
     public serialize(): WorkpsaceData {
