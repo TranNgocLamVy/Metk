@@ -28,7 +28,7 @@ export default function MenuBar() {
 				<MenuBarItem item={ViewDropdownOptions} />
 				<MenuBarItem item={MapDropdownOptions} />
 				<MenuBarItem item={LayerDropdownOptions} />
-				<MenuBarItem item={ProjectDropdownOptions} />
+				{/* <MenuBarItem item={ProjectDropdownOptions} /> */}
 				<MenuBarItem item={HelpDropdownOptions} />
 				<MenuBarItem item={DebugDropdownOptions} />
 			</HStack>

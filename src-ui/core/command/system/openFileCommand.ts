@@ -6,7 +6,7 @@ import { Result } from "@/shared/types/result";
 import { useDialogStore } from "@/view/stores/dialogStore";
 
 @SystemCommand({
-    id: "project.openFile",
+    id: "workspace.openFile",
     name: "Open File",
     description: "",
     shortcuts: ["Ctrl+P", "Ctrl+O"],

@@ -9,7 +9,7 @@ import { save } from "@tauri-apps/plugin-dialog";
 import { ExportStorageService } from "../../../infrastructure/exportStorageService";
 
 @SystemCommand({
-    id: "project.export",
+    id: "workspace.tilemap.export.tmx",
     name: "Export Tilemap",
     description: "",
     shortcuts: ["Ctrl+E"],

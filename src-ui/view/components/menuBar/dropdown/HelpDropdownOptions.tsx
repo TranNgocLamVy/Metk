@@ -1,4 +1,4 @@
-import { Book, HeartPlus, KeyboardIcon, MessageSquare, MessageSquareMore, Star } from "lucide-react";
+import { Book, HeartPlus, MessageSquareMore } from "lucide-react";
 
 const HelpDropdownOptionGroup1: MenuDropDownGroupType = [
     {
@@ -22,13 +22,6 @@ const HelpDropdownOptionGroup2: MenuDropDownGroupType = [
         type: "option",
         label: "menu.help.actions.supportDeveloper",
         startIcon: <HeartPlus />,
-        disabled: () => true,
-        onClick() { },
-    },
-    {
-        type: "option",
-        label: "menu.help.actions.shortcuts",
-        startIcon: <KeyboardIcon />,
         disabled: () => true,
         onClick() { },
     }

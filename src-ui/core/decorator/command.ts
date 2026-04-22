@@ -13,6 +13,6 @@ export type CommandMetadata = Omit<CommandContext, "constructor">
 
 export function SystemCommand(metadata: CommandMetadata) {
     return function (constructor: any) {
-        SystemCommandManager.COMMAND_REGISTRY.push({ ...metadata, constructor });
+        SystemCommandManager.COMMAND_REGISTRY.set(metadata.id, { ...metadata, constructor });
     };
 }

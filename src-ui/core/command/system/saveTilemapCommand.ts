@@ -6,7 +6,7 @@ import { Result } from "@/shared/types/result";
 import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 @SystemCommand({
-    id: "project.save",
+    id: "workspace.tilemap.save",
     name: "Save",
     description: "",
     shortcuts: ["Ctrl+S"],

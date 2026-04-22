@@ -5,9 +5,9 @@ import { TilemapService } from "@/shared/services/tilemapService";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { RulesetService } from "@/shared/services/rulesetService";
 import { appCore } from "@/core/appcore";
-import { MenuBarUtils } from "@/shared/utils/menuBarUtils";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
+import { executeCommand } from "@/core/service/commandService";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -30,7 +30,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.new.tilemap",
 					startIcon: <SquarePlus />,
-					disabled: () => !MenuBarUtils.isProjectOpened(),
+					disabled: () => !(appCore.projectManager.currentProject != null),
                     onClick() {
 						TilemapService.createTilemap();
 					},
@@ -39,7 +39,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.new.tileset",
 					startIcon: <Grid2x2Plus />,
-					disabled: () => !MenuBarUtils.isProjectOpened(),
+					disabled: () => !(appCore.projectManager.currentProject != null),
                     onClick() {
 						TilesetService.createTileset();
 					},
@@ -48,7 +48,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.new.ruleset",
 					startIcon: <Grid2x2Plus />,
-					disabled: () => !MenuBarUtils.isProjectOpened(),
+					disabled: () => !(appCore.projectManager.currentProject != null),
                     onClick() {
 						RulesetService.createRuleset();
 					},
@@ -60,10 +60,8 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.file.actions.open.file",
 		startIcon: <FolderOpen />,
-		disabled: () => !MenuBarUtils.isProjectOpened(),
-        onClick() { 
-			useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal });
-		},
+		disabled: () => !(appCore.projectManager.currentProject != null),
+        onClick: () => executeCommand("workspace.openFile")
 	},
 	{
 		type: "option",
@@ -113,8 +111,13 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.file.actions.save",
 		startIcon: <Save />,
-		disabled: () => true,
-        onClick() { },
+		disabled: () => {
+			const editorContext = appCore.editorContext;
+			const currentSession = editorContext.getCurrentTilemapSession();
+			if (!currentSession) return true;
+			return !currentSession.isDirty;
+		},
+        onClick: () => executeCommand("workspace.tilemap.save"),
 	},
 	{
 		type: "option",
@@ -127,8 +130,13 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.file.actions.saveAll",
 		startIcon: <SaveAll />,
-		disabled: () => true,
-        onClick() { },
+		disabled: () => {
+			const currentWorkspace = appCore.workspaceManager.currentWorkspace;
+			if (!currentWorkspace) return true;
+			const tilemapsSession = currentWorkspace.tilemapSessionManager.tilemapsSession;
+			return !tilemapsSession.some(s => s.isDirty);
+		},
+        onClick: () => executeCommand("workspace.tilemap.saveAll"),
 	},
 	{
 		type: "subMenu",
@@ -170,8 +178,14 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.actions.export.exportTMX",
 					startIcon: <FolderUp />,
+					disabled: () => {
+						const editorContext = appCore.editorContext;
+						const currentSession = editorContext.getCurrentTilemapSession();
+						if (!currentSession) return true;
+						return !currentSession.isDirty;
+					},
                     onClick() {
-						appCore.systemCommandManager.execute("project.export");
+						executeCommand("workspace.tilemap.export.tmx");
 					},
 				},
 				{

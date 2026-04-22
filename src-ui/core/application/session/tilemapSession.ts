@@ -42,7 +42,12 @@ export class TilemapSession implements IBaseSession {
         this.eventEmitter = new EventEmitter<TilemapSessionEvents>();
 
         this.viewState = tilemapSessionData.viewState ?? { x: null, y: null, zoom: 1 };
-        this.layerState = tilemapSessionData.layerState ?? { selectedLayers: [] };
+
+        const layers = Array.from(this.tilemap.rootLayer.getAllIds());
+        const selectedLayers = tilemapSessionData.layerState?.selectedLayers ?? [];
+        this.layerState = {
+            selectedLayers: layers.filter(id => selectedLayers.includes(id))
+        }
 
         this.sessionView = new TilemapSessionView(this);
 
@@ -92,6 +97,14 @@ export class TilemapSession implements IBaseSession {
     public markAsClean(): void {
         this.isDirty = false;
         useTilemapSessionStore.getState().refresh();
+    }
+
+    public updateSelectedLayers() {
+        const layers = Array.from(this.tilemap.rootLayer.getAllIds());
+        const selectedLayers = this.layerState.selectedLayers;
+        this.layerState = {
+            selectedLayers: layers.filter(id => selectedLayers.includes(id))
+        }
     }
 
     public destroy() {

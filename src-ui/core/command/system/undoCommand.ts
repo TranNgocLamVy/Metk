@@ -4,7 +4,7 @@ import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Result } from "@/shared/types/result";
 
 @SystemCommand({
-    id: "project.undo",
+    id: "workspace.tilemap.undo",
     name: "Undo",
     description: "",
     shortcuts: ["Ctrl+Z"],
