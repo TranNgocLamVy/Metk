@@ -1,4 +1,4 @@
-import { create, exists, mkdir, readFile, readTextFile, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { create, exists, mkdir, readFile, readTextFile, remove, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { IStorageProvider, StorageOptions } from "./interface/IStorageProvider";
 import { Result } from "@/shared/types/result";
 
@@ -67,6 +67,17 @@ export class TauriFileSystemProvider implements IStorageProvider {
             return Result.Success();
         } catch (error) {
             return Result.Error(`Write error: ${error}`);
+        }
+    }
+
+    public async removeFile(path: string, options?: StorageOptions): Promise<Result> {
+        try {
+            if (await this.exists(path, options)) {
+                await remove(path, options);
+            }
+            return Result.Success();
+        } catch (error) {
+            return Result.Error(`Remove error: ${error}`);
         }
     }
 }

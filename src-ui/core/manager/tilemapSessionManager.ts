@@ -107,6 +107,16 @@ export class TilemapSessionManager {
         }
     }
 
+    public getSession(sessionId: string): TilemapSession | null {
+        return this.tilemapSessionMap.get(sessionId) || null;
+    }
+
+    public getSessionByTilemapId(tilemapId: string): TilemapSession | null {
+        const sessionId = this.tilemapMap.get(tilemapId);
+        if (!sessionId) return null;
+        return this.tilemapSessionMap.get(sessionId) || null;
+    }
+
     public getLastTilemapSessionId(): string | null {
         if (this.tilemapSessionIdStack.length === 0) return null;
         return this.tilemapSessionIdStack[this.tilemapSessionIdStack.length - 1] || null; 

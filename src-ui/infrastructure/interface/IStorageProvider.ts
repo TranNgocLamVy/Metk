@@ -10,4 +10,5 @@ export interface IStorageProvider {
     writeTextFile(path: string, content: string, options?: StorageOptions): Promise<Result>;
     readFile(path: string, options?: StorageOptions): Promise<Result<Uint8Array>>;
     writeFile(path: string, content: Uint8Array, options?: StorageOptions): Promise<Result>;
+    removeFile(path: string, options?: StorageOptions): Promise<Result>;
 }

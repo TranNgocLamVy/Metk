@@ -55,8 +55,6 @@ export class TilemapManager {
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
 
         if (loadTilemapResult.status !== Result.Status.Success) {
-            // TODO: Move ToastService outside of TilemapManager
-            ToastService.error({ message: loadTilemapResult.message });
             return Result.Error(loadTilemapResult.message);
         }
 
@@ -113,6 +111,26 @@ export class TilemapManager {
 
         const tilemapData = tilemap.serialize();
         return TilemapStorageService.save(tilemap.tilemapPathSystem.getFileAbsPath(), tilemapData);
+    }
+
+    public async deleteTilemap(id: string): Promise<Result> {
+        const metaData = this.tilemapMetadata.get(id);
+        if (!metaData) return Result.Error(`Tilemap metadata not found for id: ${id}`);
+
+        if (this.loadedTilemaps.has(id)) {
+            await this.unloadTilemap(id);
+        }
+
+        const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
+        const removeResult = await TilemapStorageService.remove(tilemapAbsPath);
+        
+        if (removeResult.status !== Result.Status.Success) {
+            return Result.Error(`Failed to delete tilemap file: ${removeResult.message}`);
+        }
+
+        this.tilemapMetadata.delete(id);
+
+        return Result.Success();
     }
 
     public serialize(): TilemapMetadata[] {

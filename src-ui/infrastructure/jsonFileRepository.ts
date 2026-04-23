@@ -39,6 +39,10 @@ export class JsonFileRepository<T> {
         }
     }
 
+    public async remove(absPath: string, options?: StorageOptions): Promise<Result> {
+        return await this.storage.removeFile(absPath, options);
+    }
+
     private async performSave(absFilePath: string, data: any): Promise<Result> {
         try {
             const serializedResult = this.serializer.serialize(data);
