@@ -28,7 +28,7 @@ export class ProjectManager {
         const metaData = this.projectMetadataMap.get(projectId);
         if (!metaData) return Result.Error("Project meta data not found");
 
-        const projectAbsPath = PathUtils.join(metaData.directory, "project.json");
+        const projectAbsPath = PathUtils.join(metaData.directory, ".metk", "project.json");
         const loadProjectResult = await ProjectStorageService.load(projectAbsPath);
         if (loadProjectResult.status !== Result.Status.Success) {
             return Result.Error(loadProjectResult.message);
@@ -51,7 +51,7 @@ export class ProjectManager {
     public async saveCurrrentProject(): Promise<Result> {
         const project = this.currentProject;
         if (!project) return Result.Error("No project selected");
-        const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath("project.json")
+        const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "project.json"))
         return await ProjectStorageService.save(projectAbsPath, project.serialize());
     }
 

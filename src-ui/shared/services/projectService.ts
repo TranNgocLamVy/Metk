@@ -24,7 +24,8 @@ export class ProjectService {
             return;
         }
         const projectData = projectDataResult.data;
-        const projectAbsDir = PathUtils.dirname(projectAbsPath);
+        const metkDir = PathUtils.dirname(projectAbsPath);
+        const projectAbsDir = PathUtils.dirname(metkDir);
         const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
 
         const projectManager = appCore.projectManager;
@@ -43,6 +44,7 @@ export class ProjectService {
         if (!form) return;
 
         const projectAbsDir = PathUtils.join(form.destination, form.name);
+        const metkDir = PathUtils.join(projectAbsDir, ".metk");
 
         const mkdirResult = await TauriFileStorage.mkdir(projectAbsDir);
         if (mkdirResult.status !== Result.Status.Success) {
@@ -50,10 +52,16 @@ export class ProjectService {
             return;
         }
 
+        const mkdirMetkResult = await TauriFileStorage.mkdir(metkDir);
+        if (mkdirMetkResult.status !== Result.Status.Success) {
+            ToastService.error({ message: mkdirMetkResult.message });
+            return;
+        }
+
         const projectData = defaultProjectData({ name: form.name });
         const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
 
-        const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath("project.json");
+        const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "project.json"));
         const saveResult = await ProjectStorageService.save(projectAbsPath, project.serialize());
         if (saveResult.status !== Result.Status.Success) {
             ToastService.error({ message: saveResult.message });
