@@ -74,6 +74,7 @@ export type FilePathFieldInput = BaseField & {
     type: "filePath";
     multiple?: boolean;
     filter?: FileFilter;
+    defaultDir?: string;
     defaultValue?: string[];
 };
 
@@ -84,6 +85,7 @@ export type FileFilter = {
 
 export type FolderPathFieldInput = BaseField & {
     type: "folderPath";
+    defaultDir?: string;
     defaultValue?: string;
 };
 

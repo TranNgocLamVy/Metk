@@ -17,12 +17,21 @@ export class RulesetService {
     public static async createRuleset(): Promise<void> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
-        if (!currentProject) return;
+        const currentWorkspace = editorContext.currentWorkspace;
+        if (!currentProject || !currentWorkspace) return;
 
         const form = await DialogService.openFormDialog(createRulesetForm);
         if (!form) return;
 
-        const rulesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        let defaultRulesetDir: string;
+        const savedRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
+        if (savedRulesetDir) {
+            defaultRulesetDir = savedRulesetDir;
+        } else {
+            defaultRulesetDir = currentProject.projectPathSystem.absDir;
+        }
+
+        const rulesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return;
 
         const rulesetData: RulesetData = {

@@ -1,6 +1,6 @@
 import { FormUtils } from "@/shared/utils/formUtils";
 
-export const createTilesetForm = () => {
+export const createTilesetForm = (textureDefaultDir?: string) => {
     return FormUtils.createForm({
         title: "form.tileset.title",
         okText: "form.tileset.action.create",
@@ -33,6 +33,7 @@ export const createTilesetForm = () => {
                         id: "source",
                         name: "source",
                         type: "filePath",
+                        defaultDir: textureDefaultDir,
                         multiple: false,
                         label: "form.tileset.image.source",
                         required: true,

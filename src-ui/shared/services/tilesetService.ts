@@ -16,12 +16,29 @@ export class TilesetService {
     public static async createTileset(): Promise<void> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
-        if (!currentProject) return;
+        const currentWorkspace = editorContext.currentWorkspace;
+        if (!currentProject || !currentWorkspace) return;
+
+        let defaultTextureDir: string;
+        const savedTextureDir = currentWorkspace.savedPathManager.getTextureDir();
+        if (savedTextureDir) {
+            defaultTextureDir = savedTextureDir;
+        } else {
+            defaultTextureDir = currentProject.projectPathSystem.absDir;
+        }
         
-        const form = await DialogService.openFormDialog(createTilesetForm())
+        const form = await DialogService.openFormDialog(createTilesetForm(defaultTextureDir));
         if (!form) return;
 
-        const tilesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tileset", filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        let defaultTilesetDir: string;
+        const savedTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
+        if (savedTilesetDir) {
+            defaultTilesetDir = savedTilesetDir;
+        } else {
+            defaultTilesetDir = currentProject.projectPathSystem.absDir;
+        }
+
+        const tilesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tileset", defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
         const tilesetDir = PathUtils.dirname(tilesetAbsPath);
 

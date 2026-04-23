@@ -3,18 +3,11 @@ import { type } from "arktype";
 import { TilemapSessionManagerSchema } from "./tilemapSessionSchema";
 import { TilesetSessionManagerSchema } from "./tilesetSessionSchema";
 import { ToolStateSchema } from "./toolSessionSchema";
-import { safeArray } from ".";
 import { RulesetSessionManagerSchema } from "./rulesetSessionSchema";
-
-export const ExportPathSchema = type({
-    tilemapId: type("string"),
-    exportPath: type("string").or("null").default(null),
-})
-
-export type ExportPathData = typeof ExportPathSchema.infer
+import { SavedPathSchema } from "./savedPathSchema";
 
 export const WorkpsaceDataSchema = type("string.json.parse").to({
-    exportPaths: safeArray(ExportPathSchema),
+    savedPath: SavedPathSchema.default(() => ({ exportPaths: [] })),
     toolState: ToolStateSchema.default(() => ({ currentTool: null })),
     tilesets: TilesetSessionManagerSchema.default(() => ({ tilesetSessions: [], currentTilesetSessionId: null })),
     tilemaps: TilemapSessionManagerSchema.default(() => ({ tilemapSessions: [], currentTilemapSessionId: null })),
@@ -38,5 +31,11 @@ export const defaultWorkspaceData: WorkpsaceData = {
     toolState: {
         currentTool: null,
     },
-    exportPaths: [],
+    savedPath: {
+        exportPaths: [],
+        tilemapDir: null,
+        tilesetDir: null,
+        rulesetDir: null,
+        textureDir: null,
+    },
 }

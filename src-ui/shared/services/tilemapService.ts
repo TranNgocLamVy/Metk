@@ -17,13 +17,25 @@ export class TilemapService {
     public static async createTilemap(): Promise<void> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
-        if (!currentProject) return;
+        const currentWorkspace = editorContext.currentWorkspace;
+        if (!currentProject || !currentWorkspace) return;
         
         const form = await DialogService.openFormDialog(createTilemapForm());
         if (!form) return;
+        
+        let defaultDir: string;
+        const savedTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
+        if (savedTilemapDir) {
+            defaultDir = savedTilemapDir;
+        } else {
+            defaultDir = currentProject.projectPathSystem.absDir;
+        }
 
-        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", defaultPath: defaultDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return;
+
+        const tilemapDir = PathUtils.dirname(tilemapAbsPath);
+        currentWorkspace.savedPathManager.setTilemapDir(tilemapDir);
 
         const tilemapData: TilemapData = {
             id: uuidv4(),

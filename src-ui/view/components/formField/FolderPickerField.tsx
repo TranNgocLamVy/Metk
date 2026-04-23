@@ -10,7 +10,7 @@ type FolderPickerProps = {
 	name: string;
 	label: string;
 	placeholder?: string;
-	defaultValue?: string;
+	defaultDir?: string;
 	required?: boolean;
 	value: string;
 	handleChange?: (fieldName: string, raw: unknown) => void;
@@ -18,11 +18,12 @@ type FolderPickerProps = {
 
 export default function FolderPickerField(props: FolderPickerProps) {
 	const { t: translate } = useTranslation([]);
-	const { id, name, label, placeholder, required, value, handleChange } = props;
+	const { id, name, label, placeholder, defaultDir, required, value, handleChange } = props;
 
 	const selectFolder = async () => {
 		const path = await FileDialogUtils.open({
 			directory: true, // Only allow selecting directories
+			defaultPath: defaultDir,
 			multiple: false, // Prevent multiple selection
 		});
 		if (path) handleChange?.(name, path);
