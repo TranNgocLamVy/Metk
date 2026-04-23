@@ -70,7 +70,7 @@ export class TilemapManager {
         this.loadedTilemaps.set(tilemapData.id, tilemap);
 
         let addMoreTileset: boolean = false;
-        await Promise.all(tilemapData.tilesets.map(tilesetRef => {
+        await Promise.all(tilemapData.tilesets.refs.map(tilesetRef => {
             if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
                 return this.tilesetManager.loadTileset({ id: tilesetRef.id })
             } else {
@@ -81,7 +81,7 @@ export class TilemapManager {
             }
         }));
 
-        await Promise.all(tilemapData.rulesets.map(rulesetRef => {
+        await Promise.all(tilemapData.rulesets.refs.map(rulesetRef => {
             if (this.rulesetManager.rulesetMetadata.has(rulesetRef.id)) {
                 return this.rulesetManager.loadRuleset(rulesetRef.id)
             } else {
@@ -123,7 +123,6 @@ export class TilemapManager {
 
         const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
         const removeResult = await TilemapStorageService.remove(tilemapAbsPath);
-        
         if (removeResult.status !== Result.Status.Success) {
             return Result.Error(`Failed to delete tilemap file: ${removeResult.message}`);
         }

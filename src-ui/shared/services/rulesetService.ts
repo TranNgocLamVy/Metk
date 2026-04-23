@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { RulesetMetadata, RulesetData } from "@/shared/schema/ruleSchema";
+import { RulesetMetadata, RulesetData } from "@/shared/schema/rulesetSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { ToastService } from "./toastService";
 import { appCore } from "@/core/appcore";
@@ -40,8 +40,8 @@ export class RulesetService {
             color: form.color,
             size: 5,
             rules: [],
-            tilesets: [],
-            rulesets: [],
+            tilesets: { refs: [], nextIndex: 0 },
+            rulesets: { refs: [], nextIndex: 0 },
         }
 
         const saveResult = await RulesetStorageService.save(rulesetAbsPath, rulesetData);

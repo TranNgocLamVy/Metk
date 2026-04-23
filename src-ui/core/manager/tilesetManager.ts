@@ -101,7 +101,7 @@ export class TilesetManager {
         if (tileset == undefined) return Result.Error("Tileset not found");
 
         const tilesetData = tileset.serialize();
-        return TilesetStorageService.save(tileset.tilesetPathSystem.getFileAbsDir(), tilesetData);
+        return TilesetStorageService.save(tileset.tilesetPathSystem.getFileAbsPath(), tilesetData);
     }
 
     public getTilesetById(id: string): Tileset | null {
@@ -131,7 +131,8 @@ export class TilesetManager {
             await this.unloadTileset(id);
         }
 
-        const removeResult = await TilesetStorageService.remove(tilesetMetadata.tilesetRelPath);
+        const tilesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(tilesetMetadata.tilesetRelPath);
+        const removeResult = await TilesetStorageService.remove(tilesetAbsPath);
         if (removeResult.status !== Result.Status.Success) {
             return Result.Error(`Failed to delete tileset file: ${removeResult.message}`);
         }

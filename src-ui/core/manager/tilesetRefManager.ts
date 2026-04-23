@@ -6,25 +6,17 @@ import { TilesetMetadata, TilesetRefData } from "@/shared/schema/tilesetSchema";
 
 export class TilesetRefManager {
     public tilesetRefs: TilesetRefData[] = []
-    private nextTilesetIndex: number;
+    private nextIndex: number;
 
     constructor(
         public readonly tilesetManager: TilesetManager,
         public readonly filePathSystem: FilePathSystem,
     ) { }
 
-    public load(tilesetRefs: TilesetRefData[]) {
+    public load(tilesetRefs: TilesetRefData[], nextIndex: number) {
         this.tilesetRefs = tilesetRefs;
-
-        if (this.tilesetRefs.length === 0) {
-            this.nextTilesetIndex = 0;
-        } else {
-            const maxIndex = Math.max(...this.tilesetRefs.map(tileset => tileset.index));
-            this.nextTilesetIndex = maxIndex + 1;
-        }
+        this.nextIndex = nextIndex;
     }
-
-    public serialize(): TilesetRefData[] { return Array.from(this.tilesetRefs); }    
 
     public getTilesetIndex(tileset: TilesetMetadata): number {
         const tilesetRef = this.tilesetRefs.find(tilesetRef => tilesetRef.id === tileset.id);
@@ -37,13 +29,13 @@ export class TilesetRefManager {
             const tilesetRelPath = PathUtils.relative(absDir, tilesetAbsPath);
 
             const newTilesetRef: TilesetRefData = {
-                index: this.nextTilesetIndex,
+                index: this.nextIndex,
                 id: tileset.id,
                 name: tileset.name,
                 source: tilesetRelPath,
             }
             this.tilesetRefs.push(newTilesetRef);
-            this.nextTilesetIndex += 1;
+            this.nextIndex += 1;
             return newTilesetRef.index;
         }
         return tilesetRef.index;
@@ -60,4 +52,17 @@ export class TilesetRefManager {
         if (!tilesetRef) return null;
         return tilesetRef.id;
     }
+
+    public getRefIds(): string[] {
+        const ids = this.tilesetRefs.map(ref => ref.id);
+        return ids;
+    }
+
+    public serialize() {
+        return {
+            refs: Array.from(this.tilesetRefs),
+            nextIndex: this.nextIndex,
+        }
+    }    
+
 }

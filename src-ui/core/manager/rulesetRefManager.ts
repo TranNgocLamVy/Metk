@@ -1,4 +1,4 @@
-import { RulesetMetadata, RulesetRefData } from "@/shared/schema/ruleSchema";
+import { RulesetMetadata, RulesetRefData } from "@/shared/schema/rulesetSchema";
 import { RulesetManager } from "./rulesetManager";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { PathUtils } from "@/shared/utils/pathUtils";
@@ -7,25 +7,17 @@ import { PathUtils } from "@/shared/utils/pathUtils";
 
 export class RulesetRefManager {
     public rulesetRefs: RulesetRefData[] = []
-    private nextRulesetIndex: number;
+    private nextIndex: number;
 
     constructor(
         public readonly rulesetManager: RulesetManager,
         public readonly filePathSystem: FilePathSystem,
     ) { }
 
-    public load(rulesetRefs: RulesetRefData[]) {
+    public load(rulesetRefs: RulesetRefData[], nextIndex: number) {
         this.rulesetRefs = rulesetRefs;
-
-        if (this.rulesetRefs.length === 0) {
-            this.nextRulesetIndex = 0;
-        } else {
-            const maxIndex = Math.max(...this.rulesetRefs.map(ruleset => ruleset.index));
-            this.nextRulesetIndex = maxIndex + 1;
-        }
+        this.nextIndex = nextIndex;
     }
-
-    public serialize(): RulesetRefData[] { return Array.from(this.rulesetRefs); }
 
     public getRulesetIndex(ruleset: RulesetMetadata): number {
         const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.id === ruleset.id);
@@ -38,13 +30,13 @@ export class RulesetRefManager {
             const rulesetRelPath = PathUtils.relative(absDir, rulesetAbsPath);
 
             const newRulesetRef: RulesetRefData = {
-                index: this.nextRulesetIndex,
+                index: this.nextIndex,
                 id: ruleset.id,
                 name: ruleset.name,
                 source: rulesetRelPath,
             }
             this.rulesetRefs.push(newRulesetRef);
-            this.nextRulesetIndex += 1;
+            this.nextIndex += 1;
             return newRulesetRef.index;
         }
         return rulesetRef.index;
@@ -60,5 +52,17 @@ export class RulesetRefManager {
         const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.index === index);
         if (!rulesetRef) return null;
         return rulesetRef.id;
+    }
+
+    public getRefIds(): string[] {
+        const ids = this.rulesetRefs.map(ref => ref.id);
+        return ids;
+    }
+
+    public serialize() {
+        return {
+            refs: Array.from(this.rulesetRefs),
+            nextIndex: this.nextIndex,
+        }
     }
 }

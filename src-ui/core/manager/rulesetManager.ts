@@ -1,4 +1,4 @@
-import { RulesetData, RulesetMetadata } from "@/shared/schema/ruleSchema";
+import { RulesetData, RulesetMetadata } from "@/shared/schema/rulesetSchema";
 import { Ruleset } from "../application/rule/ruleset";
 import { TilesetManager } from "./tilesetManager";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
@@ -77,7 +77,7 @@ export class RulesetManager {
         this.loadedRulesets.set(rulesetData.id, ruleset);
 
         let addMoreTileset: boolean = false;
-        await Promise.all(rulesetData.tilesets.map(tilesetRef => {
+        await Promise.all(rulesetData.tilesets.refs.map(tilesetRef => {
             if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
                 return this.tilesetManager.loadTileset({ id: tilesetRef.id })
             } else {
@@ -85,6 +85,12 @@ export class RulesetManager {
                 const tilesetAbsPath = rulesetPathSystem.getAbsPathFromRelPath(tilesetRef.source);
                 const tilesetRelPathFromProject = this.projectPathSystem.getRelPathFromAbsPath(tilesetAbsPath);
                 return this.tilesetManager.loadTileset({ tilesetRelPath: tilesetRelPathFromProject });
+            }
+        }));
+
+        await Promise.all(rulesetData.rulesets.refs.map(rulesetRef => {
+            if (this.rulesetMetadata.has(rulesetRef.id)) {
+                return this.loadRuleset(rulesetRef.id)
             }
         }));
 
@@ -142,6 +148,25 @@ export class RulesetManager {
         const ruleset = this.loadedRulesets.get(rulesetData.id);
         if (!ruleset) return;
         ruleset.updateRuleset(rulesetData);
+    }
+
+    public async deleteRuleset(id: string): Promise<Result> {
+        const metaData = this.rulesetMetadata.get(id);
+        if (!metaData) return Result.Error(`Ruleset metadata not found for id: ${id}`);
+    
+        if (this.loadedRulesets.has(id)) {
+            await this.unloadRuleset(id);
+        }
+    
+        const rulesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.rulesetRelPath);
+        const removeResult = await RulesetStorageService.remove(rulesetAbsPath);
+        
+        if (removeResult.status !== Result.Status.Success) {
+            return Result.Error(`Failed to delete ruleset file: ${removeResult.message}`);
+        }
+    
+        this.rulesetMetadata.delete(id);
+        return Result.Success();
     }
 
     public serialize(): RulesetMetadata[] {

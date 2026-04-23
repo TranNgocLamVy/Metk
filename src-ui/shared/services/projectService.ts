@@ -79,6 +79,13 @@ export class ProjectService {
     }
 
     public static async removeProject(projectId: string): Promise<void> {
+        const confirm = await DialogService.openPermissionDialog({
+            title: "Remove Project", // TODO: i18n
+            description: "Are you sure you want to remove this project?"
+        });
+
+        if (!confirm) return;
+
         const projectManager = appCore.projectManager;
         projectManager.removeProjectMetadata(projectId);
         await appCore.saveProjectManager();

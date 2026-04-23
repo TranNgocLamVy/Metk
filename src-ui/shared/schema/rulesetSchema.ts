@@ -43,8 +43,14 @@ export const RulesetDataSchema = type("string.json.parse").to({
     color: type("string").default("#ffffff"),
     size: type("number").default(5),
     rules: safeArray(RuleData).default(() => []),
-    tilesets: safeArray(TilesetRefDataSchema).default(() => []),
-    rulesets: safeArray(RulesetRefDataSchema).default(() => []),
+    tilesets: type({
+        refs: safeArray(TilesetRefDataSchema).default(() => []),
+        nextIndex: type("number").default(0),
+    }),
+    rulesets: type({
+        refs: safeArray(RulesetRefDataSchema).default(() => []),
+        nextIndex: type("number").default(0),
+    }),
 })
 export type RulesetData = typeof RulesetDataSchema.infer;
 
