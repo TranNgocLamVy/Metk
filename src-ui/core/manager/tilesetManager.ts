@@ -123,6 +123,24 @@ export class TilesetManager {
         return this.projectPathSystem.getAbsPathFromRelPath(tilesetMetadata.tilesetRelPath);
     }
 
+    public async deleteTileset(id: string): Promise<Result> {
+        const tilesetMetadata = this.tilesetMetadata.get(id);
+        if (!tilesetMetadata) return Result.Error(`Tileset metadata not found for id: ${id}`);
+
+        if (this.loadedTilesets.has(id)) {
+            await this.unloadTileset(id);
+        }
+
+        const removeResult = await TilesetStorageService.remove(tilesetMetadata.tilesetRelPath);
+        if (removeResult.status !== Result.Status.Success) {
+            return Result.Error(`Failed to delete tileset file: ${removeResult.message}`);
+        }
+
+        this.tilesetMetadata.delete(id);
+
+        return Result.Success();
+    }
+
     public serialize(): TilesetMetadata[] {
         return Array.from(this.tilesetMetadata.values()).map((tilesetMetadata) => {
             const tileset = this.loadedTilesets.get(tilesetMetadata.id);

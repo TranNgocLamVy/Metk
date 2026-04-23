@@ -101,6 +101,16 @@ export class TilesetSessionManager {
         }
     }
 
+    public getSession(sessionId: string): TilesetSession | null {
+        return this.tilesetSessionMap.get(sessionId) || null;
+    }
+
+    public getSessionByTilesetId(tilesetId: string): TilesetSession | null {
+        const tilesetSessionId = this.tilesetMap.get(tilesetId);
+        if (!tilesetSessionId) return null;
+        return this.tilesetSessionMap.get(tilesetSessionId) || null;
+    }
+
     public getLastTilesetSessionId(): string | null {
         if (this.tilesetSessionIdStack.length === 0) return null;
         return this.tilesetSessionIdStack[this.tilesetSessionIdStack.length - 1] || null;
