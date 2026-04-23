@@ -6,6 +6,8 @@ import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 import { Result } from "../types/result";
 import { ToastService } from "./toastService";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
+import { useLayoutStore } from "@/view/stores/layoutStore";
+import { Model } from "flexlayout-react";
 
 export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
@@ -21,12 +23,20 @@ export class WorkspaceService {
 
         const project = loadProjectResult.data;
 
+        const loadLayoutResult = await appCore.layoutManager.loadLayout(project);
+        if (loadLayoutResult.status !== Result.Status.Success) {
+            ToastService.error({ message: loadLayoutResult.message });
+        } else {   
+            const workspaceLayout = loadLayoutResult.data;
+            useLayoutStore.getState().setModel(Model.fromJson(workspaceLayout));
+        }
+
         const loadWorkspaceResult = await appCore.workspaceManager.loadProjectWorkspace(project);
         if (loadWorkspaceResult.status !== Result.Status.Success) {
             ToastService.error({ message: loadWorkspaceResult.message });
             return loadWorkspaceResult;
         }
-
+        
         const workspace = loadWorkspaceResult.data;
 
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;

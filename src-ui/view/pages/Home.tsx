@@ -23,6 +23,7 @@ export default function HomePage() {
 	useEffect(() => {
 		appCore.projectManager.unLoadProject();
 		appCore.workspaceManager.unloadWorkspace();
+		appCore.layoutManager.unloadLayout();
 	}, [])
 
 	const { t: translate } = useTranslation([]);
