@@ -78,10 +78,10 @@ export class ProjectService {
         useProjectManagerStore.getState().refresh();
     }
 
-    public static removeProject(projectId: string): void {
+    public static async removeProject(projectId: string): Promise<void> {
         const projectManager = appCore.projectManager;
         projectManager.removeProjectMetadata(projectId);
-        projectManager.saveCurrrentProject();
+        await appCore.saveProjectManager();
         useProjectManagerStore.getState().refresh();
     }
 }

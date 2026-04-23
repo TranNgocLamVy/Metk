@@ -169,11 +169,17 @@ const DeleteGroup: MenuDropDownGroupType = [
         label: "workspace.tilemapEditor.contextMenu.delete",
         startIcon: <Trash2 />,
         variant: "destructive",
-		disabled() {
-			return true;
+		disabled: () => {
+			const editorContext = appCore.editorContext;
+			const currentTilemapSession = editorContext.getCurrentTilemapSession();
+			if (!currentTilemapSession) return true;
+			return false;
 		},
-        onClick() {
-            // TODO: Implement
+        onClick: () => {
+            const editorContext = appCore.editorContext;
+			const currentTilemapSession = editorContext.getCurrentTilemapSession();
+			if (!currentTilemapSession) return;
+			TilemapService.deleteTilemap(currentTilemapSession.tilemap.id);
         }
     },
 ];

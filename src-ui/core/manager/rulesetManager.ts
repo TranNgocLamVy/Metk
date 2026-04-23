@@ -62,8 +62,6 @@ export class RulesetManager {
         const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);
 
         if (loadRulesetResult.status !== Result.Status.Success) {
-            // TODO: Move ToastService outside of RuleManager
-            ToastService.error({ message: loadRulesetResult.message });
             return Result.Error(loadRulesetResult.message);
         }
 

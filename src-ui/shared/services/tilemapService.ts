@@ -68,6 +68,32 @@ export class TilemapService {
         WorkspaceService.createTilemapSession(tilemapData.id);
         
         ToastService.success({ message: "Tilemap created successfully" });
+    }
 
+    public static async deleteTilemap(tilemapId: string): Promise<void> {
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+        
+        if (!currentProject || !currentWorkspace) return;
+
+        const confirm = await DialogService.openPermissionDialog({
+            title: "Delete Tilemap", // TODO: i18n
+            description: "Are you sure you want to delete this tilemap? This action will permanently remove the file and cannot be undone."
+        });
+
+        if (!confirm) return;
+
+        const tilemapSession = currentWorkspace.tilemapSessionManager.getSessionByTilemapId(tilemapId);
+        if (tilemapSession) await WorkspaceService.closeTilemapSession(tilemapSession.id, true);
+
+        const deleteResult = await currentProject.tilemapManager.deleteTilemap(tilemapId);
+        if (deleteResult.status !== Result.Status.Success) {
+            ToastService.error({ message: deleteResult.message });
+            return;
+        }
+
+        await editorContext.projectManager.saveCurrrentProject();
+        ToastService.success({ message: "Tilemap deleted successfully" });
     }
 }

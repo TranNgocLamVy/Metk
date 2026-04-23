@@ -8,6 +8,7 @@ import { ToastService } from "./toastService";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import { useLayoutStore } from "@/view/stores/layoutStore";
 import { Model } from "flexlayout-react";
+import { DialogService } from "./dialogService";
 
 export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
@@ -183,20 +184,35 @@ export class WorkspaceService {
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static async closeTilemapSession(sessionId: string): Promise<void> {
-        const workspace = appCore.workspaceManager.currentWorkspace;
-        if (!workspace) return;
+    public static async closeTilemapSession(sessionId: string, force?: boolean): Promise<void> {
+        const currentProject = appCore.editorContext.currentProject;
+        const currentWorkspace = appCore.workspaceManager.currentWorkspace;
+        if (!currentProject || !currentWorkspace) return;
         
-        const tilemapSessionManager = workspace.tilemapSessionManager;
-        tilemapSessionManager.closeTilemapSession(sessionId);
+        const tilemapSessionManager = currentWorkspace.tilemapSessionManager;
+        const tilemapSession = tilemapSessionManager.getSession(sessionId);
+        if (!tilemapSession) return;
 
-        const lastSessionId = tilemapSessionManager.getLastTilemapSessionId();
-        if (lastSessionId) await WorkspaceService.openTilemapSession(lastSessionId);
+        const isDirty = tilemapSession.isDirty;
+        if (isDirty && !force) {
+            const saveResult = await DialogService.openSaveDialog({
+                title: "Do you want to save changes to the tilemap before closing it?", // TODO: i18n
+                description: "If you don't save, your changes will be lost.",
+            })
+            if (saveResult === "cancel") {
+                return;
+            } else if (saveResult === "save") {
+                await currentProject.tilemapManager.saveTilemap(tilemapSession.tilemap.id);
+            }
+        }
+        tilemapSessionManager.closeTilemapSession(sessionId);
 
         useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
+
+    //================ ruleset ================
     public static async selectRuleset(rulesetId: string | null): Promise<void> {
         const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
         if (!rulesetSessionManager) return;

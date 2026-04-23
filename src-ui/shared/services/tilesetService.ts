@@ -83,8 +83,4 @@ export class TilesetService {
     public static async editViewTileset(): Promise<void> {
 
     }
-
-    public static async deleteViewTileset(): Promise<void> {
-
-    }
 }

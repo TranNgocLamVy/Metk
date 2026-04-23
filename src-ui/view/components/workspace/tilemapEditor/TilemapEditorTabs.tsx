@@ -3,14 +3,12 @@ import { Fragment, useMemo, useRef } from "react";
 
 import { appCore } from "@/core/appcore";
 import { DialogService } from "@/shared/services/dialogService";
-import { ToastService } from "@/shared/services/toastService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
 import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 
 export default function TilemapEditorTabs() {
 	const ref = useRef<HTMLDivElement>(null);
@@ -28,24 +26,27 @@ export default function TilemapEditorTabs() {
 	}, [version, getCurrentTilemapSessionId]);
 
 	return (
-		<HStack className="w-full h-fit bg-surface pr-1" justify="start" align="center">
-			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar w-full h-8 bg-surface-sunken">
+		<HStack className="w-full h-fit bg-surface pr-1 relative z-10" justify="start" align="center">
+            <style>{`.tm_tab::after { content: ""; position: absolute; bottom: 0; left: 4px; width: calc(100% - 4px); height: 2px; background-color: var(--foreground); }`}</style>
+			<div ref={ref} className="flex flex-row items-center overflow-x-auto scroll-smooth no-scrollbar w-full h-8 bg-surface-sunken">
 				{tilemapSession.map((session) => {
 					const isCurrent = currentSessionId === session.sessionId;
 					const isDirty = session.isDirty;
+                    
 					const openTilemapSession = () => {
 						if (isCurrent) return;
 						WorkspaceService.openTilemapSession(session.sessionId);
 					};
+                    
 					const closeTilemapSession = async (e: any) => {
 						e.stopPropagation();
 						if (isDirty) {
 							const saveResult = await DialogService.openSaveDialog({
 								title: "Do you want to save changes to the tilemap before closing it?",
 								description: "If you don't save, your changes will be lost.",
-							})
+							});
 							if (saveResult === "save") {
-								const commandManager = appCore.systemCommandManager
+								const commandManager = appCore.systemCommandManager;
 								await commandManager.execute("project.save");
 								WorkspaceService.closeTilemapSession(session.sessionId);
 							} else if (saveResult === "not save") {
@@ -55,9 +56,15 @@ export default function TilemapEditorTabs() {
 							WorkspaceService.closeTilemapSession(session.sessionId);
 						}
 					};
+                    
 					return (
-						<Button variant={"empty"} key={session.sessionId} onClick={openTilemapSession} size={"sm"} className={`group h-full pr-1 rounded-none cursor-pointer border-none ${isCurrent ? "text-foreground bg-surface tm_tab relative" : "text-muted-foreground hover:text-foreground bg-transparent"}`}>
-							<style>{`.tm_tab::after { content: ""; position: absolute; bottom: 0; left: 4px; width: calc(100% - 4px); height: 2px; background-color: var(--foreground); }`}</style>
+						<Button 
+                            variant={"empty"} 
+                            key={session.sessionId} 
+                            onClick={openTilemapSession} 
+                            size={"sm"} 
+                            className={`group relative h-full pr-1 rounded-none cursor-pointer border-none ${isCurrent ? "text-foreground bg-surface tm_tab" : "text-muted-foreground hover:text-foreground bg-transparent"}`}
+                        >
 							{session.name}
 							<div className="group/icon ml-1 flex w-6 h-6 items-center justify-center rounded-md hover:bg-surface-sunken" onClick={closeTilemapSession}>
 								{isDirty ? (
