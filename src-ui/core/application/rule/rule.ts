@@ -1,4 +1,4 @@
-import { RuleData, RuleOutputData, RuleConstraintType, RuleConstraintData } from "@/shared/schema/ruleSchema";
+import { RuleData, RuleOutputData, RuleConstraintType, RuleConstraintData } from "@/shared/schema/rulesetSchema";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
 import { RulesetRefData } from "@/shared/schema/layerSchema";

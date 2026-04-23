@@ -4,7 +4,7 @@ import { type } from "arktype";
 import { TilemapMetadataSchema } from "./tilemapSchema";
 import { TilesetMetadataSchema } from "./tilesetSchema";
 import { safeArray } from ".";
-import { RulesetMetadataSchema } from "./ruleSchema";
+import { RulesetMetadataSchema } from "./rulesetSchema";
 
 export const ProjectDataSchema = type("string.json.parse").to({
     id: type("string"),

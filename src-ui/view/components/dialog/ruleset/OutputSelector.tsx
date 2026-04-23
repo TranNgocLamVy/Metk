@@ -27,7 +27,7 @@ export default function OutputSelector() {
     }, [session])
 
     useEffect(() => {
-        if (session.pixiApp && usedTilesets.length > 0) selectTileset(usedTilesets[0].id);
+        if (session.pixiApp && usedTilesets.refs.length > 0) selectTileset(usedTilesets.refs[0].id);
     }, [session, version])
 
     const [activeTilesetId, setActiveTilesetId] = useState<string | null>(null);
@@ -78,7 +78,7 @@ export default function OutputSelector() {
                 <TilesetSelector selectTileset={selectTileset} />
                 <ScrollArea className="flex-1 whitespace-nowrap bg-surface-base">
                     <HStack className="flex">
-                        {usedTilesets.map((tilesetRef) => (
+                        {usedTilesets.refs.map((tilesetRef) => (
                             <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant={"empty"} size={"sm"} className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
                                 <style>{`.rs_tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: calc(100%); height: 2px; background-color: var(--foreground); }`}</style>
                                 {tilesetRef.name}

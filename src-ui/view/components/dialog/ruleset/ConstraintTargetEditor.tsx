@@ -3,7 +3,7 @@ import { VStack } from "../../custom/stack/Stack";
 import { useCallback, useMemo } from "react";
 import { Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import { appCore } from "@/core/appcore";
-import { RuleConstraintType } from "@/shared/schema/ruleSchema";
+import { RuleConstraintType } from "@/shared/schema/rulesetSchema";
 
 type ConstraintTargetEditorProps = {
     selectedGrid: number;

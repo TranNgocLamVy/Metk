@@ -45,8 +45,8 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilewidth = tilemapData.tilewidth;
         this.tileheight = tilemapData.tileheight;
         
-        this.tilesetRefManager.load(tilemapData.tilesets);
-        this.rulesetRefManager.load(tilemapData.rulesets);
+        this.tilesetRefManager.load(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
+        this.rulesetRefManager.load(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
 
         this.rootLayer = new RootLayer(
             tilemapData.layers, 

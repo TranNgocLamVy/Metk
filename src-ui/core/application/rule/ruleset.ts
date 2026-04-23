@@ -1,5 +1,5 @@
 import { Rule } from "./rule";
-import { RuleOutputData, RulesetData } from "@/shared/schema/ruleSchema";
+import { RuleOutputData, RulesetData } from "@/shared/schema/rulesetSchema";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
@@ -32,7 +32,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.size = ruleData.size;
         this.rules = ruleData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager));
 
-        this.tilesetRefManager.load(ruleData.tilesets);
+        this.tilesetRefManager.load(ruleData.tilesets.refs, ruleData.tilesets.nextIndex);
     }
 
     public updateRuleset(rulesetData: RulesetData): void {
@@ -44,8 +44,8 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.name = rulesetData.name;
         this.color = rulesetData.color;
 
-        this.tilesetRefManager.load(rulesetData.tilesets);
-        this.rulesetRefManager.load(rulesetData.rulesets);
+        this.tilesetRefManager.load(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
+        this.rulesetRefManager.load(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
 
         const processedRuleIds = new Set<string>();
 

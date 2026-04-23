@@ -45,8 +45,8 @@ export class TilemapService {
             width: form.options.map.mapwidth,
             tilewidth: form.options.tile.tilewidth,
             tileheight: form.options.tile.tileheight,
-            tilesets: [],
-            rulesets: [],
+            tilesets: { refs: [], nextIndex: 0 },
+            rulesets: { refs: [], nextIndex: 0 },
             layers: [],
         }
 

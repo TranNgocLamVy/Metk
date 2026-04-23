@@ -6,7 +6,7 @@ import { ArkTypeJsonSerializer } from "./arkTypeJsonSerializer";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { TilesetData, TilesetDataSchema } from "@/shared/schema/tilesetSchema";
 import { WorkpsaceData, WorkpsaceDataSchema } from "@/shared/schema/workspaceSchema";
-import { RulesetData, RulesetDataSchema } from "@/shared/schema/ruleSchema";
+import { RulesetData, RulesetDataSchema } from "@/shared/schema/rulesetSchema";
 import { IJsonModel } from "flexlayout-react";
 
 export const TauriFileStorage = new TauriFileSystemProvider();

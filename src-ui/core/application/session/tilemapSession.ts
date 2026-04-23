@@ -56,7 +56,7 @@ export class TilemapSession implements IBaseSession {
     }
 
     public async loadTilemapSession(): Promise<void> {
-        const tilesetIds = this.tilemap.tilesetRefManager.serialize().map(r => r.id);
+        const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
         const currentProject = this.editorContext.currentProject;
         if (!currentProject) return;
         const tilesetManager = currentProject.tilesetManager;
@@ -108,7 +108,7 @@ export class TilemapSession implements IBaseSession {
     }
 
     public destroy() {
-        const tilesetIds = this.tilemap.tilesetRefManager.serialize().map(r => r.id);
+        const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
         const textureManager = this.editorContext.textureManager;
         for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id);
 
