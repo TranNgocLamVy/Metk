@@ -11,7 +11,7 @@ type FilePickerProps = {
 	name: string;
 	label: string;
 	placeholder?: string;
-	defaultValue?: string;
+	defaultDir?: string;
 	required?: boolean;
 	multiple?: boolean;
     filter?: FileFilter;
@@ -21,11 +21,12 @@ type FilePickerProps = {
 
 export default function FilePickerField(props: FilePickerProps) {
 	const { t: translate } = useTranslation([]);
-	const { id, name, label, placeholder, required, multiple, filter, value, handleChange } = props;
+	const { id, name, label, placeholder, defaultDir, required, multiple, filter, value, handleChange } = props;
 
 	const selectFile = async () => {
 		const path = await FileDialogUtils.open({
             directory: false, // Only allow selecting files
+			defaultPath: defaultDir,
             multiple: multiple ?? false, // Prevent multiple selection
             filters: filter ? [
                 {

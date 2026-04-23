@@ -1,7 +1,7 @@
 import { WorkpsaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
-import { ExportPathManager } from "../manager/exportPathManager";
+import { SavedPathManager } from "../manager/savedPathManager";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilemapSessionManager } from "../manager/tilemapSessionManager";
 import { TilesetManager } from "../manager/tilesetManager";
@@ -16,7 +16,7 @@ export class Workspace {
     public tilemapSessionManager: TilemapSessionManager;
     public rulesetSessionManager: RulesetSessionManager;
     public toolSessionManager: ToolSessionManager;
-    public exportPathManager: ExportPathManager;
+    public savedPathManager: SavedPathManager;
 
     constructor (
         workspaceData: WorkpsaceData, 
@@ -29,7 +29,7 @@ export class Workspace {
         this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
         this.rulesetSessionManager = new RulesetSessionManager(workspaceData.ruleset, this.editorContext);
         this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorContext);
-        this.exportPathManager = new ExportPathManager(workspaceData.exportPaths);
+        this.savedPathManager = new SavedPathManager(workspaceData.savedPath);
     }
 
     public async loadSession(): Promise<Result> {
@@ -50,7 +50,7 @@ export class Workspace {
             tilesets: this.tilesetSessionManager.serialize(),
             tilemaps: this.tilemapSessionManager.serialize(),
             toolState: this.toolSessionManager.serialize(),
-            exportPaths: this.exportPathManager.serialize(),
+            savedPath: this.savedPathManager.serialize(),
             ruleset: this.rulesetSessionManager.serialize(),
         }
     }

@@ -15,7 +15,7 @@ import { ExportStorageService } from "../../../infrastructure/exportStorageServi
     shortcuts: ["Ctrl+E"],
     when: "inWorkspace && !isModalOpen",
 })
-export class ExportTilemapCommand implements ISystemCommand {
+export class ExportTilemapTMXCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {
         const workspace = context.currentWorkspace;
         if (!workspace) return Result.Error("No workspace");
@@ -25,7 +25,7 @@ export class ExportTilemapCommand implements ISystemCommand {
         const tilemap = tilemapSession.tilemap;
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const exportPathManager = workspace.exportPathManager;
+        const exportPathManager = workspace.savedPathManager;
         let exportPath = exportPathManager.getExportPath(tilemap.id);
         if (!exportPath) {
             const savePath = await save({
