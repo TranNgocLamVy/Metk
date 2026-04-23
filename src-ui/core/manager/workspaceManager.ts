@@ -5,6 +5,7 @@ import { EditorContext } from "../application/editorContext";
 import { Project } from "../application/project";
 import { Workspace } from "../application/workspace";
 import { WorkspaceStorageService } from "@/infrastructure/container";
+import { PathUtils } from "@/shared/utils/pathUtils";
 
 export class WorkspaceManager {
     public currentWorkspace: Workspace | null = null;
@@ -19,7 +20,7 @@ export class WorkspaceManager {
         if (this.currentWorkspace) await this.currentWorkspace.destroy();
         this.currentWorkspace = null;
 
-        const workspaceAbsPath = project.projectPathSystem.getAbsPathFromRelPath("session.ss.json");
+        const workspaceAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "session.json"));
         const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
         if (loadSessionResult.status === Result.Status.Success) {
             this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
@@ -39,7 +40,7 @@ export class WorkspaceManager {
     public async saveCurrentWorkspace(): Promise<Result> {
         if (!this.currentWorkspace) return Result.Error("No current workspace");
         const workspaceData = this.currentWorkspace.serialize();
-        const workspaceAbsPath = this.currentWorkspace.projectPathSystem.getAbsPathFromRelPath("session.ss.json");
+        const workspaceAbsPath = this.currentWorkspace.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "session.json"));
         return await WorkspaceStorageService.save(workspaceAbsPath, workspaceData);
     }
 }
