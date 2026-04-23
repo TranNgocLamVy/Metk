@@ -55,8 +55,8 @@ export default function HomePage() {
 									{project.name}
 								</Button>
 								<h3 className="text-xs text-foreground cursor-default">{project.directory}</h3>
-								<Button size={"icon-xs"} variant={"ghost"} onClick={() => ProjectService.removeProject(project.id)}>
-									<X size={20} className="text-foreground/50 hover:text-foreground ml-auto hidden group-hover:block" />
+								<Button size={"icon-xs"} variant={"ghost"} onClick={() => ProjectService.removeProject(project.id)} className="ml-auto">
+									<X className="text-foreground/50 hover:text-foreground hidden group-hover:block" />
 								</Button>
 							</HStack>
 						);

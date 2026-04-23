@@ -49,13 +49,19 @@ const Group3: MenuDropDownGroupType = [
     {
         type: "option",
         label: "workspace.tilesetSelector.contextMenu.delete",
-        startIcon: <Trash2/>,
+        startIcon: <Trash2 />,
         variant: "destructive",
         disabled() {
-            return true;
+            const editorContext = appCore.editorContext;
+            const currentTilesetSession = editorContext.getCurrentTilesetSession();
+            if (!currentTilesetSession) return true;
+            return false;
         },
         onClick() {
-            // TODO: Implement
+            const editorContext = appCore.editorContext;
+            const currentTilesetSession = editorContext.getCurrentTilesetSession();
+            if (!currentTilesetSession) return;
+            TilesetService.deleteTileset(currentTilesetSession.tileset.id); 
         }
     },
 ];

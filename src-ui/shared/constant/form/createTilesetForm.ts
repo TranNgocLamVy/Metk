@@ -3,7 +3,7 @@ import { FormUtils } from "@/shared/utils/formUtils";
 export const createTilesetForm = (textureDefaultDir?: string) => {
     return FormUtils.createForm({
         title: "form.tileset.title",
-        okText: "form.tileset.action.create",
+        okText: "form.tileset.action.saveAs",
         cancelText: "form.tileset.action.cancel",
         size: "md",
         inputs: [

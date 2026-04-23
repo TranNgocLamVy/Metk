@@ -128,6 +128,10 @@ export class WorkspaceService {
         if (!workspace) return;
 
         const tilesetSessionManager = workspace.tilesetSessionManager;
+
+        const tilesetSession = tilesetSessionManager.getSession(sessionId);
+        if (!tilesetSession) return;
+
         tilesetSessionManager.closeTilesetSession(sessionId);
 
         const lastSessionId = tilesetSessionManager.getLastTilesetSessionId();

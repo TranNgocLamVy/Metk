@@ -75,7 +75,13 @@ export class RulesetService {
             return;
         }
 
-        const confirmDelete = await DialogService.openPermissionDialog({ title: "Delete Ruleset", description: `Are you sure you want to delete "${rulesetMetadata.name}" Ruleset?`, okText: "Delete", okButtonVariant: "destructive", cancelText: "Cancel" });
+        const confirmDelete = await DialogService.openPermissionDialog({ 
+            title: "Delete Ruleset", 
+            description: `Are you sure you want to delete "${rulesetMetadata.name}" Ruleset?`, 
+            okText: "Delete", 
+            okButtonVariant: "destructive", 
+            cancelText: "Cancel" 
+        });
 
         if (!confirmDelete) return;
 

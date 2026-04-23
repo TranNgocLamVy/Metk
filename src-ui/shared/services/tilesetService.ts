@@ -26,7 +26,7 @@ export class TilesetService {
         } else {
             defaultTextureDir = currentProject.projectPathSystem.absDir;
         }
-        
+
         const form = await DialogService.openFormDialog(createTilesetForm(defaultTextureDir));
         if (!form) return;
 
@@ -80,7 +80,33 @@ export class TilesetService {
         ToastService.success({ message: "Tileset created successfully" });
     }
 
-    public static async editViewTileset(): Promise<void> {
+    public static async editTileset(): Promise<void> {
 
+    }
+
+    public static async deleteTileset(tilesetId: string): Promise<void> {
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return;
+
+        const confirm = await DialogService.openPermissionDialog({
+            title: "Delete Tileset", // TODO: i18n
+            description: "Are you sure you want to delete this tileset? This action will permanently remove the file and cannot be undone."
+        });
+
+        if (!confirm) return;
+
+        const tilesetSession = currentWorkspace.tilesetSessionManager.getSessionByTilesetId(tilesetId);
+        if (tilesetSession) await WorkspaceService.closeTilesetSession(tilesetSession.id);
+
+        const deleteResult = await currentProject.tilesetManager.deleteTileset(tilesetId);
+        if (deleteResult.status !== Result.Status.Success) {
+            ToastService.error({ message: deleteResult.message });
+            return;
+        }
+
+        await editorContext.projectManager.saveCurrrentProject();
     }
 }

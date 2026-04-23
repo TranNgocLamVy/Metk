@@ -1,4 +1,25 @@
 {
+    "global": {
+        "action": {
+            "ok": "OK",
+            "cancel": "Cancel",
+            "save": "Save",
+            "create": "Create",
+            "remove": "Remove",
+            "delete": "Delete",
+            "import": "Import",
+            "export": "Export",
+            "close": "Close",
+            "open": "Open",
+            "apply": "Apply",
+            "reset": "Reset",
+            "undo": "Undo",
+            "redo": "Redo",
+            "cut": "Cut",
+            "copy": "Copy",
+            "paste": "Paste"            
+        }
+    },
     "menu": {
         "file": {
             "label": "File",
