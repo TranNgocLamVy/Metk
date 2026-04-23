@@ -1,10 +1,10 @@
 import "@/assets/style/flexLayout/workspace.css";
 
-import { Action, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
-import { useRef } from "react";
+import { Action, IJsonModel, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
+import { useEffect, useRef } from "react";
 
 import { useRelativeFlexLayout } from "@/view/hooks/useRelativeFlexLayout";
-import { useWorkspaceDockStore } from "@/view/stores/workspaceDockStore";
+import { useLayoutStore } from "@/view/stores/layoutStore";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import ContextBar from "./ContextBar";
@@ -14,16 +14,15 @@ import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
 import { useTranslation } from "react-i18next";
 import { useContextScope } from "@/view/hooks/useContextScope";
+import { appCore } from "@/core/appcore";
 
 export default function Workspace() {
-	const layoutRef = useRef<Layout | null>(null);
-
-	useContextScope("inWorkspace", true);
-
-	const { model } = useWorkspaceDockStore();
-
 	const { t: translate } = useTranslation([]);
 
+	const { model, setModel } = useLayoutStore();
+	const layoutRef = useRef<Layout | null>(null);
+	
+	useContextScope("inWorkspace", true);
 	useRelativeFlexLayout(layoutRef);
 
 	const factory = (node: TabNode) => {
@@ -67,7 +66,7 @@ export default function Workspace() {
 	}
 
 	const onModelChange = (model: Model, action: Action) => {
-		localStorage.setItem("workspaceLayout", JSON.stringify(model.toJson()));
+		appCore.layoutManager.updateLayout(model.toJson());
 	};
 
 	return (

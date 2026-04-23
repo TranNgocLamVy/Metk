@@ -11,6 +11,7 @@ import { ProjectMetadataRepo } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 import { TextureManager } from "./manager/textureManager";
 import { ContextManager } from "./manager/contextManager";
+import { LayoutManager } from "./manager/layoutManager";
 
 
 export class AppCore {
@@ -18,7 +19,8 @@ export class AppCore {
     private isLoaded: boolean = false;
     public readonly projectManager: ProjectManager;
     public readonly workspaceManager: WorkspaceManager;
-    public systemCommandManager: SystemCommandManager;
+    public readonly layoutManager: LayoutManager;
+    public readonly systemCommandManager: SystemCommandManager;
     public readonly toolManager: ToolManager;
     public readonly contextManager: ContextManager;
     public readonly keybindingManager: KeybindingManager;
@@ -31,6 +33,7 @@ export class AppCore {
         // Init Managers
         this.projectManager = new ProjectManager();
         this.workspaceManager = new WorkspaceManager();
+        this.layoutManager = new LayoutManager();
         this.toolManager = new ToolManager();
         this.textureManager = new TextureManager();
         this.editorContext = new EditorContext(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager);
