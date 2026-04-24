@@ -73,7 +73,6 @@ export class TilemapSessionManager {
         if (this.currentTilemapSession) {
             this.currentTilemapSession.sessionView.unActivateSession();
         }
-        pixiApp.stage.removeChildren(); 
 
         this.currentTilemapSession = tilemapSession;
         
