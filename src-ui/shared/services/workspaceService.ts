@@ -24,6 +24,13 @@ export class WorkspaceService {
 
         const project = loadProjectResult.data;
 
+        const loadWorkspaceResult = await appCore.workspaceManager.loadProjectWorkspace(project);
+        if (loadWorkspaceResult.status !== Result.Status.Success) {
+            ToastService.error({ message: loadWorkspaceResult.message });
+            return loadWorkspaceResult;
+        }
+        const workspace = loadWorkspaceResult.data;
+
         const loadLayoutResult = await appCore.layoutManager.loadLayout(project);
         if (loadLayoutResult.status !== Result.Status.Success) {
             ToastService.error({ message: loadLayoutResult.message });
@@ -31,15 +38,7 @@ export class WorkspaceService {
             const workspaceLayout = loadLayoutResult.data;
             useLayoutStore.getState().setModel(Model.fromJson(workspaceLayout));
         }
-
-        const loadWorkspaceResult = await appCore.workspaceManager.loadProjectWorkspace(project);
-        if (loadWorkspaceResult.status !== Result.Status.Success) {
-            ToastService.error({ message: loadWorkspaceResult.message });
-            return loadWorkspaceResult;
-        }
         
-        const workspace = loadWorkspaceResult.data;
-
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         const tilesetSessionManager = workspace.tilesetSessionManager;
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
