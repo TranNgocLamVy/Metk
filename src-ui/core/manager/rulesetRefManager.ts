@@ -1,7 +1,6 @@
 import { RulesetMetadata, RulesetRefData } from "@/shared/schema/rulesetSchema";
 import { RulesetManager } from "./rulesetManager";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
-import { PathUtils } from "@/shared/utils/pathUtils";
 
 
 
@@ -16,24 +15,42 @@ export class RulesetRefManager {
 
     public load(rulesetRefs: RulesetRefData[], nextIndex: number) {
         this.rulesetRefs = rulesetRefs;
-        this.nextIndex = nextIndex;
+        this.nextIndex = nextIndex ?? 0;
+    }
+
+    public addRulesetToRefs(rulesetId: string): void {
+        if (this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId)) return;
+        const ruleset = this.rulesetManager.getRulesetMetadataById(rulesetId);
+        if (!ruleset) return;
+        this.rulesetRefs.push({ index: this.nextIndex, id: ruleset.id, name: ruleset.name });
+        this.nextIndex += 1;
+    }
+
+    public removeRulesetFromRefs(rulesetId: string): void {
+        const rulesetRefIndex = this.getRulesetRefIndex(rulesetId);
+        if (rulesetRefIndex === -1) return;
+        this.rulesetRefs = this.rulesetRefs.filter(rulesetRef => rulesetRef.id !== rulesetId);
+    }
+
+    public replaceRulesetRef(rulesetId: string, newRulesetId: string): void {
+        const rulesetRefIndex = this.getRulesetRefIndex(rulesetId);
+        if (rulesetRefIndex === -1) return;
+        this.rulesetRefs[rulesetRefIndex].id = newRulesetId;
+    }
+
+    public getRulesetRefIndex(rulesetId: string): number {
+        const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId);
+        if (!rulesetRef) this.addRulesetToRefs(rulesetId);
+        return this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId)!.index;
     }
 
     public getRulesetIndex(ruleset: RulesetMetadata): number {
         const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.id === ruleset.id);
         if (!rulesetRef) {
-            const rulesetAbsPath = this.rulesetManager.getRulesetAbsById(ruleset.id);
-            if (!rulesetAbsPath) return -1;
-
-            const absDir = this.filePathSystem.getFileAbsDir();
-        
-            const rulesetRelPath = PathUtils.relative(absDir, rulesetAbsPath);
-
             const newRulesetRef: RulesetRefData = {
                 index: this.nextIndex,
                 id: ruleset.id,
                 name: ruleset.name,
-                source: rulesetRelPath,
             }
             this.rulesetRefs.push(newRulesetRef);
             this.nextIndex += 1;

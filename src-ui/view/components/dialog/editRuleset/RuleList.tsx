@@ -1,32 +1,21 @@
-
+// src-ui/view/components/dialog/RuleList.tsx
 import { useEffect, useMemo, useRef } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
-import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { Copy, EllipsisVertical, GripHorizontal, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
-import { Rule } from "@/core/application/rule/rule";
 import { appCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 import PixiImage from "../../custom/PixiImage";
+import { useEditRuleset } from "./EditRulesetContext";
+import { Rule } from "@/core/application/rule/rule";
 
-
-export default function RuleList() {
-    const { version, session, setSelectedRule } = useEditRulesetStore();
-    
+export default function RuleList() {    
+    const { ruleset, version } = useEditRuleset();
     const bottomRef = useRef<HTMLDivElement>(null);
     const prevLengthRef = useRef(0);
 
-    const ruleList = useMemo(() => {
-        const ruleset = session.ruleset;
-        return ruleset.getAllRules();
-    }, [version, session]);
-
-    useEffect(() => {
-        const rules = session.ruleset.getAllRules();
-        if (rules.length > 0) setSelectedRule(rules[0].id);
-        prevLengthRef.current = rules.length;
-    }, []); 
+    const ruleList = useMemo(() => ruleset.getAllRules(), [ruleset, version]);
 
     useEffect(() => {
         if (ruleList.length > prevLengthRef.current) {
@@ -38,9 +27,9 @@ export default function RuleList() {
     return (
         <ScrollArea className="w-auto h-full overflow-hidden">
             <VStack className="w-full h-full">
-                {ruleList.map((rule, index) => {
-                    return <RuleItem key={rule.id} rule={rule} index={index} />;
-                })}
+                {ruleList.map((rule, index) => (
+                    <RuleItem key={rule.id} rule={rule} index={index} />
+                ))}
                 <div ref={bottomRef} />
             </VStack>
         </ScrollArea>
@@ -48,25 +37,14 @@ export default function RuleList() {
 }
 
 function RuleItem({ rule, index }: { rule: Rule, index: number }) {
-    const { session, version, setSelectedRule } = useEditRulesetStore();
+    const { ruleset, selectedRuleId, setSelectedRuleId, version, refresh } = useEditRuleset();
 
-    const selectedRuleId = useMemo(() => {
-        return session.getSelectedRule()?.id;
-    }, [session, version])
-
-    const pixiApp = useMemo(() => {
-        return session.pixiApp;
-    }, [session, version]);
-
-    const ruleOutputs = useMemo(() => {
-        return rule.getOutputs();
-    }, [session, version])
+    const ruleOutputs = useMemo(() => rule.getOutputs(), [rule, version]);
 
     return (
         <HStack
-            key={rule.id}
             align="center"
-            onClick={() => setSelectedRule(rule.id)}
+            onClick={() => setSelectedRuleId(rule.id)}
             draggable
             className={`w-full h-12 p-2 flex gap-4 ${selectedRuleId === rule.id ? "bg-accent text-accent-foreground" : "bg-surface-base hover:bg-accent/50 hover:text-accent-foreground"}`}
         >
@@ -74,43 +52,39 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
             {index + 1}
             <RuleToolTip rule={rule}>
                 <div className="size-8 border border-foreground/20">
-                    {pixiApp && ruleOutputs.length > 0 && (() => {
+                    {ruleOutputs.length > 0 && (() => {
                         const firstOutput = ruleOutputs[0];
-                        const tilesetId = session.ruleset.tilesetRefManager.getTilesetIdByIndex(firstOutput.tilesetIndex);
+                        const tilesetId = ruleset.tilesetRefManager.getTilesetIdByIndex(firstOutput.tilesetIndex);
                         if (!tilesetId) return null;
                         const textureManager = appCore.editorContext.textureManager;
                         const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                         if (!tilesetTexture) return null;
-                        return <PixiImage texture={tilesetTexture} pixiApp={pixiApp} />
+                        return <PixiImage texture={tilesetTexture} />;
                     })()}
                 </div>
             </RuleToolTip>
             <RuleDropdown rule={rule} />
         </HStack>
-    )
+    );
 }
 
 function RuleDropdown({ rule }: { rule: Rule }) {
-    const { session, refresh } = useEditRulesetStore();
-
-    const ruleset = useMemo(() => {
-        return session.ruleset;
-    }, [session])
+    const { ruleset, refresh } = useEditRuleset();
 
     const handleDuplicate = () => {
-        // TODO: 
+        ruleset.duplicateRule(rule.id);
         refresh();
-    }
+    };
 
     const handleDelete = () => {
         ruleset.removeRule(rule);
         refresh();
-    }
+    };
 
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-                <div className="size-8 flex items-center justify-center ml-auto hover:bg-foreground/10" onClick={(e) => { e.stopPropagation() }}>
+                <div className="size-8 flex items-center justify-center ml-auto hover:bg-foreground/10" onClick={(e) => e.stopPropagation()}>
                     <EllipsisVertical size={16} />
                 </div>
             </DropdownMenuTrigger>
@@ -125,25 +99,16 @@ function RuleDropdown({ rule }: { rule: Rule }) {
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
-    )
+    );
 }
 
-function RuleToolTip({ rule, children }: { rule: Rule, children: React.ReactNode }) {
-
+function RuleToolTip({ children }: { rule: Rule, children: React.ReactNode }) {
     return (
         <Tooltip delayDuration={500}>
-            <TooltipTrigger asChild>
-                {children}
-            </TooltipTrigger>
-            <TooltipContent
-                side="bottom"
-                sideOffset={8}
-                className="w-80 h-40 bg-secondary-background border border-foreground/20 shadow-lg"
-            >
-                <HStack>
-
-                </HStack>
+            <TooltipTrigger asChild>{children}</TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={8} className="w-80 h-40 bg-secondary-background border border-foreground/20 shadow-lg">
+                <HStack></HStack>
             </TooltipContent>
         </Tooltip>
-    )
+    );
 }

@@ -35,7 +35,6 @@ export type TilesetMetadata = typeof TilesetMetadataSchema.infer
 
 export const TilesetRefDataSchema = type({
     index: type("number"),
-    source: type("string"),
     id: type("string"),
     name: type("string").default("Untitled Tileset"),
 })

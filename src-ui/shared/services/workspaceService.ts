@@ -31,13 +31,14 @@ export class WorkspaceService {
         }
         const workspace = loadWorkspaceResult.data;
 
-        const loadLayoutResult = await appCore.layoutManager.loadLayout(project);
-        if (loadLayoutResult.status !== Result.Status.Success) {
-            ToastService.error({ message: loadLayoutResult.message });
-        } else {   
-            const workspaceLayout = loadLayoutResult.data;
-            useLayoutStore.getState().setModel(Model.fromJson(workspaceLayout));
-        }
+        // const loadLayoutResult = await appCore.layoutManager.loadLayout(project);
+        // if (loadLayoutResult.status !== Result.Status.Success) {
+        //     ToastService.error({ message: loadLayoutResult.message });
+        // } else {   
+        //     const workspaceLayout = loadLayoutResult.data;
+        //     useLayoutStore.getState().setModel(Model.fromJson(workspaceLayout));
+        // }
+        // FIXME: handle load layout;
         
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         const tilesetSessionManager = workspace.tilesetSessionManager;

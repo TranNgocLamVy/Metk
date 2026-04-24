@@ -73,22 +73,15 @@ export class TilemapManager {
         await Promise.all(tilemapData.tilesets.refs.map(tilesetRef => {
             if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
                 return this.tilesetManager.loadTileset({ id: tilesetRef.id })
-            } else {
-                addMoreTileset = true;
-                const tilesetAbsPath = tilemapPathSystem.getAbsPathFromRelPath(tilesetRef.source);
-                const tilesetRelPathFromProject = this.projectPathSystem.getRelPathFromAbsPath(tilesetAbsPath);
-                return this.tilesetManager.loadTileset({ tilesetRelPath: tilesetRelPathFromProject });
             }
+            // TODO: Handle unknown tileset
         }));
 
         await Promise.all(tilemapData.rulesets.refs.map(rulesetRef => {
-            if (this.rulesetManager.rulesetMetadata.has(rulesetRef.id)) {
+            if (this.rulesetManager.rulesetMetadatas.has(rulesetRef.id)) {
                 return this.rulesetManager.loadRuleset(rulesetRef.id)
-            } else {
-                const rulesetAbsPath = tilemapPathSystem.getAbsPathFromRelPath(rulesetRef.source);
-                const rulesetRelPathFromProject = this.projectPathSystem.getRelPathFromAbsPath(rulesetAbsPath);
-                return this.rulesetManager.loadRuleset(rulesetRelPathFromProject);
             }
+            // TODO: Handle unknown ruleset
         }));
 
         return Result.Success(tilemap);

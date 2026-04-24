@@ -43,7 +43,7 @@ export class LayoutManager {
     }
 
     private async performSave(): Promise<Result> {
-        if (!this.project || !this.layoutData) return Result.Error("No layout or project loaded");
+        if (!this.project || !this.layoutData) return Result.Cancel();
 
         const layoutAbsPath = this.project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "layout.json"));
         return await LayoutStorageService.save(layoutAbsPath, this.layoutData);

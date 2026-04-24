@@ -1,44 +1,38 @@
+// src-ui/view/components/dialog/RuleHeader.tsx
 import { useState } from "react";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
 import { SketchPicker } from "react-color";
 import { Button } from "../../shadcn/button";
 import { Plus } from "lucide-react";
-import { useEditRulesetStore } from "@/view/stores/editRulesetStore";
+import { useEditRuleset } from "./EditRulesetContext";
 
 export default function RuleHeader() {
-    const { session, refresh } = useEditRulesetStore();
-
-    const [tempName, setTempName] = useState(session!.ruleset.name);
-    const [tempColor, setTempColor] = useState(session!.ruleset.color);
+    const { ruleset, refresh } = useEditRuleset();
+    const [tempName, setTempName] = useState(ruleset.name);
+    const [tempColor, setTempColor] = useState(ruleset.color);
 
     const handleRename = () => {
-        if (tempName.trim() == "") {
-            setTempName(session!.ruleset.name);
+        if (tempName.trim() === "") {
+            setTempName(ruleset.name);
         } else {
-            session.ruleset.name = tempName;
+            ruleset.name = tempName;
         }
+        refresh();
     };
 
     const addRule = () => {
-        session.ruleset.addEmptyRule();
+        ruleset.addEmptyRule();
         refresh();
-    }
+    };
 
     const customStyles = {
-        default: {
-            picker: {
-                width: '220px',
-                padding: '0px',
-                boxShadow: '0 0 0 0',
-                background: 'var(--background)'
-            }
-        }
+        default: { picker: { width: '220px', padding: '0px', boxShadow: '0 0 0 0', background: 'var(--background)' } }
     };
 
     return (
         <HStack className="gap-2 w-full">
-            <DropdownMenu onOpenChange={() => session!.ruleset.color = tempColor} modal={false}>
+            <DropdownMenu onOpenChange={() => { ruleset.color = tempColor; refresh(); }} modal={false}>
                 <DropdownMenuTrigger asChild>
                     <div className="h-full aspect-square" style={{ backgroundColor: tempColor }} />
                 </DropdownMenuTrigger>
@@ -53,12 +47,12 @@ export default function RuleHeader() {
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 onBlur={handleRename}
-                onKeyDown={(e) => { if (e.key === "Enter") handleRename() }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleRename(); }}
                 className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-overlay-sunken"
             />
-            <Button size={"icon"} variant={"ghost"} onClick={addRule} className="h-full aspect-square">
+            <Button size="icon" variant="ghost" onClick={addRule} className="h-full aspect-square">
                 <Plus />
             </Button>
         </HStack>
-    )
+    );
 }

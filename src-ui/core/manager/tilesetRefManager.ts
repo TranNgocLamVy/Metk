@@ -21,18 +21,10 @@ export class TilesetRefManager {
     public getTilesetIndex(tileset: TilesetMetadata): number {
         const tilesetRef = this.tilesetRefs.find(tilesetRef => tilesetRef.id === tileset.id);
         if (!tilesetRef) {
-            const tilesetAbsPath = this.tilesetManager.getTilesetAbsById(tileset.id);
-            if (!tilesetAbsPath) return -1;
-        
-            const absDir = this.filePathSystem.getFileAbsDir();
-
-            const tilesetRelPath = PathUtils.relative(absDir, tilesetAbsPath);
-
             const newTilesetRef: TilesetRefData = {
                 index: this.nextIndex,
                 id: tileset.id,
                 name: tileset.name,
-                source: tilesetRelPath,
             }
             this.tilesetRefs.push(newTilesetRef);
             this.nextIndex += 1;
