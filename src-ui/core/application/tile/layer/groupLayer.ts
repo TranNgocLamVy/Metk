@@ -112,4 +112,12 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         groupLayerData.id = uuidv4();
         return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
     }
+
+    public override removeRulesetRef(rulesetIndex: number): void {
+        this.layers.forEach((layer) => layer.removeRulesetRef(rulesetIndex));
+    }
+
+    public override removeTilesetRef(tilesetIndex: number): void {
+        this.layers.forEach((layer) => layer.removeTilesetRef(tilesetIndex));
+    }
 }

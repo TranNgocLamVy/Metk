@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/OutputList.tsx
 import { useMemo } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { appCore } from "@/core/appcore";
@@ -17,7 +16,7 @@ export default function OutputList() {
         <ScrollArea className='h-full w-full border border-foreground/20 bg-surface-overlay-sunken'>
             <div className="flex flex-wrap gap-2 p-2 w-full">
                 {selectedTiles.map((tileRef) => {
-                    const tilesetId = ruleset.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
+                    const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(tileRef.tilesetIndex);
                     if (!tilesetId) return null;
                     const textureManager = appCore.editorContext.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, tileRef.tileId);

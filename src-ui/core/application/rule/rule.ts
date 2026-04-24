@@ -64,7 +64,7 @@ export class Rule extends BaseObject<RuleEvent> {
     public addOutput(tileId: number, tilesetId: string, weight: number): void;
     public addOutput(tileId: number, tilesetIndex: number, weight: number): void;
     public addOutput(tileId: number, tileset: string | number, weight: number): void {
-        const tilesetIndex = typeof tileset === "string" ? this.tilesetRefManager.getTilesetIndexById(tileset) : tileset;
+        const tilesetIndex = typeof tileset === "string" ? this.tilesetRefManager.getTilesetRefIndex(tileset) : tileset;
         this.outputs.push({ tileId, tilesetIndex, weight });
         this.eventEmitter.emit("onChange");
     }
@@ -72,7 +72,7 @@ export class Rule extends BaseObject<RuleEvent> {
     public removeOutput(tileId: number, tilesetId: string): void;
     public removeOutput(tileId: number, tilesetIndex: number): void;
     public removeOutput(tileId: number, tileset: string | number): void {
-        const tilesetIndex = typeof tileset === "string" ? this.tilesetRefManager.getTilesetIndexById(tileset) : tileset;
+        const tilesetIndex = typeof tileset === "string" ? this.tilesetRefManager.getTilesetRefIndex(tileset) : tileset;
         this.outputs = this.outputs.filter((o) => o.tileId !== tileId || o.tilesetIndex !== tilesetIndex);
         this.eventEmitter.emit("onChange");
     }
@@ -82,7 +82,7 @@ export class Rule extends BaseObject<RuleEvent> {
     }
 
     public setChance(tileId: number, tilesetId: string, weight: number): void {
-        const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
+        const tilesetIndex = this.tilesetRefManager.getTilesetRefIndex(tilesetId);
         this.outputs = this.outputs.map((o) => ({ tileId: o.tileId, tilesetIndex: o.tilesetIndex, weight: o.tileId === tileId && o.tilesetIndex === tilesetIndex ? weight : o.weight }));
         this.eventEmitter.emit("onChange");
     }
@@ -109,7 +109,7 @@ export class Rule extends BaseObject<RuleEvent> {
         const selectedOutput = outputs[0];
         if (!selectedOutput) return null;
 
-        const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(selectedOutput.tilesetIndex);
+        const tilesetId = this.tilesetRefManager.getTilesetRefId(selectedOutput.tilesetIndex);
         if (!tilesetId) return null;
 
         return { tileId: selectedOutput.tileId, tilesetId: tilesetId };
@@ -121,6 +121,14 @@ export class Rule extends BaseObject<RuleEvent> {
 
     public getConstaints(): RuleConstraint[] {
         return this.constraints;
+    }
+
+    public removeRulesetRef(rulesetIndex: number): void {
+        this.constraints.forEach((constraint) => constraint.removeTarget(rulesetIndex));
+    }
+
+    public removeTilesetRef(tilesetIndex: number): void {
+        this.outputs = this.outputs.filter((output) => output.tilesetIndex !== tilesetIndex);
     }
 
     public serialize(): RuleData {
@@ -146,26 +154,24 @@ export class RuleConstraint {
     }
 
     public getTargetIds(): string[] {
-        return this.targetIndexs.map(target => this.rulesetRefManager.getRulesetIdByIndex(target)).filter(target => target !== null);
+        return this.targetIndexs.map(target => this.rulesetRefManager.getRulesetRefId(target)).filter(target => target !== null);
     }
 
-    public addTargetById(targetId: string): void {
-        const targetIndex = this.rulesetRefManager.getRulesetIndexById(targetId);
-        if (targetIndex !== -1) {
-            this.targetIndexs.push(targetIndex);
-            this.rule.eventEmitter.emit("onChange");
-        }
+    public addTarget(target: string | number): void {
+        const targetIndex = typeof target === "string" ? this.rulesetRefManager.getRulesetRefIndex(target) : target;
+        if (targetIndex === -1) return;
+        this.targetIndexs.push(targetIndex);
+        this.rule.eventEmitter.emit("onChange");
     }
 
-    public removeTargetById(targetId: string): void {
-        const targetIndex = this.rulesetRefManager.getRulesetIndexById(targetId);
-        if (targetIndex !== -1) {
-            this.targetIndexs = this.targetIndexs.filter((target) => target !== targetIndex);
-            this.rule.eventEmitter.emit("onChange");
-        }
+    public removeTarget(target: string | number): void {
+        const targetIndex = typeof target === "string" ? this.rulesetRefManager.getRulesetRefIndex(target) : target;
+        if (targetIndex === -1) return;
+        this.targetIndexs = this.targetIndexs.filter((target) => target !== targetIndex);
+        this.rule.eventEmitter.emit("onChange");
     }
 
-    public clearAll(): void {
+    public clearAllTargets(): void {
         this.targetIndexs = [];
         this.rule.eventEmitter.emit("onChange");
     }
@@ -180,31 +186,22 @@ export class RuleConstraint {
     }
 
     public isSatisfied(targetId: string | null): boolean {
-        if (targetId === null) {
-            switch (this.requirement) {
-                case "ANY":
-                    return true;
-                case "EMPTY":
-                    return true;
-                case "NOT_EMPTY":
-                    return false;
-            }
-            return false;
+        if (this.requirement === "ANY") {
+            return true;
+        } else if (this.requirement === "EMPTY") {
+            return targetId === null;
+        } else if (this.requirement === "NOT_EMPTY") {
+            return targetId !== null;
+        } else if (this.requirement === "IS") {
+            if (targetId === null) return false;
+            const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
+            return targetId !== null && this.targetIndexs.includes(targetIndex);
+        } else if (this.requirement === "NOT") {
+            if (targetId === null) return true;
+            const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
+            return targetId !== null && !this.targetIndexs.includes(targetIndex);
         }
-        const targetIndex = this.rulesetRefManager.getRulesetIndexById(targetId);
-        if (targetIndex === -1) return false;
-        switch (this.requirement) {
-            case "ANY":
-                return true;
-            case "EMPTY":
-                return targetId === null;
-            case "NOT_EMPTY":
-                return targetId !== null && !this.targetIndexs.includes(targetIndex);
-            case "IS":
-                return targetId !== null && this.targetIndexs.includes(targetIndex);
-            case "NOT":
-                return targetId === null || !this.targetIndexs.includes(targetIndex);
-        }
+        return false;
     }
 
     public serialize(): RuleConstraintData {

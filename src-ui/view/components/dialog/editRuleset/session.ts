@@ -1,4 +1,3 @@
-// src-ui/core/application/renderer/tilesetSelectorRenderer.ts
 import { Application, Container, Sprite, Graphics } from 'pixi.js';
 import { Tileset } from '@/core/application/tile/tileset';
 import { appCore } from '@/core/appcore';
@@ -134,7 +133,7 @@ export class EditRulesetSession {
         if (!this.currentRule) return;
 
         const currentOutputs = this.currentRule.getOutputs();
-        const activeTilesetIndex = this.currentRuleset.tilesetRefManager.getTilesetIndexById(this.currentTileset!.id);
+        const activeTilesetIndex = this.currentRuleset.tilesetRefManager.getTilesetRefIndex(this.currentTileset!.id);
 
         const exists = currentOutputs.some(o => o.tileId === tileId && o.tilesetIndex === activeTilesetIndex);
         if (exists) {
@@ -158,7 +157,7 @@ export class EditRulesetSession {
         if (!this.currentTileset) return;
 
         const { tilewidth, tileheight, columns } = this.currentTileset;
-        const activeTilesetIndex = this.currentRuleset.tilesetRefManager.getTilesetIndexById(this.currentTileset!.id);
+        const activeTilesetIndex = this.currentRuleset.tilesetRefManager.getTilesetRefIndex(this.currentTileset!.id);
 
         const outputs = this.currentRule?.getOutputs() || [];
 

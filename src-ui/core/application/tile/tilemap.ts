@@ -45,8 +45,8 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilewidth = tilemapData.tilewidth;
         this.tileheight = tilemapData.tileheight;
         
-        this.tilesetRefManager.load(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
-        this.rulesetRefManager.load(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
+        this.tilesetRefManager.loadData(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
+        this.rulesetRefManager.loadData(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
 
         this.rootLayer = new RootLayer(
             tilemapData.layers, 
@@ -84,15 +84,16 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.eventEmitter.removeAllListeners();
     }
 
-    // ------------------------------ Properties Operations ------------------------------
-    public getName(): string {
-        return this.name;
+    public removeRulesetRef(ruleset: string | number): void {
+        const rulesetIndex = this.rulesetRefManager.removeRulesetRef(ruleset);
+        if (rulesetIndex === -1) return;
+        this.rootLayer.removeRulesetRef(rulesetIndex);
     }
 
-    public async rename(name: string): Promise<Result> {
-        this.name = name;
-        this.eventEmitter.emit("updateProperty", "name", this.name);
-        return Result.Success();
+    public removeTilesetRef(tileset: string | number): void {
+        const tilesetIndex = this.tilesetRefManager.removeTilesetRef(tileset);
+        if (tilesetIndex === -1) return;
+        this.rootLayer.removeTilesetRef(tilesetIndex);
     }
 
     public isInBoundary(coordinate: Coordinate): boolean {

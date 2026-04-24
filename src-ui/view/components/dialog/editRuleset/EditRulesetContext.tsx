@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/EditRulesetContext.tsx
 import { createContext, useContext } from "react";
 import { Ruleset } from "@/core/application/rule/ruleset";
 import { Rule } from "@/core/application/rule/rule";

@@ -68,10 +68,10 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const rulesetRef = row[coordinate.col];
         if (!rulesetRef) return null;
 
-        const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
+        const rulesetId = this.rulesetRefManager.getRulesetRefId(rulesetRef.rulesetIndex);
         if (!rulesetId) return null;
 
-        const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(rulesetRef.tilesetIndex);
+        const tilesetId = this.tilesetRefManager.getTilesetRefId(rulesetRef.tilesetIndex);
         if (!tilesetId || rulesetRef.tileId === -1) return { rulesetId };
 
         return { rulesetId, output: { tileId: rulesetRef.tileId, tilesetId } };
@@ -90,14 +90,14 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
             let tileRef = this.rulesetsRef[coordinate.row][coordinate.col];
 
-            const oldRulesetId = tileRef ? this.rulesetRefManager.getRulesetIdByIndex(tileRef.rulesetIndex) : null;
+            const oldRulesetId = tileRef ? this.rulesetRefManager.getRulesetRefId(tileRef.rulesetIndex) : null;
             results.push({ coordinate, oldRulesetId: oldRulesetId || null });
 
             if (rulesetId === null) {
                 this.rulesetsRef[coordinate.row][coordinate.col] = null;
                 this.markAffected(coordinate, affectedCoordinates);
             } else {
-                const rulesetIndex = this.rulesetRefManager.getRulesetIndexById(rulesetId);
+                const rulesetIndex = this.rulesetRefManager.getRulesetRefIndex(rulesetId);
                 if (rulesetIndex === -1) continue;
 
                 if (!tileRef) {
@@ -143,7 +143,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
                 const targetRef = targetRow[targetX];
                 if (!targetRef) continue;
 
-                const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(targetRef.rulesetIndex);
+                const rulesetId = this.rulesetRefManager.getRulesetRefId(targetRef.rulesetIndex);
                 if (!rulesetId) continue;
 
                 const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
@@ -168,7 +168,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const rulesetRef = row[coordinate.col]!;
         if (!rulesetRef) return null;
 
-        const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
+        const rulesetId = this.rulesetRefManager.getRulesetRefId(rulesetRef.rulesetIndex);
         if (!rulesetId) return null;
 
         const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
@@ -184,7 +184,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const calculateResult = this.calculateOutputAt(coordinate);
         
         if (calculateResult) {
-            const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(calculateResult.tilesetId);
+            const tilesetIndex = this.tilesetRefManager.getTilesetRefIndex(calculateResult.tilesetId);
             rulesetRef.setOutput(calculateResult.tileId, tilesetIndex);
         } else {
             rulesetRef.setOutput(-1, -1);
@@ -211,7 +211,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         const row = this.rulesetsRef[coordinate.row]!;
         const rulesetRef = row[coordinate.col]!;
 
-        const rulesetId = this.rulesetRefManager.getRulesetIdByIndex(rulesetRef.rulesetIndex);
+        const rulesetId = this.rulesetRefManager.getRulesetRefId(rulesetRef.rulesetIndex);
         if (!rulesetId) return [];
 
         const ruleset = this.rulesetRefManager.rulesetManager.getRulesetById(rulesetId);
@@ -309,6 +309,38 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {
         cb(this);
+    }
+
+    public override removeTilesetRef(tilesetIndex: number): void {
+        const changedCoords: Coordinate[] = [];
+
+        this.rulesetsRef.forEach((row, rowIndex) => {
+            if (!row) return;
+            row.forEach((rulesetRef, colIndex) => {
+                if (rulesetRef?.tilesetIndex === tilesetIndex) {
+                    this.rulesetsRef[rowIndex][colIndex] = null;
+                    changedCoords.push({ col: colIndex, row: rowIndex });
+                }
+            });
+        });
+
+        if (changedCoords.length > 0) this.eventEmitter.emit("rulesetRefsOutputChanged", changedCoords);
+    }
+
+    public override removeRulesetRef(rulesetIndex: number): void {
+        const changedCoords: Coordinate[] = [];
+
+        this.rulesetsRef.forEach((row, rowIndex) => {
+            if (!row) return;
+            row.forEach((rulesetRef, colIndex) => {
+                if (rulesetRef?.rulesetIndex === rulesetIndex) {
+                    this.rulesetsRef[rowIndex][colIndex] = null;
+                    changedCoords.push({ col: colIndex, row: rowIndex });
+                }
+            });
+        });
+
+        if (changedCoords.length > 0) this.eventEmitter.emit("rulesetRefsOutputChanged", changedCoords);
     }
 }
 

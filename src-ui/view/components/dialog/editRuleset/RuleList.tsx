@@ -11,11 +11,15 @@ import { useEditRuleset } from "./EditRulesetContext";
 import { Rule } from "@/core/application/rule/rule";
 
 export default function RuleList() {    
-    const { ruleset, version } = useEditRuleset();
+    const { ruleset, version, setSelectedRuleId } = useEditRuleset();
     const bottomRef = useRef<HTMLDivElement>(null);
     const prevLengthRef = useRef(0);
 
     const ruleList = useMemo(() => ruleset.getAllRules(), [ruleset, version]);
+
+    useEffect(() => {
+        if (ruleList.length > 0) setSelectedRuleId(ruleList[0].id);
+    }, [])
 
     useEffect(() => {
         if (ruleList.length > prevLengthRef.current) {
@@ -54,7 +58,7 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
                 <div className="size-8 border border-foreground/20">
                     {ruleOutputs.length > 0 && (() => {
                         const firstOutput = ruleOutputs[0];
-                        const tilesetId = ruleset.tilesetRefManager.getTilesetIdByIndex(firstOutput.tilesetIndex);
+                        const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(firstOutput.tilesetIndex);
                         if (!tilesetId) return null;
                         const textureManager = appCore.editorContext.textureManager;
                         const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
@@ -77,7 +81,7 @@ function RuleDropdown({ rule }: { rule: Rule }) {
     };
 
     const handleDelete = () => {
-        ruleset.removeRule(rule);
+        ruleset.removeRule(rule.id);
         refresh();
     };
 
