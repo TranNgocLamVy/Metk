@@ -133,13 +133,17 @@ export class EditRulesetSession {
         if (!this.currentRule) return;
 
         const currentOutputs = this.currentRule.getOutputs();
-        const activeTilesetIndex = this.currentRuleset.tilesetRefManager.getTilesetRefIndex(this.currentTileset!.id);
+        const tilesetId = this.currentTileset!.id;
 
-        const exists = currentOutputs.some(o => o.tileId === tileId && o.tilesetIndex === activeTilesetIndex);
+        const exists = currentOutputs.some(output => {
+            const outputData = output.getOutputData();
+            if (!outputData) return false;
+            return outputData.tileId === tileId && outputData.tilesetId === tilesetId;
+        })
         if (exists) {
-            this.currentRule.removeOutput(tileId, activeTilesetIndex);
+            this.currentRule.removeOutput(tileId, tilesetId);
         } else {
-            this.currentRule.addOutput(tileId, activeTilesetIndex, 1);
+            this.currentRule.addOutput(tileId, tilesetId, 1);
         }
         this.refresh();
         this.renderHighlights();
