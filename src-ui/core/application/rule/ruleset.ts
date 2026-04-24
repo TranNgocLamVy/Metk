@@ -6,6 +6,7 @@ import { BaseObject, BaseObjectEvents } from "../baseObject";
 import { v4 as uuidv4 } from "uuid";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 import { RulesetRefData } from "@/shared/schema/layerSchema";
+import { Console } from "@/shared/services/consoleService";
 
 interface RulesetEvent extends BaseObjectEvents {
     onChange: () => void
@@ -21,47 +22,42 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     constructor(
         ruleData: RulesetData,
         public readonly rulesetPathSystem: FilePathSystem,
-        public readonly tilesetRefManager: TilesetRefManager, 
+        public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager
     ) {
         super();
-        
+
         this.id = ruleData.id;
         this.name = ruleData.name;
         this.color = ruleData.color;
         this.size = ruleData.size;
-        this.rules = ruleData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager));
-
-        this.tilesetRefManager.load(ruleData.tilesets.refs, ruleData.tilesets.nextIndex);
+        this.rules = ruleData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager, this.rulesetRefManager));
+        
+        this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
     }
 
     public updateRuleset(rulesetData: RulesetData): void {
         if (!rulesetData) return;
         if (this.id !== rulesetData.id) {
-            console.warn(`Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`);
+            Console.warn(`Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`);
             return;
         }
         this.name = rulesetData.name;
         this.color = rulesetData.color;
-
         this.tilesetRefManager.load(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
         this.rulesetRefManager.load(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
-
         const processedRuleIds = new Set<string>();
-
         for (const ruleData of rulesetData.rules) {
             processedRuleIds.add(ruleData.id);
             const existingRule = this.getRule(ruleData.id);
-
             if (existingRule) {
                 existingRule.update(ruleData);
             } else {
-                this.addRule(new Rule(ruleData, this.size, this.tilesetRefManager));
+                const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager);
+                this.rules.push(newRule);
             }
         }
-
         this.rules = this.rules.filter((rule) => processedRuleIds.has(rule.id));
-
         this.eventEmitter.emit("onChange");
     }
 
@@ -75,43 +71,27 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         return null;
     }
 
-    public async load(): Promise<void> {
+    public async load(): Promise<void> { }
 
-    }
+    public async unload(): Promise<void> { }
 
-    public getRule(id: string): Rule | null {
-        return this.rules.find((rule) => rule.id === id) ?? null;
-    }
+    public getRule(id: string): Rule | null { return this.rules.find((rule) => rule.id === id) ?? null }
 
-    public getAllRules(): Rule[] {
-        return this.rules;
-    }
-
-    public addRule(rule: Rule): void {
-        this.rules.push(rule);
-    }
+    public getAllRules(): Rule[] { return this.rules }
 
     public addEmptyRule(): void {
-        const newRule = new Rule({ id: uuidv4(), constraints: [], outputs: "" }, this.size, this.tilesetRefManager);
+        const newRule = new Rule({ id: uuidv4(), constraints: [], outputs: "" }, this.size, this.tilesetRefManager, this.rulesetRefManager);
         this.rules.push(newRule);
     }
 
-    public duplicateRule(rule: Rule): void {
-        this.rules.push(new Rule(rule.serialize(), this.size, this.tilesetRefManager));
+    public duplicateRule(ruleId: string): void {
+        const rule = this.getRule(ruleId);
+        if (!rule) return;
+        const newRule = new Rule(rule.serialize(), this.size, this.tilesetRefManager, this.rulesetRefManager);
+        this.rules.push(newRule);
     }
 
-    public removeRule(rule: Rule): void {
-        this.rules = this.rules.filter((r) => r !== rule);
-    }
-
-    public getOutput(): RuleOutputData | null {
-        for (const rule of this.rules) {
-            const outputs = rule.getOutputs();
-            // TODO: Choose random base on chance
-            if (outputs && outputs.length > 0) return outputs[0];
-        }
-        return null;
-    }
+    public removeRule(rule: Rule): void { this.rules = this.rules.filter((r) => r !== rule) }
 
     public serialize(): RulesetData {
         return {

@@ -1,5 +1,5 @@
-// src-ui/view/components/dialog/ruleset/OutputSelector.tsx
-import { useEffect, useMemo, useState } from 'react';
+// src-ui/view/components/dialog/OutputSelector.tsx
+import { useMemo, useRef, useState } from 'react';
 import { Application } from 'pixi.js';
 import { Application as PixiApplication } from '@pixi/react';
 import useResizeObserver from '@/view/hooks/useResizeObserver';
@@ -9,32 +9,25 @@ import { ScrollArea, ScrollBar } from '@/view/components/shadcn/scroll-area';
 import { Plus } from 'lucide-react';
 
 import { appCore } from '@/core/appcore';
-import { useEditRulesetStore } from '@/view/stores/editRulesetStore';
 import { HStack, VStack } from '../../custom/stack/Stack';
 import { Result } from '@/shared/types/result';
 import { ToastService } from '@/shared/services/toastService';
-
+import { EditRulesetSession } from './session';
+import { useEditRuleset } from './EditRulesetContext';
 
 export default function OutputSelector() {
-    const { session, version, refresh } = useEditRulesetStore();
-
-    const rule = useMemo(() => {
-        return session.getSelectedRule();
-    }, [session, version]);
-
-    const usedTilesets = useMemo(() => {
-        return session.ruleset.tilesetRefManager.serialize();
-    }, [session])
-
-    useEffect(() => {
-        if (session.pixiApp && usedTilesets.refs.length > 0) selectTileset(usedTilesets.refs[0].id);
-    }, [session, version])
-
+    const { ruleset, selectedRule, version, refresh } = useEditRuleset();
+    const [pixiApp, setPixiApp] = useState<Application | null>(null);
+    const sessionRef = useRef<EditRulesetSession | null>(null);
     const [activeTilesetId, setActiveTilesetId] = useState<string | null>(null);
 
+    const usedTilesets = useMemo(() => {
+        return ruleset.tilesetRefManager.serialize();
+    }, [ruleset, version]);
+
     const selectTileset = async (tilesetId: string) => {
-        const renderer = session.renderer;
-        if (!renderer) return;
+        const session = sessionRef.current;
+        if (!session) return;
 
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
@@ -45,32 +38,32 @@ export default function OutputSelector() {
             ToastService.error({ message: tilesetResult.message });
             return;
         }
+        
         const tileset = tilesetResult.data;
-        renderer.setTileset(tileset);
-        renderer.setCurrentRule(rule);
+        session.setTileset(tileset);
+        session.setCurrentRule(selectedRule);
         setActiveTilesetId(tileset.id);
-    }
-
-    useEffect(() => {
-        const renderer = session.renderer;
-        if (renderer) renderer.setCurrentRule(rule)
-    }, [rule]);
+    };
 
     const containerRef = useResizeObserver<HTMLDivElement>(
         (entry) => {
-            if (!session.pixiApp) return;
+            if (!pixiApp) return;
             const w = entry.contentRect.width;
             const h = entry.contentRect.height;
-            session.pixiApp.renderer?.resize(w - 4, h - 4);
+            pixiApp.renderer?.resize(w - 4, h - 4);
         },
-        [session, version]
+        [pixiApp, version]
     );
 
     const onInit = (app: Application) => {
-        session.activateSession(app);
-        session.renderer.setCurrentRule(rule);
+        // Because refresh is stable (wrapped in useCallback internally), session gets the fixed reference
+        const session = new EditRulesetSession(ruleset, refresh);
+        sessionRef.current = session;
+        session.activatePixiApp(app);
+        session.setCurrentRule(selectedRule);
+        setPixiApp(app);
         refresh();
-    }
+    };
 
     return (
         <VStack className="w-full h-full gap-2">
@@ -79,7 +72,7 @@ export default function OutputSelector() {
                 <ScrollArea className="flex-1 whitespace-nowrap bg-surface-base">
                     <HStack className="flex">
                         {usedTilesets.refs.map((tilesetRef) => (
-                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant={"empty"} size={"sm"} className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
+                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant="empty" size="sm" className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
                                 <style>{`.rs_tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: calc(100%); height: 2px; background-color: var(--foreground); }`}</style>
                                 {tilesetRef.name}
                             </Button>
@@ -94,26 +87,23 @@ export default function OutputSelector() {
                 </div>
             </div>
         </VStack>
-
     );
 }
 
-
-function TilesetSelector({ selectTileset }: { selectTileset: (tilesetId: string) => void }) {
-    const { session, refresh } = useEditRulesetStore();
-
+function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => void }) {
+    const { ruleset, version, refresh } = useEditRuleset();
+    
     const allTilesets = useMemo(() => {
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return [];
-        return currentProject.tilesetManager.serialize()
-    }, [session])
+        return currentProject.tilesetManager.serialize();
+    }, [version]);
 
     const handleAddTileset = async (tilesetId: string) => {
-        const ruleset = session.ruleset;
         const index = ruleset.tilesetRefManager.getTilesetIndexById(tilesetId);
         if (index > -1) selectTileset(tilesetId);
         refresh();
-    }
+    };
 
     return (
         <DropdownMenu>
@@ -134,5 +124,5 @@ function TilesetSelector({ selectTileset }: { selectTileset: (tilesetId: string)
                 )}
             </DropdownMenuContent>
         </DropdownMenu>
-    )
+    );
 }

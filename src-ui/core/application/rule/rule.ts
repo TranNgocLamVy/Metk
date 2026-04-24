@@ -1,7 +1,8 @@
-import { RuleData, RuleOutputData, RuleConstraintType, RuleConstraintData } from "@/shared/schema/rulesetSchema";
+import { RuleData, RuleOutputData, ConstraintRequirementType, RuleConstraintData } from "@/shared/schema/rulesetSchema";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
 import { RulesetRefData } from "@/shared/schema/layerSchema";
+import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RuleEvent extends BaseObjectEvents {
     onChange: () => void
@@ -15,53 +16,56 @@ export class Rule extends BaseObject<RuleEvent> {
     constructor(
         data: RuleData,
         private readonly size: number,
-        public readonly tilesetRefManager: TilesetRefManager
+        public readonly tilesetRefManager: TilesetRefManager,
+        public readonly rulesetRefManager: RulesetRefManager
     ) {
         super();
         this.id = data.id;
-        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
+        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this, this.rulesetRefManager));
         if (this.constraints.length < this.size * this.size) {
             for (let i = this.constraints.length; i < this.size * this.size; i++) {
-                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
+                this.constraints.push(new RuleConstraint({ requirement: "ANY", targetIndexs: [] }, this, this.rulesetRefManager));
             }
         }
-        
-        this.outputs = data.outputs ? data.outputs.split(" ").map((output) => {
+        this.outputs = data.outputs ? this.processOutputs(data.outputs) : [];
+    }
+
+    private processConstraints(data: string): RuleConstraintData[] {
+        const constraints: RuleConstraintData[] = [];
+        // TODO: Implement process constraints
+        return constraints;
+    }
+
+    private processOutputs(data: string): RuleOutputData[] {
+        const outputs: RuleOutputData[] = [];
+        data.split(",").forEach((output) => {
             const parts = output.split(":");
-            return { 
-                tileId: parseInt(parts[0]), 
-                tilesetIndex: parseInt(parts[1]), 
-                chance: parseInt(parts[2]) 
-            };
-        }) : [];
+            const parsedTileId = isNaN(parseInt(parts[0])) ? -1 : parseInt(parts[0]);
+            const parsedTilesetIndex = isNaN(parseInt(parts[1])) ? -1 : parseInt(parts[1]);
+            const parsedWeight = isNaN(parseInt(parts[2])) ? 1 : parseInt(parts[2]);
+            if (parsedTileId === -1 || parsedTilesetIndex === -1) return;
+            outputs.push({ tileId: parsedTileId, tilesetIndex: parsedTilesetIndex, weight: parsedWeight });
+        });
+        return outputs;
     }
 
     public update(data: RuleData): void {
-        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this));
-        
+        this.constraints = data.constraints.map((constraint) => new RuleConstraint(constraint, this, this.rulesetRefManager));
         if (this.constraints.length < this.size * this.size) {
             for (let i = this.constraints.length; i < this.size * this.size; i++) {
-                this.constraints.push(new RuleConstraint({ constraint: "ANY", targets: [] }, this));
+                this.constraints.push(new RuleConstraint({ requirement: "ANY", targetIndexs: [] }, this, this.rulesetRefManager));
             }
         }
-        
-        this.outputs = data.outputs ? data.outputs.split(" ").map((output) => {
-            const parts = output.split(":");
-            return { 
-                tileId: parseInt(parts[0]), 
-                tilesetIndex: parseInt(parts[1]), 
-                chance: parseInt(parts[2]) 
-            };
-        }) : [];
+        this.outputs = data.outputs ? this.processOutputs(data.outputs) : [];
 
         this.eventEmitter.emit("onChange");
     }
 
-    public addOutput(tileId: number, tilesetId: string, chance: number): void;
-    public addOutput(tileId: number, tilesetIndex: number, chance: number): void;
-    public addOutput(tileId: number, tileset: string | number, chance: number): void {
+    public addOutput(tileId: number, tilesetId: string, weight: number): void;
+    public addOutput(tileId: number, tilesetIndex: number, weight: number): void;
+    public addOutput(tileId: number, tileset: string | number, weight: number): void {
         const tilesetIndex = typeof tileset === "string" ? this.tilesetRefManager.getTilesetIndexById(tileset) : tileset;
-        this.outputs.push({ tileId, tilesetIndex, chance });
+        this.outputs.push({ tileId, tilesetIndex, weight });
         this.eventEmitter.emit("onChange");
     }
 
@@ -77,9 +81,9 @@ export class Rule extends BaseObject<RuleEvent> {
         return this.constraints[index];
     }
 
-    public setChance(tileId: number, tilesetId: string, chance: number): void {
+    public setChance(tileId: number, tilesetId: string, weight: number): void {
         const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
-        this.outputs = this.outputs.map((o) => ({ tileId: o.tileId, tilesetIndex: o.tilesetIndex, chance: o.tileId === tileId && o.tilesetIndex === tilesetIndex ? chance : o.chance }));
+        this.outputs = this.outputs.map((o) => ({ tileId: o.tileId, tilesetIndex: o.tilesetIndex, weight: o.tileId === tileId && o.tilesetIndex === tilesetIndex ? weight : o.weight }));
         this.eventEmitter.emit("onChange");
     }
 
@@ -101,13 +105,13 @@ export class Rule extends BaseObject<RuleEvent> {
         const outputs = this.getOutputs();
         if (!outputs || outputs.length === 0) return null;
 
-        //TODO: Randomly select one output base on its chance scale.
+        //TODO: Randomly select one output base on its weight scale.
         const selectedOutput = outputs[0];
         if (!selectedOutput) return null;
 
         const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(selectedOutput.tilesetIndex);
         if (!tilesetId) return null;
-        
+
         return { tileId: selectedOutput.tileId, tilesetId: tilesetId };
     }
 
@@ -123,65 +127,90 @@ export class Rule extends BaseObject<RuleEvent> {
         return {
             id: this.id,
             constraints: this.constraints.map((constraint) => constraint.serialize()),
-            outputs: this.outputs.map((output) => `${output.tileId}:${output.tilesetIndex}:${output.chance}`).join(" "),
+            outputs: this.outputs.map((output) => `${output.tileId}:${output.tilesetIndex}:${output.weight}`).join(","),
         }
     }
 }
 
 export class RuleConstraint {
-    private targets: string[];
-    private constraint: RuleConstraintType;
-    
-    constructor(data: RuleConstraintData, private readonly rule: Rule) {
-        this.targets = data.targets;
-        this.constraint = data.constraint;
+    private targetIndexs: number[];
+    private requirement: ConstraintRequirementType;
+
+    constructor(
+        data: RuleConstraintData,
+        private readonly rule: Rule,
+        private readonly rulesetRefManager: RulesetRefManager
+    ) {
+        this.targetIndexs = data.targetIndexs;
+        this.requirement = data.requirement;
     }
 
-    public getTargets(): string[] {
-        return this.targets;
-    }
-    
-    public addTarget(targetId: string): void {
-        this.targets.push(targetId);
-        this.rule.eventEmitter.emit("onChange");
+    public getTargetIds(): string[] {
+        return this.targetIndexs.map(target => this.rulesetRefManager.getRulesetIdByIndex(target)).filter(target => target !== null);
     }
 
-    public removeTarget(targetId: string): void {
-        this.targets = this.targets.filter((target) => target !== targetId);
-        this.rule.eventEmitter.emit("onChange");
+    public addTargetById(targetId: string): void {
+        const targetIndex = this.rulesetRefManager.getRulesetIndexById(targetId);
+        if (targetIndex !== -1) {
+            this.targetIndexs.push(targetIndex);
+            this.rule.eventEmitter.emit("onChange");
+        }
+    }
+
+    public removeTargetById(targetId: string): void {
+        const targetIndex = this.rulesetRefManager.getRulesetIndexById(targetId);
+        if (targetIndex !== -1) {
+            this.targetIndexs = this.targetIndexs.filter((target) => target !== targetIndex);
+            this.rule.eventEmitter.emit("onChange");
+        }
     }
 
     public clearAll(): void {
-        this.targets = [];
+        this.targetIndexs = [];
         this.rule.eventEmitter.emit("onChange");
     }
 
-    public setConstraint(constraint: RuleConstraintType): void {
-        this.constraint = constraint;
+    public setRequirement(requirement: ConstraintRequirementType): void {
+        this.requirement = requirement;
         this.rule.eventEmitter.emit("onChange");
     }
 
-    public getConstraint(): RuleConstraintType {
-        return this.constraint;
+    public getRequirement(): ConstraintRequirementType {
+        return this.requirement;
     }
 
     public isSatisfied(targetId: string | null): boolean {
-        switch (this.constraint) {
-            case "EMPTY":
-                return targetId === null;
+        if (targetId === null) {
+            switch (this.requirement) {
+                case "ANY":
+                    return true;
+                case "EMPTY":
+                    return true;
+                case "NOT_EMPTY":
+                    return false;
+            }
+            return false;
+        }
+        const targetIndex = this.rulesetRefManager.getRulesetIndexById(targetId);
+        if (targetIndex === -1) return false;
+        switch (this.requirement) {
             case "ANY":
                 return true;
-            case "REQUIRE":
-                return targetId !== null && this.targets.includes(targetId);
+            case "EMPTY":
+                return targetId === null;
+            case "NOT_EMPTY":
+                return targetId !== null && !this.targetIndexs.includes(targetIndex);
+            case "IS":
+                return targetId !== null && this.targetIndexs.includes(targetIndex);
             case "NOT":
-                return targetId === null || !this.targets.includes(targetId);
+                return targetId === null || !this.targetIndexs.includes(targetIndex);
         }
     }
 
     public serialize(): RuleConstraintData {
         return {
-            constraint: this.constraint,
-            targets: this.targets,
+            requirement: this.requirement,
+            targetIndexs: this.targetIndexs,
         }
     }
 }

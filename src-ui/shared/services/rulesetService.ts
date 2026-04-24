@@ -79,17 +79,16 @@ export class RulesetService {
             title: "Delete Ruleset", 
             description: `Are you sure you want to delete "${rulesetMetadata.name}" Ruleset?`, 
             okText: "Delete", 
-            okButtonVariant: "destructive", 
+            okButtonVariant: "destructive",
             cancelText: "Cancel" 
         });
 
         if (!confirmDelete) return;
 
-        // TODO: move remove to Infrastructure layer
-        remove(rulesetManager.getRulesetAbsById(id)!);
-        
-        rulesetManager.removeRule(id);
+        await rulesetManager.deleteRuleset(id);
         await appCore.projectManager.saveCurrrentProject();
+
+        // TODO: Remove ref from tilemap
 
         useRulesetManagerStore.getState().refresh();
 

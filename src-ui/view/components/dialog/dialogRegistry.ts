@@ -3,7 +3,7 @@ import { FormDialog } from "./FormDialog";
 import { PermissionDialog } from "./PermissionDialog";
 import { SaveDialog } from "./SaveDialog";
 import { EditTilesetDialog } from "./EditTilesetDialog";
-import { EditRulesetDialog } from "./ruleset/EditRulesetDialog";
+import { EditRulesetDialog } from "./editRuleset/EditRulesetDialog";
 
 export const DIALOG_TYPES = {
     FORM: 'FORM_DIALOG',
