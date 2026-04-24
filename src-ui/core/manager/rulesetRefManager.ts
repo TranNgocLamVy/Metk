@@ -62,8 +62,8 @@ export class RulesetRefManager {
      * * @param tilesetId - The current ID of the tileset to be replaced.
      * @param newTilesetId - The new ID to assign to this reference.
      */
-    public replaceRulesetRef(rulesetId: string, newRulesetId: string): void {
-        const refToUpdate = this.rulesetRefs.find(ref => ref.id === rulesetId);
+    public replaceRulesetRef(ruleset: string | number, newRulesetId: string): void {
+        const refToUpdate = typeof ruleset === "string" ? this.rulesetRefs.find(ref => ref.id === ruleset) : this.rulesetRefs.find(ref => ref.index === ruleset);
         const refToAdd = this.rulesetManager.getRulesetMetadataById(newRulesetId);
         if (refToUpdate && refToAdd) {
             refToUpdate.id = newRulesetId;

@@ -1,25 +1,28 @@
 import { HStack, VStack } from "../../custom/stack/Stack";
-import { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { Rule } from "@/core/application/rule/rule";
-import { CircleQuestionMark, Square, SquareCheck, SquareDashed, SquareX } from "lucide-react";
+import { CircleQuestionMark, SquareCheck, SquareX } from "lucide-react";
 import { appCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 import { useEditRuleset } from "./EditRulesetContext";
+import { RuleRequirement } from "@/shared/schema/rulesetSchema";
+
+const requirementIcons = [
+    { requirement: RuleRequirement.ANY, icon: <CircleQuestionMark /> },
+    { requirement: RuleRequirement.IS, icon: <SquareCheck /> },
+    { requirement: RuleRequirement.NOT, icon: <SquareX /> },
+]
 
 export default function ConstraintsGrid() {
-    const { ruleset, selectedRule, selectedGrid, selectedTarget, version, setSelectedGrid, setSelectedTarget, refresh } = useEditRuleset();
+    const { ruleset, selectedRule, selectedGrid, version, setSelectedGrid, refresh } = useEditRuleset();
 
     const gridSize = ruleset.size;
+    const middleIndex = ((gridSize * gridSize) - 1) / 2;
 
     const constraints = useMemo(() => {
         if (!selectedRule) return [];
         return selectedRule.getConstaints();
     }, [selectedRule, version]);
-
-    const selectedConstraint = useMemo(() => {
-        if (!selectedRule) return null;
-        return selectedRule.getConstraint(selectedGrid);
-    }, [selectedRule, selectedGrid, version]);
 
     const rulesetList = useMemo(() => {
         const currentProject = appCore.editorContext.currentProject;
@@ -27,59 +30,16 @@ export default function ConstraintsGrid() {
         return currentProject.rulesetManager.serialize();
     }, [version]);
 
-    const constraintsIcon = useMemo(() => [
-        { constraint: "EMPTY", icon: <SquareDashed /> },
-        { constraint: "NOT_EMPTY", icon: <Square /> },
-        { constraint: "IS", icon: <SquareCheck /> },
-        { constraint: "NOT", icon: <SquareX /> },
-    ], []);
-
-    const handleSelectTarget = useCallback(() => {
-        if (!selectedConstraint || !selectedTarget) return;
-        if (selectedConstraint.getTargetIds().includes(selectedTarget)) {
-            selectedConstraint.removeTarget(selectedTarget);
-        } else {
-            selectedConstraint.addTarget(selectedTarget);
-        }
-        refresh();
-    }, [selectedTarget, selectedConstraint, refresh]);
-
-    const handleChangeSelectedTarget = useCallback((direction: -1 | 1) => {
-        if (!selectedConstraint || !selectedTarget || rulesetList.length === 0) return;
-    
-        const currentIndex = rulesetList.findIndex((r) => r.id === selectedTarget);
-        if (currentIndex === -1) return;
-    
-        const listLength = rulesetList.length;
-        const nextIndex = (currentIndex + direction + listLength) % listLength;
-    
-        setSelectedTarget(rulesetList[nextIndex].id);
-    }, [selectedConstraint, selectedTarget, rulesetList, setSelectedTarget]);
-
     const onSelect = (index: number) => {
-        if (selectedGrid !== index) {
-            setSelectedGrid(index);
-            return;
-        }
-        const constraint = selectedRule!.getConstraint(index);
-        switch (constraint.getRequirement()) {
-            case "ANY": constraint.setRequirement("EMPTY"); break;
-            case "EMPTY": constraint.setRequirement("NOT_EMPTY"); break;
-            case "NOT_EMPTY": constraint.setRequirement("IS"); break;
-            case "IS": constraint.setRequirement("NOT"); break;
-            case "NOT": constraint.setRequirement("ANY"); break;
-        }
-        console.log(constraint);
+        setSelectedGrid(index);
         refresh();
     };
-
-    const middleIndex = ((gridSize * gridSize) - 1) / 2;
 
     return (
         <div className="w-full gap-2 grid" style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}>
             {constraints.map((constraint, index) => {
                 const firstConstraintColor = rulesetList.find((r) => constraint.getTargetIds().includes(r.id))?.color ?? null;
-                const isEmpyOrAny = constraint.getRequirement() === "EMPTY" || constraint.getRequirement() === "ANY";
+                const isEmpyOrAny = constraint.getRequirement() === RuleRequirement.ANY;
                 const currentRulesetColor = ruleset.color;
 
                 if (index === middleIndex) {
@@ -94,16 +54,11 @@ export default function ConstraintsGrid() {
                     <CellToolTip key={index} rule={selectedRule!} gridIndex={index} version={version}>
                         <div
                             onClick={() => onSelect(index)}
-                            onContextMenu={handleSelectTarget}
-                            onWheel={(e) => {
-                                if (e.deltaY > 0) handleChangeSelectedTarget(1);
-                                if (e.deltaY < 0) handleChangeSelectedTarget(-1);
-                            }}
                             className={`aspect-square bg-surface-overlay-sunken relative p-2 flex items-center justify-center ${selectedGrid === index ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent hover:border-transparent"}`}
                         >
                             {firstConstraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstConstraintColor }} />}
                             <div className="absolute">
-                                {constraintsIcon.find((icon) => icon.constraint === constraint.getRequirement())?.icon}
+                                {requirementIcons.find((icon) => icon.requirement === constraint.getRequirement())?.icon}
                             </div>
                         </div>
                     </CellToolTip>
@@ -123,15 +78,7 @@ function CellToolTip({ version, rule, gridIndex, children }: { version: number, 
         return currentProject.rulesetManager.serialize();
     }, [version]);
 
-    const constraintsIcon = useMemo(() => [
-        { constraint: "ANY", icon: <CircleQuestionMark /> },
-        { constraint: "EMPTY", icon: <SquareDashed /> },
-        { constraint: "NOT_EMPTY", icon: <Square /> },
-        { constraint: "IS", icon: <SquareCheck /> },
-        { constraint: "NOT", icon: <SquareX /> },
-    ], []);
-
-    const isEmpty = targets.length === 0 || constraint.getRequirement() === "EMPTY" || constraint.getRequirement() === "ANY";
+    const isEmpty = targets.length === 0 || constraint.getRequirement() === RuleRequirement.ANY;
 
     return (
         <Tooltip delayDuration={500}>
@@ -140,7 +87,7 @@ function CellToolTip({ version, rule, gridIndex, children }: { version: number, 
                 <VStack className="flex-1 gap-4">
                     <HStack align="center" justify="center" className="h-fit w-fit gap-2">
                         <span>Constraint:</span>
-                        <span>{constraintsIcon.find((icon) => icon.constraint === constraint.getRequirement())?.icon}</span>
+                        <span>{requirementIcons.find((icon) => icon.requirement === constraint.getRequirement())?.icon}</span>
                     </HStack>
                     <VStack className="gap-2">
                         <HStack className="gap-2">

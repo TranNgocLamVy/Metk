@@ -9,8 +9,6 @@ export type EditRulesetContextType = {
     selectedRule: Rule | null;
     selectedGrid: number;
     setSelectedGrid: (grid: number) => void;
-    selectedTarget: string | null;
-    setSelectedTarget: (target: string | null) => void;
     version: number;
     refresh: () => void;
 };

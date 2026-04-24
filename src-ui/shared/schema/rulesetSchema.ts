@@ -2,20 +2,17 @@ import { type } from "arktype";
 import { safeArray } from ".";
 import { TilesetRefDataSchema } from "./tilesetSchema";
 
-export const constraintRequirement = type("'ANY' | 'EMPTY' | 'NOT_EMPTY' | 'IS' | 'NOT' ")
-export type ConstraintRequirementType = typeof constraintRequirement.infer;
+export enum RuleRequirement {
+    ANY = 0,
+    IS = 1,
+    NOT = 2,
+}
+export type RuleConstraintData = {
+    requirement: RuleRequirement,
+    targetIndexs: number[],
+    allowEmpty: boolean,
+}
 
-export const RuleConstraintDataSchema = type({
-    requirement: constraintRequirement.default("ANY"),
-    targetIndexs: safeArray(type("number")).default(() => []),
-})
-export type RuleConstraintData = typeof RuleConstraintDataSchema.infer;
-
-export const RuleOutputDataSchema = type({
-    tileId: type("number"),
-    tilesetIndex: type("number"),
-    weight: type("number").default(1),
-})
 export type RuleOutputData = {
     tileId: number,
     tilesetIndex: number,
@@ -24,7 +21,7 @@ export type RuleOutputData = {
 
 export const RuleData = type({
     id: type("string"),
-    constraints: safeArray(RuleConstraintDataSchema).default(() => []),
+    constraints: type("string").default(""),
     outputs: type("string").default(""),
 })
 export type RuleData = typeof RuleData.infer;

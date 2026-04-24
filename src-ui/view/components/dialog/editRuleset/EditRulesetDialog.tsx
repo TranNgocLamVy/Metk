@@ -2,7 +2,7 @@ import { useDialogStore } from "@/view/stores/dialogStore";
 import { BaseDialogProps } from "../dialogRegistry";
 import { DialogContent, Dialog, DialogClose, DialogTitle } from "../../shadcn/dialog";
 import { Button } from "../../shadcn/button";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, WheelEvent } from "react";
 import { appCore } from "@/core/appcore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import RuleList from "./RuleList";
@@ -29,14 +29,12 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
     const [ruleset, setRuleset] = useState<Ruleset | null>(null);
     const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
     const [selectedGrid, setSelectedGrid] = useState<number>(0);
-    const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
 
     const selectedRule = useMemo(() => {
         if (!ruleset || !selectedRuleId) return null;
         return ruleset.getRule(selectedRuleId);
     }, [ruleset, selectedRuleId]);
 
-    // Use callback with functional state update to prevent stale closures (fixes the refresh bug in session.ts)
     const refresh = useCallback(() => {
         setVersion(v => v + 1);
     }, []);
@@ -56,6 +54,24 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
         setRuleset(clonedRuleset);
     }, [rulesetId, closeDialog, dialogId]);
 
+    const onWheel = (e: WheelEvent<HTMLDivElement>) => {
+        if (!ruleset) return;
+        const inc = e.deltaY > 0 ? 1 : -1;
+        const totalCells = ruleset.size * ruleset.size;
+        const maxIndex = totalCells - 1;
+        const middleIndex = Math.floor(totalCells / 2);
+        let newIndex = selectedGrid + inc;
+        if (newIndex < 0) newIndex = maxIndex;
+        if (newIndex > maxIndex) newIndex = 0;
+        if (newIndex === middleIndex) {
+            newIndex += inc;
+            if (newIndex < 0) newIndex = maxIndex;
+            if (newIndex > maxIndex) newIndex = 0;
+        }
+        setSelectedGrid(newIndex);
+        refresh();
+    }
+
     const handleSave = async () => {
         if (!ruleset) return;
         const currentProject = appCore.editorContext.currentProject;
@@ -65,7 +81,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
         rulesetManager.updateRuleset(ruleset.serialize());
         await rulesetManager.saveRuleset(ruleset.id);
         useRulesetManagerStore.getState().refresh();
-        
+
         ToastService.success({ message: "Ruleset saved successfully" });
         onClose();
     };
@@ -85,8 +101,6 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
             setSelectedRuleId,
             selectedGrid,
             setSelectedGrid,
-            selectedTarget,
-            setSelectedTarget,
             version,
             refresh
         }}>
@@ -110,26 +124,26 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
                     </VStack>
 
                     <HStack className="flex-1 gap-4">
-                        <HStack className="w-2/5 h-full p-2 gap-2 bg-surface-overlay">
-                                <VStack className="w-full h-full gap-8 p-2 bg-surface-base">
-                                    <div className="w-full aspect-[7/5] grid grid-cols-7">
-                                        <div className="col-span-5">
-                                            <ConstraintsGrid />
-                                        </div>
-
-                                        <div className="col-span-1 flex items-center justify-center">
-                                            {selectedRule && <ArrowRight />}
-                                        </div>
-
-                                        <div className="col-span-1 relative h-full">
-                                            {selectedRule && <div className="absolute inset-0">
-                                                <OutputList />
-                                            </div>}
-                                        </div>
+                        <HStack onWheel={onWheel} className="w-2/5 h-full p-2 gap-2 bg-surface-overlay">
+                            <VStack className="w-full h-full gap-8 p-2 bg-surface-base">
+                                <div className="w-full aspect-[7/5] grid grid-cols-7">
+                                    <div className="col-span-5">
+                                        <ConstraintsGrid />
                                     </div>
-                                    <ConstraintTargetEditor />
-                                </VStack>
-                            </HStack>
+
+                                    <div className="col-span-1 flex items-center justify-center">
+                                        {selectedRule && <ArrowRight />}
+                                    </div>
+
+                                    <div onWheel={(e) => e.stopPropagation()} className="col-span-1 relative h-full">
+                                        {selectedRule && <div className="absolute inset-0">
+                                            <OutputList />
+                                        </div>}
+                                    </div>
+                                </div>
+                                <ConstraintTargetEditor />
+                            </VStack>
+                        </HStack>
 
                         <VStack className="w-3/5 h-full p-2 bg-surface-overlay">
                             <OutputSelector />

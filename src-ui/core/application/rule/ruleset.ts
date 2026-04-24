@@ -1,5 +1,5 @@
 import { Rule } from "./rule";
-import { RuleOutputData, RulesetData } from "@/shared/schema/rulesetSchema";
+import { RuleData, RulesetData } from "@/shared/schema/rulesetSchema";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { BaseObject, BaseObjectEvents } from "../baseObject";
@@ -37,6 +37,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.rulesetRefManager.loadData(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
         
         this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
+        this.rulesetRefManager.replaceRulesetRef(0, this.id);
     }
 
     public updateRuleset(rulesetData: RulesetData): void {
@@ -83,7 +84,9 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public getAllRules(): Rule[] { return this.rules }
 
     public addEmptyRule(): void {
-        const newRule = new Rule({ id: uuidv4(), constraints: [], outputs: "" }, this.size, this.tilesetRefManager, this.rulesetRefManager);
+        const ruleData: RuleData = { id: uuidv4(), constraints: "", outputs: "" };
+        const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager);
+        console.log(newRule.serialize());
         this.rules.push(newRule);
     }
 
