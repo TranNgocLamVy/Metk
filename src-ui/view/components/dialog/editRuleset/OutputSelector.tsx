@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/OutputSelector.tsx
 import { useMemo, useRef, useState } from 'react';
 import { Application } from 'pixi.js';
 import { Application as PixiApplication } from '@pixi/react';
@@ -28,7 +27,6 @@ export default function OutputSelector() {
     const selectTileset = async (tilesetId: string) => {
         const session = sessionRef.current;
         if (!session) return;
-
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
 
@@ -56,11 +54,11 @@ export default function OutputSelector() {
     );
 
     const onInit = (app: Application) => {
-        // Because refresh is stable (wrapped in useCallback internally), session gets the fixed reference
         const session = new EditRulesetSession(ruleset, refresh);
         sessionRef.current = session;
         session.activatePixiApp(app);
         session.setCurrentRule(selectedRule);
+        // TODO: Select first tileset after loading
         setPixiApp(app);
         refresh();
     };
@@ -92,7 +90,7 @@ export default function OutputSelector() {
 
 function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => void }) {
     const { ruleset, version, refresh } = useEditRuleset();
-    
+
     const allTilesets = useMemo(() => {
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return [];
@@ -100,7 +98,7 @@ function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => voi
     }, [version]);
 
     const handleAddTileset = async (tilesetId: string) => {
-        const index = ruleset.tilesetRefManager.getTilesetIndexById(tilesetId);
+        const index = ruleset.tilesetRefManager.getTilesetRefIndex(tilesetId);
         if (index > -1) selectTileset(tilesetId);
         refresh();
     };

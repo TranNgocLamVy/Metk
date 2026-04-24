@@ -79,6 +79,14 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         return false;
     }
 
+    public removeRulesetRef(rulesetIndex: number): void {
+        // pass
+    }
+
+    public removeTilesetRef(tilesetIndex: number): void {
+        // pass
+    }
+
     public posToCoord(pos: Position): Coordinate {
         throw new Error("Method not implemented.");
     }

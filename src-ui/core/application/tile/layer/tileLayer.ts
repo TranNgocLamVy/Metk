@@ -67,14 +67,14 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         const tileRef = row[coordinate.col];
         if (!tileRef) return null;
 
-        const tilesetId = this.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
+        const tilesetId = this.tilesetRefManager.getTilesetRefId(tileRef.tilesetIndex);
         if (!tilesetId) return null;
 
         return { tileId: tileRef.tileId, tilesetId };
     }
 
     /**
-     * 
+     * Set tiles at the given coordinates and return the previous tileRefsData.
      * @param payload 
      * @returns previous tileRefsData
      */
@@ -95,7 +95,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             if (!tileRef) {
                 if (isRemove) return null;
 
-                const tilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
+                const tilesetIndex = this.tilesetRefManager.getTilesetRefIndex(tilesetId);
                 if (tilesetIndex === -1) return null
 
                 tileRef = new TileRef(tileId, tilesetIndex);
@@ -105,7 +105,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             }
 
             if (isRemove) {
-                const oldTilesetId = this.tilesetRefManager.getTilesetIdByIndex(tileRef.tilesetIndex);
+                const oldTilesetId = this.tilesetRefManager.getTilesetRefId(tileRef.tilesetIndex);
                 if (!oldTilesetId) return null
 
                 this.tilesRef[coordinate.row][coordinate.col] = null;
@@ -113,12 +113,12 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             }
 
             // Not empty to not empty
-            const newTilesetIndex = this.tilesetRefManager.getTilesetIndexById(tilesetId);
+            const newTilesetIndex = this.tilesetRefManager.getTilesetRefIndex(tilesetId);
             if (newTilesetIndex === -1) return null
 
             const setTileRefResult = tileRef.setTile(tileId, newTilesetIndex);
 
-            const oldTilesetId = this.tilesetRefManager.getTilesetIdByIndex(setTileRefResult.tilesetIndex);
+            const oldTilesetId = this.tilesetRefManager.getTilesetRefId(setTileRefResult.tilesetIndex);
 
             return { coordinate, tileId: setTileRefResult.tileId, tilesetId: oldTilesetId || null };
         }).filter(r => r !== null) as SetTilesData[];
@@ -204,21 +204,31 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {
         cb(this);
     }
+
+    public override removeTilesetRef(tilesetIndex: number): void {
+        const changedCoords: Coordinate[] = [];
+
+        this.tilesRef.forEach((row, rowIndex) => {
+            if (!row) return;
+            row.forEach((tileRef, colIndex) => {
+                if (tileRef?.tilesetIndex === tilesetIndex) {
+                    this.tilesRef[rowIndex][colIndex] = null;
+                    changedCoords.push({ col: colIndex, row: rowIndex });
+                }
+            });
+        });
+
+        if (changedCoords.length > 0) this.eventEmitter.emit("tilesChanged", changedCoords);
+    }
 }
 
 export class TileRef {
-    private _tileId: number;
-    public get tileId(): number { return this._tileId; }
-    private set tileId(value: number) { this._tileId = value; }
-
-    private _tilesetIndex: number;
-    public get tilesetIndex(): number { return this._tilesetIndex; }
-    private set tilesetIndex(value: number) { this._tilesetIndex = value; }
+    public tileId: number;
+    public tilesetIndex: number;
 
     constructor(tileId: number, tilesetIndex: number) {
         this.tileId = tileId;
         this.tilesetIndex = tilesetIndex;
-
     }
 
     public serialize(): string {

@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/ConstraintTargetEditor.tsx
 import { VStack } from "../../custom/stack/Stack";
 import { useCallback, useMemo } from "react";
 import { Check, CircleQuestionMark, Square, SquareCheck, SquareDashed, SquareX } from "lucide-react";
@@ -33,9 +32,9 @@ export default function ConstraintTargetEditor() {
     const handleSelectTarget = useCallback((targetId: string) => {
         if (!selectedConstraint) return;
         if (selectedConstraint.getTargetIds().includes(targetId)) {
-            selectedConstraint.removeTargetById(targetId);
+            selectedConstraint.removeTarget(targetId);
         } else {
-            selectedConstraint.addTargetById(targetId);
+            selectedConstraint.addTarget(targetId);
         }
         refresh();
     }, [selectedConstraint, refresh]);

@@ -74,9 +74,7 @@ export class RulesetManager {
 
         const rulesetPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.rulesetRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
-        tilesetRefManager.load(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
-        rulesetRefManager.load(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
         const ruleset = new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
 
         await ruleset.load();

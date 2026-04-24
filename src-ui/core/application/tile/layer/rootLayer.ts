@@ -20,7 +20,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         super("root", tilesetRefManager, rulesetRefManager, tilemapProps);
 
         const groupLayerMap: Map<string, IGroupLayer> = new Map([["root", this]]);
-        
+
         layersData.forEach((layerData) => {
             const parentLayer = groupLayerMap.get(layerData.parentId) ?? this;
             const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
@@ -119,5 +119,13 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         const ids = new Set<string>();
         this.traverse((layer) => { if (layer !== this) ids.add(layer.id) });
         return ids;
+    }
+
+    public override removeRulesetRef(rulesetIndex: number): void {
+        this.layers.forEach((layer) => layer.removeRulesetRef(rulesetIndex));
+    }
+
+    public override removeTilesetRef(tilesetIndex: number): void {
+        this.layers.forEach((layer) => layer.removeTilesetRef(tilesetIndex));
     }
 }

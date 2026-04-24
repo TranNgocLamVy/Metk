@@ -1,11 +1,10 @@
-import { RulesetMetadata, RulesetRefData } from "@/shared/schema/rulesetSchema";
+import { RulesetRefData } from "@/shared/schema/rulesetSchema";
 import { RulesetManager } from "./rulesetManager";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 
-
-
+/** Manages references to rulesets, maintaining a mapping between ruleset IDs and their numerical indices. */
 export class RulesetRefManager {
-    public rulesetRefs: RulesetRefData[] = []
+    private rulesetRefs: RulesetRefData[] = []    
     private nextIndex: number;
 
     constructor(
@@ -13,67 +12,75 @@ export class RulesetRefManager {
         public readonly filePathSystem: FilePathSystem,
     ) { }
 
-    public load(rulesetRefs: RulesetRefData[], nextIndex: number) {
-        this.rulesetRefs = rulesetRefs;
-        this.nextIndex = nextIndex ?? 0;
+    public loadData(rulesetRefs: RulesetRefData[], nextIndex: number) {
+        this.rulesetRefs = rulesetRefs || [];
+        this.nextIndex = Number.isNaN(nextIndex) || nextIndex == null ? 0 : nextIndex;
     }
 
+    /** Retrieves a list of all currently tracked ruleset IDs. */
+    public getRefIds(): string[] {
+        const ids = this.rulesetRefs.map(ref => ref.id);
+        return ids;
+    }
+
+    /** Adds a new ruleset to the reference list if it doesn't already exist. */
     public addRulesetToRefs(rulesetId: string): void {
-        if (this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId)) return;
+        if (this.rulesetRefs.find(ref => ref.id === rulesetId)) return;
+        
         const ruleset = this.rulesetManager.getRulesetMetadataById(rulesetId);
         if (!ruleset) return;
+        
         this.rulesetRefs.push({ index: this.nextIndex, id: ruleset.id, name: ruleset.name });
         this.nextIndex += 1;
     }
 
-    public removeRulesetFromRefs(rulesetId: string): void {
-        const rulesetRefIndex = this.getRulesetRefIndex(rulesetId);
-        if (rulesetRefIndex === -1) return;
-        this.rulesetRefs = this.rulesetRefs.filter(rulesetRef => rulesetRef.id !== rulesetId);
-    }
-
-    public replaceRulesetRef(rulesetId: string, newRulesetId: string): void {
-        const rulesetRefIndex = this.getRulesetRefIndex(rulesetId);
-        if (rulesetRefIndex === -1) return;
-        this.rulesetRefs[rulesetRefIndex].id = newRulesetId;
-    }
-
+    /**
+     * Gets the unique numerical index assigned to a specific ruleset ID.
+     * If the ruleset is not currently referenced, it will be added first.
+     * @param rulesetId - The ID of the ruleset to look up.
+     * @returns The numerical index assigned to the ruleset.
+     */
     public getRulesetRefIndex(rulesetId: string): number {
         const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId);
         if (!rulesetRef) this.addRulesetToRefs(rulesetId);
-        return this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId)!.index;
+        return this.rulesetRefs.find(rulesetRef => rulesetRef.id === rulesetId)?.index ?? -1;
     }
 
-    public getRulesetIndex(ruleset: RulesetMetadata): number {
-        const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.id === ruleset.id);
-        if (!rulesetRef) {
-            const newRulesetRef: RulesetRefData = {
-                index: this.nextIndex,
-                id: ruleset.id,
-                name: ruleset.name,
-            }
-            this.rulesetRefs.push(newRulesetRef);
-            this.nextIndex += 1;
-            return newRulesetRef.index;
-        }
-        return rulesetRef.index;
-    }
-
-    public getRulesetIndexById(rulesetId: string): number {
-        const rulesetMetadata = this.rulesetManager.getRulesetMetadataById(rulesetId);
-        if (!rulesetMetadata) return -1;
-        return this.getRulesetIndex(rulesetMetadata);
-    }
-
-    public getRulesetIdByIndex(index: number): string | null {
-        const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.index === index);
+    /**
+     * Looks up a ruleset ID based on its assigned numerical index.
+     * @param rulesetIndex - The numerical index to look up.
+     * @returns The corresponding ruleset ID, or null if no reference matches the index.
+     */
+    public getRulesetRefId(rulesetIndex: number): string | null {
+        const rulesetRef = this.rulesetRefs.find(rulesetRef => rulesetRef.index === rulesetIndex);
         if (!rulesetRef) return null;
         return rulesetRef.id;
     }
 
-    public getRefIds(): string[] {
-        const ids = this.rulesetRefs.map(ref => ref.id);
-        return ids;
+    /**
+     * Replaces an existing ruleset reference with a new ruleset ID.
+     * * @param tilesetId - The current ID of the tileset to be replaced.
+     * @param newTilesetId - The new ID to assign to this reference.
+     */
+    public replaceRulesetRef(rulesetId: string, newRulesetId: string): void {
+        const refToUpdate = this.rulesetRefs.find(ref => ref.id === rulesetId);
+        const refToAdd = this.rulesetManager.getRulesetMetadataById(newRulesetId);
+        if (refToUpdate && refToAdd) {
+            refToUpdate.id = newRulesetId;
+            refToUpdate.name = refToAdd.name;
+        }
+    }
+
+    /**
+     * Removes a ruleset reference from the manager based on its ID.
+     * @param rulesetId - The ID of the ruleset to remove.
+     * @returns The index property of the removed ruleset, or -1 if it was not found.
+     */
+    public removeRulesetRef(ruleset: string | number): number {
+        const rulesetRefIndex = typeof ruleset === "string" ? this.getRulesetRefIndex(ruleset) : ruleset;
+        if (rulesetRefIndex === -1) return -1;
+        this.rulesetRefs = this.rulesetRefs.filter(rulesetRef => rulesetRef.index !== rulesetRefIndex);
+        return rulesetRefIndex;
     }
 
     public serialize() {

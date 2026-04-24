@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/ConstraintsGrid.tsx
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { ReactNode, useCallback, useMemo } from "react";
 import { Rule } from "@/core/application/rule/rule";
@@ -38,9 +37,9 @@ export default function ConstraintsGrid() {
     const handleSelectTarget = useCallback(() => {
         if (!selectedConstraint || !selectedTarget) return;
         if (selectedConstraint.getTargetIds().includes(selectedTarget)) {
-            selectedConstraint.removeTargetById(selectedTarget);
+            selectedConstraint.removeTarget(selectedTarget);
         } else {
-            selectedConstraint.addTargetById(selectedTarget);
+            selectedConstraint.addTarget(selectedTarget);
         }
         refresh();
     }, [selectedTarget, selectedConstraint, refresh]);
@@ -70,6 +69,7 @@ export default function ConstraintsGrid() {
             case "IS": constraint.setRequirement("NOT"); break;
             case "NOT": constraint.setRequirement("ANY"); break;
         }
+        console.log(constraint);
         refresh();
     };
 

@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/RuleHeader.tsx
 import { useState } from "react";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";

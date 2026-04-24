@@ -20,18 +20,21 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     private rules: Rule[] = [];
 
     constructor(
-        ruleData: RulesetData,
+        rulesetData: RulesetData,
         public readonly rulesetPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager
     ) {
         super();
 
-        this.id = ruleData.id;
-        this.name = ruleData.name;
-        this.color = ruleData.color;
-        this.size = ruleData.size;
-        this.rules = ruleData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager, this.rulesetRefManager));
+        this.id = rulesetData.id;
+        this.name = rulesetData.name;
+        this.color = rulesetData.color;
+        this.size = rulesetData.size;
+        this.rules = rulesetData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager, this.rulesetRefManager));
+
+        this.tilesetRefManager.loadData(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
+        this.rulesetRefManager.loadData(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
         
         this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
     }
@@ -44,8 +47,8 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         }
         this.name = rulesetData.name;
         this.color = rulesetData.color;
-        this.tilesetRefManager.load(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
-        this.rulesetRefManager.load(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
+        this.tilesetRefManager.loadData(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
+        this.rulesetRefManager.loadData(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
         const processedRuleIds = new Set<string>();
         for (const ruleData of rulesetData.rules) {
             processedRuleIds.add(ruleData.id);
@@ -91,7 +94,19 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.rules.push(newRule);
     }
 
-    public removeRule(rule: Rule): void { this.rules = this.rules.filter((r) => r !== rule) }
+    public removeRule(ruleId: string): void { this.rules = this.rules.filter((r) => r.id !== ruleId) }
+
+    public removeRulesetRef(ruleset: string | number): void {
+        const rulesetIndex = this.rulesetRefManager.removeRulesetRef(ruleset);
+        if (rulesetIndex === -1) return;
+        this.rules.forEach((rule) => rule.removeRulesetRef(rulesetIndex));
+    }
+
+    public removeTilesetRef(tileset: string | number): void {
+        const tilesetIndex = this.tilesetRefManager.removeTilesetRef(tileset);
+        if (tilesetIndex === -1) return;
+        this.rules.forEach((rule) => rule.removeTilesetRef(tilesetIndex));
+    }
 
     public serialize(): RulesetData {
         return {

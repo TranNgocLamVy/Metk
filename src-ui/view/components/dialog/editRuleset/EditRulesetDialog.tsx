@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/EditRulesetDialog.tsx
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { BaseDialogProps } from "../dialogRegistry";
 import { DialogContent, Dialog, DialogClose, DialogTitle } from "../../shadcn/dialog";
