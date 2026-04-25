@@ -32,10 +32,7 @@ export class DialogService {
         const rulesetManager = currentProject.rulesetManager;
 
         const ruleset = await rulesetManager.loadRuleset(id);
-        if (!ruleset) {
-            ToastService.error({ message: "Ruleset not found" });
-            return;
-        }
+        if (!ruleset) return;
         
         useDialogStore.getState().openDialog("EDIT_RULESET_MODAL", { zLevel: DialogZLevel.Modal }, { rulesetId: id })
     }

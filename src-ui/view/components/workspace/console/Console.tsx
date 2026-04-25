@@ -8,7 +8,7 @@ import ErrorConsole from "./ErrorConsole";
 import LogConsole from "./LogConsole";
 
 
-export default function Console() {
+export default function WorkspaceConsole() {
     const { isConsoleOpen, consoleType, closeConsole, setConsoleType, clearErrors, clearLogs } = useConsoleStore();
 
     const [height, setHeight] = useState<number>(150);

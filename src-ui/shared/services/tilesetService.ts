@@ -5,12 +5,13 @@ import { TilesetData, TilesetMetadata } from "@/shared/schema/tilesetSchema";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
-import { ToastService } from "./toastService";
 import { WorkspaceService } from "./workspaceService";
 import { Result } from "../types/result";
 import { TilesetStorageService } from "@/infrastructure/container";
 import { DialogService } from "./dialogService";
 import { createTilesetForm } from "../constant/form/createTilesetForm";
+import i18n from "@/core/service/i18n";
+import { Console } from "./consoleService";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
@@ -38,7 +39,7 @@ export class TilesetService {
             defaultTilesetDir = currentProject.projectPathSystem.absDir;
         }
 
-        const tilesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tileset", defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        const tilesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
         const tilesetDir = PathUtils.dirname(tilesetAbsPath);
 
@@ -62,7 +63,10 @@ export class TilesetService {
 
         const saveResult = await TilesetStorageService.save(tilesetAbsPath, tilesetData);
         if (saveResult.status !== Result.Status.Success) {
-            ToastService.error({ message: saveResult.message });
+            Console.error({
+                message: "message.tileset.saveFail",
+                stacks: saveResult.message ? [saveResult.message] : [],
+            })
             return;
         }
 
@@ -77,7 +81,7 @@ export class TilesetService {
 
         WorkspaceService.createTilesetSession(tilesetData.id);
 
-        ToastService.success({ message: "Tileset created successfully" });
+        Console.success({ message: "message.tileset.createSucess" });
     }
 
     public static async editTileset(): Promise<void> {
@@ -92,8 +96,8 @@ export class TilesetService {
         if (!currentProject || !currentWorkspace) return;
 
         const confirm = await DialogService.openPermissionDialog({
-            title: "Delete Tileset", // TODO: i18n
-            description: "Are you sure you want to delete this tileset? This action will permanently remove the file and cannot be undone."
+            title: "dialog.delete.tileset.title",
+            description: "dialog.delete.tileset.description",
         });
 
         if (!confirm) return;
@@ -103,10 +107,15 @@ export class TilesetService {
 
         const deleteResult = await currentProject.tilesetManager.deleteTileset(tilesetId);
         if (deleteResult.status !== Result.Status.Success) {
-            ToastService.error({ message: deleteResult.message });
+            Console.error({
+                message: "message.tileset.deleteFail",
+                stacks: deleteResult.message ? [deleteResult.message] : [],
+            })
             return;
         }
 
         await editorContext.projectManager.saveCurrrentProject();
+
+        Console.log({ message: "message.tileset.deleteSuccess"});
     }
 }

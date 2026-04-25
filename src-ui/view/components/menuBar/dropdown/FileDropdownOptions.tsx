@@ -12,13 +12,13 @@ import { executeCommand } from "@/core/service/commandService";
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		label: "menu.file.actions.new.label",
+		label: "menu.file.action.new.label",
 		startIcon: <FolderPlus className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					label: "menu.file.actions.new.project",
+					label: "menu.file.action.new.project",
 					startIcon: <FolderPlus />,
                     onClick() {
                         ProjectService.createProject();
@@ -28,7 +28,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 			[
 				{
 					type: "option",
-					label: "menu.file.actions.new.tilemap",
+					label: "menu.file.action.new.tilemap",
 					startIcon: <SquarePlus />,
 					disabled: () => !(appCore.projectManager.currentProject != null),
                     onClick() {
@@ -37,7 +37,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 				},
 				{
 					type: "option",
-					label: "menu.file.actions.new.tileset",
+					label: "menu.file.action.new.tileset",
 					startIcon: <Grid2x2Plus />,
 					disabled: () => !(appCore.projectManager.currentProject != null),
                     onClick() {
@@ -46,7 +46,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 				},
 				{
 					type: "option",
-					label: "menu.file.actions.new.ruleset",
+					label: "menu.file.action.new.ruleset",
 					startIcon: <Grid2x2Plus />,
 					disabled: () => !(appCore.projectManager.currentProject != null),
                     onClick() {
@@ -58,14 +58,14 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.open.file",
+		label: "menu.file.action.open.file",
 		startIcon: <FolderOpen />,
 		disabled: () => !(appCore.projectManager.currentProject != null),
         onClick: () => executeCommand("workspace.openFile")
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.open.project",
+		label: "menu.file.action.open.project",
 		startIcon: <FolderOpenDot />,
 		disabled: () => true,
         onClick() {
@@ -74,13 +74,13 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		label: "menu.file.actions.recentFiles.label",
+		label: "menu.file.action.recentFiles.label",
 		startIcon: <FileClock className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					label: "menu.file.actions.recentFiles.clear",
+					label: "menu.file.action.recentFiles.clear",
 					startIcon: <BrushCleaning />,
 					disabled: () => true,
                     onClick() { },
@@ -90,13 +90,13 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		label: "menu.file.actions.recentProjects.label",
+		label: "menu.file.action.recentProjects.label",
 		startIcon: <FolderClock className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					label: "menu.file.actions.recentProjects.clear",
+					label: "menu.file.action.recentProjects.clear",
 					startIcon: <BrushCleaning />,
 					disabled: () => true,
                     onClick() { },
@@ -109,7 +109,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "option",
-		label: "menu.file.actions.save",
+		label: "menu.file.action.save",
 		startIcon: <Save />,
 		disabled: () => {
 			const editorContext = appCore.editorContext;
@@ -121,14 +121,14 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.saveAs",
+		label: "menu.file.action.saveAs",
 		startIcon: <Save />,
 		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.saveAll",
+		label: "menu.file.action.saveAll",
 		startIcon: <SaveAll />,
 		disabled: () => {
 			const currentWorkspace = appCore.workspaceManager.currentWorkspace;
@@ -140,27 +140,27 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		label: "menu.file.actions.import.label",
+		label: "menu.file.action.import.label",
 		startIcon: <FolderUp className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					label: "menu.file.actions.import.tilemap",
+					label: "menu.file.action.import.tilemap",
 					startIcon: <FolderUp />,
 					disabled: () => true,
                     onClick() { },
 				},
 				{
 					type: "option",
-					label: "menu.file.actions.import.tileset",
+					label: "menu.file.action.import.tileset",
 					startIcon: <ImageUp />,
 					disabled: () => true,
                     onClick() { },
 				},
 				{
 					type: "option",
-					label: "menu.file.actions.import.ruleset",
+					label: "menu.file.action.import.ruleset",
 					startIcon: <ImageUp />,
 					disabled: () => true,
                     onClick() { },
@@ -170,13 +170,13 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		label: "menu.file.actions.export.label",
+		label: "menu.file.action.export.label",
 		startIcon: <FolderUp className=" stroke-2" />,
 		subMenus: [
 			[
 				{
 					type: "option",
-					label: "menu.file.actions.export.exportTMX",
+					label: "menu.file.action.export.exportTMX",
 					startIcon: <FolderUp />,
 					disabled: () => {
 						const editorContext = appCore.editorContext;
@@ -190,7 +190,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 				},
 				{
 					type: "option",
-					label: "menu.file.actions.export.exportImage",
+					label: "menu.file.action.export.exportImage",
 					startIcon: <ImageUp />,
 					disabled: () => true,
                     onClick() { },
@@ -203,28 +203,28 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 const FileDropdownOptionGroup4: MenuDropDownGroupType = [
 	{
 		type: "option",
-		label: "menu.file.actions.close",
+		label: "menu.file.action.close",
 		startIcon: <X />,
 		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.closeAll",
+		label: "menu.file.action.closeAll",
 		startIcon: <SquareX />,
 		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.closeProject",
+		label: "menu.file.action.closeProject",
 		startIcon: <FolderX />,
 		disabled: () => true,
         onClick() { },
 	},
 	{
 		type: "option",
-		label: "menu.file.actions.quit",
+		label: "menu.file.action.quit",
 		startIcon: <LogOut />,
 		disabled: () => true,
         onClick() { },

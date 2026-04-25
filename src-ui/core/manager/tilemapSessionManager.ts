@@ -31,10 +31,7 @@ export class TilemapSessionManager {
     public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<Result> {
         await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
             const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);
-            if (tilemapResult.status !== Result.Status.Success) {
-                // TODO: Move ToastService outside
-                return Result.Error(tilemapResult.message);     
-            }
+            if (tilemapResult.status !== Result.Status.Success) return Result.Error(tilemapResult.message); 
             const tilemap = tilemapResult.data;
             const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorContext);
             await tilemapSession.loadTilemapSession();

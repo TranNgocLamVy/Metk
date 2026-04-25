@@ -1,29 +1,5 @@
 import { create } from "zustand";
-import { v4 as uuidv4 } from "uuid";
-export type LogLevel = "info" | "success" | "warning";
-
-export interface ConsoleAction {
-    label: string;
-    variant?: "default" | "destructive";
-    onClick: () => void;
-}
-
-export interface LogMessage {
-    id: string;
-    timestamp: number;
-    level: LogLevel;
-    message: string;
-    details?: string;
-    actions?: ConsoleAction[];
-}
-
-export interface ErrorMessage {
-    id: string;
-    timestamp: number;
-    message: string;
-    stack?: string;
-    actions?: ConsoleAction[];
-}
+import { ErrorMessage, LogMessage } from "@/shared/services/consoleService";
 
 type ConsoleType = "log" | "error";
 
@@ -40,8 +16,10 @@ interface ConsoleState {
     toggleWithType: (type: ConsoleType) => void;
     openWithType: (type: ConsoleType) => void;
 
-    addLog: (log: Omit<LogMessage, "id" | "timestamp">) => void;
-    addError: (error: Omit<ErrorMessage, "id" | "timestamp">) => void;
+    addLog: (log: LogMessage) => void;
+    addError: (error: ErrorMessage) => void;
+    removeLog: (id: string) => void;
+    removeError: (id: string) => void;
     clearLogs: () => void;
     clearErrors: () => void;
     clearAll: () => void;
@@ -63,13 +41,17 @@ export const useConsoleStore = create<ConsoleState>((set, get) => ({
     })),
     openWithType: (type) => set({ isConsoleOpen: true, consoleType: type }),
 
-    addLog: (log) => set((state) => ({ 
-        logs: [...state.logs, { ...log, id: uuidv4(), timestamp: Date.now() }] 
+    addLog: (log) => {
+        set((state) => ({ logs: [...state.logs.filter(l => l.id !== log.id), log] }))
+    },
+    addError: (error) => {
+        set((state) => ({ errors: [...state.errors.filter(e => e.id !== error.id), error], isConsoleOpen: true, consoleType: "error"}))
+    },
+    removeLog: (id) => set((state) => ({
+        logs: state.logs.filter((log) => log.id !== id)
     })),
-    addError: (error) => set((state) => ({ 
-        errors: [...state.errors, { ...error, id: uuidv4(), timestamp: Date.now() }],
-        isConsoleOpen: true,
-        consoleType: "error"
+    removeError: (id) => set((state) => ({
+        errors: state.errors.filter((error) => error.id !== id)
     })),
     clearLogs: () => set({ logs: [] }),
     clearErrors: () => set({ errors: [] }),

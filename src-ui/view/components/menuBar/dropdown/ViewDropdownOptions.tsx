@@ -6,27 +6,27 @@ import { useUIViewOptions } from "@/view/stores/uiViewStore";
 const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		label: "menu.view.actions.viewAndToolbars.label",
+		label: "menu.view.action.viewAndToolbars.label",
         startIcon: <Eye className="stroke-1" />,
 		subMenus: [
 			[
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.project",
+					label: "menu.view.action.viewAndToolbars.project",
 					checked: () => useUIViewOptions().showProject,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowProject(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.console",
+					label: "menu.view.action.viewAndToolbars.console",
 					checked: () => useUIViewOptions().showConsole,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowConsole(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.issues",
+					label: "menu.view.action.viewAndToolbars.issues",
 					checked: () => useUIViewOptions().showIssues,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowIssues(),
@@ -35,63 +35,63 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 			[
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.properties",
+					label: "menu.view.action.viewAndToolbars.properties",
 					checked: () => useUIViewOptions().showProperties,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowProperties(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.layer",
+					label: "menu.view.action.viewAndToolbars.layer",
 					checked: () => useUIViewOptions().showLayers,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowLayers(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.history",
+					label: "menu.view.action.viewAndToolbars.history",
 					checked: () => useUIViewOptions().showHistory,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowHistory(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.objects",
+					label: "menu.view.action.viewAndToolbars.objects",
 					checked: () => useUIViewOptions().showObjects,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowObjects(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.templateEditor",
+					label: "menu.view.action.viewAndToolbars.templateEditor",
 					checked: () => useUIViewOptions().showTemplateEditor,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowTemplateEditor(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.tilesets",
+					label: "menu.view.action.viewAndToolbars.tilesets",
 					checked: () => useUIViewOptions().showTilesets,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowTilesets(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.terrainSets",
+					label: "menu.view.action.viewAndToolbars.terrainSets",
 					checked: () => useUIViewOptions().showTerrainSets,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowTerrainSets(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.minimap",
+					label: "menu.view.action.viewAndToolbars.minimap",
 					checked: () => useUIViewOptions().showMinimap,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowMinimap(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.tileStamps",
+					label: "menu.view.action.viewAndToolbars.tileStamps",
 					checked: () => useUIViewOptions().showTileStamps,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowTileStamps(),
@@ -100,21 +100,21 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 			[
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.mainToolbar",
+					label: "menu.view.action.viewAndToolbars.mainToolbar",
 					checked: () => useUIViewOptions().showMainToolbar,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowMainToolbar(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.tools",
+					label: "menu.view.action.viewAndToolbars.tools",
 					checked: () => useUIViewOptions().showTools,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowTools(),
 				},
 				{
 					type: "check",
-					label: "menu.view.actions.viewAndToolbars.toolOptions",
+					label: "menu.view.action.viewAndToolbars.toolOptions",
 					checked: () => useUIViewOptions().showToolOptions,
 					disabled: () => true,
 					toggle: () => useUIViewOptions.getState().toggleShowToolOptions(),
@@ -123,14 +123,14 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 			[
 				{
 					type: "option",
-					label: "menu.view.actions.viewAndToolbars.lockLayout",
+					label: "menu.view.action.viewAndToolbars.lockLayout",
                     startIcon: <Lock />,
 					disabled: () => true,
 					onClick() {},
 				},
 				{
 					type: "option",
-					label: "menu.view.actions.viewAndToolbars.resetToDefaultLayout",
+					label: "menu.view.action.viewAndToolbars.resetToDefaultLayout",
                     startIcon: <RotateCcw />,
 					disabled: () => true,
 					onClick() {},
@@ -140,7 +140,7 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 	},
 	{
 		type: "option",
-		label: "menu.view.actions.searchActions",
+		label: "menu.view.action.searchActions",
 		startIcon: <Search />,
 		disabled: () => true,
 		onClick() {},
@@ -150,7 +150,7 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "check",
-		label: "menu.view.actions.showGrid",
+		label: "menu.view.action.showGrid",
 		checked: () => useDrawingViewOptions().showGrid,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleGrid(),
@@ -164,34 +164,34 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "check",
-		label: "menu.view.actions.showObjectReferences",
+		label: "menu.view.action.showObjectReferences",
 		checked: () => useDrawingViewOptions().showObjectReferences,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleObjectReferences(),
 	},
 	{
 		type: "subMenu",
-		label: "menu.view.actions.showObjectNames.label",
+		label: "menu.view.action.showObjectNames.label",
         startIcon: <CaseSensitive />,
 		subMenus: [
             [
                 {
                     type: "radio",
-                    label: "menu.view.actions.showObjectNames.never",
+                    label: "menu.view.action.showObjectNames.never",
                     value: () => useDrawingViewOptions().showObjectNames,
 					disabled: () => true,
                     onValueChange: (value: ShowObjectNamesTypes) => useDrawingViewOptions.getState().setShowObjectNames(value),
                     items: [
                         {
-                            label: "menu.view.actions.showObjectNames.never",
+                            label: "menu.view.action.showObjectNames.never",
                             value: "Never",
                         },
                         {
-                            label: "menu.view.actions.showObjectNames.forSelectedObjects",
+                            label: "menu.view.action.showObjectNames.forSelectedObjects",
                             value: "ForSelectedObjects",
                         },
                         {
-                            label: "menu.view.actions.showObjectNames.forAllObjects",
+                            label: "menu.view.action.showObjectNames.forAllObjects",
                             value: "ForAllObjects",
                         },
                     ]
@@ -200,7 +200,7 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
             [
                 {
                     type: "check",
-                    label: "menu.view.actions.showObjectNames.forHoveredObjects",
+                    label: "menu.view.action.showObjectNames.forHoveredObjects",
                     checked: () => useDrawingViewOptions().showNamesForHoveredObjects,
 					disabled: () => true,
                     toggle: () => useDrawingViewOptions.getState().toggleNamesForHoveredObjects(),
@@ -210,28 +210,28 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "check",
-		label: "menu.view.actions.showTileAnimations",
+		label: "menu.view.action.showTileAnimations",
 		checked: () => useDrawingViewOptions().showTileAnimations,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleTileAnimations(),
 	},
 	{
 		type: "check",
-		label: "menu.view.actions.showTileCollisionShapes",
+		label: "menu.view.action.showTileCollisionShapes",
 		checked: () => useDrawingViewOptions().showTileCollisionShapes,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleTileCollisionShapes(),
 	},
 	{
 		type: "check",
-		label: "menu.view.actions.showWorld",
+		label: "menu.view.action.showWorld",
 		checked: () => useDrawingViewOptions().showWorld,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleWorld(),
 	},
 	{
 		type: "check",
-		label: "menu.view.actions.enableParallax",
+		label: "menu.view.action.enableParallax",
 		checked: () => useDrawingViewOptions().enableParallax,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleParallax(),
@@ -245,7 +245,7 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "check",
-		label: "menu.view.actions.highlightHoveredObject",
+		label: "menu.view.action.highlightHoveredObject",
 		checked: () => useDrawingViewOptions().highlightHoveredObject,
 		disabled: () => true,
 		toggle: () => useDrawingViewOptions.getState().toggleHighlightHoveredObject(),
@@ -255,31 +255,31 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 const ViewDropdownOptionGroup3: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		label: "menu.view.actions.snapping.label",
+		label: "menu.view.action.snapping.label",
         startIcon: <Grid3x3 className="stroke-1" />,
 		subMenus: [
             [
                 {
                     type: "radio",
-                    label: "menu.view.actions.snapping.label",
+                    label: "menu.view.action.snapping.label",
                     value: () => useDrawingViewOptions().snappingMode,
 					disabled: () => true,
                     onValueChange: (value: SnappingModeTypes) => useDrawingViewOptions.getState().setSnappingMode(value),
                     items: [
                         {
-                            label: "menu.view.actions.snapping.noSnapping",
+                            label: "menu.view.action.snapping.noSnapping",
                             value: "None",
                         },
                         {
-                            label: "menu.view.actions.snapping.snapToGrid",
+                            label: "menu.view.action.snapping.snapToGrid",
                             value: "Grid",
                         },
                         {
-                            label: "menu.view.actions.snapping.snapToFineGrid",
+                            label: "menu.view.action.snapping.snapToFineGrid",
                             value: "FineGrid",
                         },
                         {
-                            label: "menu.view.actions.snapping.snapToPixel",
+                            label: "menu.view.action.snapping.snapToPixel",
                             value: "Pixel",
                         },
                     ]
@@ -292,28 +292,28 @@ const ViewDropdownOptionGroup3: MenuDropDownGroupType = [
 const ViewDropdownOptionGroup4: MenuDropDownGroupType = [
 	{
 		type: "option",
-		label: "menu.view.actions.zoomIn",
+		label: "menu.view.action.zoomIn",
         startIcon: <ZoomIn />,
 		disabled: () => true,
 		onClick() {},
 	},
 	{
 		type: "option",
-		label: "menu.view.actions.zoomOut",
+		label: "menu.view.action.zoomOut",
         startIcon: <ZoomOut />,
 		disabled: () => true,
 		onClick() {},
 	},
 	{
 		type: "option",
-		label: "menu.view.actions.normalSize",
+		label: "menu.view.action.normalSize",
         startIcon: <RectangleHorizontal />,
 		disabled: () => true,
 		onClick() {},
 	},
 	{
 		type: "option",
-		label: "menu.view.actions.fitMapInView",
+		label: "menu.view.action.fitMapInView",
         startIcon: <Scan />,
 		disabled: () => true,
 		onClick() {},
@@ -323,7 +323,7 @@ const ViewDropdownOptionGroup4: MenuDropDownGroupType = [
 const ViewDropdownOptionGroup5: MenuDropDownGroupType = [
     {
 		type: "check",
-		label: "menu.view.actions.clearView",
+		label: "menu.view.action.clearView",
 		checked: () => false,
 		disabled: () => true,
 		toggle: () => {

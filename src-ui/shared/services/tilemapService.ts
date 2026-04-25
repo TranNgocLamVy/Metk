@@ -4,13 +4,14 @@ import { appCore } from "@/core/appcore";
 
 import { TilemapData, TilemapMetadata } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { ToastService } from "./toastService";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspaceService";
 import { TilemapStorageService } from "@/infrastructure/container";
 import { PathUtils } from "../utils/pathUtils";
 import { DialogService } from "./dialogService";
 import { createTilemapForm } from "../constant/form/createTilemapForm";
+import i18n from "@/core/service/i18n";
+import { Console } from "./consoleService";
 
 export class TilemapService {
 
@@ -31,7 +32,7 @@ export class TilemapService {
             defaultDir = currentProject.projectPathSystem.absDir;
         }
 
-        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", defaultPath: defaultDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return;
 
         const tilemapDir = PathUtils.dirname(tilemapAbsPath);
@@ -52,22 +53,79 @@ export class TilemapService {
 
         const saveResult = await TilemapStorageService.save(tilemapAbsPath, tilemapData);
         if (saveResult.status !== Result.Status.Success) {
-            ToastService.error({ message: saveResult.message });
+            Console.error({
+                message: "message.tilemap.saveFail",
+                stacks: saveResult.message ? [saveResult.message] : [],
+            })
             return;
         }
 
-        const tilemapRefPath = PathUtils.relative(currentProject.projectPathSystem.absDir, tilemapAbsPath);
-        const tilemapMetadata: TilemapMetadata = {
-            id: tilemapData.id,
-            name: tilemapData.name,
-            tilemapRelPath: tilemapRefPath,
-        }
-        currentProject.tilemapManager.addTilemapMetadata(tilemapMetadata);
+        await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
+
         await editorContext.projectManager.saveCurrrentProject();
 
         WorkspaceService.createTilemapSession(tilemapData.id);
         
-        ToastService.success({ message: "Tilemap created successfully" });
+        Console.success({ message: "message.tilemap.createSucess"});
+    }
+
+    public static async importTilemap(refTilemapId?: string): Promise<Result> {
+        const tilemapAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        if (!tilemapAbsPath) return Result.Cancel();
+        const tilemapDataResult = await TilemapStorageService.load(tilemapAbsPath);
+        if (tilemapDataResult.status !== Result.Status.Success) {
+            Console.error({
+                message: "message.tilemap.loadFail",
+                stacks: tilemapDataResult.message ? [tilemapDataResult.message] : [],
+            })
+            return Result.Error(tilemapDataResult.message);
+        }
+
+        const tilemapData = tilemapDataResult.data;
+        if (refTilemapId && tilemapData.id !== refTilemapId) {
+            Console.error({
+                message: "message.tilemap.importFail",
+                stacks: [
+                    "message.tilemap.mismatchId"
+                ]
+            });
+            return Result.Cancel();
+        }
+        
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const tilemapManager = currentProject.tilemapManager;
+        
+        await tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
+
+        await editorContext.projectManager.saveCurrrentProject();
+
+        WorkspaceService.createTilemapSession(tilemapData.id);
+        
+        Console.success({ message: "message.tilemap.importSucess"});
+
+        return Result.Success();
+    }
+
+    public static async removeTilemap(tilemapId: string): Promise<Result> {
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const tilemapSession = currentWorkspace.tilemapSessionManager.getSessionByTilemapId(tilemapId);
+        if (tilemapSession) await WorkspaceService.closeTilemapSession(tilemapSession.id);
+
+        const removeResult = await currentProject.tilemapManager.removeTilemapMetadata(tilemapId);
+        if (removeResult.status == Result.Status.Success) {
+            await editorContext.projectManager.saveCurrrentProject();
+        }
+        return removeResult;
     }
 
     public static async deleteTilemap(tilemapId: string): Promise<void> {
@@ -78,8 +136,8 @@ export class TilemapService {
         if (!currentProject || !currentWorkspace) return;
 
         const confirm = await DialogService.openPermissionDialog({
-            title: "Delete Tilemap", // TODO: i18n
-            description: "Are you sure you want to delete this tilemap? This action will permanently remove the file and cannot be undone."
+            title: "dialog.delete.tilemap.title",
+            description: "dialog.delete.tilemap.description",
         });
 
         if (!confirm) return;
@@ -89,11 +147,14 @@ export class TilemapService {
 
         const deleteResult = await currentProject.tilemapManager.deleteTilemap(tilemapId);
         if (deleteResult.status !== Result.Status.Success) {
-            ToastService.error({ message: deleteResult.message });
+            Console.error({
+                message: "message.tilemap.deleteFail",
+                stacks: deleteResult.message ? [deleteResult.message] : [],
+            })
             return;
         }
 
         await editorContext.projectManager.saveCurrrentProject();
-        ToastService.success({ message: "Tilemap deleted successfully" });
+        Console.log({ message: "message.tilemap.deleteSuccess"});
     }
 }
