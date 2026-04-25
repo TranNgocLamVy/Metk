@@ -28,6 +28,26 @@
                 "export": "Export Tilemap",
                 "remove": "Remove Tilemap",
                 "delete": "Delete Tilemap"
+            },
+            "tileset": {
+                "create": "New Tileset",
+                "open": "Open Tileset",
+                "save": "Save Tileset",
+                "saveAs": "Save Tileset As",
+                "import": "Import Tileset",
+                "export": "Export Tileset",
+                "remove": "Remove Tileset",
+                "delete": "Delete Tileset"
+            },
+            "ruleset": {
+                "create": "New Ruleset",
+                "open": "Open Ruleset",
+                "save": "Save Ruleset",
+                "saveAs": "Save Ruleset As",
+                "import": "Import Ruleset",
+                "export": "Export Ruleset",
+                "remove": "Remove Ruleset",
+                "delete": "Delete Ruleset"
             }
         }
     },
@@ -453,10 +473,12 @@
                 "description": "Are you sure you want to delete this tilemap? This action will permanently remove the file and cannot be undone."
             },
             "tileset": {
-                "title": "Delete Tileset"
+                "title": "Delete Tileset",
+                "description": "Are you sure you want to delete this tileset? This action will permanently remove the file and cannot be undone."
             },
             "ruleset": {
-                "title": "Delete Ruleset"
+                "title": "Delete Ruleset",
+                "description": "Are you sure you want to delete this ruleset? This action will permanently remove the file and cannot be undone."
             }
         },
         "saveBeforeClose": {
@@ -475,9 +497,10 @@
             "createSuccess": "Tilemap created successfully",
             "openSuccess": "Tilemap opened: {{name}}",
             "saveSuccess": "Tilemap saved: {{name}}",
+            "removeSuccess": "Tilemap removed: {{name}}",
             "deleteSuccess": "Tilemap deleted: {{name}}",
             "exportSuccess": "Tilemap '{{name}}' exported successfull",
-            "importSuccess": "Tilemap imported successfully",
+            "importSuccess": "Tilemap '{{name}}' imported successfully",
 
             "loadFail": "Tilemap load failed: name: {{name}} - id: {{id}}",
             "createFail": "Tilemap creation failed",
@@ -486,49 +509,59 @@
             "deleteFail": "Tilemap deletion failed",
             "importFail": "Tilemap import failed",
             "exportFail": "Tilemap export failed",
-            "notFound": "Tilemap not found",
-            "metadataNotFound": "Metadata not found",
-            "mismatchId": "Mismatching Id"
+            "notFound": "Tilemap not found: id: {{id}}",
+            "metadataNotFound": "Tilemap metadata not found: id: {{id}}",
+            "mismatchId": "Mismatching id between tilemap",
+            "unknownError": "Unknown error when load tilemap"
         },
         "tileset": {
             "loadSuccess": "Tileset loaded",
             "createSuccess": "Tileset created successfully",
             "openSuccess": "Tileset opened: {{name}}",
             "closeSuccess": "Tileset closed: {{name}}",
-            "saveSuccess": "Tileset saved",
-            "updatedSuccess": "Tileset updated",
-            "deleteSuccess": "Tileset deleted",
-            "importSuccess": "Tileset imported successfully",
+            "saveSuccess": "Tileset saved: {{name}}",
+            "updatedSuccess": "Tileset updated: {{name}}",
+            "deleteSuccess": "Tileset deleted: {{name}}",
+            "importSuccess": "Tileset '{{name}}' imported successfully",
 
             "loadFail": "Tileset load failed",
             "createFail": "Tileset creation failed",
             "openFail": "Tileset open failed",
             "saveFail": "Tileset save failed",
             "deleteFail": "Tileset deletion failed",
-            "importFail": "Tileset import failed"
+            "importFail": "Tileset import failed",
+            "notFound": "Tileset not found: id: {{id}}",
+            "metadataNotFound": "Tileset metadata not found: id: {{id}}",
+            "mismatchId": "Mismatching id between tileset",
+            "unknownError": "Unknown error when load tileset"
         },
         "ruleset": {
             "loadSuccess": "Ruleset loaded",
             "createSuccess": "Ruleset created successfully",
-            "openSuccess": "Ruleset opened successfully",
+            "openSuccess": "Ruleset opened",
             "saveSuccess": "Ruleset saved",
-            "updatedSuccess": "Ruleset updated",
-            "deleteSuccess": "Ruleset deleted",
+            "updatedSuccess": "Ruleset updated: {{name}}",
+            "deleteSuccess": "Ruleset deleted: {{name}}",
+            "removeSuccess": "Ruleset removed: {{name}}",
             "importSuccess": "Ruleset imported successfully",
 
-            "loadFail": "Ruleset load failed",
+            "loadFail": "Ruleset load failed: name: {{name}} - id: {{id}}",
             "createFail": "Ruleset creation failed",
             "openFail": "Ruleset open failed",
             "saveFail": "Ruleset save failed",
             "deleteFail": "Ruleset deletion failed",
-            "importFail": "Ruleset import failed"
+            "importFail": "Ruleset import failed",
+            "notFound": "Ruleset not found: id: {{id}}",
+            "metadataNotFound": "Ruleset metadata not found: id: {{id}}",
+            "mismatchId": "Mismatching id between ruleset",
+            "unknownError": "Unknown error when load ruleset"
         },
         "system": {
             "fs": {
-                "writeFail": "Error writing file: {{path}} {{error}}",
-                "readFail": "Error reading file: {{path}} {{error}}",
-                "removeFail": "Error removing file: {{path}} {{error}}",
-                "mkdirFail": "Error creating directory: {{path}} {{error}}",
+                "writeFail": "Error writing file: {{path}}",
+                "readFail": "Error reading file: {{path}}",
+                "removeFail": "Error removing file: {{path}}",
+                "mkdirFail": "Error creating directory: {{path}}",
                 "fileNotFoundAt": "File not found at: {{path}}",
                 "directoryNotFoundAt": "Directory not found at: {{path}}"
             }

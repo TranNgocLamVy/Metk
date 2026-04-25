@@ -13,7 +13,8 @@ export class TauriFileSystemProvider implements IStorageProvider {
             await mkdir(path, options);
             return Result.Success();
         } catch (error) {
-            return Result.Error({ key: "message.system.fs.mkdirFail", options: { error, path } });
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.mkdirFail", options: { path } });
         }
     }
 
@@ -25,7 +26,8 @@ export class TauriFileSystemProvider implements IStorageProvider {
             const data = await readTextFile(path, options);
             return Result.Success(data);
         } catch (error) {
-            return Result.Error({ key: "message.system.fs.readFail", options: { error, path }});
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.readFail", options: { path }});
         }
     }
 
@@ -40,7 +42,8 @@ export class TauriFileSystemProvider implements IStorageProvider {
             }
             return Result.Success();
         } catch (error) {
-            return Result.Error({ key: "message.system.fs.writeFail", options: { error, path }});
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.writeFail", options: { path }});
         }
     }
 
@@ -52,7 +55,8 @@ export class TauriFileSystemProvider implements IStorageProvider {
             const data = await readFile(path, options);
             return Result.Success(data);
         } catch (error) {
-            return Result.Error({ key: "message.system.fs.readFail", options: { error, path }});
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.readFail", options: { path }});
         }
     }
 
@@ -67,7 +71,8 @@ export class TauriFileSystemProvider implements IStorageProvider {
             }
             return Result.Success();
         } catch (error) {
-            return Result.Error({ key: "message.system.fs.writeFail", options: { error, path }});
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.writeFail", options: { path }});
         }
     }
 
@@ -78,7 +83,8 @@ export class TauriFileSystemProvider implements IStorageProvider {
             }
             return Result.Success();
         } catch (error) {
-            return Result.Error({ key: "message.system.fs.removeFail", options: { error, path }});
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.removeFail", options: { path }});
         }
     }
 }

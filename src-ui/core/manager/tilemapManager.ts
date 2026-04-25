@@ -39,7 +39,7 @@ export class TilemapManager {
         const tilemapPathSystem = new FilePathSystem(tilemap.id, this.projectPathSystem, tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
-        const newTilemap = new Tilemap(tilemap, tilesetRefManager, rulesetRefManager);
+        const newTilemap = new Tilemap(tilemap, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
         await newTilemap.load();
 
         this.loadedTilemaps.set(tilemap.id, newTilemap);
@@ -53,18 +53,16 @@ export class TilemapManager {
 
     public async loadTilemap(id: string): Promise<Result<Tilemap>> {
         if (this.loadedTilemaps.has(id)) return Result.Success(this.loadedTilemaps.get(id)!)
-
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;
 
         const loadPromise = this.performTilemapLoad(id);
         this.pendingLoads.set(id, loadPromise);
 
         try {
-            const result = await loadPromise;
-            return result;
+            return await loadPromise;
         } catch (error) {
-            console.error({ message: "Failed to load tilemap" }, error);
-            return Result.Error(`Failed to load tilemap, error: ${error}`);
+            console.error("Unknown error: ", error);
+            return Result.Error("message.tilemap.unknownError");
         } finally {
             this.pendingLoads.delete(id);
         }
@@ -74,9 +72,9 @@ export class TilemapManager {
         const tilemapMetadata = this.tilemapMetadata.get(id);
         if (!tilemapMetadata) {
             const customId = "loadTilemapFail" + id;
-            Console.error({ 
-                message: { key: "message.tilemap.loadFail", options: { name: "Unknow", id }},
-                stacks: ["message.tilemap.metadataNotFound"],
+            Console.error({
+                message: { key: "message.tilemap.loadFail", options: { name: "Unknow", id } },
+                stacks: [{ key: "message.tilemap.metadataNotFound", options: { id } }],
                 actions: [{ label: "global.action.tilemap.import", onClick: () => TilemapService.importTilemap(id), variant: "outline" }]
             }, customId);
             return Result.Error("message.tilemap.metadataNotFound");
@@ -87,11 +85,11 @@ export class TilemapManager {
 
         if (loadTilemapResult.status !== Result.Status.Success) {
             const customId = "loadTilemapFail" + id;
-            Console.error({ 
-                message:  { key: "message.tilemap.loadFail", options: { name: tilemapMetadata.name, id } },
+            Console.error({
+                message: { key: "message.tilemap.loadFail", options: { name: tilemapMetadata.name, id } },
                 stacks: loadTilemapResult.message ? [loadTilemapResult.message] : [],
                 actions: [
-                    { label: "global.action.tilemap.import", onClick: () => TilemapService.importTilemap(id), variant: "outline"},
+                    { label: "global.action.tilemap.import", onClick: () => TilemapService.importTilemap(id), variant: "outline" },
                     { label: "global.action.tilemap.remove", onClick: () => TilemapService.removeTilemap(id), variant: "destructive" },
                 ]
             }, customId);
@@ -103,12 +101,12 @@ export class TilemapManager {
         const tilemapPathSystem = new FilePathSystem(tilemapMetadata.id, this.projectPathSystem, tilemapMetadata.tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
-        const tilemap = new Tilemap(tilemapData, tilesetRefManager, rulesetRefManager);
+        const tilemap = new Tilemap(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
 
         await tilemap.load();
 
         this.loadedTilemaps.set(tilemapData.id, tilemap);
-        
+
         await this.loadTilemapDependencies(tilemapData);
 
         return Result.Success(tilemap);
@@ -122,12 +120,7 @@ export class TilemapManager {
             // TODO: Handle unknown tileset
         }));
 
-        await Promise.all(tilemapData.rulesets.refs.map(rulesetRef => {
-            if (this.rulesetManager.rulesetMetadatas.has(rulesetRef.id)) {
-                return this.rulesetManager.loadRuleset(rulesetRef.id)
-            }
-            // TODO: Handle unknown ruleset
-        }));
+        await this.rulesetManager.loadRulesets(tilemapData.rulesets.refs.map(rulesetRef => rulesetRef.id));
     }
 
     public async unloadTilemap(tilemapId: string): Promise<void> {
@@ -151,7 +144,7 @@ export class TilemapManager {
 
     public async removeTilemapMetadata(id: string): Promise<Result> {
         const metaData = this.tilemapMetadata.get(id);
-        if (!metaData) return Result.Error(`Tilemap metadata not found for id: ${id}`);
+        if (!metaData) return Result.Error({ key: "message.tilemap.metadataNotFound", options: { id } });
 
         if (this.loadedTilemaps.has(id)) {
             await this.unloadTilemap(id);
@@ -162,21 +155,28 @@ export class TilemapManager {
     }
 
     public async deleteTilemap(id: string): Promise<Result> {
-        const metaData = this.tilemapMetadata.get(id);
-        if (!metaData) return Result.Error(`Tilemap metadata not found for id: ${id}`);
+        const tilemapMetaData = this.tilemapMetadata.get(id);
+        if (!tilemapMetaData) {
+            Console.error({
+                message: "message.tilemap.deleteFail",
+                stacks: ["message.tilemap.metadataNotFound"],
+            })
+            return Result.Error({ key: "message.tilemap.metadataNotFound", options: { id } });
+        }
 
         if (this.loadedTilemaps.has(id)) {
             await this.unloadTilemap(id);
         }
 
-        const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.tilemapRelPath);
+        const tilemapAbsPath = this.projectPathSystem.getAbsPathFromRelPath(tilemapMetaData.tilemapRelPath);
         const removeResult = await TilemapStorageService.remove(tilemapAbsPath);
         if (removeResult.status !== Result.Status.Success) {
-            return Result.Error(`Failed to delete tilemap file: ${removeResult.message}`);
+            Console.error({ message: "message.tilemap.deleteFail", stacks: [removeResult.message!, ...removeResult.stacks!] })
+            return Result.Error("message.tilemap.deleteFail", removeResult);
         }
 
         this.tilemapMetadata.delete(id);
-
+        Console.log({ message: "message.tilemap.deleteSuccess" });
         return Result.Success();
     }
 

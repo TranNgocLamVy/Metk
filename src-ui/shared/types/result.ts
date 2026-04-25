@@ -15,6 +15,7 @@ export type Result<T = any> = SuccessResult<T> | ErrorResult<T>;
 type ErrorResult<T = any> = {
     status: FailStatus;
     message?: TranslatableMessage;
+    stacks?: TranslatableMessage[];
     data?: T;
 };
 
@@ -24,9 +25,10 @@ type SuccessResult<T = any> = {
     data: T;
 };
 
-function ErrorResult<T = any>(input?: TranslatableMessage): ErrorResult<T> {
+function ErrorResult<T = any>(input?: TranslatableMessage, stacksResult?: ErrorResult): ErrorResult<T> {
     const message: TranslatableMessage = typeof input === "string" ? { key: input } : input ?? "";
-    return { status: "Error", message: message };
+    const stacks = [ stacksResult?.message, ...(stacksResult?.stacks ?? []) ];
+    return { status: "Error", message: message, stacks: stacks.filter(stacks => stacks !== undefined) };
 }
 
 function SuccessResult<T = any>(data?: T, input?: TranslatableMessage): SuccessResult<T> {

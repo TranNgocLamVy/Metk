@@ -6,6 +6,9 @@ import { Result } from "@/shared/types/result";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { TilesetRefManager } from "./tilesetRefManager";
 import { RulesetRefManager } from "./rulesetRefManager";
+import { PathUtils } from "@/shared/utils/pathUtils";
+import { Console } from "@/shared/services/consoleService";
+import { RulesetService } from "@/shared/services/rulesetService";
 
 
 export class RulesetManager {
@@ -19,60 +22,87 @@ export class RulesetManager {
         private readonly projectPathSystem: ProjectPathSystem,
     ) { }
 
-    public getRulesetById(id: string): Ruleset | null {
-        const ruleset = this.loadedRulesets.get(id);
-        if (ruleset === undefined) return null
-        return ruleset;
-    }
-
-    public async getRuleset(id: string): Promise<Ruleset | null> {
-        const rulesetMetadata = this.getRulesetMetadataById(id);
-        if (!rulesetMetadata) return null;
-        const loadResult = await this.loadRuleset(id);
-        if (loadResult.status !== Result.Status.Success) return null;
-        return loadResult.data;
-    }
-
-    public getRulesetMetadataById(id: string): RulesetMetadata | null {
-        const rulesetMetadata = this.rulesetMetadatas.get(id);
-        if (!rulesetMetadata) return null;
-        return rulesetMetadata;
-    }
-
-    public addRuleMetadata(ruleMetadata: RulesetMetadata): void {
+    public addRulesetMetadata(ruleMetadata: RulesetMetadata): void {
         this.rulesetMetadatas.set(ruleMetadata.id, ruleMetadata);
     }
 
-    public setRulesetMetadatas(rulesetsMetadata: RulesetMetadata[]): void {
+    public async addRuleset(ruleset: RulesetData, rulesetAbsPath: string): Promise<void> {
+        const rulesetRelPath = PathUtils.relative(this.projectPathSystem.absDir, rulesetAbsPath);
+        const rulesetMetadata: RulesetMetadata = {
+            id: ruleset.id,
+            name: ruleset.name,
+            color: ruleset.color,
+            rulesetRelPath: rulesetRelPath,
+        }
+        this.rulesetMetadatas.set(ruleset.id, rulesetMetadata);
+        const rulesetPathSystem = new FilePathSystem(ruleset.id, this.projectPathSystem, rulesetRelPath);
+        const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
+        const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
+        const newRuleset = new Ruleset(ruleset, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+
+        await newRuleset.load();
+
+        this.loadedRulesets.set(ruleset.id, newRuleset);
+
+        await this.loadRulesetDependencies(ruleset);
+    }
+
+    public loadRulesetMetadata(rulesetsMetadata: RulesetMetadata[]): void {
         rulesetsMetadata.forEach((meta) => this.rulesetMetadatas.set(meta.id, meta));
+    }
+
+    public async loadRulesets(ids: string[]): Promise<void> {
+        await Promise.all(ids.map(id => this.loadRuleset(id)));
     }
 
     public async loadRuleset(id: string): Promise<Result<Ruleset>> {
         if (this.loadedRulesets.has(id)) return Result.Success(this.loadedRulesets.get(id)!)
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;
-        if (!this.rulesetMetadatas.has(id)) return Result.Error(`Ruleset metadata not found for id: ${id}`);
+
         const loadPromise = this.performRulesetLoad(id);
         this.pendingLoads.set(id, loadPromise);
+
         try {
             return await loadPromise;
         } catch (error) {
-            return Result.Error(`Failed to load ruleset, error: ${error}`);
+            console.error("Unknown error: ", error);
+            return Result.Error("message.ruleset.unknownError");
         } finally {
             this.pendingLoads.delete(id);
         }
     }
 
     private async performRulesetLoad(id: string): Promise<Result<Ruleset>> {
-        const metaData = this.rulesetMetadatas.get(id)!;
+        const rulesetMetadata = this.rulesetMetadatas.get(id);
+        if (!rulesetMetadata) {
+            const customId = "loadRulesetFail" + id;
+            Console.error({
+                message: { key: "message.ruleset.loadFail", options: { name: "Unknow", id } },
+                stacks: ["message.ruleset.metadataNotFound"],
+                actions: [{ label: "global.action.ruleset.import", onClick: () => RulesetService.importRuleset(id), variant: "outline" }]
+            }, customId);
+            return Result.Error("message.ruleset.metadataNotFound");
+        }
 
-        const rulesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(metaData.rulesetRelPath);
+        const rulesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(rulesetMetadata.rulesetRelPath);
         const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);
 
-        if (loadRulesetResult.status !== Result.Status.Success)  return Result.Error(loadRulesetResult.message);
+        if (loadRulesetResult.status !== Result.Status.Success) {
+            const customId = "loadRulesetFail" + id;
+            Console.error({
+                message: { key: "message.ruleset.loadFail", options: { name: rulesetMetadata.name, id } },
+                stacks: loadRulesetResult.message ? [loadRulesetResult.message] : [],
+                actions: [
+                    { label: "global.action.ruleset.import", onClick: () => RulesetService.importRuleset(id), variant: "outline" },
+                    { label: "global.action.ruleset.remove", onClick: () => RulesetService.removeRuleset(id), variant: "destructive" },
+                ]
+            }, customId);
+            return Result.Error(loadRulesetResult.message);
+        }
 
         const rulesetData = loadRulesetResult.data;
 
-        const rulesetPathSystem = new FilePathSystem(metaData.id, this.projectPathSystem, metaData.rulesetRelPath);
+        const rulesetPathSystem = new FilePathSystem(rulesetMetadata.id, this.projectPathSystem, rulesetMetadata.rulesetRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
         const ruleset = new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
@@ -81,21 +111,19 @@ export class RulesetManager {
 
         this.loadedRulesets.set(rulesetData.id, ruleset);
 
+        await this.loadRulesetDependencies(rulesetData);
+
+        return Result.Success(ruleset);
+    }
+
+    private async loadRulesetDependencies(rulesetData: RulesetData): Promise<void> {
         await Promise.all(rulesetData.tilesets.refs.map(tilesetRef => {
             if (this.tilesetManager.tilesetMetadata.has(tilesetRef.id)) {
                 return this.tilesetManager.loadTileset({ id: tilesetRef.id })
             }
-            // TODO: Handle unknown tileset
         }));
 
-        await Promise.all(rulesetData.rulesets.refs.map(rulesetRef => {
-            if (this.rulesetMetadatas.has(rulesetRef.id)) {
-                return this.loadRuleset(rulesetRef.id)
-            }
-            // TODO: Handle unknown ruleset
-        }));
-
-        return Result.Success(ruleset);
+        await this.loadRulesets(rulesetData.rulesets.refs.map(rulesetRef => rulesetRef.id).filter(id => id !== rulesetData.id));
     }
 
     public async unloadRuleset(id: string): Promise<void> {
@@ -107,32 +135,66 @@ export class RulesetManager {
 
     public async saveRuleset(id: string): Promise<Result> {
         const ruleset = this.loadedRulesets.get(id);
-        if (ruleset == undefined) return Result.Error("Ruleset not found");
+        if (ruleset == undefined) return Result.Error({ key: "message.ruleset.notFound", options: { id }});
         const rulesetData = ruleset.serialize();
         return RulesetStorageService.save(ruleset.rulesetPathSystem.getFileAbsPath(), rulesetData);
+    }
+
+    public async removeRulesetMetadata(id: string): Promise<Result> {
+        const metaData = this.rulesetMetadatas.get(id);
+        if (!metaData) return Result.Error({ key: "message.ruleset.metadataNotFound", options: { id }});
+
+        if (this.loadedRulesets.has(id)) {
+            await this.unloadRuleset(id);
+        }
+
+        this.rulesetMetadatas.delete(id);
+        Console.log({ message: { key: "message.ruleset.removeSuccess" , options: { name: metaData.name }}});
+        return Result.Success();
+    }
+
+    public getRulesetById(id: string): Ruleset | null {
+        const ruleset = this.loadedRulesets.get(id);
+        if (ruleset === undefined) return null
+        return ruleset;
+    }
+
+    public getRulesetMetadataById(id: string): RulesetMetadata | null {
+        const rulesetMetadata = this.rulesetMetadatas.get(id);
+        if (!rulesetMetadata) return null;
+        return rulesetMetadata;
     }
 
     public updateRuleset(rulesetData: RulesetData): void {
         const ruleset = this.loadedRulesets.get(rulesetData.id);
         if (!ruleset) return;
         ruleset.updateRuleset(rulesetData);
+        Console.success({ message: { key: "message.ruleset.updatedSuccess" , options: { name: rulesetData.name }}})
     }
 
     public async deleteRuleset(id: string): Promise<Result> {
         const rulesetMetadata = this.rulesetMetadatas.get(id);
-        if (!rulesetMetadata) return Result.Error(`Ruleset metadata not found for id: ${id}`);
-    
+        if (!rulesetMetadata) {
+            Console.error({
+                message: "message.ruleset.deleteFail",
+                stacks: ["message.ruleset.metadataNotFound"],
+            })
+            return Result.Error({ key: "message.ruleset.metadataNotFound", options: { id }});
+        }
+
         if (this.loadedRulesets.has(id)) await this.unloadRuleset(id);
-    
+
         const rulesetAbsPath = this.projectPathSystem.getAbsPathFromRelPath(rulesetMetadata.rulesetRelPath);
         const removeResult = await RulesetStorageService.remove(rulesetAbsPath);
-        
+
         if (removeResult.status !== Result.Status.Success) {
-            return Result.Error(`Failed to delete ruleset file: ${removeResult.message}`);
+            Console.error({ message: "message.ruleset.deleteFail", stacks: [removeResult.message!, ...removeResult.stacks!]})
+            return Result.Error("message.ruleset.deleteFail", removeResult);
         }
         this.rulesetMetadatas.delete(id);
         this.loadedRulesets.delete(id);
         this.pendingLoads.delete(id);
+        Console.log({ message: { key: "message.ruleset.deleteSuccess", options: { name: rulesetMetadata.name }}});
         return Result.Success();
     }
 

@@ -16,7 +16,6 @@ import OutputList from "./OutputList";
 import { Ruleset } from "@/core/application/rule/ruleset";
 import { EditRulesetContext } from "./EditRulesetContext";
 import { LocalizedText } from "../../custom/LocalizeText";
-import { Console } from "@/shared/services/consoleService";
 
 interface EditRulesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -84,7 +83,6 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
         await rulesetManager.saveRuleset(ruleset.id);
         useRulesetManagerStore.getState().refresh();
 
-        Console.success({ message: "message.ruleset.updatedSuccess" })
         onClose();
     };
 

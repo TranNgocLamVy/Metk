@@ -25,10 +25,9 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     public rootLayer: RootLayer;
 
-    public readonly tilemapPathSystem: FilePathSystem;
-
     constructor(
         tilemapData: TilemapData,
+        public readonly tilemapPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager
     ) {

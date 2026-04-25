@@ -44,7 +44,7 @@ export class Project {
     public async load() {
         this.tilesetManager.loadTilesetsMetadata(this.data.tilesets);
         this.tilemapManager.loadTilemapsMetada(this.data.tilemaps);
-        this.rulesetManager.setRulesetMetadatas(this.data.rulesets);
+        this.rulesetManager.loadRulesetMetadata(this.data.rulesets);
     }
 
     public async unload() {
