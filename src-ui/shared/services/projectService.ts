@@ -2,7 +2,6 @@ import { appCore } from "@/core/appcore";
 import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { ToastService } from "./toastService";
 import { Result } from "../types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
 import { defaultProjectData } from "../schema/projectSchema";
@@ -12,6 +11,7 @@ import { DialogService } from "./dialogService";
 import { useNavigationStore } from "@/view/stores/navigationStore";
 import { PathUtils } from "../utils/pathUtils";
 import { createProjectForm } from "../constant/form/createProjectForm";
+import { Console } from "./consoleService";
 
 export class ProjectService {
 
@@ -20,7 +20,7 @@ export class ProjectService {
         if (!projectAbsPath) return;
         const projectDataResult = await ProjectStorageService.load(projectAbsPath);
         if (projectDataResult.status !== Result.Status.Success) {
-            ToastService.error({ message: projectDataResult.message });
+            Console.error({ message: projectDataResult.message })
             return;
         }
         const projectData = projectDataResult.data;
@@ -48,13 +48,13 @@ export class ProjectService {
 
         const mkdirResult = await TauriFileStorage.mkdir(projectAbsDir);
         if (mkdirResult.status !== Result.Status.Success) {
-            ToastService.error({ message: mkdirResult.message });
+            Console.error({ message: mkdirResult.message })
             return;
         }
 
         const mkdirMetkResult = await TauriFileStorage.mkdir(metkDir);
         if (mkdirMetkResult.status !== Result.Status.Success) {
-            ToastService.error({ message: mkdirMetkResult.message });
+            Console.error({ message: mkdirMetkResult.message })
             return;
         }
 
@@ -64,7 +64,7 @@ export class ProjectService {
         const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "project.json"));
         const saveResult = await ProjectStorageService.save(projectAbsPath, project.serialize());
         if (saveResult.status !== Result.Status.Success) {
-            ToastService.error({ message: saveResult.message });
+            Console.error({ message: saveResult.message })
             return;
         }
 

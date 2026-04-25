@@ -13,19 +13,19 @@ export class TauriFileSystemProvider implements IStorageProvider {
             await mkdir(path, options);
             return Result.Success();
         } catch (error) {
-            return Result.Error(`${i18n.t("message.system.fs.mkdirFail")}: ${error}`);
+            return Result.Error({ key: "message.system.fs.mkdirFail", options: { error, path } });
         }
     }
 
     public async readTextFile(path: string, options?: StorageOptions): Promise<Result<string>> {
         try {
             if (!(await this.exists(path, options))) {
-                return Result.Error(`${i18n.t("message.system.fs.fileNotFoundAt")}: ${path}`);
+                return Result.Error({ key: "message.system.fs.fileNotFoundAt", options: { path }});
             }
             const data = await readTextFile(path, options);
             return Result.Success(data);
         } catch (error) {
-            return Result.Error(`${i18n.t("message.system.fs.readFail")}: ${error}`);
+            return Result.Error({ key: "message.system.fs.readFail", options: { error, path }});
         }
     }
 
@@ -40,19 +40,19 @@ export class TauriFileSystemProvider implements IStorageProvider {
             }
             return Result.Success();
         } catch (error) {
-            return Result.Error(`${i18n.t("message.system.fs.writeFail")}: ${error}`);
+            return Result.Error({ key: "message.system.fs.writeFail", options: { error, path }});
         }
     }
 
     public async readFile(path: string, options?: StorageOptions): Promise<Result<Uint8Array>> {
         try {
             if (!(await this.exists(path, options))) {
-                return Result.Error(`${i18n.t("message.system.fs.fileNotFoundAt")}: ${path}`);
+                return Result.Error({key: "message.system.fs.fileNotFoundAt", options: { path }});
             }
             const data = await readFile(path, options);
             return Result.Success(data);
         } catch (error) {
-            return Result.Error(`${i18n.t("message.system.fs.readFail")}: ${error}`);
+            return Result.Error({ key: "message.system.fs.readFail", options: { error, path }});
         }
     }
 
@@ -67,7 +67,7 @@ export class TauriFileSystemProvider implements IStorageProvider {
             }
             return Result.Success();
         } catch (error) {
-            return Result.Error(`${i18n.t("message.system.fs.writeFail")}: ${error}`);
+            return Result.Error({ key: "message.system.fs.writeFail", options: { error, path }});
         }
     }
 
@@ -78,7 +78,7 @@ export class TauriFileSystemProvider implements IStorageProvider {
             }
             return Result.Success();
         } catch (error) {
-            return Result.Error(`${i18n.t("message.system.fs.removeFail")}: ${error}`);
+            return Result.Error({ key: "message.system.fs.removeFail", options: { error, path }});
         }
     }
 }

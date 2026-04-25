@@ -1,6 +1,7 @@
 import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
 import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../custom/LocalizeText";
 
 interface NumberInputProps {
 	id: string;
@@ -43,7 +44,7 @@ export function NumberInputField(props: NumberInputProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{translate(label)}</Label>
+			<Label htmlFor={id}><LocalizedText message={label} /></Label>
 			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} value={value ?? ""} onChange={onChange} onBlur={onBlur} className="w-full" />
 		</div>
 	);

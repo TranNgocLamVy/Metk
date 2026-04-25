@@ -10,10 +10,9 @@ import { Plus } from 'lucide-react';
 import { appCore } from '@/core/appcore';
 import { HStack, VStack } from '../../custom/stack/Stack';
 import { Result } from '@/shared/types/result';
-import { ToastService } from '@/shared/services/toastService';
 import { EditRulesetSession } from './session';
 import { useEditRuleset } from './EditRulesetContext';
-import { useTranslation } from 'react-i18next';
+import { LocalizedText } from '../../custom/LocalizeText';
 
 export default function OutputSelector() {
     const { ruleset, selectedRule, version, refresh } = useEditRuleset();
@@ -33,11 +32,8 @@ export default function OutputSelector() {
 
         const tilesetManager = currentProject.tilesetManager;
         const tilesetResult = await tilesetManager.loadTileset({ id: tilesetId });
-        if (tilesetResult.status !== Result.Status.Success) {
-            ToastService.error({ message: tilesetResult.message });
-            return;
-        }
-        
+        if (tilesetResult.status !== Result.Status.Success) return;
+
         const tileset = tilesetResult.data;
         session.setTileset(tileset);
         session.setCurrentRule(selectedRule);
@@ -90,7 +86,6 @@ export default function OutputSelector() {
 }
 
 function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => void }) {
-    const { t: translate } = useTranslation();
 
     const { ruleset, version, refresh } = useEditRuleset();
 
@@ -115,7 +110,7 @@ function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => voi
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
                 {allTilesets.length === 0 ? (
-                    <DropdownMenuItem disabled className="h-7">{translate("dialog.editRuleset.noTileset")}</DropdownMenuItem>
+                    <DropdownMenuItem disabled className="h-7"><LocalizedText message="dialog.editRuleset.noTileset" /></DropdownMenuItem>
                 ) : (
                     allTilesets.map((ts) => (
                         <DropdownMenuItem key={ts.id} onClick={() => handleAddTileset(ts.id)} className="h-dropdown-menu text-xs">

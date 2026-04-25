@@ -6,11 +6,8 @@ import { RulesetService } from "@/shared/services/rulesetService";
 import { useCallback, useMemo } from "react";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import { DialogService } from "@/shared/services/dialogService";
-import { useTranslation } from "react-i18next";
 
 export default function RulesetMenuBar() {
-    const { t: translate } = useTranslation([]);
-
     const { version, getCurrentSelectedRuleId } = useRulesetManagerStore();
 
     const selectedRuleId = useMemo(() => {
@@ -29,17 +26,17 @@ export default function RulesetMenuBar() {
 
     return (
         <HStack className="bg-surface absolute bottom-1 w-full px-1 py-1 gap-0.5">
-            <QuickToolTip toolTip={translate("workspace.rulesetManager.menu.new")}>
+            <QuickToolTip toolTip={"workspace.rulesetManager.menu.new"}>
                 <Button variant={"ghost"} size={"icon-sm"} onClick={RulesetService.createRuleset}>
                     <Plus />
                 </Button>
             </QuickToolTip>
-            <QuickToolTip toolTip={translate("workspace.rulesetManager.menu.edit")}>
+            <QuickToolTip toolTip={"workspace.rulesetManager.menu.edit"}>
                 <Button variant={"ghost"} size={"icon-sm"} disabled={!selectedRuleId} onClick={onEditRule}>
                     <Pen />
                 </Button>
             </QuickToolTip>
-            <QuickToolTip toolTip={translate("workspace.rulesetManager.menu.delete")}>
+            <QuickToolTip toolTip={"workspace.rulesetManager.menu.delete"}>
                 <Button variant={"ghost"} size={"icon-sm"} className="text-destructive" disabled={!selectedRuleId} onClick={onDeleteRule}>
                     <Trash2 />
                 </Button>

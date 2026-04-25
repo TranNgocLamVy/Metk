@@ -11,7 +11,7 @@ import LogConsole from "./LogConsole";
 export default function WorkspaceConsole() {
     const { isConsoleOpen, consoleType, closeConsole, setConsoleType, clearErrors, clearLogs } = useConsoleStore();
 
-    const [height, setHeight] = useState<number>(150);
+    const [height, setHeight] = useState<number>(200);
 
     const consoleRef = useRef<HTMLDivElement>(null);
 

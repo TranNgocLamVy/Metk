@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/view/c
 import { Label } from "@/view/components/shadcn/label";
 import { Input } from "@/view/components/shadcn/input";
 import { HStack, VStack } from '../custom/stack/Stack';
-import { useTranslation } from 'react-i18next';
+import { LocalizedText } from '../custom/LocalizeText';
 
 interface ColorPickerProps {
 	id: string;
@@ -18,7 +18,6 @@ interface ColorPickerProps {
 }
 
 export function ColorPickerField(props: ColorPickerProps) {
-	const { t: translate } = useTranslation([]);
 	const { id, name, label, defaultValue, placeholder, value, onChange } = props;
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +64,7 @@ export function ColorPickerField(props: ColorPickerProps) {
 
 	return (
 		<VStack className="gap-2">
-			<Label>{translate(label)}</Label>
+			<Label><LocalizedText message={label} /></Label>
 			<HStack className="gap-2">
 				<Input id={id} name={name} type="text" placeholder={placeholder} value={color} onChange={(e) => handleChange(e.target.value)} onBlur={onBlur} className="flex-1" />
 				<DropdownMenu open={isOpen} onOpenChange={onOpenChange} modal>

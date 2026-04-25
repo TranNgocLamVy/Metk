@@ -6,7 +6,7 @@ import { appCore } from "@/core/appcore";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 import { useEditRuleset } from "./EditRulesetContext";
 import { RuleRequirement } from "@/shared/schema/rulesetSchema";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../../custom/LocalizeText";
 
 const requirementIcons = [
     { requirement: RuleRequirement.ANY, icon: <CircleQuestionMark /> },
@@ -70,8 +70,6 @@ export default function ConstraintsGrid() {
 }
 
 function CellToolTip({ version, rule, gridIndex, children }: { version: number, rule: Rule, gridIndex: number, children: ReactNode }) {
-    const { t: translate } = useTranslation();
-    
     const constraint = useMemo(() => rule.getConstraint(gridIndex), [rule, gridIndex, version]);
     const targets = useMemo(() => constraint.getTargetIds(), [constraint, version]);
 
@@ -89,13 +87,13 @@ function CellToolTip({ version, rule, gridIndex, children }: { version: number, 
             <TooltipContent side="bottom" sideOffset={8} className="w-80 min-h-fit bg-surface-overlay shadow-lg p-2">
                 <VStack className="flex-1 gap-4">
                     <HStack align="center" justify="center" className="h-fit w-fit gap-2">
-                        <span>{translate("dialog.editRuleset.requirement")}:</span>
+                        <span><LocalizedText message="dialog.editRuleset.requirement" />:</span>
                         <span>{requirementIcons.find((icon) => icon.requirement === constraint.getRequirement())?.icon}</span>
                     </HStack>
                     <VStack className="gap-2">
                         <HStack className="gap-2">
-                            <span>{translate("dialog.editRuleset.targets")}:</span>
-                            {isEmpty && <span>{translate("dialog.editRuleset.none")}</span>}
+                            <span><LocalizedText message="dialog.editRuleset.targets" />:</span>
+                            {isEmpty && <span><LocalizedText message="dialog.editRuleset.none" /></span>}
                         </HStack>
                         <HStack className="w-full flex-wrap">
                             {!isEmpty && targets.map((target) => {

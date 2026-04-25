@@ -1,7 +1,7 @@
 import { EditorContext } from "@/core/application/editorContext";
 import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
-import { ToastService } from "@/shared/services/toastService";
+import { Console } from "@/shared/services/consoleService";
 import { Result } from "@/shared/types/result";
 import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
@@ -17,8 +17,8 @@ export class SaveAllTilemapCommand implements ISystemCommand {
         const currentProject = context.currentProject;
         const workspace = context.currentWorkspace;
 
-        if (!currentProject) return Result.Error("Project not found");
-        if (!workspace) return Result.Error("Workspace not found");
+        if (!currentProject) return Result.Cancel();
+        if (!workspace) return Result.Cancel();
 
         const tilemapSessionManager = workspace.tilemapSessionManager;
 
@@ -32,7 +32,7 @@ export class SaveAllTilemapCommand implements ISystemCommand {
             }
         }
         useTilemapSessionStore.getState().refresh();
-        ToastService.success({ message: "Tilemap saved successfully" }); // TODO: use Locale to display message
+        Console.success({ message: "message.tilemap.savSuccess"});
 
         return Result.Success();
     }

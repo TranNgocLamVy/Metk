@@ -12,12 +12,11 @@ import TilesetView from "./tilesetView/TilesetView";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
-import { useTranslation } from "react-i18next";
 import { useContextScope } from "@/view/hooks/useContextScope";
 import { appCore } from "@/core/appcore";
+import { LocalizedText } from "../custom/LocalizeText";
 
 export default function Workspace() {
-	const { t: translate } = useTranslation([]);
 
 	const { model, setModel } = useLayoutStore();
 	const layoutRef = useRef<Layout | null>(null);
@@ -45,19 +44,19 @@ export default function Workspace() {
 		const component = node.getComponent();
 		switch (component) {
 			case "tilesetView":
-				renderValues.content = translate("workspace.tilesetSelector.label");
+				renderValues.content = <LocalizedText message={"workspace.tilesetSelector.label"} />
 				break;
 			case "layerManager":
-				renderValues.content = translate("workspace.layerManager.label");
+				renderValues.content = <LocalizedText message={"workspace.layerManager.label"} />
 				break;
 			case "tilemapEditor":
-				renderValues.content = translate("workspace.tilemapEditor.label");
+				renderValues.content = <LocalizedText message={"workspace.tilemapEditor.label"} />
 				break;
 			case "rulesetManager":
-				renderValues.content = translate("workspace.rulesetManager.label");
+				renderValues.content = <LocalizedText message={"workspace.rulesetManager.label"} />
 				break;
 			case "properties":
-				renderValues.content = translate("workspace.properties.label");
+				renderValues.content = <LocalizedText message={"workspace.properties.label"} />
 				break;
 			default:
 				renderValues.content = "Unknow";

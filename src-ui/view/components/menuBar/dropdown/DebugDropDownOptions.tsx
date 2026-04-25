@@ -1,7 +1,6 @@
 import { appCore } from "@/core/appcore";
 import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
 import i18n, { i18nService } from "@/core/service/i18n";
-import { ToastService } from "@/shared/services/toastService";
 import { useNavigationStore } from "@/view/stores/navigationStore";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
@@ -38,7 +37,6 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
         label: "save project manager",
         async onClick() {
             await appCore.saveProjectManager();
-            ToastService.success({ message: "Project manager saved successfully" });
         }
     },
     {

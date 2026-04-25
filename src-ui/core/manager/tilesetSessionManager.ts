@@ -8,7 +8,7 @@ import { EditorContext } from "../application/editorContext";
 import { TilesetSession } from "../application/session/tilesetSession";
 import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
-import { ToastService } from "@/shared/services/toastService";
+import { Console } from "@/shared/services/consoleService";
 
 export class TilesetSessionManager {
     public currentTilesetSession: TilesetSession | null = null;
@@ -81,6 +81,8 @@ export class TilesetSessionManager {
         this.tilesetSessionIdStack.push(sessionId);
 
         tilesetSession.sessionView.activateSession(pixiApp);
+
+        Console.log({ message: { key: "message.tileset.openSuccess", options: { name: tilesetSession.tileset.name } }});
         
         return tilesetSession;
     }
@@ -98,6 +100,8 @@ export class TilesetSessionManager {
         if (this.currentTilesetSession?.id === sessionId) {
             this.currentTilesetSession = null;
         }
+
+        Console.log({ message: { key: "message.tileset.closeSuccess", options: { name: tilesetSession.tileset.name } }})
     }
 
     public getSession(sessionId: string): TilesetSession | null {

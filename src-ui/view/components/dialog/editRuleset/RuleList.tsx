@@ -1,4 +1,3 @@
-// src-ui/view/components/dialog/RuleList.tsx
 import { useEffect, useMemo, useRef } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { HStack, VStack } from "../../custom/stack/Stack";
@@ -9,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../shadcn/tooltip";
 import PixiImage from "../../custom/PixiImage";
 import { useEditRuleset } from "./EditRulesetContext";
 import { Rule } from "@/core/application/rule/rule";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../../custom/LocalizeText";
 
 export default function RuleList() {    
     const { ruleset, version, setSelectedRuleId } = useEditRuleset();
@@ -74,7 +73,6 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
 }
 
 function RuleDropdown({ rule }: { rule: Rule }) {
-    const { t: translate } = useTranslation();
 
     const { ruleset, refresh } = useEditRuleset();
 
@@ -98,11 +96,11 @@ function RuleDropdown({ rule }: { rule: Rule }) {
             <DropdownMenuContent side="right" className="bg-surface-overlay w-40 gap-2" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem onClick={handleDuplicate} className="h-7 text-xs">
                     <Copy className="size-4" />
-                    {translate("dialog.editRuleset.action.duplicate")}
+                    <LocalizedText message="dialog.editRuleset.action.duplicate" />
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleDelete} variant="destructive" className="h-7 text-xs">
                     <Trash2 className="size-4" />
-                    {translate("dialog.editRuleset.action.delete")}
+                    <LocalizedText message="dialog.editRuleset.action.delete" />
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

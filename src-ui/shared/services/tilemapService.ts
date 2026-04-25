@@ -66,7 +66,7 @@ export class TilemapService {
 
         WorkspaceService.createTilemapSession(tilemapData.id);
         
-        Console.success({ message: "message.tilemap.createSucess"});
+        Console.success({ message: "message.tilemap.createSuccess"});
     }
 
     public static async importTilemap(refTilemapId?: string): Promise<Result> {
@@ -106,7 +106,7 @@ export class TilemapService {
 
         WorkspaceService.createTilemapSession(tilemapData.id);
         
-        Console.success({ message: "message.tilemap.importSucess"});
+        Console.success({ message: "message.tilemap.importSuccess"});
 
         return Result.Success();
     }

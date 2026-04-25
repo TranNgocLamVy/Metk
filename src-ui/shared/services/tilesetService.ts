@@ -81,7 +81,7 @@ export class TilesetService {
 
         WorkspaceService.createTilesetSession(tilesetData.id);
 
-        Console.success({ message: "message.tileset.createSucess" });
+        Console.success({ message: "message.tileset.createSuccess" });
     }
 
     public static async editTileset(): Promise<void> {

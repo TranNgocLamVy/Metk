@@ -2,7 +2,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { BaseDialogProps } from "./dialogRegistry";
 import { SaveDialogOptions } from "@/shared/types/confirmationDialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../custom/LocalizeText";
 
 interface SaveDialogProps extends BaseDialogProps {
     saveDialog: SaveDialogOptions;
@@ -10,8 +10,6 @@ interface SaveDialogProps extends BaseDialogProps {
 }
 
 export function SaveDialog({ resolve, dialogId, saveDialog }: SaveDialogProps) {
-    const { t: translate } = useTranslation();
-    
     const { closeDialog } = useDialogStore();
 
     const { title, description } = saveDialog;
@@ -32,13 +30,13 @@ export function SaveDialog({ resolve, dialogId, saveDialog }: SaveDialogProps) {
         <AlertDialog open onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{translate(title)}</AlertDialogTitle>
-                    <AlertDialogDescription>{translate(description)}</AlertDialogDescription>
+                    <AlertDialogTitle><LocalizedText message={title} /></AlertDialogTitle>
+                    <AlertDialogDescription><LocalizedText message={description} /></AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogAction onClick={() => closePermissionDialog("save")}>{translate("global.actionsave")}</AlertDialogAction>
-                    <AlertDialogAction onClick={() => closePermissionDialog("not save")} variant={"destructive"}>{translate("global.actionnotSave")}</AlertDialogAction>
-                    <AlertDialogCancel onClick={() => closePermissionDialog("cancel")}>{translate("global.actioncancel")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => closePermissionDialog("save")}><LocalizedText message="global.actionsave" /></AlertDialogAction>
+                    <AlertDialogAction onClick={() => closePermissionDialog("not save")} variant={"destructive"}><LocalizedText message="global.actionnotSave" /></AlertDialogAction>
+                    <AlertDialogCancel onClick={() => closePermissionDialog("cancel")}><LocalizedText message="global.actioncancel" /></AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

@@ -5,10 +5,9 @@ import { appCore } from "@/core/appcore";
 import { useEditRuleset } from "./EditRulesetContext";
 import { RuleRequirement } from "@/shared/schema/rulesetSchema";
 import { Checkbox } from "../../shadcn/checkbox";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../../custom/LocalizeText";
 
 export default function ConstraintTargetEditor() {
-    const { t: translate } = useTranslation();
 
     const { selectedRule, selectedGrid, version, refresh } = useEditRuleset();
 
@@ -63,7 +62,7 @@ export default function ConstraintTargetEditor() {
     return (
         <VStack className="flex-1 gap-6">
             <VStack className="gap-2">
-                <span className="text-base">{translate("dialog.editRuleset.requirement")}</span>
+                <span className="text-base"><LocalizedText message="dialog.editRuleset.requirement" /></span>
                 <div className="w-full gap-2 grid grid-cols-7">
                     {requirementList.map((requirement) => {
                         const selected = selectedConstraint.getRequirement() === requirement.requirement;
@@ -83,11 +82,11 @@ export default function ConstraintTargetEditor() {
 
             <HStack align="center" className="w-full h-fit gap-2">
                 <Checkbox checked={allowEmpty} onCheckedChange={handleChangeAllowEmpty} />
-                <span className="text-base">{translate("dialog.editRuleset.allowEmpty")}</span>
+                <span className="text-base"><LocalizedText message="dialog.editRuleset.allowEmpty" /></span>
             </HStack>
 
             <VStack className="gap-2">
-                <span className="text-base">{translate("dialog.editRuleset.targets")}</span>
+                <span className="text-base"><LocalizedText message="dialog.editRuleset.targets" /></span>
                 <div className="grid grid-cols-7 w-full gap-2">
                     {rulesetList.map((ruleset) => {
                         const selected = selectedTargets.includes(ruleset.id) && selectedConstraint.getRequirement() !== RuleRequirement.ANY;

@@ -1,14 +1,13 @@
 import { Application } from "pixi.js";
-import { v4 as uuidv4 } from "uuid";
 
-import { defaultTilemapSessionData, TilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSessionSchema";
+import { defaultTilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSessionSchema";
 
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { Tilemap } from "../application/tile/tilemap";
 import { TilemapManager } from "./tilemapManager";
 import { Result } from "@/shared/types/result";
-import { ToastService } from "@/shared/services/toastService";
+import { Console } from "@/shared/services/consoleService";
 
 export class TilemapSessionManager {
     public currentTilemapSession: TilemapSession | null = null;
@@ -78,6 +77,8 @@ export class TilemapSessionManager {
         
         tilemapSession.sessionView.activateSession(pixiApp);
         this.editorContext.eventEmitter.emit("onOpenTilemapSession");
+
+        Console.log({ message: { key: "message.tilemap.openSuccess", options: { name: tilemapSession.tilemap.name }}});
         
         return tilemapSession;
     }
@@ -101,6 +102,8 @@ export class TilemapSessionManager {
         if (this.currentTilemapSession?.id === sessionId) {
             this.currentTilemapSession = null;
         }
+
+        Console.log({ message: { key: "message.tilemap.closeSuccess", options: { name: tilemapSession.tilemap.name } }})
     }
 
     public getSession(sessionId: string): TilemapSession | null {

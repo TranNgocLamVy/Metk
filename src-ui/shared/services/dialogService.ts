@@ -3,7 +3,6 @@ import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/ty
 import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "../types/confirmationDialog";
 import { DialogZLevel } from "../types/dialog";
 import { appCore } from "@/core/appcore";
-import { ToastService } from "./toastService";
 
 
 export class DialogService {
