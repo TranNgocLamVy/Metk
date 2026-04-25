@@ -13,6 +13,7 @@ import { Result } from '@/shared/types/result';
 import { ToastService } from '@/shared/services/toastService';
 import { EditRulesetSession } from './session';
 import { useEditRuleset } from './EditRulesetContext';
+import { useTranslation } from 'react-i18next';
 
 export default function OutputSelector() {
     const { ruleset, selectedRule, version, refresh } = useEditRuleset();
@@ -89,6 +90,8 @@ export default function OutputSelector() {
 }
 
 function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => void }) {
+    const { t: translate } = useTranslation();
+
     const { ruleset, version, refresh } = useEditRuleset();
 
     const allTilesets = useMemo(() => {
@@ -112,7 +115,7 @@ function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => voi
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
                 {allTilesets.length === 0 ? (
-                    <DropdownMenuItem disabled className="h-7">No available tilesets</DropdownMenuItem>
+                    <DropdownMenuItem disabled className="h-7">{translate("dialog.editRuleset.noTileset")}</DropdownMenuItem>
                 ) : (
                     allTilesets.map((ts) => (
                         <DropdownMenuItem key={ts.id} onClick={() => handleAddTileset(ts.id)} className="h-dropdown-menu text-xs">

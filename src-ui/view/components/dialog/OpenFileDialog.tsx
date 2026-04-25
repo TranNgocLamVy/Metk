@@ -1,14 +1,18 @@
 import { appCore } from "@/core/appcore";
-import { Command, CommandDialog, CommandGroup, CommandInput, CommandList, CommandSeparator } from "../shadcn/command";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { BaseDialogProps } from "./dialogRegistry";
+import { useTranslation } from "react-i18next";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../shadcn/dialog";
+import { VStack } from "../custom/stack/Stack";
 
 interface OpenFileModalProps extends BaseDialogProps {
     dialogId: string;
 }
 
 export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
+    const { t: translate } = useTranslation();
+
     const { closeDialog } = useDialogStore();
 
     const currentProject = appCore.editorContext.currentProject;
@@ -31,11 +35,15 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
     }
 
     return (
-        <CommandDialog open onOpenChange={onOpenChange} title="Open File" description="Open Tilemap or Tileset" className="w-fit h-fit">
-            <Command onClick={(e) => e.stopPropagation()} className={`h-90 w-90 shadow-lg bg-surface-overlay p-4 rounded-md gap-2`}>
-                <CommandInput placeholder="Type to seach for files..." />
-                <CommandList>
-                    {tilemaps.length > 0 && <CommandGroup heading="Tilemaps">
+        <Dialog open onOpenChange={onOpenChange}>
+            <DialogHeader>
+                <DialogTitle>{translate("dialog.openFile.title")}</DialogTitle>
+                <DialogDescription>{translate("dialog.openFile.description")}</DialogDescription>
+            </DialogHeader>
+            <DialogContent className="w-120 min-h-80">
+                <VStack className="gap-6">
+                    <VStack className="gap-2">
+                        <span>{translate("dialog.openFile.tilemap")}</span>
                         {tilemaps.map((tilemap) => {
                             return (
                                 <div key={tilemap.id} onClick={() => onOpenTilemap(tilemap.id)} className="w-full h-fit p-2 hover:bg-surface-overlay-sunken cursor-pointer">
@@ -43,9 +51,9 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
                                 </div>
                             )
                         })}
-                    </CommandGroup>}
-                    {tilemaps.length > 0 && tilesets.length > 0 && <CommandSeparator className="my-2" />}
-                    {tilesets.length > 0 && <CommandGroup heading="Tilesets">
+                    </VStack>
+                    <VStack className="gap-2">
+                        <span>{translate("dialog.openFile.tileset")}</span>
                         {tilesets.map((tileset) => {
                             return (
                                 <div key={tileset.id} onClick={() => onOpenTileset(tileset.id)} className="w-full h-fit p-2 hover:bg-surface-overlay-sunken cursor-pointer">
@@ -53,9 +61,9 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
                                 </div>
                             )
                         })}
-                    </CommandGroup>}
-                </CommandList>
-            </Command>
-        </CommandDialog>
-    );
+                    </VStack>
+                </VStack>
+            </DialogContent>
+        </Dialog>
+    )
 }

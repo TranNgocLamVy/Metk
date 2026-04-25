@@ -1,6 +1,6 @@
 
 import { VStack } from "../../custom/stack/Stack";
-import Console from "../console/Console";
+import WorkspaceConsole from "../console/Console";
 import ToolBar from "../ToolBar";
 import TilemapEditorCanvas from "./TilemapEditorCanvas";
 import TilemapEditorTabs from "./TilemapEditorTabs";
@@ -11,7 +11,7 @@ export default function TilemapEditor() {
             <TilemapEditorTabs />
 			<ToolBar />
             <TilemapEditorCanvas />
-            <Console />
+            <WorkspaceConsole />
         </VStack>
     );
 }

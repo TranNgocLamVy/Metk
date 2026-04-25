@@ -16,6 +16,7 @@ import ConstraintTargetEditor from "./ConstraintTargetEditor";
 import OutputList from "./OutputList";
 import { Ruleset } from "@/core/application/rule/ruleset";
 import { EditRulesetContext } from "./EditRulesetContext";
+import { useTranslation } from "react-i18next";
 
 interface EditRulesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -23,6 +24,8 @@ interface EditRulesetDialogProps extends BaseDialogProps {
 }
 
 export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProps) {
+    const { t: translate } = useTranslation();
+
     const { closeDialog } = useDialogStore();
 
     const [version, setVersion] = useState(0);
@@ -111,15 +114,15 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
                     onOpenAutoFocus={(e) => e.preventDefault()}
                     showCloseButton={false}
                 >
-                    <DialogTitle className="hidden">Ruleset Editor</DialogTitle>
+                    <DialogTitle className="hidden">{translate("dialog.editRuleset.title")}</DialogTitle>
                     <VStack className="w-fit h-full bg-surface-overlay p-2 gap-2">
                         <RuleHeader />
                         <RuleList />
                         <HStack className="w-full h-fit gap-2">
                             <DialogClose asChild>
-                                <Button variant="outline" type="button" onClick={() => closeDialog(dialogId)} className="ml-auto">Discard change</Button>
+                                <Button variant="outline" type="button" onClick={() => closeDialog(dialogId)} className="ml-auto">{translate("dialog.editRuleset.action.discard")}</Button>
                             </DialogClose>
-                            <Button type="button" onClick={handleSave}>Save</Button>
+                            <Button type="button" onClick={handleSave}>{translate("dialog.editRuleset.action.save")}</Button>
                         </HStack>
                     </VStack>
 

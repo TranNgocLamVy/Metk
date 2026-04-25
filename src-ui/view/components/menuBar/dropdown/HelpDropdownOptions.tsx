@@ -3,14 +3,14 @@ import { Book, HeartPlus, MessageSquareMore } from "lucide-react";
 const HelpDropdownOptionGroup1: MenuDropDownGroupType = [
     {
         type: "option",
-        label: "menu.help.actions.userManual",
+        label: "menu.help.action.userManual",
         startIcon: <Book />,
         disabled: () => true,
         onClick() { },
     },
     {
         type: "option",
-        label: "menu.help.actions.reportIssue",
+        label: "menu.help.action.reportIssue",
         startIcon: <MessageSquareMore />,
         disabled: () => true,
         onClick() { },
@@ -20,7 +20,7 @@ const HelpDropdownOptionGroup1: MenuDropDownGroupType = [
 const HelpDropdownOptionGroup2: MenuDropDownGroupType = [
     {
         type: "option",
-        label: "menu.help.actions.supportDeveloper",
+        label: "menu.help.action.supportDeveloper",
         startIcon: <HeartPlus />,
         disabled: () => true,
         onClick() { },

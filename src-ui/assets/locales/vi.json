@@ -2,7 +2,7 @@
     "menu": {
         "file": {
             "label": "Tệp",
-            "actions": {
+            "action": {
                 "new": {
                     "label": "Mới",
                     "project": "Dự án mới",
@@ -45,7 +45,7 @@
         },
         "edit": {
             "label": "Chỉnh sửa",
-            "actions": {
+            "action": {
                 "undo": "Hoàn tác (Undo)",
                 "redo": "Làm lại (Redo)",
                 "cut": "Cắt",
@@ -60,7 +60,7 @@
         },
         "view": {
             "label": "Giao diện",
-            "actions": {
+            "action": {
                 "viewAndToolbars": {
                     "label": "Giao diện và Thanh công cụ",
                     "project": "Dự án",
@@ -114,7 +114,7 @@
         },
         "map": {
             "label": "Bản đồ",
-            "actions": {
+            "action": {
                 "resizeMap": "Đổi kích thước bản đồ",
                 "cropToSelection": "Cắt theo vùng chọn",
                 "autoCrop": "Tự động cắt",
@@ -126,7 +126,7 @@
         },
         "layer": {
             "label": "Layer",
-            "actions": {
+            "action": {
                 "newLayer": {
                     "label": "Tạo Layer mới",
                     "tileLayer": "Tile Layer",
@@ -160,7 +160,7 @@
         },
         "project": {
             "label": "Dự án",
-            "actions": {
+            "action": {
                 "addFolderToProject": "Thêm thư mục vào Dự án",
                 "refreshProject": "Làm mới Dự án",
                 "projectProperties": "Thuộc tính Dự án"
@@ -168,7 +168,7 @@
         },
         "help": {
             "label": "Trợ giúp",
-            "actions": {
+            "action": {
                 "userManual": "Hướng dẫn sử dụng",
                 "reportIssue": "Báo lỗi",
                 "supportDeveloper": "Ủng hộ nhà phát triển",

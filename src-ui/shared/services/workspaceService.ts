@@ -200,8 +200,8 @@ export class WorkspaceService {
         const isDirty = tilemapSession.isDirty;
         if (isDirty && !force) {
             const saveResult = await DialogService.openSaveDialog({
-                title: "Do you want to save changes to the tilemap before closing it?", // TODO: i18n
-                description: "If you don't save, your changes will be lost.",
+                title: "dialog.saveBeforeClose.tilemap.title",
+                description: "dialog.saveBeforeClose.tilemap.description",
             })
             if (saveResult === "cancel") {
                 return;

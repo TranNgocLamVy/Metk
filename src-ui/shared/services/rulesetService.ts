@@ -3,15 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 import { Result } from "@/shared/types/result";
 import { RulesetMetadata, RulesetData } from "@/shared/schema/rulesetSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
-import { ToastService } from "./toastService";
 import { appCore } from "@/core/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
-import { remove } from "@tauri-apps/plugin-fs";
 import { DialogService } from "./dialogService";
 import { createRulesetForm } from "../constant/form/createRulesetForm";
 import { WorkspaceService } from "./workspaceService";
+import i18n from "@/core/service/i18n";
+import { Console } from "./consoleService";
 
 export class RulesetService {
     public static async createRuleset(): Promise<void> {
@@ -31,7 +31,7 @@ export class RulesetService {
             defaultRulesetDir = currentProject.projectPathSystem.absDir;
         }
 
-        const rulesetAbsPath = await FileDialogUtils.saveFile({ title: "Save Tilemap", defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        const rulesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.ruleset.title"), defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return;
 
         const rulesetData: RulesetData = {
@@ -46,7 +46,10 @@ export class RulesetService {
 
         const saveResult = await RulesetStorageService.save(rulesetAbsPath, rulesetData);
         if (saveResult.status !== Result.Status.Success) {
-            ToastService.error({ message: saveResult.message });
+            Console.error({
+                message: i18n.t("message.ruleset.saveFail"),
+                stacks: [i18n.t(saveResult.message)],
+            })
             return;
         }
 
@@ -62,7 +65,7 @@ export class RulesetService {
 
         useRulesetManagerStore.getState().refresh();
 
-        ToastService.success({ message: "Ruleset created successfully" });
+        Console.success({message: "message.ruleset.createSucess"});
     }
 
     public static async deleteRuleset(id: string): Promise<void> {
@@ -71,16 +74,16 @@ export class RulesetService {
 
         const rulesetMetadata = rulesetManager.getRulesetMetadataById(id);
         if (!rulesetMetadata) {
-            ToastService.error({ message: `Ruleset not found` });
+            Console.error({
+                message: "message.ruleset.deleteFail",
+                stacks: ["message.ruleset.notFound"],
+            })
             return;
         }
 
         const confirmDelete = await DialogService.openPermissionDialog({ 
-            title: "Delete Ruleset", 
-            description: `Are you sure you want to delete "${rulesetMetadata.name}" Ruleset?`, 
-            okText: "Delete", 
-            okButtonVariant: "destructive",
-            cancelText: "Cancel" 
+            title: "dialog.delete.ruleset.title",
+            description: "dialog.delete.ruleset.description", 
         });
 
         if (!confirmDelete) return;
@@ -99,6 +102,6 @@ export class RulesetService {
             WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
 
-        ToastService.success({ message: "Ruleset deleted" });
+        Console.log({ message: "message.ruleset.deleteSuccess"});
     }
 }

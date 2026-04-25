@@ -41,9 +41,11 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     }
 
     public updateRuleset(rulesetData: RulesetData): void {
-        if (!rulesetData) return;
+        if (!rulesetData) return;                                                                                                                                                                                                              
         if (this.id !== rulesetData.id) {
-            Console.warn(`Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`);
+            Console.warn({
+                message: `Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`, // TODO: i18n
+            });
             return;
         }
         this.name = rulesetData.name;
