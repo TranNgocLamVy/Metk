@@ -2,7 +2,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { BaseDialogProps } from "./dialogRegistry";
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { PermissionDialogOptions } from "@/shared/types/confirmationDialog";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../custom/LocalizeText";
 
 interface PermissionDialogProps extends BaseDialogProps {
     permissionDialog: PermissionDialogOptions;
@@ -10,8 +10,6 @@ interface PermissionDialogProps extends BaseDialogProps {
 }
 
 export function PermissionDialog({ resolve, dialogId, permissionDialog }: PermissionDialogProps) {
-    const { t: translate } = useTranslation();
-    
     const { closeDialog } = useDialogStore();
 
     const { title, description, okText = "global.action.ok", cancelText = "global.action.cancel", okButtonVariant = "default" } = permissionDialog;
@@ -32,12 +30,12 @@ export function PermissionDialog({ resolve, dialogId, permissionDialog }: Permis
         <AlertDialog open onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{translate(title)}</AlertDialogTitle>
-                    <AlertDialogDescription>{translate(description)}</AlertDialogDescription>
+                    <AlertDialogTitle><LocalizedText message={title} /></AlertDialogTitle>
+                    <AlertDialogDescription><LocalizedText message={description} /></AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => closePermissionDialog(false)}>{translate(cancelText)}</AlertDialogCancel>
-                    <AlertDialogAction variant={okButtonVariant} onClick={() => closePermissionDialog(true)}>{translate(okText)}</AlertDialogAction>
+                    <AlertDialogCancel onClick={() => closePermissionDialog(false)}><LocalizedText message={cancelText} /></AlertDialogCancel>
+                    <AlertDialogAction variant={okButtonVariant} onClick={() => closePermissionDialog(true)}><LocalizedText message={okText} /></AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

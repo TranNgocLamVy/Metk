@@ -3,28 +3,32 @@ import { Result } from "../types/result";
 import { v4 as uuidv4 } from "uuid";
 
 export class Console {
-    static log(payload: Omit<LogMessage, "id" | "timestamp" | "level">, customId?: string) {
+    static log(payload: Omit<LogMessage, "id" | "uiId" | "timestamp" | "level">, customId?: string) {
         const id = customId ?? uuidv4();
+        const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addLog({ id, timestamp, level: "info", ...payload });
+        useConsoleStore.getState().addLog({ id, uiId, timestamp, level: "info", ...payload });
     }
 
-    static success(payload: Omit<LogMessage, "id" | "timestamp" | "level">, customId?: string) {
+    static success(payload: Omit<LogMessage, "id" | "uiId" | "timestamp" | "level">, customId?: string) {
         const id = customId ?? uuidv4();
+        const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addLog({ id, timestamp, level: "success", ...payload });
+        useConsoleStore.getState().addLog({ id, uiId, timestamp, level: "success", ...payload });
     }
 
-    static warn(payload: Omit<LogMessage, "id" | "timestamp" | "level">, customId?: string) {
+    static warn(payload: Omit<LogMessage, "id" | "uiId" | "timestamp" | "level">, customId?: string) {
         const id = customId ?? uuidv4();
+        const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addLog({ id, timestamp, level: "warning", ...payload });
+        useConsoleStore.getState().addLog({ id, uiId, timestamp, level: "warning", ...payload });
     }
 
-    static error(payload: Omit<ErrorMessage, "id" | "timestamp">, customId?: string) {
+    static error(payload: Omit<ErrorMessage, "id" | "uiId" | "timestamp">, customId?: string) {
         const id = customId ?? uuidv4();
+        const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addError({ id, timestamp, ...payload });
+        useConsoleStore.getState().addError({ id, uiId, timestamp, ...payload });
     }
 
     static removeLog(id: string) {
@@ -51,24 +55,26 @@ export class Console {
 export type LogLevel = "info" | "success" | "warning";
 
 export interface ConsoleAction {
-    label: string;
+    label: TranslatableMessage;
     variant?: "destructive" | "outline" | "ghost";
     onClick: () => Result | Promise<Result>;
 }
 
 export interface LogMessage {
     id: string;
+    uiId: string; // Id only for rendering
+    message: TranslatableMessage;
     timestamp: number;
     level: LogLevel;
-    message: string;
-    details?: string;
+    details?: TranslatableMessage;
     actions?: ConsoleAction[];
 }
 
 export interface ErrorMessage {
     id: string;
+    uiId: string; // Id only for rendering
+    message?: TranslatableMessage;
+    stacks?: TranslatableMessage[];
     timestamp: number;
-    message: string;
-    stacks?: string[];
     actions?: ConsoleAction[];
 }

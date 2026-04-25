@@ -1,6 +1,7 @@
 import { Input } from "@/view/components/shadcn/input";
 import { Label } from "@/view/components/shadcn/label";
 import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../custom/LocalizeText";
 
 interface TextInputProps {
 	id: string;
@@ -25,7 +26,7 @@ export function TextInputField(props: TextInputProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{translate(label)}</Label>
+			<Label htmlFor={id}><LocalizedText message={label} /></Label>
 			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} minLength={minLength} maxLength={maxLength} value={value ?? ""} onChange={onChange} className="w-full" />
 		</div>
 	);

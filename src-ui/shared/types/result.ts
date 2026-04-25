@@ -14,27 +14,28 @@ export type Result<T = any> = SuccessResult<T> | ErrorResult<T>;
 
 type ErrorResult<T = any> = {
     status: FailStatus;
-    message?: string;
+    message?: TranslatableMessage;
     data?: T;
 };
 
 type SuccessResult<T = any> = {
     status: "Success";
-    message?: string;
+    message?: TranslatableMessage;
     data: T;
 };
 
-function ErrorResult<T = any>(message: string | undefined): ErrorResult<T> {
-    const trace = new Error(message).stack;
-    console.error(`[ErrorResult]: ${message}\n`, trace);
-    return { status: "Error", message };
+function ErrorResult<T = any>(input?: TranslatableMessage): ErrorResult<T> {
+    const message: TranslatableMessage = typeof input === "string" ? { key: input } : input ?? "";
+    return { status: "Error", message: message };
 }
 
-function SuccessResult<T = any>(data?: T, message?: string | undefined): SuccessResult<T> {
-    return { status: "Success", message, data: data as any};
+function SuccessResult<T = any>(data?: T, input?: TranslatableMessage): SuccessResult<T> {
+    const message = typeof input === "string" ? { key: input } : input;
+    return { status: "Success", message: message, data: data as any};
 }
 
-function CancelResult<T = any>(message?: string): ErrorResult<T> {
+function CancelResult<T = any>(input?: TranslatableMessage): ErrorResult<T> {
+    const message = typeof input === "string" ? { key: input } : input;
     return { status: "Cancel", message };
 }
 

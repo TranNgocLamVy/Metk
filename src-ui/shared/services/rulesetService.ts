@@ -47,8 +47,8 @@ export class RulesetService {
         const saveResult = await RulesetStorageService.save(rulesetAbsPath, rulesetData);
         if (saveResult.status !== Result.Status.Success) {
             Console.error({
-                message: i18n.t("message.ruleset.saveFail"),
-                stacks: [i18n.t(saveResult.message)],
+                message: "message.ruleset.saveFail",
+                stacks: saveResult.message ? [saveResult.message] : [],
             })
             return;
         }
@@ -65,7 +65,7 @@ export class RulesetService {
 
         useRulesetManagerStore.getState().refresh();
 
-        Console.success({message: "message.ruleset.createSucess"});
+        Console.success({message: "message.ruleset.createSuccess"});
     }
 
     public static async deleteRuleset(id: string): Promise<void> {

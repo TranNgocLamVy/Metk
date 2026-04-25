@@ -4,6 +4,7 @@ import { Label } from "@/view/components/shadcn/label";
 import { Tooltip, TooltipContent } from "@/view/components/shadcn/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../custom/LocalizeText";
 
 type FolderPickerProps = {
 	id: string;
@@ -48,7 +49,7 @@ export default function FolderPickerField(props: FolderPickerProps) {
 
 	return (
 		<div className="grid gap-2">
-			<Label htmlFor={id}>{translate(label)}</Label>
+			<Label htmlFor={id}><LocalizedText message={label} /></Label>
 			<Tooltip delayDuration={500}>
 				<TooltipTrigger asChild>
 					<Input id={id} name={name} type="text" placeholder={translate(placeholder)} defaultValue={value ?? ""} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFolder} onKeyDown={onKeyDown} />

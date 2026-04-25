@@ -8,13 +8,11 @@ import { HStack, VStack } from "../custom/stack/Stack";
 import SVGIcon from "../custom/icons/SvgIcon";
 import { Button } from "../shadcn/button";
 import QuickToolTip from "../custom/QuickToolTip";
-import { useTranslation } from "react-i18next";
 
 export default function ToolBar() {
 	const { version, getTools, getActiceTool } = useToolbarStore();
 
 
-	const { t: translate } = useTranslation([]);
 
 	const tools = useMemo(() => getTools(), [version]);
 
@@ -32,7 +30,7 @@ export default function ToolBar() {
 					const isActive = activeTool === tool.id;
 					return (
 						<Fragment key={tool.id}>
-							<QuickToolTip toolTip={tool.tooltip ? translate(tool.tooltip) : ""}>
+							<QuickToolTip toolTip={tool.tooltip ? tool.tooltip : ""}>
 								<Button onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}>
 									<SVGIcon svgString={tool.icon} />
 								</Button>

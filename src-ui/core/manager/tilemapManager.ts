@@ -1,4 +1,3 @@
-import { ToastService } from "@/shared/services/toastService";
 import { Result } from "@/shared/types/result";
 
 import { TilemapData, TilemapMetadata } from "../../shared/schema/tilemapSchema";
@@ -12,7 +11,6 @@ import { RulesetManager } from "./rulesetManager";
 import { Console } from "@/shared/services/consoleService";
 import { PathUtils } from "@/shared/utils/pathUtils";
 import { TilemapService } from "@/shared/services/tilemapService";
-import i18n from "../service/i18n";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -75,12 +73,12 @@ export class TilemapManager {
     private async performTilemapLoad(id: string): Promise<Result<Tilemap>> {
         const tilemapMetadata = this.tilemapMetadata.get(id);
         if (!tilemapMetadata) {
-            // TODO: i18n
+            const customId = "loadTilemapFail" + id;
             Console.error({ 
-                message: "message.tilemap.loadFail",
+                message: { key: "message.tilemap.loadFail", options: { name: "Unknow", id }},
                 stacks: ["message.tilemap.metadataNotFound"],
                 actions: [{ label: "global.action.tilemap.import", onClick: () => TilemapService.importTilemap(id), variant: "outline" }]
-            });
+            }, customId);
             return Result.Error("message.tilemap.metadataNotFound");
         }
 
@@ -88,15 +86,15 @@ export class TilemapManager {
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
 
         if (loadTilemapResult.status !== Result.Status.Success) {
-            // TODO: i18n
+            const customId = "loadTilemapFail" + id;
             Console.error({ 
-                message:  `${i18n.t("message.tilemap.loadFail")}: ${tilemapMetadata.name}`,
+                message:  { key: "message.tilemap.loadFail", options: { name: tilemapMetadata.name, id } },
                 stacks: loadTilemapResult.message ? [loadTilemapResult.message] : [],
                 actions: [
                     { label: "global.action.tilemap.import", onClick: () => TilemapService.importTilemap(id), variant: "outline"},
                     { label: "global.action.tilemap.remove", onClick: () => TilemapService.removeTilemap(id), variant: "destructive" },
                 ]
-            });
+            }, customId);
             return Result.Error(loadTilemapResult.message);
         }
 

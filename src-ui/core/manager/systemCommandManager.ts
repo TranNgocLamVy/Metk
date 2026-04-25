@@ -2,8 +2,8 @@ import { Result } from "@/shared/types/result";
 import { CommandContext } from "../decorator/command";
 import { ISystemCommandConstructor } from "../interface/IBaseCommand";
 import { ContextManager } from "./contextManager";
-import { ToastService } from "@/shared/services/toastService";
 import { EditorContext } from "../application/editorContext";
+import { Console } from "@/shared/services/consoleService";
 
 export class SystemCommandManager {
     public static COMMAND_REGISTRY: Map<string, CommandContext> = new Map();
@@ -41,8 +41,7 @@ export class SystemCommandManager {
         const command = new commandConstructor();
         const result = await command.execute(this.editorContext);
         if (result.status === Result.Status.Error) {
-            // TODO: Handle error
-            ToastService.error({ message: result.message });
+            Console.error({ message: result.message });
         }
     }
 }

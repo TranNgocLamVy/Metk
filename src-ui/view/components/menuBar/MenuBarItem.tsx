@@ -1,18 +1,17 @@
 import { Fragment, useEffect, useReducer, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
 
 import { Button } from "@/view/components/shadcn/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/view/components/shadcn/dropdown-menu";
+import { LocalizedText } from "../custom/LocalizeText";
 
 
 interface MenuBarItemProps {
 	item: MenuItemType;
 }
+
 export default function MenuBarItem({ item }: MenuBarItemProps) {
     const [isOpen, setIsOpen] = useState(false);
-
-    const { t: translate } = useTranslation([]);
 
     useEffect(() => {
         const onWindowLoseFocus = () => setIsOpen(false);
@@ -30,7 +29,7 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false} >
 			<DropdownMenuTrigger disabled={disabled} asChild>
 				<Button size={"sm"} variant={"empty"} className="px-2 rounded-none h-8 hover:bg-surface-sunken" asChild>
-					<p className="text-xs">{translate(label)}</p>
+					<p className="text-xs"><LocalizedText message={label} /></p>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className={className} side="bottom" align="start" sideOffset={0} >
@@ -70,13 +69,10 @@ type MenuBarDropdownItemProps = {
 
 function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
     const [, forceUpdate] = useReducer(x => x + 1, 0)
-	
-	const { t: translate } = useTranslation([]);
-
 	if (item.visible != undefined && !item.visible()) return null;
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
-	const label = translate(typeof item.label === "function" ? item.label() : item.label)
+	const labelKey = typeof item.label === "function" ? item.label() : item.label;
 
 	const wrapIcon = (icon: React.ReactNode, placeholder: boolean = true) => {
 		if (!placeholder && !icon) return null;
@@ -92,7 +88,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 		return (
 			<DropdownMenuItem className="gap-2 h-7 text-xs" disabled={disabled} onClick={item.onClick}>
 				{wrapIcon(item.startIcon)}
-				{label}
+				<LocalizedText message={labelKey} />
 				{wrapIcon(item.endIcon, false)}
 				<DropdownMenuShortcut>{item.shortCut ? item.shortCut : null}</DropdownMenuShortcut>
 				{wrapIcon(null, item.shortCut ? false : true)}
@@ -107,7 +103,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 			<DropdownMenuSub>
 				<DropdownMenuSubTrigger className="gap-2 h-7 text-xs" disabled={disabled}>
 					{wrapIcon(item.startIcon)}
-					{label}
+					<LocalizedText message={labelKey} />
 					{wrapIcon(item.endIcon, false)}
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className={subMenusClassName} sideOffset={0}>
@@ -124,7 +120,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
                 item.toggle();
             }}>
 				{wrapIcon(item.startIcon, false)}
-				{label}
+				<LocalizedText message={labelKey} />
 				{wrapIcon(item.endIcon, false)}
 				<DropdownMenuShortcut>{item.shortCut ? item.shortCut : null}</DropdownMenuShortcut>
 				{wrapIcon(null, item.shortCut ? false : true)}
@@ -140,7 +136,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 					return (
 						<DropdownMenuRadioItem onSelect={(e) => e.preventDefault()} className="gap-2 h-7 text-xs" key={radioItem.value} value={radioItem.value} disabled={disabled}>
 							{wrapIcon(radioItem.startIcon, false)}
-							{translate(radioItem.label)}
+							<LocalizedText message={radioItem.label} />
 						</DropdownMenuRadioItem>
 					);
 				})}

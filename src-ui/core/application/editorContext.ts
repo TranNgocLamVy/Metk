@@ -1,6 +1,5 @@
 import EventEmitter from "eventemitter3";
 
-import { appCore } from "../appcore";
 import { HistoryManager } from "../manager/historyManager";
 import { ProjectManager } from "../manager/projectManager";
 import { ToolManager } from "../manager/toolManager";

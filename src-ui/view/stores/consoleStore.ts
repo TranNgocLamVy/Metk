@@ -42,10 +42,20 @@ export const useConsoleStore = create<ConsoleState>((set, get) => ({
     openWithType: (type) => set({ isConsoleOpen: true, consoleType: type }),
 
     addLog: (log) => {
-        set((state) => ({ logs: [...state.logs.filter(l => l.id !== log.id), log] }))
+        set((state) => {
+            const updatedLogs = [...state.logs.filter(l => l.id !== log.id), log];
+            return { logs: updatedLogs.slice(-200) };
+        })
     },
     addError: (error) => {
-        set((state) => ({ errors: [...state.errors.filter(e => e.id !== error.id), error], isConsoleOpen: true, consoleType: "error"}))
+        set((state) => {
+            const updatedErrors = [...state.errors.filter(e => e.id !== error.id), error];
+            return { 
+                errors: updatedErrors.slice(-50), 
+                isConsoleOpen: true, 
+                consoleType: "error" 
+            };
+        })
     },
     removeLog: (id) => set((state) => ({
         logs: state.logs.filter((log) => log.id !== id)

@@ -4,11 +4,11 @@ import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
-import { ToastService } from "./toastService";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import { useLayoutStore } from "@/view/stores/layoutStore";
 import { Model } from "flexlayout-react";
 import { DialogService } from "./dialogService";
+import { Console } from "./consoleService";
 
 export class WorkspaceService {
     private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
@@ -18,7 +18,7 @@ export class WorkspaceService {
 
         const loadProjectResult = await projectManager.setAndLoadProject(projectId);
         if (loadProjectResult.status !== Result.Status.Success) {
-            ToastService.error({ message: loadProjectResult.message });
+            Console.error({ message: loadProjectResult.message });
             return loadProjectResult;
         }
 
@@ -26,7 +26,7 @@ export class WorkspaceService {
 
         const loadWorkspaceResult = await appCore.workspaceManager.loadProjectWorkspace(project);
         if (loadWorkspaceResult.status !== Result.Status.Success) {
-            ToastService.error({ message: loadWorkspaceResult.message });
+            Console.error({ message: loadWorkspaceResult.message });
             return loadWorkspaceResult;
         }
         const workspace = loadWorkspaceResult.data;
@@ -73,7 +73,7 @@ export class WorkspaceService {
         WorkspaceService.saveWorkspaceTimeout = setTimeout(async () => {
             const result = await appCore.workspaceManager.saveCurrentWorkspace();
             if (result.status !== Result.Status.Success) {
-                ToastService.error({ message: result.message });
+                Console.error({ message: result.message });
                 return;
             }
             WorkspaceService.saveWorkspaceTimeout = null;
@@ -85,7 +85,7 @@ export class WorkspaceService {
     public static async createTilesetSession(tilesetId: string): Promise<void> {
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         if (!tilesetPixiApp) {
-            ToastService.error({ message: "Tileset pixi app not found" });
+            Console.error({ message: "Tileset pixi app not found" }); // TODO: i18n
             return;
         }
 
@@ -94,7 +94,7 @@ export class WorkspaceService {
 
         const tilesetResult = await currentProject.tilesetManager.loadTileset({ id: tilesetId });
         if (tilesetResult.status !== Result.Status.Success) {
-            ToastService.error({ message: tilesetResult.message });
+            Console.error({ message: tilesetResult.message });
             return;
         }
 
@@ -146,7 +146,7 @@ export class WorkspaceService {
     public static async createTilemapSession(tilemapId: string) {
         const tilesetPixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!tilesetPixiApp) {
-            ToastService.error({ message: "Tilemap pixi app not found" });
+            Console.error({ message: "Tilemap pixi app not found" }); // TODO: i18n
             return;
         }
 
@@ -154,10 +154,7 @@ export class WorkspaceService {
         if (!currentProject) return;
 
         const tilemapResult = await currentProject.tilemapManager.loadTilemap(tilemapId);
-        if (tilemapResult.status !== Result.Status.Success) {
-            ToastService.error({ message: tilemapResult.message });
-            return;
-        }
+        if (tilemapResult.status !== Result.Status.Success) return;
 
         const tilemap = tilemapResult.data;
 
@@ -174,7 +171,7 @@ export class WorkspaceService {
     public static async openTilemapSession(sessionId: string): Promise<void> {
         const tilemapPixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!tilemapPixiApp) {
-            ToastService.error({ message: "Tilemap pixi app not found" });
+            Console.error({ message: "Tilemap pixi app not found" }); // TODO: i18n
             return;
         }
 

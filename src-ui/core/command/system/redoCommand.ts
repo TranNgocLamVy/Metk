@@ -13,7 +13,7 @@ import { Result } from "@/shared/types/result";
 export class RedoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {
         const historyManager = context.getCurrentHistoryManager();
-        if (!historyManager) return Result.Error("History manager not found");
+        if (!historyManager) return Result.Cancel();
         historyManager.redo(context);
         return Result.Success();
     }

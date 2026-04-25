@@ -1,13 +1,6 @@
-
-import { TilemapData } from "@/shared/schema/tilemapSchema";
-import { TilesetData } from "@/shared/schema/tilesetSchema";
-import { Result } from "@/shared/types/result";
-
 import { ProjectData, ProjectMetadata } from "../../shared/schema/projectSchema";
 import { TilemapManager } from "../manager/tilemapManager";
 import { TilesetManager } from "../manager/tilesetManager";
-import { Tilemap } from "./tile/tilemap";
-import { Tileset } from "./tile/tileset";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { RulesetManager } from "../manager/rulesetManager";
 

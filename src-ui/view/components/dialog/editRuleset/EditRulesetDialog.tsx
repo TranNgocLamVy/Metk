@@ -7,7 +7,6 @@ import { appCore } from "@/core/appcore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import RuleList from "./RuleList";
 import RuleHeader from "./RuleHeader";
-import { ToastService } from "@/shared/services/toastService";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import OutputSelector from "./OutputSelector";
 import ConstraintsGrid from "./ConstraintsGrid";
@@ -16,7 +15,8 @@ import ConstraintTargetEditor from "./ConstraintTargetEditor";
 import OutputList from "./OutputList";
 import { Ruleset } from "@/core/application/rule/ruleset";
 import { EditRulesetContext } from "./EditRulesetContext";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../../custom/LocalizeText";
+import { Console } from "@/shared/services/consoleService";
 
 interface EditRulesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -24,7 +24,6 @@ interface EditRulesetDialogProps extends BaseDialogProps {
 }
 
 export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProps) {
-    const { t: translate } = useTranslation();
 
     const { closeDialog } = useDialogStore();
 
@@ -85,7 +84,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
         await rulesetManager.saveRuleset(ruleset.id);
         useRulesetManagerStore.getState().refresh();
 
-        ToastService.success({ message: "Ruleset saved successfully" });
+        Console.success({ message: "message.ruleset.updatedSuccess" })
         onClose();
     };
 
@@ -114,15 +113,15 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
                     onOpenAutoFocus={(e) => e.preventDefault()}
                     showCloseButton={false}
                 >
-                    <DialogTitle className="hidden">{translate("dialog.editRuleset.title")}</DialogTitle>
+                    <DialogTitle className="hidden"><LocalizedText message="dialog.editRuleset.title" /></DialogTitle>
                     <VStack className="w-fit h-full bg-surface-overlay p-2 gap-2">
                         <RuleHeader />
                         <RuleList />
                         <HStack className="w-full h-fit gap-2">
                             <DialogClose asChild>
-                                <Button variant="outline" type="button" onClick={() => closeDialog(dialogId)} className="ml-auto">{translate("dialog.editRuleset.action.discard")}</Button>
+                                <Button variant="outline" type="button" onClick={() => closeDialog(dialogId)} className="ml-auto"><LocalizedText message="dialog.editRuleset.action.discard" /></Button>
                             </DialogClose>
-                            <Button type="button" onClick={handleSave}>{translate("dialog.editRuleset.action.save")}</Button>
+                            <Button type="button" onClick={handleSave}><LocalizedText message="dialog.editRuleset.action.save" /></Button>
                         </HStack>
                     </VStack>
 

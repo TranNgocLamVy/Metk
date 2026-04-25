@@ -1,6 +1,5 @@
 import { MouseEvent, useEffect, useState } from "react";
 
-import { ToastService } from "@/shared/services/toastService";
 import { Field, FormDialogOptions, GroupFieldInput, ShapeFromInputs, Simplify } from "@/shared/types/formDialog";
 import { Button } from "@/view/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/view/components/shadcn/dialog";
@@ -13,7 +12,8 @@ import FilePickerField from "../formField/FilePickerField";
 import { BaseDialogProps } from "./dialogRegistry";
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { ColorPickerField } from "../formField/ColorPickerField";
-import { useTranslation } from "react-i18next";
+import { LocalizedText } from "../custom/LocalizeText";
+import { Console } from "@/shared/services/consoleService";
 
 interface FormDialogProps extends BaseDialogProps {
     formDialog: FormDialogOptions;
@@ -21,8 +21,6 @@ interface FormDialogProps extends BaseDialogProps {
 }
 
 export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
-    const { t: translate } = useTranslation([]);
-
     const [values, setValues] = useState<Record<string, any>>({});
 
     useEffect(() => {
@@ -77,11 +75,7 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
 
             if (input.validate) {
                 const result = await input.validate(val);
-                if (!result.valid) {
-                    // TODO: Log Error
-                    ToastService.warning({ message: result.message });
-                    return false;
-                }
+                if (!result.valid) return false;
             }
 
             if (input.type === "group") {
@@ -101,8 +95,6 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
         if (validateBeforeSubmit) {
             const result = await validateBeforeSubmit(values);
             if (!result.valid) {
-                // TODO: Log Warning
-                ToastService.warning({ message: result.message });
                 return;
             }
         }
@@ -121,8 +113,8 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
             <form autoComplete="off">
                 <DialogContent className={`${sizeClasses[size]} max-h-[90vh] overflow-y-auto w-full`} onInteractOutside={(e) => e.preventDefault()}>
                     <DialogHeader>
-                        <DialogTitle>{translate(title)}</DialogTitle>
-                        <DialogDescription>{translate(description)}</DialogDescription>
+                        <DialogTitle><LocalizedText message={title ?? ""} /></DialogTitle>
+                        <DialogDescription><LocalizedText message={description ?? ""} /></DialogDescription>
                     </DialogHeader>
 
                     <div className="flex flex-col gap-4 py-4">
@@ -134,10 +126,10 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline" type="button" onClick={() => cancelFormDialog()}>
-                                {translate(cancelText)}
+                                <LocalizedText message={cancelText ?? ""} />
                             </Button>
                         </DialogClose>
-                        <Button type="button" onClick={handleSubmit}>{translate(okText)}</Button>
+                        <Button type="button" onClick={handleSubmit}><LocalizedText message={okText ?? ""} /></Button>
                     </DialogFooter>
                 </DialogContent>
             </form>
@@ -158,7 +150,6 @@ const getInitialValues = (inputs: readonly Field[]): Record<string, any> => {
 };
 
 const GroupField = ({ field, value = {}, onChange }: { field: GroupFieldInput; value: Record<string, any>; onChange: (fieldName: string, val: any) => void }) => {
-    const { t: translate } = useTranslation([]);
     const { orientation = "vertical", visible = true, inputs, name, label } = field;
 
     const handleChildChange = (childName: string, childValue: any) => {
@@ -184,7 +175,7 @@ const GroupField = ({ field, value = {}, onChange }: { field: GroupFieldInput; v
 
     return (
         <div className="relative mt-3 rounded-md border border-foreground/40 p-4 pt-6 h-full">
-            <label className="absolute -top-2.5 left-3 bg-surface-overlay px-1 text-sm font-semibold text-foreground">{translate(label)}</label>
+            <label className="absolute -top-2.5 left-3 bg-surface-overlay px-1 text-sm font-semibold text-foreground"><LocalizedText message={label} /></label>
             {content}
         </div>
     );
