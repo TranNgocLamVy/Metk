@@ -28,6 +28,8 @@ export class Console {
         const id = customId ?? uuidv4();
         const uiId = uuidv4();
         const timestamp = Date.now();
+        payload.stacks = payload.stacks ?? [];
+        payload.stacks.filter(stack => stack !== undefined);
         useConsoleStore.getState().addError({ id, uiId, timestamp, ...payload });
     }
 

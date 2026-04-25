@@ -14,6 +14,7 @@ import i18n from "@/core/service/i18n";
 import { Console } from "./consoleService";
 
 export class RulesetService {
+
     public static async createRuleset(): Promise<void> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
@@ -53,14 +54,8 @@ export class RulesetService {
             return;
         }
 
-        const rulesetRefPath = PathUtils.relative(currentProject.projectPathSystem.absDir, rulesetAbsPath);
-        const rulesetMetadata: RulesetMetadata = {
-            id: rulesetData.id,
-            name: rulesetData.name,
-            color: rulesetData.color,
-            rulesetRelPath: rulesetRefPath,
-        }
-        currentProject.rulesetManager.addRuleMetadata(rulesetMetadata);
+        await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
+
         await editorContext.projectManager.saveCurrrentProject();
 
         useRulesetManagerStore.getState().refresh();
@@ -68,18 +63,69 @@ export class RulesetService {
         Console.success({message: "message.ruleset.createSuccess"});
     }
 
+    public static async importRuleset(refRulesetId?: string): Promise<Result> {
+        const rulesetAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        if (!rulesetAbsPath) return Result.Cancel();
+        const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);
+        if (loadRulesetResult.status !== Result.Status.Success) {
+            Console.error({
+                message: "message.ruleset.loadFail",
+                stacks: [loadRulesetResult.message!, ...loadRulesetResult.stacks!]
+            })
+            return Result.Error(loadRulesetResult.message);
+        }
+
+        const rulesetData = loadRulesetResult.data;
+        if (refRulesetId && rulesetData.id !== refRulesetId) {
+            Console.error({
+                message: "message.ruleset.importFail",
+                stacks: ["message.ruleset.mismatchId"]
+            });
+            return Result.Cancel();
+        }
+
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
+
+        await editorContext.projectManager.saveCurrrentProject();
+
+        useRulesetManagerStore.getState().refresh();
+
+        Console.success({message: "message.ruleset.importSuccess"});
+
+        return Result.Success();
+    }
+
+    public static async removeRuleset(id: string): Promise<Result> {
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const removeResult = await currentProject.rulesetManager.removeRulesetMetadata(id);
+        const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
+
+        // TODO: Remove ref from tilemap
+
+        useRulesetManagerStore.getState().refresh();
+
+        if (removeResult.status == Result.Status.Success && rulesetSessionManager) {
+            const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
+            if (selectedRuleId === id) rulesetSessionManager.setSelectedRuleId(null);
+            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        }
+        return removeResult
+    }
+
     public static async deleteRuleset(id: string): Promise<void> {
         const rulesetManager = appCore.projectManager.currentProject?.rulesetManager;
         if (!rulesetManager) return;
-
-        const rulesetMetadata = rulesetManager.getRulesetMetadataById(id);
-        if (!rulesetMetadata) {
-            Console.error({
-                message: "message.ruleset.deleteFail",
-                stacks: ["message.ruleset.notFound"],
-            })
-            return;
-        }
 
         const confirmDelete = await DialogService.openPermissionDialog({ 
             title: "dialog.delete.ruleset.title",
@@ -101,7 +147,5 @@ export class RulesetService {
             if (selectedRuleId === id) rulesetSessionManager.setSelectedRuleId(null);
             WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
-
-        Console.log({ message: "message.ruleset.deleteSuccess"});
     }
 }

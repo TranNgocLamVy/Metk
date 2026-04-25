@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { appCore } from "@/core/appcore";
 
-import { TilemapData, TilemapMetadata } from "../schema/tilemapSchema";
+import { TilemapData } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspaceService";
@@ -10,8 +10,8 @@ import { TilemapStorageService } from "@/infrastructure/container";
 import { PathUtils } from "../utils/pathUtils";
 import { DialogService } from "./dialogService";
 import { createTilemapForm } from "../constant/form/createTilemapForm";
-import i18n from "@/core/service/i18n";
 import { Console } from "./consoleService";
+import i18n from "@/core/service/i18n";
 
 export class TilemapService {
 
@@ -72,16 +72,16 @@ export class TilemapService {
     public static async importTilemap(refTilemapId?: string): Promise<Result> {
         const tilemapAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return Result.Cancel();
-        const tilemapDataResult = await TilemapStorageService.load(tilemapAbsPath);
-        if (tilemapDataResult.status !== Result.Status.Success) {
+        const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
+        if (loadTilemapResult.status !== Result.Status.Success) {
             Console.error({
                 message: "message.tilemap.loadFail",
-                stacks: tilemapDataResult.message ? [tilemapDataResult.message] : [],
+                stacks: loadTilemapResult.message ? [loadTilemapResult.message] : [],
             })
-            return Result.Error(tilemapDataResult.message);
+            return Result.Error(loadTilemapResult.message);
         }
 
-        const tilemapData = tilemapDataResult.data;
+        const tilemapData = loadTilemapResult.data;
         if (refTilemapId && tilemapData.id !== refTilemapId) {
             Console.error({
                 message: "message.tilemap.importFail",
@@ -98,9 +98,7 @@ export class TilemapService {
 
         if (!currentProject || !currentWorkspace) return Result.Cancel();
 
-        const tilemapManager = currentProject.tilemapManager;
-        
-        await tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
+        await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
 
         await editorContext.projectManager.saveCurrrentProject();
 
@@ -145,16 +143,7 @@ export class TilemapService {
         const tilemapSession = currentWorkspace.tilemapSessionManager.getSessionByTilemapId(tilemapId);
         if (tilemapSession) await WorkspaceService.closeTilemapSession(tilemapSession.id, true);
 
-        const deleteResult = await currentProject.tilemapManager.deleteTilemap(tilemapId);
-        if (deleteResult.status !== Result.Status.Success) {
-            Console.error({
-                message: "message.tilemap.deleteFail",
-                stacks: deleteResult.message ? [deleteResult.message] : [],
-            })
-            return;
-        }
-
+        await currentProject.tilemapManager.deleteTilemap(tilemapId);
         await editorContext.projectManager.saveCurrrentProject();
-        Console.log({ message: "message.tilemap.deleteSuccess"});
     }
 }
