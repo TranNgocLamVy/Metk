@@ -581,6 +581,16 @@
                 "mkdirFail": "Error creating directory: {{path}}",
                 "fileNotFoundAt": "File not found at: {{path}}",
                 "directoryNotFoundAt": "Directory not found at: {{path}}"
+            },
+            "unknownError": {
+                "default": "Unknown error",
+
+                "loadProject": "Unknown error when load project",
+                "loadTilemap": "Unknown error when load tilemap",
+                "loadTileset": "Unknown error when load tileset",
+                "loadRuleset": "Unknown error when load ruleset",
+                "loadTilemapSession": "Unknown error when load tilemap session",
+                "loadTilesetSession": "Unknown error when load tileset session"
             }
         }
     }
