@@ -6,11 +6,19 @@ import { Project } from "../application/project";
 import { Workspace } from "../application/workspace";
 import { WorkspaceStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/pathUtils";
+import EventEmitter from "eventemitter3";
 
-export class WorkspaceManager {
+type WorkspaceManagerEvent = {
+    onWorkspaceLoaded: (workspace: Workspace) => void;
+    onWorkspaceUnloaded: () => void;
+}
+
+export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
     public currentWorkspace: Workspace | null = null;
     private editorContext: EditorContext;
-    public constructor() { }
+    public constructor() {
+        super();
+    }
 
     public setEditorContext(editorContext: EditorContext) {
         this.editorContext = editorContext;
@@ -28,6 +36,7 @@ export class WorkspaceManager {
             this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
         }
         await this.currentWorkspace.loadSession();
+        this.emit("onWorkspaceLoaded", this.currentWorkspace);
         return Result.Success(this.currentWorkspace!);
     }
 
@@ -35,6 +44,7 @@ export class WorkspaceManager {
         if (!this.currentWorkspace) return;
         await this.currentWorkspace.destroy();
         this.currentWorkspace = null;
+        this.emit("onWorkspaceUnloaded");
     }
 
     public async saveCurrentWorkspace(): Promise<Result> {

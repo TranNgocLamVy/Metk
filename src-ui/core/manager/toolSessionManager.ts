@@ -13,7 +13,7 @@ export class ToolSessionManager {
     }
 
     public async load() {
-        const toolManager = this.editorContext.getToolManager();
+        const toolManager = this.editorContext.toolManager;
         if (this.toolSessionData?.currentTool) {
             toolManager.startTool(this.toolSessionData.currentTool);
         }
@@ -21,12 +21,11 @@ export class ToolSessionManager {
     }
 
     public async destroy() {
-        const toolManager = this.editorContext.getToolManager();
-        toolManager.off("onToolChanged", this.bindOnToolChanged);
+        this.editorContext.toolManager.off("onToolChanged", this.bindOnToolChanged);
     }
 
     public async onToolChange() {
-        const currentTool = this.editorContext.getToolManager().getCurrentToolId() ?? undefined;
+        const currentTool = this.editorContext.toolManager.getCurrentToolId() ?? undefined;
         this.updateToolState({ currentTool });
         await this.editorContext.workspaceManager.saveCurrentWorkspace();
     }

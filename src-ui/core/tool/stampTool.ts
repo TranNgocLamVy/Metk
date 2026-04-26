@@ -12,6 +12,7 @@ import { GroupLayer } from "../application/tile/layer/groupLayer";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
 
 import icon from "@/assets/icons/stamp.svg?raw";
+import { TilemapSessionView } from "../application/session/tilemapSessionView";
 
 @Tool({
     id: "tool.stamp",
@@ -29,6 +30,8 @@ export class StampTool implements ITool {
     private activeDrawStrategy: IDrawStrategy | null = null;
 
     private currentSession: TilemapSession | null = null;
+    private currentSessionView: TilemapSessionView | null = null;
+
     private overlayContainer: Container | null = null;
 
     private previousMousePosition: Position = null!;
@@ -75,11 +78,13 @@ export class StampTool implements ITool {
         this.currentMousePosition = null!;
     }
 
-    public attach(session: TilemapSession): void {
+    public attach(session: TilemapSession, view: TilemapSessionView): void {
         this.currentSession = session;
-        const viewport = session.sessionView.viewport;
+        this.currentSessionView = view;
 
-        this.overlayContainer = session.sessionView.overlayerContainer;
+        const viewport = this.currentSessionView.viewport;
+
+        this.overlayContainer = this.currentSessionView.overlayerContainer;
 
         viewport.on("pointerdown", this.bindPointerOnDown);
         viewport.on("pointermove", this.bindPointerOnMove);
@@ -93,8 +98,8 @@ export class StampTool implements ITool {
     }
 
     public detach(): void {
-        if (!this.currentSession) return;
-        const viewport = this.currentSession.sessionView.viewport;
+        if (!this.currentSession || !this.currentSessionView) return;
+        const viewport = this.currentSessionView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
         viewport.off("pointermove", this.bindPointerOnMove);
@@ -213,7 +218,7 @@ export class StampTool implements ITool {
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {
-        const localPosition = this.currentSession!.sessionView.viewport.toLocal(new Point(e.global.x, e.global.y));
+        const localPosition = this.currentSessionView!.viewport.toLocal(new Point(e.global.x, e.global.y));
         return { x: localPosition.x, y: localPosition.y };
     }
 

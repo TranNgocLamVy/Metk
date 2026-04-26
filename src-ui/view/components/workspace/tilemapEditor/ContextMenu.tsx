@@ -151,14 +151,14 @@ const GridGroup: MenuDropDownGroupType = [
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const session = appCore.editorContext.getCurrentTilemapSession();
-            if (!session) return false;
-            return session.sessionView.grid.gridEnabled
+            const sessionView = appCore.editorContext.getCurrentTilemapSessionView();
+            if (!sessionView) return false;
+            return sessionView.grid.gridEnabled
         },
         toggle() {
-            const session = appCore.editorContext.getCurrentTilemapSession();
-            if (!session) return;
-            session.sessionView.toggleGrid();
+            const sessionView = appCore.editorContext.getCurrentTilemapSessionView();
+            if (!sessionView) return;
+            return sessionView.toggleGrid();
         },
     }
 ];

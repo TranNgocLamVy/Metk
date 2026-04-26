@@ -17,6 +17,7 @@ import { BaseLayer } from "../application/tile/layer/baseLayer";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
 import { DrawTileStrategy } from "./drawStrategy/drawTileStrategy";
 import { DrawRuleStrategy } from "./drawStrategy/drawRuleStrategy";
+import { TilemapSessionView } from "../application/session/tilemapSessionView";
 
 @Tool({
     id: "tool.eraser",
@@ -34,6 +35,8 @@ export class EraserTool implements ITool {
     private activeDrawStrategy: IDrawStrategy | null = null;
 
     private currentSession: TilemapSession | null = null;
+    private currentSessionView: TilemapSessionView | null = null;
+
     private overlayContainer: Container | null = null;
 
     private previousPreviewCoordinate: Coordinate = null!;
@@ -89,11 +92,13 @@ export class EraserTool implements ITool {
         this.reverseErase();
     }
 
-    public attach(session: TilemapSession): void {
+    public attach(session: TilemapSession, view: TilemapSessionView): void {
         this.currentSession = session;
-        const viewport = session.sessionView.viewport;
+        this.currentSessionView = view;
 
-        this.overlayContainer = session.sessionView.overlayerContainer;
+        const viewport = this.currentSessionView.viewport;
+
+        this.overlayContainer = this.currentSessionView.overlayerContainer;
 
         this.previewGraphics = new Graphics();
         this.overlayContainer.addChild(this.previewGraphics);
@@ -118,8 +123,8 @@ export class EraserTool implements ITool {
     }
 
     public detach(): void {
-        if (!this.currentSession) return;
-        const viewport = this.currentSession.sessionView.viewport;
+        if (!this.currentSession || !this.currentSessionView) return;
+        const viewport = this.currentSessionView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
         viewport.off("pointermove", this.bindPointerOnMove);
@@ -293,7 +298,7 @@ export class EraserTool implements ITool {
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {
-        const localPosition = this.currentSession!.sessionView.viewport.toLocal(new Point(e.global.x, e.global.y));
+        const localPosition = this.currentSessionView!.viewport.toLocal(new Point(e.global.x, e.global.y));
         return { x: localPosition.x, y: localPosition.y };
     }
 

@@ -40,21 +40,7 @@ export default function TilemapEditorTabs() {
                     
 					const closeTilemapSession = async (e: any) => {
 						e.stopPropagation();
-						if (isDirty) {
-							const saveResult = await DialogService.openSaveDialog({
-								title: "Do you want to save changes to the tilemap before closing it?",
-								description: "If you don't save, your changes will be lost.",
-							});
-							if (saveResult === "save") {
-								const commandManager = appCore.systemCommandManager;
-								await commandManager.execute("project.save");
-								WorkspaceService.closeTilemapSession(session.sessionId);
-							} else if (saveResult === "not save") {
-								WorkspaceService.closeTilemapSession(session.sessionId);
-							}
-						} else {
-							WorkspaceService.closeTilemapSession(session.sessionId);
-						}
+						WorkspaceService.closeTilemapSession(session.sessionId);
 					};
                     
 					return (

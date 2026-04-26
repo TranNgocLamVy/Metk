@@ -23,9 +23,7 @@ export class TilemapSession implements IBaseSession {
 
     public viewState: ViewState;
     public layerState: LayerState;
-
-    public sessionView: TilemapSessionView;
-
+    
     public eventEmitter: EventEmitter<TilemapSessionEvents>;
 
     private bindOnTilemapChange: () => void;
@@ -48,8 +46,6 @@ export class TilemapSession implements IBaseSession {
         this.layerState = {
             selectedLayers: layers.filter(id => selectedLayers.includes(id))
         }
-
-        this.sessionView = new TilemapSessionView(this);
 
         this.bindOnTilemapChange = this.markAsDirty.bind(this);
         this.tilemap.eventEmitter.on("updateProperty", this.bindOnTilemapChange);
@@ -111,8 +107,5 @@ export class TilemapSession implements IBaseSession {
         const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
         const textureManager = this.editorContext.textureManager;
         for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id);
-
-        this.sessionView.unActivateSession();
-        this.sessionView.destroy();
     }
 }

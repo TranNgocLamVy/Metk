@@ -11,6 +11,7 @@ import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
 import { TextureManager } from "../manager/textureManager";
 import { Ruleset } from "./rule/ruleset";
+import { TilemapSessionView } from "./session/tilemapSessionView";
 
 type EditorContextEvent = {
     onOpenTilemapSession: () => void,
@@ -34,16 +35,18 @@ export class EditorContext {
         return this.workspaceManager.currentWorkspace;
     }
 
-    public getToolManager(): ToolManager {
-        return this.toolManager;
-    }
-
     public getCurrentTilemapSession(): TilemapSession | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) return null;
         const currentTilemapSession = currentWorkspace.tilemapSessionManager.currentTilemapSession;
         if (!currentTilemapSession) return null;
         return currentTilemapSession;
+    }
+
+    public getCurrentTilemapSessionView(): TilemapSessionView | null {
+        const currentWorkspace = this.workspaceManager.currentWorkspace;
+        if (!currentWorkspace) return null;
+        return currentWorkspace.tilemapSessionManager.getCurrentSessionView();
     }
 
     public getCurrentTilesetSession(): TilesetSession | null {
