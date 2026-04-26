@@ -77,8 +77,8 @@ export class TilesetRefManager {
      * @returns The assigned numerical index of the removed tileset, or -1 if it was not found.
      */
     public removeTilesetRef(tileset: string | number): number {
-        const tilesetRefIndex = typeof tileset === "string" ? this.getTilesetRefIndex(tileset) : tileset;
-        if (tilesetRefIndex === -1) return -1;
+        const tilesetRefIndex = typeof tileset === "string" ? this.tilesetRefs.find(ref => ref.id === tileset)?.index : tileset;
+        if (tilesetRefIndex === undefined || tilesetRefIndex === -1) return -1;
         this.tilesetRefs = this.tilesetRefs.filter(tilesetRef => tilesetRef.index !== tilesetRefIndex);
         return tilesetRefIndex;
     }

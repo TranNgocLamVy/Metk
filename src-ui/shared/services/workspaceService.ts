@@ -92,7 +92,7 @@ export class WorkspaceService {
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
 
-        const tilesetResult = await currentProject.tilesetManager.loadTileset({ id: tilesetId });
+        const tilesetResult = await currentProject.tilesetManager.loadTileset(tilesetId);
         if (tilesetResult.status !== Result.Status.Success) {
             Console.error({ message: tilesetResult.message });
             return;

@@ -8,10 +8,11 @@ import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
 import { TilemapEditorContextMenu } from "./ContextMenu";
 import { LocalizedText } from "../../custom/LocalizeText";
 import { useMemo } from "react";
-import { VStack } from "../../custom/stack/Stack";
+import { HStack, VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
+import { TilemapService } from "@/shared/services/tilemapService";
 
 export default function TilemapEditorCanvas() {
 	const { version, getCurrentTilemapSessionId } = useTilemapSessionStore();
@@ -41,9 +42,14 @@ export default function TilemapEditorCanvas() {
 				<span className="text-sm">
 					<LocalizedText message="workspace.tilemapEditor.empty" />
 				</span>
-				<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
-					<LocalizedText message="workspace.tilemapEditor.open" />
-				</Button>
+				<HStack className="gap-2">
+					<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
+						<LocalizedText message="workspace.tilemapEditor.open" />
+					</Button>
+					<Button variant={"link"} onClick={TilemapService.createTilemap}>
+						<LocalizedText message="workspace.tilemapEditor.create" />
+					</Button>
+				</HStack>
 			</VStack>}
 		</div>
 	);

@@ -13,7 +13,7 @@ export class TextureManager {
     constructor() { }
 
     public async loadDefaultTextures(): Promise<void> {
-        
+
     }
 
     public async retainTilesetGraphics(tileset: Tileset): Promise<Result> {
@@ -87,6 +87,11 @@ export class TextureManager {
         } else {
             this.refCounts.set(tilesetId, newCount);
         }
+    }
+
+    public forceUnloadTexture(tilesetId: string): void {
+        this.refCounts.delete(tilesetId);
+        this.destroyTextures(tilesetId);
     }
 
     private destroyTextures(tilesetId: string): void {

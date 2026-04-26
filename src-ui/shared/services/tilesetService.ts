@@ -20,31 +20,28 @@ export class TilesetService {
         const currentWorkspace = editorContext.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
 
-        let defaultTextureDir: string;
-        const savedTextureDir = currentWorkspace.savedPathManager.getTextureDir();
-        if (savedTextureDir) {
-            defaultTextureDir = savedTextureDir;
-        } else {
-            defaultTextureDir = currentProject.projectPathSystem.absDir;
-        }
+        const defaultTextureDir = currentWorkspace.savedPathManager.getTextureDir();
 
         const form = await DialogService.openFormDialog(createTilesetForm(defaultTextureDir));
         if (!form) return;
 
-        let defaultTilesetDir: string;
-        const savedTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
-        if (savedTilesetDir) {
-            defaultTilesetDir = savedTilesetDir;
-        } else {
-            defaultTilesetDir = currentProject.projectPathSystem.absDir;
-        }
+        const defaultTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
 
         const tilesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
-        const tilesetDir = PathUtils.dirname(tilesetAbsPath);
 
         const imageAbsPath = form.image.source[0];
-        const imageRelPath = PathUtils.relative(tilesetDir, imageAbsPath);
+        if (!imageAbsPath) return;
+
+        const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
+        currentWorkspace.savedPathManager.setTilesetDir(tilesetAbsDir);
+
+        const imageAbsDir = PathUtils.dirname(imageAbsPath);
+        currentWorkspace.savedPathManager.setTextureDir(imageAbsDir);
+
+        const imageRelPath = PathUtils.relative(tilesetAbsDir, imageAbsPath);
+
+        // TODO: Load texture to get texture's size
 
         const tilesetData: TilesetData = {
             id: uuidv4(),
@@ -70,22 +67,85 @@ export class TilesetService {
             return;
         }
 
-        const tilemapRelPath = PathUtils.relative(currentProject.projectPathSystem.absDir, tilesetAbsPath);
-        const tilesetMetadata: TilesetMetadata = {
-            id: tilesetData.id,
-            name: tilesetData.name,
-            tilesetRelPath: tilemapRelPath,
-        }
-        currentProject.tilesetManager.addTilesetMetadata(tilesetMetadata);
+        await currentProject.tilesetManager.addTileset(tilesetData, tilesetAbsPath);
         await editorContext.projectManager.saveCurrrentProject();
 
-        WorkspaceService.createTilesetSession(tilesetData.id);
+        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await WorkspaceService.createTilesetSession(tilesetData.id);
 
         Console.success({ message: "message.tileset.createSuccess" });
     }
 
-    public static async editTileset(): Promise<void> {
+    public static async importTileset(refTilesetId?: string): Promise<Result> {
+        const rulesetAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        if (!rulesetAbsPath) return Result.Cancel();
+        const loadTilesetResult = await TilesetStorageService.load(rulesetAbsPath);
+        if (loadTilesetResult.status !== Result.Status.Success) {
+            Console.error({
+                message: "message.tileset.importFail",
+                stacks: ["message.tileset.loadFail", loadTilesetResult.message!, ...loadTilesetResult.stacks!]
+            })
+            return Result.Error(loadTilesetResult.message);
+        }
 
+        const tilesetData = loadTilesetResult.data;
+        if (refTilesetId && tilesetData.id !== refTilesetId) {
+            Console.error({
+                message: "message.tileset.importFail",
+                stacks: ["message.tileset.mismatchId"]
+            });
+            return Result.Cancel();
+        }
+
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        await currentProject.tilesetManager.addTileset(tilesetData, rulesetAbsPath);
+
+        await editorContext.projectManager.saveCurrrentProject();
+
+        WorkspaceService.createTilesetSession(tilesetData.id);
+
+        Console.success({ message: "message.tileset.importSuccess" });
+
+        return Result.Success();
+    }
+
+    public static async removeTileset(tilesetId: string): Promise<Result> {
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+
+        if (!currentProject) return Result.Cancel();
+
+        const confirmRemoval = await DialogService.openPermissionDialog({
+            title: "dialog.remove.tileset.title",
+            description: "dialog.remove.tileset.description",
+        });
+        if (!confirmRemoval) return Result.Cancel();
+
+        const removeResult = await currentProject.tilesetManager.removeTileset(tilesetId);
+
+        await Promise.all([
+            currentProject.tilemapManager.removeTilesetRef(tilesetId),
+            currentProject.rulesetManager.removeTilesetRef(tilesetId)
+        ])
+
+        // TODO: Unload texture
+
+        if (removeResult.status !== Result.Status.Success) return Result.Cancel();
+
+        await editorContext.projectManager.saveCurrrentProject();
+
+        const tilesetSession = editorContext.currentWorkspace?.tilesetSessionManager.getSessionByTilesetId(tilesetId);
+        if (tilesetSession) {
+            await WorkspaceService.closeTilesetSession(tilesetSession.id);
+            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        }
+
+        return removeResult;
     }
 
     public static async deleteTileset(tilesetId: string): Promise<void> {
@@ -102,20 +162,20 @@ export class TilesetService {
 
         if (!confirm) return;
 
-        const tilesetSession = currentWorkspace.tilesetSessionManager.getSessionByTilesetId(tilesetId);
-        if (tilesetSession) await WorkspaceService.closeTilesetSession(tilesetSession.id);
-
         const deleteResult = await currentProject.tilesetManager.deleteTileset(tilesetId);
-        if (deleteResult.status !== Result.Status.Success) {
-            Console.error({
-                message: "message.tileset.deleteFail",
-                stacks: deleteResult.message ? [deleteResult.message] : [],
-            })
-            return;
-        }
+
+        await Promise.all([
+            currentProject.tilemapManager.removeTilesetRef(tilesetId),
+            currentProject.rulesetManager.removeTilesetRef(tilesetId),
+        ])
+
+        appCore.textureManager.forceUnloadTexture(tilesetId);
+
+        if (deleteResult.status !== Result.Status.Success) return;
 
         await editorContext.projectManager.saveCurrrentProject();
 
-        Console.log({ message: "message.tileset.deleteSuccess"});
+        const tilesetSession = currentWorkspace.tilesetSessionManager.getSessionByTilesetId(tilesetId);
+        if (tilesetSession) await WorkspaceService.closeTilesetSession(tilesetSession.id);
     }
 }

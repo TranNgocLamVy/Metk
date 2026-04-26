@@ -101,16 +101,18 @@ export class Ruleset extends BaseObject<RulesetEvent> {
 
     public removeRule(ruleId: string): void { this.rules = this.rules.filter((r) => r.id !== ruleId) }
 
-    public removeRulesetRef(ruleset: string | number): void {
+    public removeRulesetRef(ruleset: string | number): boolean {
         const rulesetIndex = this.rulesetRefManager.removeRulesetRef(ruleset);
-        if (rulesetIndex === -1) return;
+        if (rulesetIndex === -1) return false;
         this.rules.forEach((rule) => rule.removeRulesetRef(rulesetIndex));
+        return true;
     }
 
-    public removeTilesetRef(tileset: string | number): void {
+    public removeTilesetRef(tileset: string | number): boolean {
         const tilesetIndex = this.tilesetRefManager.removeTilesetRef(tileset);
-        if (tilesetIndex === -1) return;
+        if (tilesetIndex === -1) return false;
         this.rules.forEach((rule) => rule.removeTilesetRef(tilesetIndex));
+        return true;
     }
 
     public serialize(): RulesetData {

@@ -30,7 +30,7 @@ export class TilesetSessionManager {
 
     public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<Result> {
         await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
-            const tilesetResult = await tilesetManager.loadTileset({ id: sessionData.tilesetId });
+            const tilesetResult = await tilesetManager.loadTileset(sessionData.tilesetId);
             if (tilesetResult.status !== Result.Status.Success) {
                 return Result.Error(tilesetResult.message);
             }

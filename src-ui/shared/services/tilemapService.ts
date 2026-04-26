@@ -20,23 +20,17 @@ export class TilemapService {
         const currentProject = editorContext.currentProject;
         const currentWorkspace = editorContext.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
-        
+
         const form = await DialogService.openFormDialog(createTilemapForm());
         if (!form) return;
-        
-        let defaultDir: string;
-        const savedTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
-        if (savedTilemapDir) {
-            defaultDir = savedTilemapDir;
-        } else {
-            defaultDir = currentProject.projectPathSystem.absDir;
-        }
+
+        const defaultDir = currentWorkspace.savedPathManager.getTilemapDir();
 
         const tilemapAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return;
 
-        const tilemapDir = PathUtils.dirname(tilemapAbsPath);
-        currentWorkspace.savedPathManager.setTilemapDir(tilemapDir);
+        const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
+        currentWorkspace.savedPathManager.setTilemapDir(tilemapAbsDir);
 
         const tilemapData: TilemapData = {
             id: uuidv4(),
@@ -61,12 +55,12 @@ export class TilemapService {
         }
 
         await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
-
         await editorContext.projectManager.saveCurrrentProject();
 
+        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         WorkspaceService.createTilemapSession(tilemapData.id);
-        
-        Console.success({ message: "message.tilemap.createSuccess"});
+
+        Console.success({ message: "message.tilemap.createSuccess" });
     }
 
     public static async importTilemap(refTilemapId?: string): Promise<Result> {
@@ -75,8 +69,8 @@ export class TilemapService {
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
         if (loadTilemapResult.status !== Result.Status.Success) {
             Console.error({
-                message: "message.tilemap.loadFail",
-                stacks: loadTilemapResult.message ? [loadTilemapResult.message] : [],
+                message: "message.tilemap.importFail",
+                stacks: ["message.tilemap.loadFail", loadTilemapResult.message!, ...loadTilemapResult.stacks!]
             })
             return Result.Error(loadTilemapResult.message);
         }
@@ -85,13 +79,11 @@ export class TilemapService {
         if (refTilemapId && tilemapData.id !== refTilemapId) {
             Console.error({
                 message: "message.tilemap.importFail",
-                stacks: [
-                    "message.tilemap.mismatchId"
-                ]
+                stacks: ["message.tilemap.mismatchId"]
             });
             return Result.Cancel();
         }
-        
+
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
         const currentWorkspace = editorContext.currentWorkspace;
@@ -103,8 +95,8 @@ export class TilemapService {
         await editorContext.projectManager.saveCurrrentProject();
 
         WorkspaceService.createTilemapSession(tilemapData.id);
-        
-        Console.success({ message: "message.tilemap.importSuccess"});
+
+        Console.success({ message: "message.tilemap.importSuccess" });
 
         return Result.Success();
     }
@@ -112,38 +104,51 @@ export class TilemapService {
     public static async removeTilemap(tilemapId: string): Promise<Result> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
 
-        if (!currentProject || !currentWorkspace) return Result.Cancel();
+        if (!currentProject) return Result.Cancel();
 
-        const tilemapSession = currentWorkspace.tilemapSessionManager.getSessionByTilemapId(tilemapId);
-        if (tilemapSession) await WorkspaceService.closeTilemapSession(tilemapSession.id);
+        const confirmRemoval = await DialogService.openPermissionDialog({
+            title: "dialog.remove.tilemap.title",
+            description: "dialog.remove.tilemap.description",
+        });
+        if (!confirmRemoval) return Result.Cancel();
 
         const removeResult = await currentProject.tilemapManager.removeTilemapMetadata(tilemapId);
-        if (removeResult.status == Result.Status.Success) {
-            await editorContext.projectManager.saveCurrrentProject();
+        if (removeResult.status !== Result.Status.Success) return Result.Cancel();
+
+        await editorContext.projectManager.saveCurrrentProject();
+
+        const tilemapSession = editorContext.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
+        if (tilemapSession) {
+            await WorkspaceService.closeTilemapSession(tilemapSession.id);
+            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
+
         return removeResult;
     }
 
     public static async deleteTilemap(tilemapId: string): Promise<void> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
-        
-        if (!currentProject || !currentWorkspace) return;
 
-        const confirm = await DialogService.openPermissionDialog({
+        if (!currentProject) return;
+
+        const confirmDeletion = await DialogService.openPermissionDialog({
             title: "dialog.delete.tilemap.title",
             description: "dialog.delete.tilemap.description",
         });
+        if (!confirmDeletion) return;
 
-        if (!confirm) return;
+        const deleteTilemapResult = await currentProject.tilemapManager.deleteTilemap(tilemapId);
+        if (deleteTilemapResult.status !== Result.Status.Success) return;
 
-        const tilemapSession = currentWorkspace.tilemapSessionManager.getSessionByTilemapId(tilemapId);
-        if (tilemapSession) await WorkspaceService.closeTilemapSession(tilemapSession.id, true);
-
-        await currentProject.tilemapManager.deleteTilemap(tilemapId);
         await editorContext.projectManager.saveCurrrentProject();
+
+        const tilemapSession = editorContext.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
+        if (tilemapSession) {
+            await WorkspaceService.closeTilemapSession(tilemapSession.id, true);
+            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        }
+
     }
 }

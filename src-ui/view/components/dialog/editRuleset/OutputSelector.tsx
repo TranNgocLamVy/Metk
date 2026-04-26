@@ -31,7 +31,7 @@ export default function OutputSelector() {
         if (!currentProject) return;
 
         const tilesetManager = currentProject.tilesetManager;
-        const tilesetResult = await tilesetManager.loadTileset({ id: tilesetId });
+        const tilesetResult = await tilesetManager.loadTileset(tilesetId);
         if (tilesetResult.status !== Result.Status.Success) return;
 
         const tileset = tilesetResult.data;

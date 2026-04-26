@@ -1,17 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { RulesetMetadata, RulesetData } from "@/shared/schema/rulesetSchema";
+import { RulesetData } from "@/shared/schema/rulesetSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { appCore } from "@/core/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { PathUtils } from "../utils/pathUtils";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
 import { DialogService } from "./dialogService";
 import { createRulesetForm } from "../constant/form/createRulesetForm";
 import { WorkspaceService } from "./workspaceService";
 import i18n from "@/core/service/i18n";
 import { Console } from "./consoleService";
+import { PathUtils } from "../utils/pathUtils";
 
 export class RulesetService {
 
@@ -24,22 +24,19 @@ export class RulesetService {
         const form = await DialogService.openFormDialog(createRulesetForm);
         if (!form) return;
 
-        let defaultRulesetDir: string;
-        const savedRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
-        if (savedRulesetDir) {
-            defaultRulesetDir = savedRulesetDir;
-        } else {
-            defaultRulesetDir = currentProject.projectPathSystem.absDir;
-        }
+        const defaultRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
 
         const rulesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.ruleset.title"), defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return;
+
+        const rulesetAbsDir = PathUtils.dirname(rulesetAbsPath);
+        currentWorkspace.savedPathManager.setRulesetDir(rulesetAbsDir);
 
         const rulesetData: RulesetData = {
             id: uuidv4(),
             name: form.name,
             color: form.color,
-            size: 5,
+            size: 5, // TODO: Handle 3x3, 7x7 and 9x9
             rules: [],
             tilesets: { refs: [], nextIndex: 0 },
             rulesets: { refs: [], nextIndex: 0 },
@@ -57,10 +54,11 @@ export class RulesetService {
         await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
 
         await editorContext.projectManager.saveCurrrentProject();
+        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 
         useRulesetManagerStore.getState().refresh();
 
-        Console.success({message: "message.ruleset.createSuccess"});
+        Console.success({ message: "message.ruleset.createSuccess" });
     }
 
     public static async importRuleset(refRulesetId?: string): Promise<Result> {
@@ -69,7 +67,7 @@ export class RulesetService {
         const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);
         if (loadRulesetResult.status !== Result.Status.Success) {
             Console.error({
-                message: "message.ruleset.loadFail",
+                message: "message.ruleset.importFail",
                 stacks: [loadRulesetResult.message!, ...loadRulesetResult.stacks!]
             })
             return Result.Error(loadRulesetResult.message);
@@ -96,56 +94,81 @@ export class RulesetService {
 
         useRulesetManagerStore.getState().refresh();
 
-        Console.success({message: "message.ruleset.importSuccess"});
+        Console.success({ message: "message.ruleset.importSuccess" });
 
         return Result.Success();
     }
 
-    public static async removeRuleset(id: string): Promise<Result> {
+    public static async removeRuleset(rulesetId: string): Promise<Result> {
         const editorContext = appCore.editorContext;
         const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
 
-        if (!currentProject || !currentWorkspace) return Result.Cancel();
+        if (!currentProject) return Result.Cancel();
 
-        const removeResult = await currentProject.rulesetManager.removeRulesetMetadata(id);
-        const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
+        const confirmRemoval = await DialogService.openPermissionDialog({
+            title: "dialog.remove.ruleset.title",
+            description: "dialog.remove.ruleset.description",
+        });
+        if (!confirmRemoval) return Result.Cancel();
 
-        // TODO: Remove ref from tilemap
+        const removeResult = await currentProject.rulesetManager.removeRuleset(rulesetId);
+
+        await Promise.all([
+            currentProject.tilemapManager.removeRulesetRef(rulesetId),
+            currentProject.rulesetManager.removeRulesetRef(rulesetId)
+        ])
+
+        if (removeResult.status !== Result.Status.Success) return Result.Cancel();
+
+        await editorContext.projectManager.saveCurrrentProject();
+
+        const rulesetSessionManager = editorContext.currentWorkspace?.rulesetSessionManager;
+        if (removeResult.status == Result.Status.Success && rulesetSessionManager) {
+            const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
+            if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
+            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        }
 
         useRulesetManagerStore.getState().refresh();
 
-        if (removeResult.status == Result.Status.Success && rulesetSessionManager) {
-            const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
-            if (selectedRuleId === id) rulesetSessionManager.setSelectedRuleId(null);
-            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-        }
         return removeResult
     }
 
-    public static async deleteRuleset(id: string): Promise<void> {
-        const rulesetManager = appCore.projectManager.currentProject?.rulesetManager;
-        if (!rulesetManager) return;
+    public static async deleteRuleset(rulesetId: string): Promise<void> {
+        const currentProject = appCore.editorContext.currentProject;
+        if (!currentProject) return;
+        const rulesetManager = currentProject.rulesetManager;
 
-        const confirmDelete = await DialogService.openPermissionDialog({ 
+        const confirmDeletion = await DialogService.openPermissionDialog({
             title: "dialog.delete.ruleset.title",
-            description: "dialog.delete.ruleset.description", 
+            description: "dialog.delete.ruleset.description",
         });
+        if (!confirmDeletion) return;
 
-        if (!confirmDelete) return;
+        const deleteResult = await rulesetManager.deleteRuleset(rulesetId);
 
-        await rulesetManager.deleteRuleset(id);
+        await Promise.all([
+            currentProject.tilemapManager.removeRulesetRef(rulesetId),
+            currentProject.rulesetManager.removeRulesetRef(rulesetId)
+        ])
+
+        if (deleteResult.status !== Result.Status.Success) {
+            Console.error({
+                message: "message.ruleset.deleteFail",
+                stacks: deleteResult.message ? [deleteResult.message] : [],
+            })
+            return;
+        }
+
         await appCore.projectManager.saveCurrrentProject();
-
-        // TODO: Remove ref from tilemap
-
-        useRulesetManagerStore.getState().refresh();
 
         const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
         if (rulesetSessionManager) {
             const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
-            if (selectedRuleId === id) rulesetSessionManager.setSelectedRuleId(null);
-            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
+            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
+
+        useRulesetManagerStore.getState().refresh();
     }
 }
