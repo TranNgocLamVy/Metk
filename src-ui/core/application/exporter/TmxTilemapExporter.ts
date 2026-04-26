@@ -53,7 +53,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
             this.tilesetFirstGidMap.set(tilesetIndex, firstGrid);
             firstGidCount += tileset.tiles.length;
 
-            const tilesetAbsPath = tilesetManager.getTilesetAbsById(tilesetRef.id)!;
+            const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
             const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
 
             const imageRelPath = tileset.image.source;

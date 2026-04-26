@@ -23,7 +23,7 @@ export class SaveTilemapCommand implements ISystemCommand {
         if (saveResult.status === Result.Status.Success) {
             tilemapSession.markAsClean();
             useTilemapSessionStore.getState().refresh();
-            Console.success({ message: "message.tilemap.savSuccess"});
+            Console.success({ message: { key: "message.tilemap.saveSuccess", options: { name: tilemap.name }}});
         }
         return saveResult;
     }

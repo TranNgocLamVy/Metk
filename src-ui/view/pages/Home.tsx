@@ -45,11 +45,10 @@ export default function HomePage() {
 					</Button>
 				</VStack>
 				<h2 className="mt-2 font-semibold text-foreground"><LocalizedText message="home.recentProjects" /></h2>
-				<VStack className="w-full gap-2 px-1 py-1 overflow-y-auto">
+				<VStack className="w-full gap-2 py-1 overflow-y-auto">
 					{projects.map((project) => (
 							<HStack align="center" justify="start" key={project.id} className="gap-4 min-w-160 group">
 								<Button variant={"link"} onClick={() => navigate(`/project/${project.id}`)}>
-									<SquareArrowOutUpRight size={20} />
 									{project.name}
 								</Button>
 								<h3 className="text-xs text-foreground cursor-default">{project.directory}</h3>

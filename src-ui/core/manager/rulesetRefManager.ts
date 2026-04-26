@@ -77,8 +77,8 @@ export class RulesetRefManager {
      * @returns The index property of the removed ruleset, or -1 if it was not found.
      */
     public removeRulesetRef(ruleset: string | number): number {
-        const rulesetRefIndex = typeof ruleset === "string" ? this.getRulesetRefIndex(ruleset) : ruleset;
-        if (rulesetRefIndex === -1) return -1;
+        const rulesetRefIndex = typeof ruleset === "string" ? this.rulesetRefs.find(ref => ref.id === ruleset)?.index : ruleset;
+        if (rulesetRefIndex === undefined || rulesetRefIndex === -1) return -1;
         this.rulesetRefs = this.rulesetRefs.filter(rulesetRef => rulesetRef.index !== rulesetRefIndex);
         return rulesetRefIndex;
     }

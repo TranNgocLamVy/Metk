@@ -22,8 +22,8 @@ function AlertDialogOverlay({ className: customClassName, ...props }: React.Comp
 	return <AlertDialogPrimitive.Overlay data-slot="alert-dialog-overlay" className={cn(dataClassName, className, customClassName)} {...props} />;
 }
 
-function AlertDialogContent({ className: customClassName, size = "default", ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { size?: "default" | "sm" }) {
-	const dataClassName = "data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-sm";
+function AlertDialogContent({ className: customClassName, size = "default", ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { size?: "lg" | "default" | "sm" }) {
+	const dataClassName = "data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[size=default]:max-w-xs data-[size=sm]:max-w-xs data-[size=default]:sm:max-w-lg";
 	const className = "bg-surface-overlay ring-foreground/10 gap-4 rounded-none p-4 duration-100 group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 outline-none"
 	return (
 		<AlertDialogPortal>

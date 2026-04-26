@@ -1,3 +1,4 @@
+import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { ExportPathData, SavedPathData } from "@/shared/schema/savedPathSchema";
 
 export class SavedPathManager {
@@ -7,7 +8,7 @@ export class SavedPathManager {
     private rulesetDir: string | null;
     private textureDir: string | null;
 
-    constructor(savePathData: SavedPathData) {
+    constructor(savePathData: SavedPathData, private readonly projectPathSystem: ProjectPathSystem) {
         savePathData.exportPaths.forEach((data) => {
             if (data.exportPath) this.exportPathMap.set(data.tilemapId, data.exportPath);
         })
@@ -21,32 +22,32 @@ export class SavedPathManager {
         this.exportPathMap.set(tilemapId, exportPath);
     }
 
-    public getTilemapDir(): string | null {
-        return this.tilemapDir;
+    public getTilemapDir(): string {
+        return this.tilemapDir || this.projectPathSystem.absDir;
     }
 
     public setTilemapDir(tilemapDir: string): void {
         this.tilemapDir = tilemapDir;
     }
 
-    public getTilesetDir(): string | null {
-        return this.tilesetDir;
+    public getTilesetDir(): string {
+        return this.tilesetDir || this.projectPathSystem.absDir;
     }
 
     public setTilesetDir(tilesetDir: string): void {
         this.tilesetDir = tilesetDir;
     }
 
-    public getRulesetDir(): string | null {
-        return this.rulesetDir;
+    public getRulesetDir(): string {
+        return this.rulesetDir || this.projectPathSystem.absDir;
     }
 
     public setRulesetDir(rulesetDir: string): void {
         this.rulesetDir = rulesetDir;
     }
 
-    public getTextureDir(): string | null {
-        return this.textureDir;
+    public getTextureDir(): string {
+        return this.textureDir || this.projectPathSystem.absDir;
     }
 
     public setTextureDir(textureDir: string): void {

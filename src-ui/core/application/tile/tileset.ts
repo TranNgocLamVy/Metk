@@ -44,6 +44,10 @@ export class Tileset extends BaseObject<TilesetEvent> {
             });
         }
     }
+    
+    public async load(): Promise<void> { }
+
+    public async unload(): Promise<void> { }
 
     public serialize(): TilesetData {
         return {

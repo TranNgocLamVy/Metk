@@ -32,7 +32,7 @@ export class SaveAllTilemapCommand implements ISystemCommand {
             }
         }
         useTilemapSessionStore.getState().refresh();
-        Console.success({ message: "message.tilemap.savSuccess"});
+        Console.success({ message: "message.tilemap.saveAllSuccess"});
 
         return Result.Success();
     }

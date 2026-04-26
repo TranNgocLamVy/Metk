@@ -83,16 +83,18 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.eventEmitter.removeAllListeners();
     }
 
-    public removeRulesetRef(ruleset: string | number): void {
+    public removeRulesetRef(ruleset: string | number): boolean {
         const rulesetIndex = this.rulesetRefManager.removeRulesetRef(ruleset);
-        if (rulesetIndex === -1) return;
+        if (rulesetIndex === -1) return false;
         this.rootLayer.removeRulesetRef(rulesetIndex);
+        return true;
     }
 
-    public removeTilesetRef(tileset: string | number): void {
+    public removeTilesetRef(tileset: string | number): boolean {
         const tilesetIndex = this.tilesetRefManager.removeTilesetRef(tileset);
-        if (tilesetIndex === -1) return;
+        if (tilesetIndex === -1) return false;
         this.rootLayer.removeTilesetRef(tilesetIndex);
+        return true;
     }
 
     public isInBoundary(coordinate: Coordinate): boolean {

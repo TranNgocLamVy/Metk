@@ -29,7 +29,7 @@ export class Workspace {
         this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
         this.rulesetSessionManager = new RulesetSessionManager(workspaceData.ruleset, this.editorContext);
         this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorContext);
-        this.savedPathManager = new SavedPathManager(workspaceData.savedPath);
+        this.savedPathManager = new SavedPathManager(workspaceData.savedPath, this.projectPathSystem);
     }
 
     public async loadSession(): Promise<Result> {
@@ -49,9 +49,9 @@ export class Workspace {
         return {
             tilesets: this.tilesetSessionManager.serialize(),
             tilemaps: this.tilemapSessionManager.serialize(),
+            ruleset: this.rulesetSessionManager.serialize(),
             toolState: this.toolSessionManager.serialize(),
             savedPath: this.savedPathManager.serialize(),
-            ruleset: this.rulesetSessionManager.serialize(),
         }
     }
 }
