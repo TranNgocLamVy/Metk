@@ -44,13 +44,8 @@ export class WorkspaceService {
         const tilesetSessionManager = workspace.tilesetSessionManager;
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
-        useTilesetSessionStore.getState().refresh();
-
-        const tilemapPixiApp = useTilemapSessionStore.getState().pixiApp;
-        const tilemapSessionManager = workspace.tilemapSessionManager;
-        const currentTilemapSessionId = tilemapSessionManager.tilemapSessionManagerData.currentTilemapSessionId;
-        if (currentTilemapSessionId && tilemapPixiApp) await WorkspaceService.openTilemapSession(currentTilemapSessionId);
         
+        useTilesetSessionStore.getState().refresh();
         useTilemapSessionStore.getState().refresh();
         useLayerManagerStore.getState().refresh();
         useRulesetManagerStore.getState().refresh();
@@ -144,12 +139,6 @@ export class WorkspaceService {
 
     //================ tilemap ================
     public static async createTilemapSession(tilemapId: string) {
-        const tilesetPixiApp = useTilemapSessionStore.getState().pixiApp;
-        if (!tilesetPixiApp) {
-            Console.error({ message: "Tilemap pixi app not found" }); // TODO: i18n
-            return;
-        }
-
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
 
@@ -162,24 +151,18 @@ export class WorkspaceService {
         if (!workspace) return;
 
         const tilemapSessionManager = workspace.tilemapSessionManager;
-        await tilemapSessionManager.createTilemapSession(tilemap, tilesetPixiApp);
+        await tilemapSessionManager.createTilemapSession(tilemap);
 
         useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
     public static async openTilemapSession(sessionId: string): Promise<void> {
-        const tilemapPixiApp = useTilemapSessionStore.getState().pixiApp;
-        if (!tilemapPixiApp) {
-            Console.error({ message: "Tilemap pixi app not found" }); // TODO: i18n
-            return;
-        }
-
         const workspace = appCore.workspaceManager.currentWorkspace;
         if (!workspace) return;
 
         const tilemapSessionManager = workspace.tilemapSessionManager;
-        tilemapSessionManager.openTilemapSession(sessionId, tilemapPixiApp);
+        tilemapSessionManager.openTilemapSession(sessionId);
 
         useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });

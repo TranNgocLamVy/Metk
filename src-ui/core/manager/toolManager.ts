@@ -4,6 +4,7 @@ import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { ToolContext } from "../decorator/tool";
 import { ITool, IToolContructor } from "../interface/ITool";
+import { TilemapSessionView } from "../application/session/tilemapSessionView";
 
 type ToolManagerEvent = {
     onToolChanged: () => void;
@@ -16,7 +17,10 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
     private currentTool: ITool | null;
     private currentToolId: string | null;
 
-    private editorContext: EditorContext
+    private editorContext: EditorContext;
+
+    private activeTilemapSession: TilemapSession | null = null;
+    private activeTilemapSessionView: TilemapSessionView | null = null;
 
     constructor() {
         super();
@@ -25,10 +29,6 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
     public setEditorContext(editorContext: EditorContext) {
         this.editorContext = editorContext;
-
-        this.editorContext.eventEmitter.on("onOpenTilemapSession", () => {
-            this.onSessionChanged(this.editorContext.getCurrentTilemapSession());
-        });
     }
 
     private initializeDecoratedTools() {
@@ -54,13 +54,14 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         this.toolMap.set(toolId, brushConstructor);
     }
 
-    private onSessionChanged(newSession: TilemapSession | null) {
-        if (this.currentTool) {
-            this.currentTool.detach();
-        }
+    public setActiveSession(session: TilemapSession | null, view: TilemapSessionView | null) {
+        this.activeTilemapSession = session;
+        this.activeTilemapSessionView = view;
 
-        if (newSession && this.currentTool) {
-            this.currentTool.attach(newSession);
+        if (this.currentTool) this.currentTool.detach();
+
+        if (session && view && this.currentTool) {
+            this.currentTool.attach(session, view);
         }
     }
 
@@ -74,9 +75,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
             this.currentTool.onEnable();
 
-            const activeTilemapSession = this.editorContext.getCurrentTilemapSession();
-            if (activeTilemapSession) {
-                this.currentTool.attach(activeTilemapSession);
+            if (this.activeTilemapSession && this.activeTilemapSessionView) {
+                this.currentTool.attach(this.activeTilemapSession, this.activeTilemapSessionView);
             }
             this.emit("onToolChanged");
         }
@@ -102,9 +102,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
     public resumeTool() {
         if (this.currentTool) {
             this.currentTool.onEnable();
-            const activeTilemapSession = this.editorContext.getCurrentTilemapSession();
-            if (activeTilemapSession) {
-                this.currentTool.attach(activeTilemapSession);
+            if (this.activeTilemapSession && this.activeTilemapSessionView) {
+                this.currentTool.attach(this.activeTilemapSession, this.activeTilemapSessionView);
             }
         }
     }

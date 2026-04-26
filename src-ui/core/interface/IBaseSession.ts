@@ -5,7 +5,6 @@ import { HistoryManager } from "../manager/historyManager";
 export interface IBaseSession {
     id: string;
     historyManager: HistoryManager;
-    sessionView: IBaseSessionView;
     destroy(): void;
 }
 

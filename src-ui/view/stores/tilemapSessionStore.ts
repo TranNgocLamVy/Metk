@@ -29,10 +29,6 @@ export const useTilemapSessionStore = create<TilemapViewStore>((set, get) => {
 
         setPixiApp: (pixiApp: Application) => {
             set({ pixiApp })
-            const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
-            if (!tilemapSessionManager) return;
-            const currentSession = tilemapSessionManager.currentTilemapSession;
-            if (currentSession) currentSession.sessionView.activateSession(pixiApp);
         },
         getTileamapDisplayData: () => {
             const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
