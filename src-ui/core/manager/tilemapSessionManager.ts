@@ -8,6 +8,7 @@ import { Tilemap } from "../application/tile/tilemap";
 import { TilemapManager } from "./tilemapManager";
 import { Result } from "@/shared/types/result";
 import { Console } from "@/shared/services/consoleService";
+import { CatchError } from "../decorator/catchResultError";
 
 export class TilemapSessionManager {
     public currentTilemapSession: TilemapSession | null = null;
@@ -27,6 +28,7 @@ export class TilemapSessionManager {
         
     }
 
+    @CatchError("message.system.unknownError.loadTilemapSession")
     public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<Result> {
         await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
             const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);

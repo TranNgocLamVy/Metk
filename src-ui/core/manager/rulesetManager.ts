@@ -8,6 +8,7 @@ import { TilesetRefManager } from "./tilesetRefManager";
 import { RulesetRefManager } from "./rulesetRefManager";
 import { PathUtils } from "@/shared/utils/pathUtils";
 import { Console } from "@/shared/services/consoleService";
+import { CatchError } from "../decorator/catchResultError";
 
 export class RulesetManager {
     public readonly rulesetMetadatas: Map<string, RulesetMetadata> = new Map<string, RulesetMetadata>(); // id -> ruleMetadata
@@ -43,7 +44,7 @@ export class RulesetManager {
         this.loadedRulesets.set(ruleset.id, newRuleset);
 
         const tilesetDepIds = ruleset.tilesets.refs.map(tilesetRef => tilesetRef.id);
-        const rulesetDepIds = ruleset.rulesets.refs.map(rulesetRef => rulesetRef.id).filter(id => id !== ruleset.id && !this.pendingLoads.has(id)); 
+        const rulesetDepIds = ruleset.rulesets.refs.map(rulesetRef => rulesetRef.id).filter(id => id !== ruleset.id && !this.pendingLoads.has(id));
         await Promise.all([
             this.tilesetManager.loadTilesets(tilesetDepIds),
             this.loadRulesets(rulesetDepIds),
@@ -60,6 +61,7 @@ export class RulesetManager {
         return await Promise.all(ids.map(id => this.loadRuleset(id)));
     }
 
+    @CatchError("message.system.unknownError.loadRuleset")
     public async loadRuleset(id: string): Promise<Result<Ruleset>> {
         if (this.loadedRulesets.has(id)) return Result.Success(this.loadedRulesets.get(id)!)
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;
@@ -67,11 +69,8 @@ export class RulesetManager {
         const loadPromise = this.performRulesetLoad(id);
         this.pendingLoads.set(id, loadPromise);
 
-        try {
+        try {   
             return await loadPromise;
-        } catch (error) {
-            console.error("Unknown error: ", error);
-            return Result.Error("message.ruleset.unknownError");
         } finally {
             this.pendingLoads.delete(id);
         }
@@ -84,8 +83,8 @@ export class RulesetManager {
             Console.error({
                 message: { key: "message.ruleset.loadFail", options: { name: "Unknow", id } },
                 stacks: ["message.ruleset.metadataNotFound"],
-                actions: [{ 
-                    label: "global.action.ruleset.import", variant: "outline", 
+                actions: [{
+                    label: "global.action.ruleset.import", variant: "outline",
                     onClick: async () => {
                         const { RulesetService } = await import("@/shared/services/rulesetService");
                         return await RulesetService.importRuleset(id);
@@ -111,8 +110,8 @@ export class RulesetManager {
                             return await RulesetService.importRuleset(id);
                         }
                     },
-                    { 
-                        label: "global.action.ruleset.remove", variant: "destructive", 
+                    {
+                        label: "global.action.ruleset.remove", variant: "destructive",
                         onClick: async () => {
                             const { RulesetService } = await import("@/shared/services/rulesetService");
                             return await RulesetService.removeRuleset(id);

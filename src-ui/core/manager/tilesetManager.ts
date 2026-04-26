@@ -6,6 +6,7 @@ import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathS
 import { TilesetStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/pathUtils";
 import { Console } from "@/shared/services/consoleService";
+import { CatchError } from "../decorator/catchResultError";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -42,11 +43,12 @@ export class TilesetManager {
     public loadTilesetsMetadata(tilesetsMetadata: TilesetMetadata[]): void {
         tilesetsMetadata.forEach((meta) => this.tilesetMetadata.set(meta.id, meta));
     }
-
+    
     public async loadTilesets(ids: string[]): Promise<Result<Tileset>[]> {
         return await Promise.all(ids.map(id => this.loadTileset(id)));
     }
-
+    
+    @CatchError("message.system.unknownError.loadTileset")
     public async loadTileset(id: string): Promise<Result<Tileset>> {
         if (this.loadedTilesets.has(id)) return Result.Success(this.loadedTilesets.get(id)!);
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;
@@ -56,9 +58,6 @@ export class TilesetManager {
 
         try {
             return await loadPromise;
-        } catch (error) {
-            console.error("Unknown error: ", error);
-            return Result.Error("message.tileset.unknownError");
         } finally {
             this.pendingLoads.delete(id);
         }

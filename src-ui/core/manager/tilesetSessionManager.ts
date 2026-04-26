@@ -1,7 +1,6 @@
 import { Application } from "pixi.js";
-import { v4 as uuidv4 } from "uuid";
 
-import { defaultTilesetSessionData, TilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSessionSchema";
+import { defaultTilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSessionSchema";
 import { Result } from "@/shared/types/result";
 
 import { EditorContext } from "../application/editorContext";
@@ -9,6 +8,7 @@ import { TilesetSession } from "../application/session/tilesetSession";
 import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 import { Console } from "@/shared/services/consoleService";
+import { CatchError } from "../decorator/catchResultError";
 
 export class TilesetSessionManager {
     public currentTilesetSession: TilesetSession | null = null;
@@ -16,7 +16,7 @@ export class TilesetSessionManager {
     private tilesetMap: Map<string, string> = new Map<string, string>();
 
     private tilesetSessionIdStack: string[] = [];
-    
+
     public get tilesetsSession(): TilesetSession[] {
         return Array.from(this.tilesetSessionMap.values());
     }
@@ -25,9 +25,10 @@ export class TilesetSessionManager {
         public readonly tilesetSessionManagerData: TilesetSessionManagerData,
         private readonly editorContext: EditorContext
     ) {
-        
+
     }
 
+    @CatchError("message.system.unknownError.loadTilesetSession")
     public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<Result> {
         await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
             const tilesetResult = await tilesetManager.loadTileset(sessionData.tilesetId);
@@ -37,7 +38,7 @@ export class TilesetSessionManager {
             const tileset = tilesetResult.data;
             const tilesetSession = new TilesetSession(tileset, sessionData, this.editorContext);
             await tilesetSession.loadTilesetSession();
-            
+
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
             this.tilesetMap.set(tileset.id, tilesetSession.id);
         }))
@@ -82,8 +83,8 @@ export class TilesetSessionManager {
 
         tilesetSession.sessionView.activateSession(pixiApp);
 
-        Console.log({ message: { key: "message.tileset.openSuccess", options: { name: tilesetSession.tileset.name } }});
-        
+        Console.log({ message: { key: "message.tileset.openSuccess", options: { name: tilesetSession.tileset.name } } });
+
         return tilesetSession;
     }
 
@@ -101,7 +102,7 @@ export class TilesetSessionManager {
             this.currentTilesetSession = null;
         }
 
-        Console.log({ message: { key: "message.tileset.closeSuccess", options: { name: tilesetSession.tileset.name } }})
+        Console.log({ message: { key: "message.tileset.closeSuccess", options: { name: tilesetSession.tileset.name } } })
     }
 
     public getSession(sessionId: string): TilesetSession | null {
