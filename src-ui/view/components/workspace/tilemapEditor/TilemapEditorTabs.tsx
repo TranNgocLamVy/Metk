@@ -1,11 +1,9 @@
 import { X } from "lucide-react";
-import { Fragment, useMemo, useRef } from "react";
+import { Fragment, useRef } from "react";
 
-import { appCore } from "@/core/appcore";
-import { DialogService } from "@/shared/services/dialogService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useHorizontalScroll } from "@/view/hooks/useHorizontalSCroll";
-import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
+import { useTilemapEditorSessionStore } from "@/view/stores/tilemapEditorSessionStore";
 
 import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
@@ -15,22 +13,14 @@ export default function TilemapEditorTabs() {
 
 	useHorizontalScroll(ref);
 
-	const { version, getTileamapDisplayData, getCurrentTilemapSessionId } = useTilemapSessionStore();
-
-	const tilemapSession = useMemo(() => {
-		return getTileamapDisplayData();
-	}, [version, getTileamapDisplayData]);
-
-	const currentSessionId = useMemo(() => {
-		return getCurrentTilemapSessionId();
-	}, [version, getCurrentTilemapSessionId]);
+	const { tilemapSessions, currentTilemapSessionId } = useTilemapEditorSessionStore();
 
 	return (
 		<HStack className="w-full h-fit bg-surface pr-1 relative z-10" justify="start" align="center">
             <style>{`.tm_tab::after { content: ""; position: absolute; bottom: 0; left: 4px; width: calc(100% - 4px); height: 2px; background-color: var(--foreground); }`}</style>
 			<div ref={ref} className="flex flex-row items-center overflow-x-auto scroll-smooth no-scrollbar w-full h-8 bg-surface-sunken">
-				{tilemapSession.map((session) => {
-					const isCurrent = currentSessionId === session.sessionId;
+				{tilemapSessions.map((session) => {
+					const isCurrent = currentTilemapSessionId === session.sessionId;
 					const isDirty = session.isDirty;
                     
 					const openTilemapSession = () => {

@@ -3,7 +3,6 @@ import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Console } from "@/shared/services/consoleService";
 import { Result } from "@/shared/types/result";
-import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 @SystemCommand({
     id: "workspace.tilemap.save",
@@ -22,7 +21,6 @@ export class SaveTilemapCommand implements ISystemCommand {
         const saveResult = await currentProject.tilemapManager.saveTilemap(tilemap.id);
         if (saveResult.status === Result.Status.Success) {
             tilemapSession.markAsClean();
-            useTilemapSessionStore.getState().refresh();
             Console.success({ message: { key: "message.tilemap.saveSuccess", options: { name: tilemap.name }}});
         }
         return saveResult;

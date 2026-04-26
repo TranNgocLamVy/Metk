@@ -97,7 +97,12 @@ export class TilesetSessionView implements IBaseSessionView {
     }
 
     public activateSession(pixiApp: Application) {
-        if (!this.isInit || this.pixiApp !== pixiApp) {
+        if (this.isInit && this.pixiApp !== pixiApp) {
+            this.destroy();
+            this.isInit = false;
+        }
+    
+        if (!this.isInit) {
             this.initSession(pixiApp);
             this.isInit = true;
         }

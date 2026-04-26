@@ -2,19 +2,18 @@ import { IBaseSession } from "@/core/interface/IBaseSession";
 import { HistoryManager } from "@/core/manager/historyManager";
 import { ViewState } from "@/shared/schema/viewState";
 import { LayerState, TilemapSessionData } from "@/shared/schema/tilemapSessionSchema";
-import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
-import { TilemapSessionView } from "./tilemapSessionView";
 import { Tileset } from "../tile/tileset";
 import EventEmitter from "eventemitter3";
 
 interface TilemapSessionEvents {
+    onMarkChange: (isDirty: boolean) => void;
     onSelectedLayersChanged: (layerIds: string[]) => void;
 }
 
-export class TilemapSession implements IBaseSession {
+export class TilemapSession extends EventEmitter<TilemapSessionEvents> implements IBaseSession {
     public readonly id: string;
 
     public isDirty: boolean;
@@ -24,20 +23,17 @@ export class TilemapSession implements IBaseSession {
     public viewState: ViewState;
     public layerState: LayerState;
     
-    public eventEmitter: EventEmitter<TilemapSessionEvents>;
-
     private bindOnTilemapChange: () => void;
-
     constructor(
         public readonly tilemap: Tilemap,
         tilemapSessionData: TilemapSessionData,
         public readonly editorContext: EditorContext
     ) {
+        super();
         this.id = tilemapSessionData.id;
         this.tilemap = tilemap;
 
         this.historyManager = new HistoryManager();
-        this.eventEmitter = new EventEmitter<TilemapSessionEvents>();
 
         this.viewState = tilemapSessionData.viewState ?? { x: null, y: null, zoom: 1 };
 
@@ -73,7 +69,7 @@ export class TilemapSession implements IBaseSession {
     //==========Layer State==========
     public updateLayerState(state: Partial<LayerState>) {
         this.layerState = { ...this.layerState, ...state };
-        this.eventEmitter.emit("onSelectedLayersChanged", this.layerState.selectedLayers);
+        this.emit("onSelectedLayersChanged", this.layerState.selectedLayers);
     }
 
     public serialize(): TilemapSessionData {
@@ -87,12 +83,12 @@ export class TilemapSession implements IBaseSession {
 
     public markAsDirty(): void {
         this.isDirty = true;
-        useTilemapSessionStore.getState().refresh();
+        this.emit("onMarkChange", this.isDirty);
     }
 
     public markAsClean(): void {
         this.isDirty = false;
-        useTilemapSessionStore.getState().refresh();
+        this.emit("onMarkChange", this.isDirty);
     }
 
     public updateSelectedLayers() {
