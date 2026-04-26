@@ -110,7 +110,7 @@ export class EraserTool implements ITool {
         viewport.addEventListener("mouseleave", this.bindPointerOutside);
 
         this.updateActiveDrawStrategy();
-        this.currentSession.eventEmitter.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
 
         const wheelPlugin = viewport.plugins.get('wheel');
         const originalWheelEvent = wheelPlugin!.wheel;
@@ -131,7 +131,7 @@ export class EraserTool implements ITool {
         viewport.off("pointerup", this.bindPointerOnUp);
         viewport.off("pointerupoutside", this.bindPointerOnUp);
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
-        this.currentSession.eventEmitter.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
 
         const wheelPlugin = viewport.plugins.get('wheel')!;
         wheelPlugin.wheel = this.originalWheelEvent;

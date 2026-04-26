@@ -1,6 +1,5 @@
 import { appCore } from "@/core/appcore";
 import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
-import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
@@ -46,7 +45,6 @@ export class WorkspaceService {
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
         
         useTilesetSessionStore.getState().refresh();
-        useTilemapSessionStore.getState().refresh();
         useLayerManagerStore.getState().refresh();
         useRulesetManagerStore.getState().refresh();
 
@@ -153,7 +151,6 @@ export class WorkspaceService {
         const tilemapSessionManager = workspace.tilemapSessionManager;
         await tilemapSessionManager.createTilemapSession(tilemap);
 
-        useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
@@ -164,7 +161,6 @@ export class WorkspaceService {
         const tilemapSessionManager = workspace.tilemapSessionManager;
         tilemapSessionManager.openTilemapSession(sessionId);
 
-        useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
@@ -191,7 +187,6 @@ export class WorkspaceService {
         }
         tilemapSessionManager.closeTilemapSession(sessionId);
 
-        useTilemapSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 

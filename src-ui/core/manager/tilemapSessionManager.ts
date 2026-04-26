@@ -1,8 +1,5 @@
-import { Application } from "pixi.js";
 import { EventEmitter } from "eventemitter3";
-
 import { defaultTilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemapSessionSchema";
-
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
 import { Tilemap } from "../application/tile/tilemap";
@@ -24,9 +21,6 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
     private tilemapMap: Map<string, string> = new Map<string, string>(); // tilemapId -> sessionId
 
     private currentTilemapSessionView: TilemapSessionView | null = null;
-
-
-    private tilemapSessionIdStack: string[] = [];
 
     public get tilemapsSession(): TilemapSession[] {
         return Array.from(this.tilemapSessionMap.values());
@@ -92,9 +86,6 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
 
         this.currentTilemapSession = tilemapSession;
         
-        this.tilemapSessionIdStack = this.tilemapSessionIdStack.filter(id => id !== sessionId);
-        this.tilemapSessionIdStack.push(sessionId);
-        
         this.emit("onOpenTilemapSession", tilemapSession);
 
         return tilemapSession;
@@ -107,8 +98,6 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         tilemapSession.destroy();
 
         this.tilemapSessionMap.delete(sessionId);
-        this.tilemapMap.delete(tilemapSession.tilemap.id);
-        this.tilemapSessionIdStack = this.tilemapSessionIdStack.filter(id => id !== sessionId);
 
         const currentProject = this.editorContext.currentProject;
         if (!currentProject) return;
@@ -132,11 +121,6 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         const sessionId = this.tilemapMap.get(tilemapId);
         if (!sessionId) return null;
         return this.tilemapSessionMap.get(sessionId) || null;
-    }
-
-    public getLastTilemapSessionId(): string | null {
-        if (this.tilemapSessionIdStack.length === 0) return null;
-        return this.tilemapSessionIdStack[this.tilemapSessionIdStack.length - 1] || null; 
     }
 
     public getCurrentSessionView(): TilemapSessionView | null {

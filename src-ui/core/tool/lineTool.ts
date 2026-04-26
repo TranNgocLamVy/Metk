@@ -90,7 +90,7 @@ export class LineTool implements ITool {
         viewport.addEventListener("mouseleave", this.bindPointerOutside);
 
         this.updateActiveDrawStrategy();
-        this.currentSession.eventEmitter.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
     }
 
     public detach(): void {
@@ -103,7 +103,7 @@ export class LineTool implements ITool {
         viewport.off("pointerupoutside", this.bindPointerOnUp);
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
-        this.currentSession.eventEmitter.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
         this.currentSession = null;
 
         this.overlayContainer = null;

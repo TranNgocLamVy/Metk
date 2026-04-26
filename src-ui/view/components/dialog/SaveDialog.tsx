@@ -34,9 +34,9 @@ export function SaveDialog({ resolve, dialogId, saveDialog }: SaveDialogProps) {
                     <AlertDialogDescription><LocalizedText message={description} /></AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogAction onClick={() => closePermissionDialog("save")}><LocalizedText message="global.actionsave" /></AlertDialogAction>
-                    <AlertDialogAction onClick={() => closePermissionDialog("not save")} variant={"destructive"}><LocalizedText message="global.actionnotSave" /></AlertDialogAction>
-                    <AlertDialogCancel onClick={() => closePermissionDialog("cancel")}><LocalizedText message="global.actioncancel" /></AlertDialogCancel>
+                    <AlertDialogAction onClick={() => closePermissionDialog("save")}><LocalizedText message="global.action.save" /></AlertDialogAction>
+                    <AlertDialogAction onClick={() => closePermissionDialog("not save")} variant={"destructive"}><LocalizedText message="global.action.notSave" /></AlertDialogAction>
+                    <AlertDialogCancel onClick={() => closePermissionDialog("cancel")}><LocalizedText message="global.action.cancel" /></AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

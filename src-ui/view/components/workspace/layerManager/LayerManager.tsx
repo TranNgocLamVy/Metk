@@ -10,7 +10,7 @@ import { ScrollArea } from "../../shadcn/scroll-area";
 import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerNodeRow from "./LayerNodeRow";
 import LayerMenuBar from "./LayerMenuBar";
-import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
+import { useTilemapEditorSessionStore } from "@/view/stores/tilemapEditorSessionStore";
 import { appCore } from "@/core/appcore";
 import { LocalizedText } from "../../custom/LocalizeText";
 import { Button } from "../../shadcn/button";
@@ -21,17 +21,17 @@ export default function LayerManager() {
 	const { version, getFlatView, getSelectedLayers, setTargetLayer, refresh } = useLayerManagerStore();
 	useLayerManagerStore((s) => s.version);
 
-	const { version: tilemapVersion } = useTilemapSessionStore();
+	const { version: tilemapVersion, currentTilemapSessionId } = useTilemapEditorSessionStore();
 	
 	const currentTilemapSession = useMemo(() => {
 		const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
 		if (!tilemapSessionManager) return null;
 		return tilemapSessionManager.currentTilemapSession;
-	}, [tilemapVersion, version]);
+	}, [tilemapVersion, version, currentTilemapSessionId]);
 
 	const selectedIds = useMemo(() => {
 		return getSelectedLayers();
-	}, [version, tilemapVersion]);
+	}, [version, tilemapVersion, currentTilemapSessionId]);
 
 	const [isMounted, setIsMounted] = useState(false);
 
@@ -42,7 +42,7 @@ export default function LayerManager() {
 
 	const flatView = useMemo(() => {
 		return getFlatView();
-	}, [version, tilemapVersion]);
+	}, [version, tilemapVersion, currentTilemapSessionId]);
 
 	const handleContainerDrop = (e: DragEvent) => {
 		e.preventDefault();

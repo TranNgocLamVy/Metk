@@ -94,7 +94,7 @@ export class StampTool implements ITool {
 
         this.updateActiveDrawStrategy();
 
-        this.currentSession.eventEmitter.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
     }
 
     public detach(): void {
@@ -107,7 +107,7 @@ export class StampTool implements ITool {
         viewport.off("pointerupoutside", this.bindPointerOnUp);
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
-        this.currentSession.eventEmitter.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
 
         this.currentSession = null;
         this.overlayContainer = null;

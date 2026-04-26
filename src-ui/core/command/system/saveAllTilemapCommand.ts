@@ -3,7 +3,6 @@ import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { Console } from "@/shared/services/consoleService";
 import { Result } from "@/shared/types/result";
-import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 @SystemCommand({
     id: "workspace.tilemap.saveAll",
@@ -31,7 +30,7 @@ export class SaveAllTilemapCommand implements ISystemCommand {
                 tilemapSession.markAsClean();
             }
         }
-        useTilemapSessionStore.getState().refresh();
+
         Console.success({ message: "message.tilemap.saveAllSuccess"});
 
         return Result.Success();

@@ -84,7 +84,7 @@ export class RectangleTool implements ITool {
         viewport.on("pointerupoutside", this.bindPointerOnUp);
 
         this.updateActiveDrawStrategy();
-        this.currentSession.eventEmitter.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
     }
 
     public detach(): void {
@@ -96,7 +96,7 @@ export class RectangleTool implements ITool {
         viewport.off("pointerup", this.bindPointerOnUp);
         viewport.off("pointerupoutside", this.bindPointerOnUp);
 
-        this.currentSession.eventEmitter.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+        this.currentSession.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
         this.currentSession = null;
 
         this.overlayContainer = null;

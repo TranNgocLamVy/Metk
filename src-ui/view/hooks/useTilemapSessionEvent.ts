@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 
 import { useWorkspaceStore } from '../stores/useWorkspaceStore';
 import { TilemapSessionManagerEvent } from '@/core/manager/tilemapSessionManager';
-import { useTilemapSessionStore } from '../stores/tilemapSessionStore';
+import { useTilemapEditorSessionStore } from '../stores/tilemapEditorSessionStore';
 
 export function useTilemapSessionEvent<TEvent extends keyof TilemapSessionManagerEvent>(eventName: TEvent, callback: TilemapSessionManagerEvent[TEvent]) {
     const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
-    const pixiApp = useTilemapSessionStore((state) => state.pixiApp);
+    const pixiApp = useTilemapEditorSessionStore((state) => state.pixiApp);
 
     useEffect(() => {
         if (!activeWorkspace || !pixiApp) return;
