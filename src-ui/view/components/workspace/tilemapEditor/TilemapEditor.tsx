@@ -1,5 +1,5 @@
 
-import { useWorkspaceStore } from "@/view/stores/useWorkspaceStore";
+import { useWorkspaceStore } from "@/view/stores/workspaceStore";
 import { VStack } from "../../custom/stack/Stack";
 import WorkspaceConsole from "../console/Console";
 import ToolBar from "../ToolBar";

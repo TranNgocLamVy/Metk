@@ -64,6 +64,7 @@ export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
     }
 
     public unloadLayout(): void {
+        if (!this.project) return;
         if (this.saveTimeout) clearTimeout(this.saveTimeout);
         this.layoutData = null;
         this.project = null;

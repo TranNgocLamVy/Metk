@@ -1,4 +1,4 @@
-import { useWorkspaceStore } from "@/view/stores/useWorkspaceStore";
+import { useWorkspaceStore } from "@/view/stores/workspaceStore";
 import { VStack } from "../../custom/stack/Stack";
 import TilesetMenuBar from "./TilesetMenuBar";
 import TilesetViewCanvas from "./TilesetViewCanvas";

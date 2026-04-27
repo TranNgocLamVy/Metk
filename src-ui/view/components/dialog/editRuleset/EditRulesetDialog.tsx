@@ -7,7 +7,7 @@ import { appCore } from "@/core/appcore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import RuleList from "./RuleList";
 import RuleHeader from "./RuleHeader";
-import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
+import { useRulesetStore } from "@/view/stores/rulesetStore";
 import OutputSelector from "./OutputSelector";
 import ConstraintsGrid from "./ConstraintsGrid";
 import { ArrowRight } from "lucide-react";
@@ -81,7 +81,6 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
         const rulesetManager = currentProject.rulesetManager;
         rulesetManager.updateRuleset(ruleset.serialize());
         await rulesetManager.saveRuleset(ruleset.id);
-        useRulesetManagerStore.getState().refresh();
 
         onClose();
     };

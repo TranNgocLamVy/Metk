@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useWorkspaceStore } from '../stores/useWorkspaceStore';
+import { useWorkspaceStore } from '../stores/workspaceStore';
 import { TilemapSessionManagerEvent } from '@/core/manager/tilemapSessionManager';
 import { useTilemapSessionStore } from '../stores/tilemapSessionStore';
 

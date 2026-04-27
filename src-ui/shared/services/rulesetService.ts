@@ -5,7 +5,7 @@ import { RulesetData } from "@/shared/schema/rulesetSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { appCore } from "@/core/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
+import { useRulesetStore } from "@/view/stores/rulesetStore";
 import { DialogService } from "./dialogService";
 import { createRulesetForm } from "../constant/form/createRulesetForm";
 import { WorkspaceService } from "./workspaceService";
@@ -56,8 +56,6 @@ export class RulesetService {
         await editorContext.projectManager.saveCurrrentProject();
         await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 
-        useRulesetManagerStore.getState().refresh();
-
         Console.success({ message: "message.ruleset.createSuccess" });
     }
 
@@ -91,8 +89,6 @@ export class RulesetService {
         await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
 
         await editorContext.projectManager.saveCurrrentProject();
-
-        useRulesetManagerStore.getState().refresh();
 
         Console.success({ message: "message.ruleset.importSuccess" });
 
@@ -128,8 +124,6 @@ export class RulesetService {
             if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
             await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
-
-        useRulesetManagerStore.getState().refresh();
 
         return removeResult
     }
@@ -168,7 +162,5 @@ export class RulesetService {
             if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
             await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         }
-
-        useRulesetManagerStore.getState().refresh();
     }
 }

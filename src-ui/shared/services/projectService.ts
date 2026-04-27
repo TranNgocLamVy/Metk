@@ -1,6 +1,4 @@
 import { appCore } from "@/core/appcore";
-import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
-
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { Result } from "../types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
@@ -35,7 +33,6 @@ export class ProjectService {
         const openProject = await DialogService.openPermissionDialog({ title: "Project opened successfully", description: "Do you want to open this project?" })
 
         if (openProject) useNavigationStore.getState().navigate!(`/project/${project.id}`);
-        useProjectManagerStore.getState().refresh();
     }
 
     public static async createProject(): Promise<void> {
@@ -75,7 +72,6 @@ export class ProjectService {
         const openProject = await DialogService.openPermissionDialog({ title: "Project created successfully", description: "Do you want to open the project?" })
 
         if (openProject) useNavigationStore.getState().navigate!(`/project/${project.id}`);
-        useProjectManagerStore.getState().refresh();
     }
 
     public static async removeProject(projectId: string): Promise<void> {
@@ -89,6 +85,5 @@ export class ProjectService {
         const projectManager = appCore.projectManager;
         projectManager.removeProjectMetadata(projectId);
         await appCore.saveProjectManager();
-        useProjectManagerStore.getState().refresh();
     }
 }

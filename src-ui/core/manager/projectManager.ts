@@ -7,6 +7,7 @@ import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import EventEmitter from "eventemitter3";
 
 type ProjectManagerEvent = {
+    onProjectMetadatasChanged: (projectMetadata: ProjectMetadata[]) => void;
     onProjectLoaded: (project: Project) => void;
     onProjectUnloaded: (projectId: string) => void;
 }
@@ -22,6 +23,7 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
         for (const metaData of projectRepoData) {
             this.projectMetadataMap.set(metaData.id, metaData);
         }
+        this.emit("onProjectMetadatasChanged", this.serialize());
     }
 
     public async setAndLoadProject(projectId: string) {
@@ -65,10 +67,12 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
 
     public addProjectMetadata(projectMetadata: ProjectMetadata): void {
         this.projectMetadataMap.set(projectMetadata.id, projectMetadata);
+        this.emit("onProjectMetadatasChanged", this.serialize());
     }
 
     public removeProjectMetadata(projectId: string): void {
         this.projectMetadataMap.delete(projectId);
+        this.emit("onProjectMetadatasChanged", this.serialize());
     }
 
     public serialize(): ProjectMetadata[] {
