@@ -7,10 +7,12 @@ import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
 import { Tileset } from "../tile/tileset";
 import EventEmitter from "eventemitter3";
+import { BaseLayer } from "../tile/layer/baseLayer";
 
 interface TilemapSessionEvents {
     onMarkChange: (isDirty: boolean) => void;
     onSelectedLayersChanged: (layerIds: string[]) => void;
+    onLayerChange: () => void;
 }
 
 export class TilemapSession extends EventEmitter<TilemapSessionEvents> implements IBaseSession {
@@ -22,6 +24,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
     public viewState: ViewState;
     public layerState: LayerState;
+    public targetLayer: BaseLayer<any> | null = null;
     
     private bindOnTilemapChange: () => void;
     constructor(
@@ -72,18 +75,14 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
         this.emit("onSelectedLayersChanged", this.layerState.selectedLayers);
     }
 
-    public serialize(): TilemapSessionData {
-        return {
-            id: this.id,
-            tilemapId: this.tilemap.id,
-            viewState: this.viewState,
-            layerState: this.layerState
-        }
-    }
-
     public markAsDirty(): void {
         this.isDirty = true;
         this.emit("onMarkChange", this.isDirty);
+    }
+
+    public markLayerChange(): void {
+        this.isDirty = true;
+        this.emit("onLayerChange");
     }
 
     public markAsClean(): void {
@@ -91,11 +90,12 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
         this.emit("onMarkChange", this.isDirty);
     }
 
-    public updateSelectedLayers() {
-        const layers = Array.from(this.tilemap.rootLayer.getAllIds());
-        const selectedLayers = this.layerState.selectedLayers;
-        this.layerState = {
-            selectedLayers: layers.filter(id => selectedLayers.includes(id))
+    public serialize(): TilemapSessionData {
+        return {
+            id: this.id,
+            tilemapId: this.tilemap.id,
+            viewState: this.viewState,
+            layerState: this.layerState
         }
     }
 

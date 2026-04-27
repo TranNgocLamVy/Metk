@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
-
 import { EditorContext } from "../../application/editorContext";
 import { IBaseCommand } from "../../interface/IBaseCommand";
 
@@ -25,9 +23,7 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         this.oldIsLocked = targetLayer.locked;
         targetLayer.toggleLock(this.newIsLocked);
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh()
+        currentSession.markLayerChange();
 
         return Result.Success();
     }
@@ -42,9 +38,7 @@ export class ToggleLayerLockCommand implements IBaseCommand {
 
         targetLayer.toggleLock(this.oldIsLocked);
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh()
+        currentSession.markLayerChange();
 
         return Result.Success();
     }

@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
 import { IBaseCommand } from "../../interface/IBaseCommand";
@@ -27,9 +26,7 @@ export class DuplicateLayerCommand implements IBaseCommand {
         const cloneLayerName = `${targetLayer.name} (copy)`
         duplicateLayer.rename(cloneLayerName);
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }
@@ -43,9 +40,7 @@ export class DuplicateLayerCommand implements IBaseCommand {
         if (!targetLayer) return Result.Error("Target layer not found");
         targetLayer.removeFromParent();
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }

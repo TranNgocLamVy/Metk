@@ -2,8 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { TileLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
-
 import { EditorContext } from "../../application/editorContext";
 import { IGroupLayer } from "../../application/tile/layer/baseLayer";
 import { GroupLayer } from "../../application/tile/layer/groupLayer";
@@ -33,9 +31,7 @@ export class CreateTileLayerCommand implements IBaseCommand {
 
         this.tileLayerId = newTileLayer.id;
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }
@@ -48,10 +44,8 @@ export class CreateTileLayerCommand implements IBaseCommand {
         tileLayer.removeFromParent();
         this.tileLayerData = tileLayer.serialize();
 
-        currentSession.markAsDirty();
+        currentSession.markLayerChange();
         
-        useLayerManagerStore.getState().refresh();
-
         return Result.Success();
     }
 

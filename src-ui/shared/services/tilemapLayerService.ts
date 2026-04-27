@@ -25,8 +25,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-
-        const targetLayer = useLayerManagerStore.getState().targetLayer;
+        const targetLayer = currentSession.targetLayer;
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -49,8 +48,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-
-        const targetLayer = useLayerManagerStore.getState().targetLayer;
+        const targetLayer = currentSession.targetLayer;
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -73,8 +71,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-
-        const targetLayer = useLayerManagerStore.getState().targetLayer;
+        const targetLayer = currentSession.targetLayer;
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -122,9 +119,9 @@ export class TilemapLayerService {
         })
         historyManager.commitTransaction();
 
-        currentSession.updateSelectedLayers();
-
-        useLayerManagerStore.getState().refresh();
+        const layers = Array.from(currentSession.tilemap.rootLayer.getAllIds());
+        const selectedLayers = currentSession.layerState.selectedLayers;
+        currentSession.updateLayerState({ selectedLayers: layers.filter(id => selectedLayers.includes(id)) });
     }
 
     public static selectLayer(id: string, multi: boolean) {
@@ -141,8 +138,6 @@ export class TilemapLayerService {
         }
         currentSession.updateLayerState({ selectedLayers });
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static selectAllLayers() {
@@ -154,8 +149,6 @@ export class TilemapLayerService {
         const selectedLayers = Array.from(root.getAllIds());
         currentSession.updateLayerState({ selectedLayers });
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static deselectAllLayers() {
@@ -165,8 +158,6 @@ export class TilemapLayerService {
         if (!currentSession) return;
         currentSession.updateLayerState({ selectedLayers: [] });
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static toggleSelectedLayersVisibility() {
@@ -204,8 +195,6 @@ export class TilemapLayerService {
             historyManager.execute(toggleVisibilityCommand, editorContext);
         });
         historyManager.commitTransaction();
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static toggleSelectedLayersLock() {
@@ -243,8 +232,6 @@ export class TilemapLayerService {
             historyManager.execute(toggleLockCommand, editorContext);
         });
         historyManager.commitTransaction();
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayers(draggedIds: string[], targetId: string, position: DropPosition) {
@@ -293,8 +280,6 @@ export class TilemapLayerService {
                 }
             }
         }
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayersUp() {
@@ -342,8 +327,6 @@ export class TilemapLayerService {
             }
         });
         historyManager.commitTransaction();
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static moveLayersDown() {
@@ -391,8 +374,6 @@ export class TilemapLayerService {
             }
         });
         historyManager.commitTransaction();
-
-        useLayerManagerStore.getState().refresh();
     }
 
     public static renameLayer(id: string, name: string, recordUndo: boolean = true) {
@@ -411,7 +392,5 @@ export class TilemapLayerService {
             if (!layer) return;
             layer.rename(name);
         }
-
-        useLayerManagerStore.getState().refresh();
     }
 }

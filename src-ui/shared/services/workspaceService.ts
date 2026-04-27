@@ -45,7 +45,6 @@ export class WorkspaceService {
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
         
         useTilesetSessionStore.getState().refresh();
-        useLayerManagerStore.getState().refresh();
         useRulesetManagerStore.getState().refresh();
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
