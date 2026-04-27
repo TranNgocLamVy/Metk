@@ -17,7 +17,7 @@ import { BaseLayer } from "../application/tile/layer/baseLayer";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
 import { DrawTileStrategy } from "./drawStrategy/drawTileStrategy";
 import { DrawRuleStrategy } from "./drawStrategy/drawRuleStrategy";
-import { TilemapSessionView } from "../application/session/tilemapSessionView";
+import { TilemapView } from "../application/view/tilemapView";
 
 @Tool({
     id: "tool.eraser",
@@ -35,7 +35,7 @@ export class EraserTool implements ITool {
     private activeDrawStrategy: IDrawStrategy | null = null;
 
     private currentSession: TilemapSession | null = null;
-    private currentSessionView: TilemapSessionView | null = null;
+    private currentView: TilemapView | null = null;
 
     private overlayContainer: Container | null = null;
 
@@ -92,13 +92,13 @@ export class EraserTool implements ITool {
         this.reverseErase();
     }
 
-    public attach(session: TilemapSession, view: TilemapSessionView): void {
+    public attach(session: TilemapSession, view: TilemapView): void {
         this.currentSession = session;
-        this.currentSessionView = view;
+        this.currentView = view;
 
-        const viewport = this.currentSessionView.viewport;
+        const viewport = this.currentView.viewport;
 
-        this.overlayContainer = this.currentSessionView.overlayerContainer;
+        this.overlayContainer = this.currentView.overlayerContainer;
 
         this.previewGraphics = new Graphics();
         this.overlayContainer.addChild(this.previewGraphics);
@@ -123,8 +123,8 @@ export class EraserTool implements ITool {
     }
 
     public detach(): void {
-        if (!this.currentSession || !this.currentSessionView) return;
-        const viewport = this.currentSessionView.viewport;
+        if (!this.currentSession || !this.currentView) return;
+        const viewport = this.currentView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
         viewport.off("pointermove", this.bindPointerOnMove);
@@ -299,7 +299,7 @@ export class EraserTool implements ITool {
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {
-        const localPosition = this.currentSessionView!.viewport.toLocal(new Point(e.global.x, e.global.y));
+        const localPosition = this.currentView!.viewport.toLocal(new Point(e.global.x, e.global.y));
         return { x: localPosition.x, y: localPosition.y };
     }
 

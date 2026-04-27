@@ -8,8 +8,8 @@ export interface IBaseSession {
     destroy(): void;
 }
 
-export interface IBaseSessionView {
-    activateSession(pixiApp: Application): void;
-    unActivateSession(): void;
+export interface IBaseView {
+    activateView(pixiApp: Application): void;
+    unActivateView(): void;
     destroy(): void;
 }

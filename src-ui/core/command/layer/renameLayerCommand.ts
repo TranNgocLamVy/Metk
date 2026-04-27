@@ -13,7 +13,7 @@ export class RenameLayerCommand implements IBaseCommand {
     ) { }
 
     public execute(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession()
+        const currentSession = context.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
@@ -29,7 +29,7 @@ export class RenameLayerCommand implements IBaseCommand {
     }
 
     public undo(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession()
+        const currentSession = context.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         

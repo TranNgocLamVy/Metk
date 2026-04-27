@@ -5,7 +5,7 @@ import { ViewState } from "@/shared/schema/viewState";
 import { TilesetSessionData } from "@/shared/schema/tilesetSessionSchema";
 
 import { Tileset } from "../tile/tileset";
-import { TilesetSessionView } from "./tilesetSessionView";
+import { TilesetView } from "../view/tilesetView";
 import { EditorContext } from "../editorContext";
 import EventEmitter from "eventemitter3";
 
@@ -21,9 +21,6 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
     private pivot: Coordinate | null = null;
 
     public historyManager: HistoryManager;
-
-    public sessionView: TilesetSessionView;
-
 
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorContext: EditorContext) {
         super();
@@ -71,6 +68,6 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
 
     public destroy(): void {
         const textureManager = this.editorContext.textureManager;
-        textureManager.releaseTilesetGraphics(this.tileset.id); // TODO: Move this to sessionView
+        textureManager.releaseTilesetGraphics(this.tileset.id); // TODO: Move this to view
     }
 }

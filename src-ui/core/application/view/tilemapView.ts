@@ -1,25 +1,25 @@
 import { Viewport } from "pixi-viewport";
-import { Application } from "pixi.js";
+import { Application, Container } from "pixi.js";
 
-import { TilesetSession } from "@/core/application/session/tilesetSession";
-import { IBaseSessionView } from "@/core/interface/IBaseSession";
+import { TilemapSession } from "@/core/application/session/tilemapSession";
+import { IBaseView } from "@/core/interface/IBaseSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
-import { TilesetGridRenderer } from "../renderer/tilesetGridRenderer";
-import { TilesetRenderer } from "../renderer/tilesetRenderer";
-import { TilesetViewSelector } from "../renderer/tilesetViewSelector";
+import { TilemapGridRenderer } from "../renderer/tilemapGridRenderer";
+import { TilemapRenderer } from "../renderer/tilemapRenderer";
 
-export class TilesetSessionView implements IBaseSessionView {
-    public session: TilesetSession;
+export class TilemapView implements IBaseView {
+    public session: TilemapSession;
     public viewport: Viewport;
     private pixiApp: Application;
-    private renderer: TilesetRenderer;
-    public grid: TilesetGridRenderer;
-    public gridEnabled: boolean = true;
-    public selector: TilesetViewSelector;
+
+    private renderer: TilemapRenderer;
+    public overlayerContainer: Container;
+    public grid: TilemapGridRenderer;
+
     private isInit: boolean = false;
 
-    constructor(session: TilesetSession) {
+    constructor(session: TilemapSession) {
         this.session = session;
     }
 
@@ -29,15 +29,17 @@ export class TilesetSessionView implements IBaseSessionView {
         this.pixiApp.stage.eventMode = isOverUI ? 'none' : 'auto';
     };
 
-    private initSession(pixiApp: Application) {
+    private initView(pixiApp: Application) {
         this.pixiApp = pixiApp;
 
         this.viewport = new Viewport({
             screenWidth: pixiApp.screen.width,
             screenHeight: pixiApp.screen.height,
-            passiveWheel: true,
+            worldWidth: this.session.tilemap.width * this.session.tilemap.tilewidth,
+            worldHeight: this.session.tilemap.height * this.session.tilemap.tileheight,
+            passiveWheel: false,
             stopPropagation: true,
-            allowPreserveDragOutside: true,
+            allowPreserveDragOutside: false,
             events: pixiApp.renderer.events,
         });
 
@@ -47,19 +49,19 @@ export class TilesetSessionView implements IBaseSessionView {
         window.addEventListener('wheel', this.handleNativePointerState, { passive: true });
 
         this.viewport
-            .drag({ mouseButtons: "middle " })
+            .drag({ mouseButtons: "middle" })
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.5, maxScale: 50 })
+            .clampZoom({ minScale: 0.05, maxScale: 50 });
 
-        setTimeout(() => this.updateViewport(), 0)
+        setTimeout(() => this.updateViewport(), 0);
 
         this.pixiApp.renderer.on("resize", () => {
             const w = this.pixiApp.renderer.width;
             const h = this.pixiApp.renderer.height;
             this.viewport.resize(w, h);
-
             this.updateViewport();
+            this.viewport.emit("resize")
         });
 
         this.viewport.on("moved-end", () => {
@@ -77,7 +79,7 @@ export class TilesetSessionView implements IBaseSessionView {
             WorkspaceService.saveCurrentWorkspace();
         });
 
-        this.viewport.on("drag-start", (e) => {
+        this.viewport.on("drag-start", () => {
             this.viewport.cursor = "grabbing";
         });
 
@@ -85,38 +87,38 @@ export class TilesetSessionView implements IBaseSessionView {
             this.viewport.cursor = "default";
         });
 
-        this.grid = new TilesetGridRenderer({ viewport: this.viewport, tileset: this.session.tileset });
-        this.renderer = new TilesetRenderer({ tileset: this.session.tileset, parent: this.viewport, gap: this.grid.gridGap });
-        this.selector = new TilesetViewSelector({ tileset: this.session.tileset, tilesetSession: this.session, parent: this.viewport, gap: this.grid.gridGap });
+        // Initialize Renderer
+        this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
+        this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap });
+        this.overlayerContainer = new Container();
 
-
-        // Selector is on top of renderer (init after renderer)
+        // Add Renderer
         this.viewport.addChild(this.renderer.container);
+        this.viewport.addChild(this.overlayerContainer);
         this.viewport.addChild(this.grid.graphics);
-        this.viewport.addChild(this.selector.graphics);
     }
 
-    public activateSession(pixiApp: Application) {
+    public activateView(pixiApp: Application) {
         if (this.isInit && this.pixiApp !== pixiApp) {
             this.destroy();
             this.isInit = false;
         }
     
         if (!this.isInit) {
-            this.initSession(pixiApp);
+            this.initView(pixiApp);
             this.isInit = true;
         }
-        
+
         this.viewport.eventMode = 'static';
         this.viewport.plugins.resume('drag');
         this.viewport.plugins.resume('wheel');
         this.viewport.plugins.resume('decelerate');
-        
-        this.updateViewport();
+
         this.pixiApp.stage.addChild(this.viewport);
+        this.updateViewport();
     }
 
-    public unActivateSession() {
+    public unActivateView() {
         if (!this.isInit) return;
         this.viewport.removeFromParent();
         this.viewport.eventMode = 'none';
@@ -125,40 +127,32 @@ export class TilesetSessionView implements IBaseSessionView {
         this.viewport.plugins.pause('decelerate');
     }
 
-    public updateViewport() {
-        if (this.session.viewState.x != null && this.session.viewState.y != null) {
-            this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);
-        }
-        this.viewport.setZoom(this.session.viewState.zoom); 
-    }
-
-    public toggleGrid(): void {
-        if (this.grid.gridEnabled) {
-            this.grid.disableGrid();
-            this.renderer.setGap(0);
-            this.selector.setGap(0);
-        } else {
-            this.grid.enableGrid();
-            this.renderer.setGap(this.grid.gridGap);
-            this.selector.setGap(this.grid.gridGap);
-        }
-    }
-
     public destroy() {
         if (!this.isInit) return;
-        this.unActivateSession();
-        this.viewport.destroy({ children: true });
-        this.viewport = null!;
-
-        this.renderer.destroy();
-        this.renderer = null!;
-
-        this.selector.destroy();
-        this.selector = null!;
+        this.unActivateView();
 
         window.removeEventListener('pointerdown', this.handleNativePointerState);
         window.removeEventListener('pointermove', this.handleNativePointerState);
         window.removeEventListener('pointerup', this.handleNativePointerState);
         window.removeEventListener('wheel', this.handleNativePointerState);
+
+        if (this.renderer) this.renderer.destroy();
+
+        this.viewport.destroy({ children: true });
+    }
+
+    public updateViewport() {
+        if (this.session.viewState.x != null && this.session.viewState.y != null) {
+            this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);
+        }
+        this.viewport.setZoom(this.session.viewState.zoom);
+    }
+
+    public toggleGrid(): void {
+        if (this.grid.gridEnabled) {
+            this.grid.disableGrid();
+        } else {
+            this.grid.enableGrid();
+        }
     }
 }

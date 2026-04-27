@@ -33,14 +33,14 @@ const Group2: MenuDropDownGroupType = [
         label: "workspace.tilesetSelector.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const sessionView = appCore.editorContext.getCurrentTilesetSessionView();
-            if (!sessionView) return false;
-            return sessionView.gridEnabled;
+            const activeTilesetView = appCore.editorContext.getActiveTilesetView();
+            if (!activeTilesetView) return false;
+            return activeTilesetView.gridEnabled;
         },
         toggle() {
-            const sessionView = appCore.editorContext.getCurrentTilesetSessionView();
-            if (!sessionView) return false;
-            sessionView.toggleGrid();
+            const activeTilesetView = appCore.editorContext.getActiveTilesetView();
+            if (!activeTilesetView) return false;
+            activeTilesetView.toggleGrid();
         },
     }
 ];
@@ -53,13 +53,13 @@ const Group3: MenuDropDownGroupType = [
         variant: "destructive",
         disabled() {
             const editorContext = appCore.editorContext;
-            const currentTilesetSession = editorContext.getCurrentTilesetSession();
+            const currentTilesetSession = editorContext.getActiveTilesetSession();
             if (!currentTilesetSession) return true;
             return false;
         },
         onClick() {
             const editorContext = appCore.editorContext;
-            const currentTilesetSession = editorContext.getCurrentTilesetSession();
+            const currentTilesetSession = editorContext.getActiveTilesetSession();
             if (!currentTilesetSession) return;
             TilesetService.deleteTileset(currentTilesetSession.tileset.id); 
         }

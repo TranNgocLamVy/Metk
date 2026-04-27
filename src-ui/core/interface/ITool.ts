@@ -1,11 +1,11 @@
 import { EditorContext } from "../application/editorContext";
 import { TilemapSession } from "../application/session/tilemapSession";
-import { TilemapSessionView } from "../application/session/tilemapSessionView";
+import { TilemapView } from "../application/view/tilemapView";
 
 export interface ITool {
     onEnable(): void;
     onDisable(): void;
-    attach(session: TilemapSession, view: TilemapSessionView): void;
+    attach(session: TilemapSession, view: TilemapView): void;
     detach(): void;
 }
 

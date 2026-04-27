@@ -7,7 +7,7 @@ import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 import { Console } from "@/shared/services/consoleService";
 import { CatchError } from "../decorator/catchResultError";
-import { TilesetSessionView } from "../application/session/tilesetSessionView";
+import { TilesetView } from "../application/view/tilesetView";
 
 export type TilesetSessionManagerEvent = {
     onCreateTilesetSession: (session: TilesetSession) => void;
@@ -20,7 +20,7 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
     private tilesetMap: Map<string, string> = new Map<string, string>();
 
     public activeSession: TilesetSession | null = null;
-    private activeSessionView: TilesetSessionView | null = null;
+    private activeView: TilesetView | null = null;
 
     private tilesetSessionIdStack: string[] = [];
 
@@ -120,16 +120,16 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
         return this.tilesetSessionIdStack[this.tilesetSessionIdStack.length - 1] || null;
     }
 
-    public getActiveSessionView(): TilesetSessionView | null {
-        return this.activeSessionView;
+    public getActiveView(): TilesetView | null {
+        return this.activeView;
     }
 
-    public registerActiveSessionView(view: TilesetSessionView | null) {
-        this.activeSessionView = view
+    public registerActiveView(view: TilesetView | null) {
+        this.activeView = view
     }
 
-    public unregisterActiveSessionView() {
-        this.activeSessionView = null;
+    public unregisterActiveView() {
+        this.activeView = null;
     }
 
     public serialize(): TilesetSessionManagerData {

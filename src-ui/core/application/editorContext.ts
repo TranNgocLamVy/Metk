@@ -11,8 +11,8 @@ import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
 import { TextureManager } from "../manager/textureManager";
 import { Ruleset } from "./rule/ruleset";
-import { TilemapSessionView } from "./session/tilemapSessionView";
-import { TilesetSessionView } from "./session/tilesetSessionView";
+import { TilemapView } from "./view/tilemapView";
+import { TilesetView } from "./view/tilesetView";
 
 type EditorContextEvent = {
     onOpenTilemapSession: () => void,
@@ -36,7 +36,7 @@ export class EditorContext {
         return this.workspaceManager.currentWorkspace;
     }
 
-    public getCurrentTilemapSession(): TilemapSession | null {
+    public getActiveTilemapSession(): TilemapSession | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) return null;
         const currentTilemapSession = currentWorkspace.tilemapSessionManager.activeSession;
@@ -44,13 +44,13 @@ export class EditorContext {
         return currentTilemapSession;
     }
 
-    public getCurrentTilemapSessionView(): TilemapSessionView | null {
+    public getActiveTilemapView(): TilemapView | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) return null;
-        return currentWorkspace.tilemapSessionManager.getActiveSessionView();
+        return currentWorkspace.tilemapSessionManager.getActiveView();
     }
 
-    public getCurrentTilesetSession(): TilesetSession | null {
+    public getActiveTilesetSession(): TilesetSession | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) return null;
         const currentTilesetSession = currentWorkspace.tilesetSessionManager.activeSession;
@@ -58,10 +58,10 @@ export class EditorContext {
         return currentTilesetSession;
     }
 
-    public getCurrentTilesetSessionView(): TilesetSessionView | null {
+    public getActiveTilesetView(): TilesetView | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) return null;
-        return currentWorkspace.tilesetSessionManager.getActiveSessionView();
+        return currentWorkspace.tilesetSessionManager.getActiveView();
     }
 
     public getCurrentHistoryManager(): HistoryManager | null {
@@ -69,16 +69,14 @@ export class EditorContext {
         if (!currentWorkspace) return null;
         const currentMapSession = currentWorkspace.tilemapSessionManager.activeSession;
         if (!currentMapSession) return null;
-        const historyManager = currentMapSession.historyManager;
-        if (!historyManager) return null;
-        return historyManager;
+        return currentMapSession.historyManager;
     }
 
     // Access the Tileset Session
     public getSelectedTile(): (Tile | null)[][] | null {
         const tilesetSessionManager = this.currentWorkspace?.tilesetSessionManager;
         if (!tilesetSessionManager) return null;
-        const activeSession = tilesetSessionManager.getActiveSessionView();
+        const activeSession = tilesetSessionManager.getActiveView();
         if (!activeSession) return null;
         return activeSession.selector.getSelectedTiles();
     }
@@ -92,7 +90,7 @@ export class EditorContext {
     }
 
     public getPivot(): Coordinate | null {
-        const currentTilesetSession = this.getCurrentTilesetSession();
+        const currentTilesetSession = this.getActiveTilesetSession();
         if (!currentTilesetSession) return null;
         return currentTilesetSession.getPivot();
     }

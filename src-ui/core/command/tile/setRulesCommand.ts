@@ -16,7 +16,7 @@ export class SetRuleRefsCommand implements IBaseCommand {
     ) {}
 
     public execute(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession();
+        const currentSession = context.getActiveTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
@@ -38,7 +38,7 @@ export class SetRuleRefsCommand implements IBaseCommand {
     public undo(context: EditorContext): Result {
         if (this.oldRules.length === 0) return Result.Cancel("No rule changed");
 
-        const currentSession = context.getCurrentTilemapSession();
+        const currentSession = context.getActiveTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
