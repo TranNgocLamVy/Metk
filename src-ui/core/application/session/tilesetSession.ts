@@ -4,16 +4,20 @@ import { SelectionState } from "@/shared/schema/selectionState";
 import { ViewState } from "@/shared/schema/viewState";
 import { TilesetSessionData } from "@/shared/schema/tilesetSessionSchema";
 
-import { Tile, Tileset } from "../tile/tileset";
+import { Tileset } from "../tile/tileset";
 import { TilesetSessionView } from "./tilesetSessionView";
 import { EditorContext } from "../editorContext";
+import EventEmitter from "eventemitter3";
 
-export class TilesetSession implements IBaseSession {
+interface TilesetSessionEvents {
+
+}
+
+export class TilesetSession extends EventEmitter<TilesetSessionEvents> implements IBaseSession {
     public readonly id: string;
     public readonly tileset: Tileset;
     public viewState: ViewState;
     public selectionState: SelectionState;
-    private selectedTiles: (Tile | null)[][] = [];
     private pivot: Coordinate | null = null;
 
     public historyManager: HistoryManager;
@@ -22,14 +26,13 @@ export class TilesetSession implements IBaseSession {
 
 
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorContext: EditorContext) {
+        super();
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
         this.viewState = tilesetSessionData.viewState ?? { x: null, y: null, zoom: 1 };
         this.selectionState = tilesetSessionData.selectionState ?? { selectedTilesSet: [], pivot: null };
 
         this.historyManager = new HistoryManager();
-
-        this.sessionView = new TilesetSessionView(this);
     }
 
     public async loadTilesetSession(): Promise<void> {
@@ -68,9 +71,6 @@ export class TilesetSession implements IBaseSession {
 
     public destroy(): void {
         const textureManager = this.editorContext.textureManager;
-        textureManager.releaseTilesetGraphics(this.tileset.id);
-
-        this.sessionView.unActivateSession();
-        this.sessionView.destroy();
+        textureManager.releaseTilesetGraphics(this.tileset.id); // TODO: Move this to sessionView
     }
 }

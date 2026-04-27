@@ -33,14 +33,14 @@ const Group2: MenuDropDownGroupType = [
         label: "workspace.tilesetSelector.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const session = appCore.editorContext.getCurrentTilesetSession();
-            if (!session) return false;
-            return session.sessionView.gridEnabled;
+            const sessionView = appCore.editorContext.getCurrentTilesetSessionView();
+            if (!sessionView) return false;
+            return sessionView.gridEnabled;
         },
         toggle() {
-            const session = appCore.editorContext.getCurrentTilesetSession();
-            if (!session) return;
-            session.sessionView.toggleGrid();
+            const sessionView = appCore.editorContext.getCurrentTilesetSessionView();
+            if (!sessionView) return false;
+            sessionView.toggleGrid();
         },
     }
 ];

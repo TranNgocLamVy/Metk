@@ -7,15 +7,13 @@ import { Application as PixiApplication } from "@pixi/react";
 import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
 import { TilesetViewContextMenu } from "./ContextMenu";
 import { LocalizedText } from "../../custom/LocalizeText";
-import { useMemo } from "react";
 import { VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
 
 export default function TilesetViewCanvas() {
-	const { version, getCurrentTilesetSessionId } = useTilesetSessionStore();
-	const currentTilesetSessionId = useMemo(() => getCurrentTilesetSessionId(), [version]);
+	const { activeSession } = useTilesetSessionStore();
 
 	const { pixiApp, setPixiApp } = useTilesetSessionStore();
 
@@ -38,7 +36,7 @@ export default function TilesetViewCanvas() {
 			<ContextMenuWrapper item={TilesetViewContextMenu}>
 				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm" />
 			</ContextMenuWrapper>
-			{currentTilesetSessionId == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0 pr-2">
+			{activeSession == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0 pr-2">
 				<span className="text-sm">
 					<LocalizedText message="workspace.tilesetSelector.empty" />
 				</span>

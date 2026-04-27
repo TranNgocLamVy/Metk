@@ -16,11 +16,11 @@ export type TilemapSessionManagerEvent = {
 }
 
 export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEvent> {
-    public currentTilemapSession: TilemapSession | null = null;
     private tilemapSessionMap: Map<string, TilemapSession> = new Map<string, TilemapSession>(); // sessionId -> session
     private tilemapMap: Map<string, string> = new Map<string, string>(); // tilemapId -> sessionId
-
-    private currentTilemapSessionView: TilemapSessionView | null = null;
+    
+    public activeSession: TilemapSession | null = null;
+    private activeSessionView: TilemapSessionView | null = null;
 
     public get tilemapsSession(): TilemapSession[] {
         return Array.from(this.tilemapSessionMap.values());
@@ -54,13 +54,6 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         return Result.Success();
     }
 
-    public async detroy(): Promise<void> {
-        Array.from(this.tilemapSessionMap.values()).forEach(session => session.destroy());
-        this.tilemapSessionMap.clear();
-        this.tilemapMap.clear();
-        this.removeAllListeners();
-    }
-
     public async createTilemapSession(tilemap: Tilemap): Promise<TilemapSession | null> {
         const sessionId = this.tilemapMap.get(tilemap.id);
         if (sessionId) return this.openTilemapSession(sessionId);
@@ -84,7 +77,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         const tilemapSession = this.tilemapSessionMap.get(sessionId);
         if (!tilemapSession) return null;
 
-        this.currentTilemapSession = tilemapSession;
+        this.activeSession = tilemapSession;
         
         this.emit("onOpenTilemapSession", tilemapSession);
 
@@ -106,8 +99,8 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         const tilemapManager = currentProject.tilemapManager;
         tilemapManager.unloadTilemap(tilemapSession.tilemap.id);
         
-        if (this.currentTilemapSession?.id === sessionId) {
-            this.currentTilemapSession = null;
+        if (this.activeSession?.id === sessionId) {
+            this.activeSession = null;
         }
         this.emit("onCloseTilemapSession", sessionId);
 
@@ -124,22 +117,29 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         return this.tilemapSessionMap.get(sessionId) || null;
     }
 
-    public getCurrentSessionView(): TilemapSessionView | null {
-        return this.currentTilemapSessionView;
+    public getActiveSessionView(): TilemapSessionView | null {
+        return this.activeSessionView;
     }
 
-    public registerView(view: TilemapSessionView | null) {
-        this.currentTilemapSessionView = view
+    public registerActiveSessionView(view: TilemapSessionView | null) {
+        this.activeSessionView = view
     }
 
-    public unregisterView() {
-        this.currentTilemapSessionView = null;
+    public unregisterActiveSessionView() {
+        this.activeSessionView = null;
     }
 
     public serialize(): TilemapSessionManagerData {
         return {
             tilemapSessions: Array.from(this.tilemapSessionMap.values()).map(session => session.serialize()),
-            currentTilemapSessionId: this.currentTilemapSession?.id || null,
+            currentTilemapSessionId: this.activeSession?.id || null,
         }
+    }
+
+    public async detroy(): Promise<void> {
+        Array.from(this.tilemapSessionMap.values()).forEach(session => session.destroy());
+        this.tilemapSessionMap.clear();
+        this.tilemapMap.clear();
+        this.removeAllListeners();
     }
 }

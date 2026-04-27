@@ -38,7 +38,7 @@ export default function TilemapEditor() {
         sessionView.activateSession(pixiApp);
         activeSessionViewRef.current = { id: sessionView.session.id, view: sessionView };
 
-        tilemapSessionManager.registerView(sessionView);
+        tilemapSessionManager.registerActiveSessionView(sessionView);
         toolManager.setActiveSession(sessionView.session, sessionView);
 
         sessionView.session.on("onMarkChange", updateTilemapSessionList);
@@ -59,7 +59,7 @@ export default function TilemapEditor() {
         toolManager.setActiveSession(null, null);
 
         const tilemapSessionManager = activeWorkspace!.tilemapSessionManager;
-        tilemapSessionManager.unregisterView();
+        tilemapSessionManager.unregisterActiveSessionView();
 
         activeSessionView.view.session.off("onMarkChange", updateTilemapSessionList);
 
@@ -72,7 +72,7 @@ export default function TilemapEditor() {
 
         const toolManager = appCore.toolManager;
         const tilemapSessionManager = activeWorkspace.tilemapSessionManager;
-        const currentSession = tilemapSessionManager.currentTilemapSession;
+        const currentSession = tilemapSessionManager.activeSession;
 
         if (currentSession) {
             const newSessionView = new TilemapSessionView(currentSession);
@@ -91,7 +91,7 @@ export default function TilemapEditor() {
             activeSessionViewRef.current?.view.session.off("onMarkChange", updateTilemapSessionList);
             activeSessionViewRef.current = null;
 
-            tilemapSessionManager.unregisterView();
+            tilemapSessionManager.unregisterActiveSessionView();
             toolManager.setActiveSession(null, null);
         }
     }, [activeWorkspace, pixiApp])
