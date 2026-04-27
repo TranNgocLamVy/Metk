@@ -1,19 +1,26 @@
-import { Application } from "pixi.js";
-
+import { EventEmitter } from "eventemitter3";
 import { defaultTilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tilesetSessionSchema";
 import { Result } from "@/shared/types/result";
-
 import { EditorContext } from "../application/editorContext";
 import { TilesetSession } from "../application/session/tilesetSession";
 import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 import { Console } from "@/shared/services/consoleService";
 import { CatchError } from "../decorator/catchResultError";
+import { TilesetSessionView } from "../application/session/tilesetSessionView";
 
-export class TilesetSessionManager {
-    public currentTilesetSession: TilesetSession | null = null;
+export type TilesetSessionManagerEvent = {
+    onCreateTilesetSession: (session: TilesetSession) => void;
+    onOpenTilesetSession: (session: TilesetSession) => void;
+    onCloseTilesetSession: (sessionId: string) => void;
+}
+
+export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEvent> {
     private tilesetSessionMap: Map<string, TilesetSession> = new Map<string, TilesetSession>();
     private tilesetMap: Map<string, string> = new Map<string, string>();
+
+    public activeSession: TilesetSession | null = null;
+    private activeSessionView: TilesetSessionView | null = null;
 
     private tilesetSessionIdStack: string[] = [];
 
@@ -25,7 +32,7 @@ export class TilesetSessionManager {
         public readonly tilesetSessionManagerData: TilesetSessionManagerData,
         private readonly editorContext: EditorContext
     ) {
-
+        super();
     }
 
     @CatchError("message.system.unknownError.loadTilesetSession")
@@ -45,15 +52,9 @@ export class TilesetSessionManager {
         return Result.Success();
     }
 
-    public async destroy(): Promise<void> {
-        Array.from(this.tilesetSessionMap.values()).forEach(session => session.destroy());
-        this.tilesetSessionMap.clear();
-        this.tilesetMap.clear();
-    }
-
-    public async createTilesetSession(tileset: Tileset, pixiApp: Application): Promise<TilesetSession | null> {
+    public async createTilesetSession(tileset: Tileset): Promise<TilesetSession | null> {
         const sessionId = this.tilesetMap.get(tileset.id);
-        if (sessionId) return this.openTilesetSession(sessionId, pixiApp);
+        if (sessionId) return this.openTilesetSession(sessionId);
 
         const newTilesetSessionData = defaultTilesetSessionData(tileset.id);
 
@@ -63,27 +64,25 @@ export class TilesetSessionManager {
         this.tilesetSessionMap.set(newTilesetSession.id, newTilesetSession);
         this.tilesetMap.set(tileset.id, newTilesetSession.id);
 
-        this.openTilesetSession(newTilesetSession.id, pixiApp);
+        this.openTilesetSession(newTilesetSession.id);
+
+        this.emit("onCreateTilesetSession", newTilesetSession);
+
+        Console.log({ message: { key: "message.tileset.openSuccess", options: { name: newTilesetSession.tileset.name } } });
 
         return newTilesetSession;
     }
 
-    public openTilesetSession(sessionId: string, pixiApp: Application): TilesetSession | null {
+    public openTilesetSession(sessionId: string): TilesetSession | null {
         const tilesetSession = this.tilesetSessionMap.get(sessionId);
         if (!tilesetSession) return null;
 
-        if (this.currentTilesetSession) {
-            this.currentTilesetSession.sessionView.unActivateSession();
-        }
-
-        this.currentTilesetSession = tilesetSession;
+        this.activeSession = tilesetSession;
 
         this.tilesetSessionIdStack = this.tilesetSessionIdStack.filter(id => id !== sessionId);
         this.tilesetSessionIdStack.push(sessionId);
 
-        tilesetSession.sessionView.activateSession(pixiApp);
-
-        Console.log({ message: { key: "message.tileset.openSuccess", options: { name: tilesetSession.tileset.name } } });
+        this.emit("onOpenTilesetSession", tilesetSession);
 
         return tilesetSession;
     }
@@ -98,9 +97,10 @@ export class TilesetSessionManager {
         this.tilesetMap.delete(tilesetSession.tileset.id);
         this.tilesetSessionIdStack = this.tilesetSessionIdStack.filter(id => id !== sessionId);
 
-        if (this.currentTilesetSession?.id === sessionId) {
-            this.currentTilesetSession = null;
+        if (this.activeSession?.id === sessionId) {
+            this.activeSession = null;
         }
+        this.emit("onCloseTilesetSession", sessionId);
 
         Console.log({ message: { key: "message.tileset.closeSuccess", options: { name: tilesetSession.tileset.name } } })
     }
@@ -120,10 +120,29 @@ export class TilesetSessionManager {
         return this.tilesetSessionIdStack[this.tilesetSessionIdStack.length - 1] || null;
     }
 
+    public getActiveSessionView(): TilesetSessionView | null {
+        return this.activeSessionView;
+    }
+
+    public registerActiveSessionView(view: TilesetSessionView | null) {
+        this.activeSessionView = view
+    }
+
+    public unregisterActiveSessionView() {
+        this.activeSessionView = null;
+    }
+
     public serialize(): TilesetSessionManagerData {
         return {
             tilesetSessions: Array.from(this.tilesetSessionMap.values()).map(session => session.serialize()),
-            currentTilesetSessionId: this.currentTilesetSession?.id || null,
+            currentTilesetSessionId: this.activeSession?.id || null,
         }
+    }
+
+    public async destroy(): Promise<void> {
+        Array.from(this.tilesetSessionMap.values()).forEach(session => session.destroy());
+        this.tilesetSessionMap.clear();
+        this.tilesetMap.clear();
+        this.removeAllListeners();
     }
 }

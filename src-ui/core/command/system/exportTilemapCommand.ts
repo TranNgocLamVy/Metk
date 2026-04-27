@@ -20,7 +20,7 @@ export class ExportTilemapTMXCommand implements ISystemCommand {
         const workspace = context.currentWorkspace;
         if (!workspace) return Result.Cancel();
 
-        const tilemapSession = workspace.tilemapSessionManager.currentTilemapSession;
+        const tilemapSession = workspace.tilemapSessionManager.activeSession;
         if (!tilemapSession) return Result.Cancel();
         const tilemap = tilemapSession.tilemap;
 

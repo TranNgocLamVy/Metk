@@ -3,23 +3,19 @@ import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import QuickToolTip from "../../custom/QuickToolTip";
 import { TilesetService } from "@/shared/services/tilesetService";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 import { appCore } from "@/core/appcore";
 
 export default function TilesetMenuBar() {
-    const { version, getCurrentTilesetSessionId } = useTilesetSessionStore();
-
-    const selectedTilesetSessionId = useMemo(() => {
-        return getCurrentTilesetSessionId();
-    }, [version])
+    const { activeSession } = useTilesetSessionStore();
 
     const onDeleteTileset = useCallback(() => {
         const tilesetSession = appCore.editorContext.getCurrentTilesetSession();
         if (!tilesetSession) return;
         const selectedTilesetId = tilesetSession.tileset.id;
         TilesetService.deleteTileset(selectedTilesetId);
-    }, [version])
+    }, [])
 
     return (
         <HStack className="bg-surface w-full gap-0.5 pt-1">
@@ -34,7 +30,7 @@ export default function TilesetMenuBar() {
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.tilesetSelector.menu.delete"}>
-                <Button variant={"ghost"} size={"icon-sm"} className="text-destructive" disabled={selectedTilesetSessionId == null} onClick={onDeleteTileset}>
+                <Button variant={"ghost"} size={"icon-sm"} className="text-destructive" disabled={!activeSession?.id} onClick={onDeleteTileset}>
                     <Trash2 />
                 </Button>
             </QuickToolTip>

@@ -1,5 +1,4 @@
 import { appCore } from "@/core/appcore";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
@@ -44,7 +43,6 @@ export class WorkspaceService {
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
         
-        useTilesetSessionStore.getState().refresh();
         useRulesetManagerStore.getState().refresh();
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
@@ -75,12 +73,6 @@ export class WorkspaceService {
 
     //================ tileset ================
     public static async createTilesetSession(tilesetId: string): Promise<void> {
-        const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
-        if (!tilesetPixiApp) {
-            Console.error({ message: "Tileset pixi app not found" }); // TODO: i18n
-            return;
-        }
-
         const currentProject = appCore.editorContext.currentProject;
         if (!currentProject) return;
 
@@ -96,22 +88,17 @@ export class WorkspaceService {
         if (!workspace) return;
 
         const tilesetSessionManager = workspace.tilesetSessionManager;
-        await tilesetSessionManager.createTilesetSession(tileset, tilesetPixiApp);
-        useTilesetSessionStore.getState().refresh();
+        await tilesetSessionManager.createTilesetSession(tileset);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
     public static async openTilesetSession(sessionId: string): Promise<void> {
-        const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
-        if (!tilesetPixiApp) return;
-
         const workspace = appCore.workspaceManager.currentWorkspace;
         if (!workspace) return;
 
         const tilesetSessionManager = workspace.tilesetSessionManager;
-        tilesetSessionManager.openTilesetSession(sessionId, tilesetPixiApp);
+        tilesetSessionManager.openTilesetSession(sessionId);
 
-        useTilesetSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
@@ -129,7 +116,6 @@ export class WorkspaceService {
         const lastSessionId = tilesetSessionManager.getLastTilesetSessionId();
         if (lastSessionId) await WorkspaceService.openTilesetSession(lastSessionId);
 
-        useTilesetSessionStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 

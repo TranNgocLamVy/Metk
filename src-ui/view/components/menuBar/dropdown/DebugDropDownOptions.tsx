@@ -50,14 +50,14 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
         type: "option",
         label: "print current tilemap",
         async onClick() {
-			console.log(appCore.workspaceManager.currentWorkspace?.tilemapSessionManager.currentTilemapSession?.tilemap);
+			console.log(appCore.workspaceManager.currentWorkspace?.tilemapSessionManager.activeSession?.tilemap);
         }
     },
     {
         type: "option",
         label: "recalculate rule layer",
         async onClick() {
-			const tilemap = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager.currentTilemapSession?.tilemap;
+			const tilemap = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager.activeSession?.tilemap;
             tilemap?.rootLayer.getAllLayers().forEach((layer) => {
                 if (layer instanceof RuleLayer) {
                     layer.reCalculateAllOutputs();

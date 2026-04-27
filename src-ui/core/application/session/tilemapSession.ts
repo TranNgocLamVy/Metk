@@ -102,6 +102,6 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
     public destroy() {
         const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
         const textureManager = this.editorContext.textureManager;
-        for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id);
+        for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id); // TODO: Move this to sessionView
     }
 }
