@@ -1,19 +1,17 @@
 import { ArrowDown, ArrowUp, Copy, Folder, Grid3x3, Plus, Trash2 } from "lucide-react";
 
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { appCore } from "@/core/appcore";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 const isTilemapSessionOpen = (): boolean => {
-	const editorContext = appCore.editorContext;
-	const tilemapSession = editorContext.getCurrentTilemapSession();
-	return !!tilemapSession;
+	const activeSession = useTilemapSessionStore.getState().activeSession;
+	return !!activeSession;
 }
 
 const numSelectedLayers = (): number => {
-	const editorContext = appCore.editorContext;
-	const tilemapSession = editorContext.getCurrentTilemapSession();
-	if (!tilemapSession) return 0;
-	return tilemapSession.layerState.selectedLayers.length;
+	const activeSession = useTilemapSessionStore.getState().activeSession;
+	if (!activeSession) return 0;
+	return activeSession.layerState.selectedLayers.length;
 }
 
 const CreateActionGroup: MenuDropDownGroupType = [

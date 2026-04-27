@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
 import { GroupLayer } from "../../application/tile/layer/groupLayer";
@@ -37,9 +36,7 @@ export class MoveLayerCommand implements IBaseCommand {
         newParentLayer.insertLayer(targetLayer, this.newIndex);
         if (newParentLayer instanceof GroupLayer && !newParentLayer.isOpen) newParentLayer.toggleOpen(true);
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }
@@ -61,9 +58,7 @@ export class MoveLayerCommand implements IBaseCommand {
         oldParentLayer.insertLayer(targetLayer, this.oldIndex);
         if (oldParentLayer instanceof GroupLayer && !oldParentLayer.isOpen) oldParentLayer.toggleOpen(true);
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }

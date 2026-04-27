@@ -9,16 +9,14 @@ import { Separator } from "../../shadcn/separator";
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
 import { LocalizedText } from "../../custom/LocalizeText";
 export default function LayerMenuBar() {
-    const { version, getFlatView, getSelectedLayers } = useLayerManagerStore();
+    const { layerViews, selectedLayers } = useLayerManagerStore();
 
-    const { selectedLayers, nonSelectedLayers, hasSelectedLayer, singleSelected } = useMemo(() => {
-        const allLayers = getFlatView();
-        const selectedLayers = getSelectedLayers();
-        const nonSelectedLayers = allLayers.filter(layer => !selectedLayers.includes(layer.id)).map(layer => layer.id);
+    const { nonSelectedLayers, hasSelectedLayer, singleSelected } = useMemo(() => {
+        const nonSelectedLayers = layerViews.filter(layer => !selectedLayers.includes(layer.id)).map(layer => layer.id);
         const hasSelectedLayer = selectedLayers.length > 0;
         const singleSelected = selectedLayers.length === 1;
         return { selectedLayers, nonSelectedLayers, hasSelectedLayer, singleSelected };
-    }, [version])
+    }, [layerViews, selectedLayers])
 
     return (
         <HStack className="bg-surface absolute bottom-1 w-full px-1 py-1 gap-0.5">

@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { RuleLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { EditorContext } from "../../application/editorContext";
 import { IGroupLayer } from "../../application/tile/layer/baseLayer";
@@ -34,9 +33,7 @@ export class CreateRuleLayerCommand implements IBaseCommand {
 
         this.ruleLayerId = newRuleLayer.id;
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }
@@ -49,10 +46,8 @@ export class CreateRuleLayerCommand implements IBaseCommand {
         ruleLayer.removeFromParent();
         this.ruleLayerData = ruleLayer.serialize();
 
-        currentSession.markAsDirty();
+        currentSession.markLayerChange();
         
-        useLayerManagerStore.getState().refresh();
-
         return Result.Success();
     }
 

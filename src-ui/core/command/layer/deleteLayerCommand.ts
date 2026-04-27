@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
-
 import { EditorContext } from "../../application/editorContext";
 import { BaseLayer, IGroupLayer } from "../../application/tile/layer/baseLayer";
 import { GroupLayer } from "../../application/tile/layer/groupLayer";
@@ -31,9 +29,7 @@ export class DeleteLayerCommand implements IBaseCommand {
         this.index = parent.getLayerIndex(targetLayer.id);
         this.layer.removeFromParent();
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }
@@ -48,9 +44,7 @@ export class DeleteLayerCommand implements IBaseCommand {
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
         parent.insertLayer(this.layer, this.index);
 
-        currentSession.markAsDirty();
-
-        useLayerManagerStore.getState().refresh();
+        currentSession.markLayerChange();
 
         return Result.Success();
     }

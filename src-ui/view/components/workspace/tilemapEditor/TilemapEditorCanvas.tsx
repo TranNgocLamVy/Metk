@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 
 import useResizeObserver from "@/view/hooks/useResizeObserver";
-import { useTilemapEditorSessionStore } from "@/view/stores/tilemapEditorSessionStore";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { Application as PixiApplication } from "@pixi/react";
 
 import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
@@ -14,7 +14,7 @@ import { useDialogStore } from "@/view/stores/dialogStore";
 import { TilemapService } from "@/shared/services/tilemapService";
 
 export default function TilemapEditorCanvas() {
-	const { pixiApp, currentTilemapSessionId, setPixiApp } = useTilemapEditorSessionStore();
+	const { pixiApp, activeSession,  setPixiApp } = useTilemapSessionStore();
 	
 	const containerRef = useResizeObserver<HTMLDivElement>(
 		(entry) => {
@@ -35,7 +35,7 @@ export default function TilemapEditorCanvas() {
 			<ContextMenuWrapper item={TilemapEditorContextMenu}>
 				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm" />
 			</ContextMenuWrapper>
-			{currentTilemapSessionId == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0">
+			{activeSession == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0">
 				<span className="text-sm">
 					<LocalizedText message="workspace.tilemapEditor.empty" />
 				</span>

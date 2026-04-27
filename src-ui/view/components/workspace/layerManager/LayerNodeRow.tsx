@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronRight, Eye, EyeOff, File, Folder, FolderOpen, Grid, Lock, LockKeyhole, LockOpen } from "lucide-react";
-import { DragEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, ChevronRight, Eye, EyeOff, Folder, FolderOpen, Grid, LockKeyhole, LockOpen } from "lucide-react";
+import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
@@ -8,6 +8,7 @@ import { DropPosition, LayerView, useLayerManagerStore } from "@/view/stores/lay
 import { Button } from "../../shadcn/button";
 import { TileLayer } from "@/core/application/tile/layer/tileLayer";
 import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 
 type LayerNodeRowProps = {
 	view: LayerView;
@@ -15,33 +16,31 @@ type LayerNodeRowProps = {
 };
 
 export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
-	const { version, editingId, getSelectedLayers, setEditingId, setTargetLayer, refresh } = useLayerManagerStore();
-
-	const selectedIds = useMemo(() => getSelectedLayers(), [version]);
+	const { activeSession } = useTilemapSessionStore();
+	const { editingId, selectedLayers, setEditingId } = useLayerManagerStore();
 
 	const layer = view.layer;
 	const isGroup = layer instanceof GroupLayer;
 	const isRenaming = editingId === layer.id;
 
-    const isRenameByUI = useRef(false);
+	const isRenameByUI = useRef(false);
 	const [dragOverPos, setDragOverPos] = useState<DropPosition | null>(null);
 
 	const handleClick = (e: MouseEvent) => {
 		e.stopPropagation();
-        TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+		TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
 	};
 
 	const handleDoubleClick = (e: MouseEvent) => {
 		e.stopPropagation();
 		setEditingId(layer.id);
-        isRenameByUI.current = true;
+		isRenameByUI.current = true;
 	};
 
 	const handleToggle = (e: MouseEvent) => {
 		e.stopPropagation();
 		if (isGroup) {
 			(layer as GroupLayer).toggleOpen();
-			refresh();
 		}
 	};
 
@@ -53,7 +52,7 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 			TilemapLayerService.selectLayer(layer.id, false);
 			idsToDrag = [layer.id];
 		} else {
-			idsToDrag = Array.from(selectedIds);
+			idsToDrag = Array.from(selectedLayers);
 		}
 
 		e.dataTransfer.setData("application/json", JSON.stringify({ ids: idsToDrag }));
@@ -105,29 +104,29 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 		}
 	};
 
-    const onContextMenu = (e: MouseEvent) => {
-        setTargetLayer(layer);
-        if (!selectedIds.includes(layer.id)) {
-            TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
-        }
-    };
+	const onContextMenu = (e: MouseEvent) => {
+		if (activeSession) activeSession.targetLayer = layer;
+		if (!selectedLayers.includes(layer.id)) {
+			TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+		}
+	};
 
 	// Styles for Drop Feedback
 	const getOuterDropStyle = () => {
 		if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
 		if (dragOverPos === "top") return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
 		if (dragOverPos === "bottom") return { borderBottom: "2px solid transparent", borderTop: "2px solid transparent" };
-		if (dragOverPos === "inside") return { outline: "2px dashed #3b82f6", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent"  };
+		if (dragOverPos === "inside") return { outline: "2px dashed #3b82f6", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
 		return {};
 	};
 
-    const getInnerDropStyle = () => {
-        if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
+	const getInnerDropStyle = () => {
+		if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
 		if (dragOverPos === "top") return { borderTop: "2px solid #3b82f6", borderBottom: "2px solid transparent" };
 		if (dragOverPos === "bottom") return { borderBottom: "2px solid #3b82f6", borderTop: "2px solid transparent" };
-		if (dragOverPos === "inside") return { outline: "2px dashed transparent", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent"  };
+		if (dragOverPos === "inside") return { outline: "2px dashed transparent", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
 		return {};
-    }
+	}
 
 	const getIcon = () => {
 		if (layer instanceof TileLayer) return <Grid size={16} className="text-emerald-500" />;
@@ -137,12 +136,12 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 	}
 
 	return (
-		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle()}}>
+		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle() }}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
-                    <div className="w-4 cursor-pointer" onClick={handleToggle}>
-                        {(layer as GroupLayer).isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    </div>
+					<div className="w-4 cursor-pointer" onClick={handleToggle}>
+						{(layer as GroupLayer).isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+					</div>
 				) : (
 					<div className="w-4" />
 				)}
@@ -158,22 +157,22 @@ export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
 				<Button
 					variant={"ghost"}
 					size={"icon-xs"}
-                    className={`ml-auto hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
+					className={`ml-auto hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
 					onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        TilemapLayerService.toggleVisibility([layer.id]);
+						e.stopPropagation();
+						e.preventDefault();
+						TilemapLayerService.toggleVisibility([layer.id]);
 					}}>
 					{layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
 				</Button>
 				<Button
 					variant={"ghost"}
 					size={"icon-xs"}
-                    className={`hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
+					className={`hover:bg-white/20 ${isSelected && "text-accent-foreground"}`}
 					onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        TilemapLayerService.toggleLock([layer.id]);
+						e.stopPropagation();
+						e.preventDefault();
+						TilemapLayerService.toggleLock([layer.id]);
 					}}>
 					{layer.locked ? <LockKeyhole size={16} /> : <LockOpen size={16} />}
 				</Button>

@@ -1,7 +1,7 @@
-import { DragEvent, Fragment, useEffect, useMemo, useState } from "react";
+import { DragEvent, useCallback, useEffect } from "react";
 
 import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { useLayerManagerStore } from "@/view/stores/layerManagerStore";
+import { LayerView, useLayerManagerStore } from "@/view/stores/layerManagerStore";
 
 import { VStack } from "../../custom/stack/Stack";
 import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
@@ -10,70 +10,78 @@ import { ScrollArea } from "../../shadcn/scroll-area";
 import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerNodeRow from "./LayerNodeRow";
 import LayerMenuBar from "./LayerMenuBar";
-import { useTilemapEditorSessionStore } from "@/view/stores/tilemapEditorSessionStore";
-import { appCore } from "@/core/appcore";
+import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { LocalizedText } from "../../custom/LocalizeText";
 import { Button } from "../../shadcn/button";
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { DialogZLevel } from "@/shared/types/dialog";
+import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
+import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 
 export default function LayerManager() {
-	const { version, getFlatView, getSelectedLayers, setTargetLayer, refresh } = useLayerManagerStore();
-	useLayerManagerStore((s) => s.version);
+	const { layerViews, selectedLayers, setLayerViews, setSelectedLayer } = useLayerManagerStore();
 
-	const { version: tilemapVersion, currentTilemapSessionId } = useTilemapEditorSessionStore();
-	
-	const currentTilemapSession = useMemo(() => {
-		const tilemapSessionManager = appCore.workspaceManager.currentWorkspace?.tilemapSessionManager;
-		if (!tilemapSessionManager) return null;
-		return tilemapSessionManager.currentTilemapSession;
-	}, [tilemapVersion, version, currentTilemapSessionId]);
+	const { activeSession } = useTilemapSessionStore();
 
-	const selectedIds = useMemo(() => {
-		return getSelectedLayers();
-	}, [version, tilemapVersion, currentTilemapSessionId]);
-
-	const [isMounted, setIsMounted] = useState(false);
+	const updateLayerView = useCallback(() => {
+		if (!activeSession) {
+			setLayerViews([]);
+			return;
+		}
+		const root = activeSession.tilemap.rootLayer;
+		const result: LayerView[] = [];
+        const processLayer = (layer: BaseLayer, depth: number) => {
+			result.push({ id: layer.id, layer, depth });
+            if (layer instanceof GroupLayer && layer.isOpen) {
+                layer.layers.forEach(c => processLayer(c, depth + 1));
+            }
+        };
+        root.layers.forEach(c => processLayer(c, 0));
+		setLayerViews(result);
+	}, [activeSession, setLayerViews])
 
 	useEffect(() => {
-		setIsMounted(true);
-		refresh();
-	}, []);
+		if (!activeSession) return;
+	
+		updateLayerView();
+		setSelectedLayer(activeSession.layerState.selectedLayers);
+		activeSession.on("onSelectedLayersChanged", setSelectedLayer);
+		activeSession.on("onLayerChange", updateLayerView);
 
-	const flatView = useMemo(() => {
-		return getFlatView();
-	}, [version, tilemapVersion, currentTilemapSessionId]);
+		return () => {
+			activeSession.off("onSelectedLayersChanged", setSelectedLayer);
+			activeSession.off("onLayerChange", updateLayerView)
+			setLayerViews([]);
+			setSelectedLayer([]);
+		}
+	}, [activeSession])
 
-	const handleContainerDrop = (e: DragEvent) => {
+	const handleContainerDrop = useCallback((e: DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (!currentTilemapSession) return;
-		const root = currentTilemapSession.tilemap.rootLayer;
+		if (!activeSession) return;
+		const root = activeSession.tilemap.rootLayer;
 
 		const data = e.dataTransfer.getData("application/json");
 		if (!data) return;
 
-		try {
-			const { ids } = JSON.parse(data);
-			if (Array.isArray(ids) && ids.length > 0) {
-				TilemapLayerService.moveLayers(ids, root.id, "inside");
-			}
-		} catch (err) {
-			console.error("Container drop error:", err);
+		const { ids } = JSON.parse(data);
+		if (Array.isArray(ids) && ids.length > 0) {
+			TilemapLayerService.moveLayers(ids, root.id, "inside");
 		}
-	};
+	}, [activeSession])
 
-	const handleDragOver = (e: DragEvent) => {
+	const handleDragOver = useCallback((e: DragEvent) => {
 		e.preventDefault();
 		e.dataTransfer.dropEffect = "move";
-	};
+	}, [])
 
-	const onOpenChange = (open: boolean) => {
-		if (!open) setTargetLayer(null);
-	};
+	const onOpenChange = useCallback((open: boolean) => {
+		if (activeSession) activeSession.targetLayer = null;
+	}, [activeSession]);
 
-	if (!isMounted || !currentTilemapSession) {
+	if (!activeSession) {
 		return (
 			<VStack className="w-full h-full px-1 py-2 bg-surface" justify="center" align="center">
 				<VStack className="w-full h-full bg-surface-base shadow-sm" justify="center" align="center">
@@ -95,8 +103,8 @@ export default function LayerManager() {
 					<ContextMenuTrigger asChild>
 						<ScrollArea className="w-full h-full shadow-sm bg-surface-base">
 							<div className="flex flex-col w-full min-h-full pb-10">
-								{flatView.map((view) => (
-									<LayerNodeRow key={view.id} view={view} isSelected={selectedIds.includes(view.id)} />
+								{layerViews.map((view) => (
+									<LayerNodeRow key={view.id} view={view} isSelected={selectedLayers.includes(view.id)} />
 								))}
 							</div>
 							<div className="flex-1 min-h-[10px] h-full transition-colors" />
