@@ -11,35 +11,21 @@ export type ToolbarItemDisplayData = {
 }
 
 type ToolbarStore = {
-    version: number;
+    tools: ToolbarItemDisplayData[];
+    activeTool: string | null;
 
-    getTools: () => ToolbarItemDisplayData[];
-    getActiceTool: () => string | null
-    refresh: () => void
+    setTools: (tools: ToolbarItemDisplayData[]) => void;
+    setActiveTool: (activeTool: string | null) => void;
 }
 
 export const useToolbarStore = create<ToolbarStore>((set, get) => ({
-    version: 0,
+    tools: [],
+    activeTool: null,
 
-    getTools: () => {
-        const toolManager = appCore.toolManager;
-        const toolData: ToolbarItemDisplayData[] = [];
-        toolManager.getToolContexts().forEach((toolContext) => {
-            if (toolContext.displayOnToolbar) {
-                toolData.push({
-                    id: toolContext.id,
-                    icon: toolContext.displayOnToolbar.icon,
-                    tooltip: toolContext.displayOnToolbar.tooltip,
-                    shortcuts: toolContext.shortcuts,
-                    index: toolContext.displayOnToolbar.index ?? 1000
-                });
-            }
-        })
-        return toolData.sort((a, b) => a.index - b.index);
-    },
-    getActiceTool: () => {
-        const toolManager = appCore.toolManager;
-        return toolManager.getCurrentToolId();
-    },
-    refresh: () => set((state) => ({ version: (state.version + 1) % 100000 })) 
+    setActiveTool: (activeTool: string | null) => set({ activeTool }),
+    setTools: (tools: ToolbarItemDisplayData[]) => set({ tools }),
 }))
+
+appCore.toolManager.on("onToolChanged", (toolId) => {
+    useToolbarStore.getState().setActiveTool(toolId);
+})

@@ -12,6 +12,7 @@ import { Button } from "../../shadcn/button";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
 import { TilemapService } from "@/shared/services/tilemapService";
+import { useEffect } from "react";
 
 export default function TilemapEditorCanvas() {
 	const { pixiApp, activeSession,  setPixiApp } = useTilemapSessionStore();
@@ -25,6 +26,13 @@ export default function TilemapEditorCanvas() {
 		},
 		[pixiApp]
 	);
+
+	useEffect(() => {
+		if (!pixiApp) return;
+		return () => {
+			setPixiApp(null!);
+		}
+	}, [pixiApp])
 
 	const onInit = (pixiApp: Application) => {
 		setPixiApp(pixiApp);

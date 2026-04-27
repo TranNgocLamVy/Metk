@@ -8,7 +8,7 @@ import { Result } from "@/shared/types/result";
     name: "Redo",
     description: "",
     shortcuts: ["Ctrl+Y"],
-    when: "inWorkspace && !isModalOpen",
+    when: "tilmapSessionOpened && !isModalOpen",
 })
 export class RedoCommand implements ISystemCommand {
     public execute(context: EditorContext): Result {

@@ -11,11 +11,10 @@ import { VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/view/stores/dialogStore";
+import { useEffect } from "react";
 
 export default function TilesetViewCanvas() {
-	const { activeSession } = useTilesetSessionStore();
-
-	const { pixiApp, setPixiApp } = useTilesetSessionStore();
+	const { pixiApp, activeSession, setPixiApp } = useTilesetSessionStore();
 
 	const containerRef = useResizeObserver<HTMLDivElement>(
 		(entry) => {
@@ -26,6 +25,13 @@ export default function TilesetViewCanvas() {
 		},
 		[pixiApp]
 	);
+
+	useEffect(() => {
+		if (!pixiApp) return;
+		return () => {
+			setPixiApp(null!);
+		}
+	}, [pixiApp])
 
 	const onInit = (pixiApp: Application) => {
 		setPixiApp(pixiApp);

@@ -1,6 +1,7 @@
 import { Result } from "@/shared/types/result";
 import { ISerializer } from "./interface/ISerializer";
 import { IStorageProvider, StorageOptions } from "./interface/IStorageProvider";
+import { exists } from '@tauri-apps/plugin-fs';
 
 export class JsonFileRepository<T> {
     private writeQueues: Map<string, Promise<Result>> = new Map();
@@ -9,6 +10,11 @@ export class JsonFileRepository<T> {
         private serializer: ISerializer<T>,
         private defaultOptions?: StorageOptions,
     ) { }
+
+    public async exists(absFilePath: string): Promise<boolean> {
+        return await exists(absFilePath, this.defaultOptions);
+    }
+
 
     public async load(absFilePath: string): Promise<Result<T>> {
         const readResult = await this.storage.readTextFile(absFilePath, this.defaultOptions);
@@ -39,10 +45,6 @@ export class JsonFileRepository<T> {
         }
     }
 
-    public async remove(absPath: string, options?: StorageOptions): Promise<Result> {
-        return await this.storage.removeFile(absPath, options);
-    }
-
     private async performSave(absFilePath: string, data: any): Promise<Result> {
         try {
             const serializedResult = this.serializer.serialize(data);
@@ -52,5 +54,9 @@ export class JsonFileRepository<T> {
         } catch (error) {
             return Result.Error(`Disk write failed: ${error}`);
         }
+    }
+
+    public async remove(absPath: string, options?: StorageOptions): Promise<Result> {
+        return await this.storage.removeFile(absPath, options);
     }
 }

@@ -3,8 +3,6 @@ import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
 import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
-import { useLayoutStore } from "@/view/stores/layoutStore";
-import { Model } from "flexlayout-react";
 import { DialogService } from "./dialogService";
 import { Console } from "./consoleService";
 
@@ -22,21 +20,17 @@ export class WorkspaceService {
 
         const project = loadProjectResult.data;
 
+        const loadLayoutResult = await appCore.layoutManager.loadLayout(project);
+        if (loadLayoutResult.status !== Result.Status.Success) {
+            Console.error({ message: loadLayoutResult.message });
+        }
+
         const loadWorkspaceResult = await appCore.workspaceManager.loadProjectWorkspace(project);
         if (loadWorkspaceResult.status !== Result.Status.Success) {
             Console.error({ message: loadWorkspaceResult.message });
             return loadWorkspaceResult;
         }
         const workspace = loadWorkspaceResult.data;
-
-        // const loadLayoutResult = await appCore.layoutManager.loadLayout(project);
-        // if (loadLayoutResult.status !== Result.Status.Success) {
-        //     ToastService.error({ message: loadLayoutResult.message });
-        // } else {   
-        //     const workspaceLayout = loadLayoutResult.data;
-        //     useLayoutStore.getState().setModel(Model.fromJson(workspaceLayout));
-        // }
-        // FIXME: handle load layout;
         
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         const tilesetSessionManager = workspace.tilesetSessionManager;
@@ -51,23 +45,7 @@ export class WorkspaceService {
     }
 
     public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
-        if (!waitForTimeout) {
-            await appCore.workspaceManager.saveCurrentWorkspace();
-            return;
-        }
-
-        if (WorkspaceService.saveWorkspaceTimeout) {
-            clearTimeout(WorkspaceService.saveWorkspaceTimeout)
-            WorkspaceService.saveWorkspaceTimeout = null;
-        }
-        WorkspaceService.saveWorkspaceTimeout = setTimeout(async () => {
-            const result = await appCore.workspaceManager.saveCurrentWorkspace();
-            if (result.status !== Result.Status.Success) {
-                Console.error({ message: result.message });
-                return;
-            }
-            WorkspaceService.saveWorkspaceTimeout = null;
-        }, 1000);
+        await appCore.workspaceManager.saveCurrentWorkspace(waitForTimeout);
     }
 
 

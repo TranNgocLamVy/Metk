@@ -7,7 +7,7 @@ import { ITool, IToolContructor } from "../interface/ITool";
 import { TilemapView } from "../application/view/tilemapView";
 
 type ToolManagerEvent = {
-    onToolChanged: () => void;
+    onToolChanged: (toolId: string | null) => void;
 }
 
 export class ToolManager extends EventEmitter<ToolManagerEvent> {
@@ -35,7 +35,6 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         ToolManager.TOOL_REGISTRY.forEach((toolContext: ToolContext) => {
             this.registerTool(toolContext.id, toolContext.constructor);
         });
-        this.emit("onToolChanged");
     }
 
     public getToolContexts(): ToolContext[] {
@@ -78,7 +77,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
             if (this.activeTilemapSession && this.activeTilemapView) {
                 this.currentTool.attach(this.activeTilemapSession, this.activeTilemapView);
             }
-            this.emit("onToolChanged");
+            this.emit("onToolChanged", toolId);
         }
     }
 
@@ -88,7 +87,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
             this.currentTool.onDisable();
             this.currentTool = null;
             this.currentToolId = null;
-            this.emit("onToolChanged");
+            this.emit("onToolChanged", null);
         }
     }
 

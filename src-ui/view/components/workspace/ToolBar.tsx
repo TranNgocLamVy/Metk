@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { Fragment } from "react";
 
 import { appCore } from "@/core/appcore";
-import { useToolbarStore } from "@/view/stores/toolbarStore";
+import { ToolbarItemDisplayData, useToolbarStore } from "@/view/stores/toolbarStore";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import SVGIcon from "../custom/icons/SvgIcon";
@@ -10,13 +10,28 @@ import { Button } from "../shadcn/button";
 import QuickToolTip from "../custom/QuickToolTip";
 
 export default function ToolBar() {
-	const { version, getTools, getActiceTool } = useToolbarStore();
+	const { tools, activeTool, setTools } = useToolbarStore();
 
+	useEffect(() => {
+		const toolManager = appCore.toolManager;
+        const toolData: ToolbarItemDisplayData[] = [];
+        toolManager.getToolContexts().forEach((toolContext) => {
+            if (toolContext.displayOnToolbar) {
+                toolData.push({
+                    id: toolContext.id,
+                    icon: toolContext.displayOnToolbar.icon,
+                    tooltip: toolContext.displayOnToolbar.tooltip,
+                    shortcuts: toolContext.shortcuts,
+                    index: toolContext.displayOnToolbar.index ?? 1000
+                });
+            }
+        })
+		setTools(toolData.sort((a, b) => a.index - b.index));
 
-
-	const tools = useMemo(() => getTools(), [version]);
-
-	const activeTool = useMemo(() => getActiceTool(), [version]);
+		return () => {
+			setTools([]);
+		}
+	}, [])
 
 	const changeTool = (toolId: string) => {
 		const toolManager = appCore.toolManager;

@@ -16,6 +16,8 @@ type WorkspaceManagerEvent = {
 export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
     public currentWorkspace: Workspace | null = null;
     private editorContext: EditorContext;
+    private saveTimeout: NodeJS.Timeout | null = null;
+
     public constructor() {
         super();
     }
@@ -29,28 +31,51 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
         this.currentWorkspace = null;
 
         const workspaceAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "session.json"));
-        const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
-        if (loadSessionResult.status === Result.Status.Success) {
-            this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
-        } else {
+
+        const workspaceExist = await WorkspaceStorageService.exists(workspaceAbsPath);
+        if (!workspaceExist) {
             this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
+            await this.saveCurrentWorkspace();
+        } else {            
+            const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
+            if (loadSessionResult.status === Result.Status.Success) {
+                this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
+            } else {
+                this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
+                await this.saveCurrentWorkspace();
+            }
         }
         await this.currentWorkspace.loadSession();
         this.emit("onWorkspaceLoaded", this.currentWorkspace);
         return Result.Success(this.currentWorkspace!);
     }
 
-    public async unloadWorkspace(): Promise<void> {
-        if (!this.currentWorkspace) return;
-        await this.currentWorkspace.destroy();
-        this.currentWorkspace = null;
-        this.emit("onWorkspaceUnloaded");
+    public async saveCurrentWorkspace(waitForTimeout: boolean = true): Promise<Result> {
+        if (!waitForTimeout) return await this.performSaveWorkspace();
+
+        if (this.saveTimeout) {
+            clearTimeout(this.saveTimeout);
+        }
+
+        this.saveTimeout = setTimeout(() => {
+            this.performSaveWorkspace();
+        }, 1000);
+
+        return Result.Success();
     }
 
-    public async saveCurrentWorkspace(): Promise<Result> {
-        if (!this.currentWorkspace) return Result.Error("No current workspace");
+    private async performSaveWorkspace(): Promise<Result> {
+        if (!this.currentWorkspace) return Result.Cancel();
         const workspaceData = this.currentWorkspace.serialize();
         const workspaceAbsPath = this.currentWorkspace.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "session.json"));
         return await WorkspaceStorageService.save(workspaceAbsPath, workspaceData);
+    }
+
+    public async unloadWorkspace(): Promise<void> {
+        if (!this.currentWorkspace) return;
+        if (this.saveTimeout) clearTimeout(this.saveTimeout);
+        await this.currentWorkspace.destroy();
+        this.currentWorkspace = null;
+        this.emit("onWorkspaceUnloaded");
     }
 }
