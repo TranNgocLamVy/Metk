@@ -119,13 +119,9 @@ export default function TilemapEditor() {
         const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
-        console.log(sessionViewRefMap.current.has(session.id));
-        
         if (sessionViewRefMap.current.has(session.id)) return;
         const newSessionView = new TilemapSessionView(session);
         sessionViewRefMap.current.set(session.id, newSessionView);
-        
-        console.log(sessionViewRefMap.current);
         
         updateTilemapSessionList();
     })

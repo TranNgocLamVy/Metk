@@ -151,6 +151,7 @@ export class EraserTool implements ITool {
     }
 
     private onPointerDown(e: FederatedPointerEvent) {
+        if (e.button !== 0) return;
         if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
         this.isDragging = true;
         this.previousPreviewCoordinate = this.targetLayer.posToCoord(this.getLocalPos(e));

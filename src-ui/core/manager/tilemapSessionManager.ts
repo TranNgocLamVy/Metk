@@ -98,7 +98,8 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         tilemapSession.destroy();
 
         this.tilemapSessionMap.delete(sessionId);
-
+        this.tilemapMap.delete(tilemapSession.tilemap.id);
+        
         const currentProject = this.editorContext.currentProject;
         if (!currentProject) return;
 

@@ -26,6 +26,7 @@ export default function LayerManager() {
 	const updateLayerView = useCallback(() => {
 		if (!activeSession) {
 			setLayerViews([]);
+			setSelectedLayer([]);
 			return;
 		}
 		const root = activeSession.tilemap.rootLayer;
