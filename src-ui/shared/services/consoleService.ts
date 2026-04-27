@@ -30,6 +30,7 @@ export class Console {
         const timestamp = Date.now();
         payload.stacks = payload.stacks ?? [];
         payload.stacks.filter(stack => stack !== undefined);
+        console.trace(payload);
         useConsoleStore.getState().addError({ id, uiId, timestamp, ...payload });
     }
 

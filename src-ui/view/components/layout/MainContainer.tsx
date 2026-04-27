@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useNavigationStore } from "@/view/stores/navigationStore";
 
 import SecurityShield from "./SecurityShield";
-import { useToolbarStore } from "@/view/stores/toolbarStore";
-import { appCore } from "@/core/appcore";
 
 interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: React.ReactNode;
@@ -29,17 +27,6 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 			}
 		}
 	}, [containerRef.current]);
-
-	const { refresh } = useToolbarStore();
-	useLayoutEffect(() => {
-		const toolManager = appCore.toolManager;
-
-		toolManager.on("onToolChanged", refresh);
-
-		return () => {
-			toolManager.off("onToolChanged", refresh);
-		}
-	}, [])
 
 	return (
 		<main id="main-container" {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-surface-base">

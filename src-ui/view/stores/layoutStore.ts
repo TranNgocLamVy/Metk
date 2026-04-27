@@ -1,16 +1,24 @@
-import { workspaceLayout } from "@/shared/constant/workspaceJsonModel";
+import { appCore } from "@/core/appcore";
 import { Model } from "flexlayout-react";
 import { create } from "zustand";
 
 
 type LayoutState = {
-	model: Model;
-	setModel: (model: Model) => void;
+	model: Model | null;
+	setModel: (model: Model | null) => void;
 };
 
 export const useLayoutStore = create<LayoutState>((set, get) => {
 	return {
-		model: Model.fromJson(workspaceLayout),
-		setModel: (model: Model) => { set({ model }) },
+		model: null,
+		setModel: (model) => { set({ model }) },
 	};
+});
+
+appCore.layoutManager.on("onLayoutLoaded", (layout) => {
+	useLayoutStore.getState().setModel(Model.fromJson(layout));
+});
+
+appCore.layoutManager.on("onLayoutUnloaded", () => {
+	useLayoutStore.getState().setModel(null);
 });

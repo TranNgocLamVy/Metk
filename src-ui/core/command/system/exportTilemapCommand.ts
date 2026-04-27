@@ -13,7 +13,7 @@ import { Console } from "@/shared/services/consoleService";
     name: "Export Tilemap",
     description: "",
     shortcuts: ["Ctrl+E"],
-    when: "inWorkspace && !isModalOpen",
+    when: "tilmapSessionOpened && !isModalOpen",
 })
 export class ExportTilemapTMXCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {

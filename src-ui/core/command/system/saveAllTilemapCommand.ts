@@ -9,7 +9,7 @@ import { Result } from "@/shared/types/result";
     name: "Save All",
     description: "",
     shortcuts: ["Ctrl+Shift+S"],
-    when: "inWorkspace && !isModalOpen",
+    when: "tilmapSessionOpened && !isModalOpen",
 })
 export class SaveAllTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {

@@ -4,45 +4,59 @@ import { Result } from "@/shared/types/result";
 import { IJsonModel } from "flexlayout-react";
 import { LayoutStorageService } from "@/infrastructure/container";
 import { workspaceLayout } from "@/shared/constant/workspaceJsonModel";
+import EventEmitter from "eventemitter3";
 
-export class LayoutManager {
+interface LayoutManagerEvents {
+    onLayoutLoaded: (layout: IJsonModel) => void;
+    onLayoutUnloaded: () => void;
+}
+
+export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
     public layoutData: IJsonModel | null = null;
     private project: Project | null = null;
     private saveTimeout: NodeJS.Timeout | null = null;
 
-    public constructor() { }
+    public constructor() {
+        super();
+    }
 
     public async loadLayout(project: Project): Promise<Result<IJsonModel>> {
         this.project = project;
         const layoutAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "layout.json"));
 
-        const loadResult = await LayoutStorageService.load(layoutAbsPath);
-
-        if (loadResult.status === Result.Status.Success) {
-            this.layoutData = loadResult.data;
-        } else {
+        const layoutExist = await LayoutStorageService.exists(layoutAbsPath);
+        if (!layoutExist) {
             this.layoutData = workspaceLayout;
+            await this.performSaveLayout();
+        } else {
+            const loadResult = await LayoutStorageService.load(layoutAbsPath);
+            if (loadResult.status === Result.Status.Success) {
+                this.layoutData = loadResult.data;
+            } else {
+                this.layoutData = workspaceLayout;
+                await this.performSaveLayout();
+            }
         }
-
+        this.emit("onLayoutLoaded", this.layoutData);
         return Result.Success(this.layoutData);
     }
 
     public updateLayout(newLayout: IJsonModel): void {
         this.layoutData = newLayout;
-        this.saveLayout();
+        this.saveCurrentLayout();
     }
 
-    private saveLayout(): void {
+    private saveCurrentLayout(): void {
         if (this.saveTimeout) {
             clearTimeout(this.saveTimeout);
         }
 
         this.saveTimeout = setTimeout(() => {
-            this.performSave();
+            this.performSaveLayout();
         }, 500);
     }
 
-    private async performSave(): Promise<Result> {
+    private async performSaveLayout(): Promise<Result> {
         if (!this.project || !this.layoutData) return Result.Cancel();
 
         const layoutAbsPath = this.project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "layout.json"));
@@ -53,5 +67,6 @@ export class LayoutManager {
         if (this.saveTimeout) clearTimeout(this.saveTimeout);
         this.layoutData = null;
         this.project = null;
+        this.emit("onLayoutUnloaded");
     }
 }

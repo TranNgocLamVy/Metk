@@ -1,7 +1,7 @@
 import "@/assets/style/flexLayout/workspace.css";
 
-import { Action, IJsonModel, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
-import { useEffect, useRef } from "react";
+import { Action, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
+import { useRef } from "react";
 
 import { useRelativeFlexLayout } from "@/view/hooks/useRelativeFlexLayout";
 import { useLayoutStore } from "@/view/stores/layoutStore";
@@ -12,16 +12,15 @@ import TilesetViewSelector from "./tilesetView/TilesetViewSelector";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
-import { useContextScope } from "@/view/hooks/useContextScope";
 import { appCore } from "@/core/appcore";
 import { LocalizedText } from "../custom/LocalizeText";
 
 export default function Workspace() {
 
-	const { model, setModel } = useLayoutStore();
+	const { model } = useLayoutStore();
+	
 	const layoutRef = useRef<Layout | null>(null);
 	
-	useContextScope("inWorkspace", true);
 	useRelativeFlexLayout(layoutRef);
 
 	const factory = (node: TabNode) => {
@@ -72,7 +71,7 @@ export default function Workspace() {
 		<HStack className="w-full h-full">
 			<VStack className="w-full h-full bg-surface">
 				<VStack className="workspace w-full h-full px-1 relative">
-					<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
+					{model && <Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />}
 					<div className="top-0 left-0 w-full h-full absolute pointer-events-none" />
 				</VStack>
 				<ContextBar />
