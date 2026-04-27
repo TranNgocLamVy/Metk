@@ -4,25 +4,21 @@ import { Button } from "../../shadcn/button";
 import QuickToolTip from "../../custom/QuickToolTip";
 import { RulesetService } from "@/shared/services/rulesetService";
 import { useCallback, useMemo } from "react";
-import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
+import { useRulesetStore } from "@/view/stores/rulesetStore";
 import { DialogService } from "@/shared/services/dialogService";
 
 export default function RulesetMenuBar() {
-    const { version, getCurrentSelectedRuleId } = useRulesetManagerStore();
-
-    const selectedRuleId = useMemo(() => {
-        return getCurrentSelectedRuleId();
-    }, [version]);
+    const { currentSelectedRuleId } = useRulesetStore();
 
     const onEditRule = useCallback(() => {
-        if (!selectedRuleId) return;
-        DialogService.openEditRulesetDialog(selectedRuleId);
-    }, [selectedRuleId])
+        if (!currentSelectedRuleId) return;
+        DialogService.openEditRulesetDialog(currentSelectedRuleId);
+    }, [currentSelectedRuleId])
 
     const onDeleteRule = useCallback(() => {
-        if (!selectedRuleId) return;
-        RulesetService.deleteRuleset(selectedRuleId);
-    }, [selectedRuleId])
+        if (!currentSelectedRuleId) return;
+        RulesetService.deleteRuleset(currentSelectedRuleId);
+    }, [currentSelectedRuleId])
 
     return (
         <HStack className="bg-surface absolute bottom-1 w-full px-1 py-1 gap-0.5">
@@ -32,12 +28,12 @@ export default function RulesetMenuBar() {
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.rulesetManager.menu.edit"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!selectedRuleId} onClick={onEditRule}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!currentSelectedRuleId} onClick={onEditRule}>
                     <Pen />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.rulesetManager.menu.delete"}>
-                <Button variant={"ghost"} size={"icon-sm"} className="text-destructive" disabled={!selectedRuleId} onClick={onDeleteRule}>
+                <Button variant={"ghost"} size={"icon-sm"} className="text-destructive" disabled={!currentSelectedRuleId} onClick={onDeleteRule}>
                     <Trash2 />
                 </Button>
             </QuickToolTip>

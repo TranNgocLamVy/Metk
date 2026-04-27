@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Workspace } from '../../core/application/workspace';
 import { appCore } from '@/core/appcore';
+import { Workspace } from '@/core/application/workspace';
 
 interface WorkspaceState {
     activeWorkspace: Workspace | null;
@@ -8,8 +8,9 @@ interface WorkspaceState {
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set) => {
+    const workspace = appCore.workspaceManager.currentWorkspace;
     return {
-        activeWorkspace: null,
+        activeWorkspace: workspace,
         setActiveWorkspace: (workspace) => set({ activeWorkspace: workspace }),
     }
 });

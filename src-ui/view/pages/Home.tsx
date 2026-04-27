@@ -1,30 +1,19 @@
 import { FolderPlus, SquareArrowOutUpRight, X } from "lucide-react";
-import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ProjectService } from "@/shared/services/projectService";
 import { HStack, VStack } from "@/view/components/custom/stack/Stack";
 import { Button } from "@/view/components/shadcn/button";
-import { useProjectManagerStore } from "@/view/stores/projectManagerStore";
-import { appCore } from "@/core/appcore";
 import { useContextScope } from "../hooks/useContextScope";
 import { LocalizedText } from "@/view/components/custom/LocalizeText";
+import { useProjectStore } from "../stores/projectStore";
 
 export default function HomePage() {
 	const navigate = useNavigate();
-	const { getProjects, version } = useProjectManagerStore()
+
+	const { projects } = useProjectStore();
 
 	useContextScope("inHome", true);
-
-	const projects = useMemo(() => {
-		return getProjects();
-	}, [version])
-
-	useEffect(() => {
-		appCore.projectManager.unLoadProject();
-		appCore.workspaceManager.unloadWorkspace();
-		appCore.layoutManager.unloadLayout();
-	}, [])
 
 	return (
 		<VStack align="center" justify="center" className="w-full h-full bg-surface-base">

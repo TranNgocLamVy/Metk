@@ -1,37 +1,50 @@
-import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
+import { useRulesetStore } from "@/view/stores/rulesetStore";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
 import { ScrollArea, ScrollBar } from "../../shadcn/scroll-area";
-import { MouseEvent, useCallback, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
 import { RulesetManagerContextMenu } from "./ContextMenu";
-import { Button } from "../../shadcn/button";
-import { Pen, Trash } from "lucide-react";
-import { RulesetService } from "@/shared/services/rulesetService";
-import { DialogService } from "@/shared/services/dialogService";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import RulesetMenuBar from "./RulesetMenuBar";
+import { useRulesetManagerEvent } from "@/view/hooks/useRulesetManagerEvent";
+import { useWorkspaceStore } from "@/view/stores/workspaceStore";
+import { useProjectStore } from "@/view/stores/projectStore";
 
 
 
 export default function RulesetManager() {
-    const { version, getRulesetDisplayData, getCurrentSelectedRuleId } = useRulesetManagerStore();
+    const { activeWorkspace } = useWorkspaceStore();
+    const { activeProject } = useProjectStore();
 
-    const rulesets = useMemo(() => {
-        return getRulesetDisplayData();
-    }, [version]);
+    const { rulesetDisplayDatas, currentSelectedRuleId, setCurrentSelectedRuleId, setRulesetDisplayData } = useRulesetStore();
 
-    const selectedRuleId = useMemo(() => {
-        return getCurrentSelectedRuleId();
-    }, [version]);
+    useEffect(() => {
+        if (!activeWorkspace || !activeProject) return;
+
+        const selectedRuleset = activeWorkspace.rulesetSessionManager.getSelectedRuleId();
+        setCurrentSelectedRuleId(selectedRuleset);
+        setRulesetDisplayData(activeProject.rulesetManager.serialize().map(ruleset => ({ id: ruleset.id, name: ruleset.name, color: ruleset.color })))
+
+        return () => {
+            setCurrentSelectedRuleId(null);
+            setRulesetDisplayData([]);
+        }
+    }, [activeWorkspace])
+
+    useRulesetManagerEvent("onRulesetManagerUpdated", (rulesets) => {
+        setRulesetDisplayData(rulesets.map(ruleset => ({ id: ruleset.id, name: ruleset.name, color: ruleset.color })))
+    })
 
     const onSelectRule = useCallback((rulesetId: string) => {
-        if (selectedRuleId === rulesetId) {
+        if (currentSelectedRuleId === rulesetId) {
             WorkspaceService.selectRuleset(null);
+            setCurrentSelectedRuleId(null);
         } else {
             WorkspaceService.selectRuleset(rulesetId);
+            setCurrentSelectedRuleId(rulesetId);
         }
-    }, [selectedRuleId]);
+    }, [currentSelectedRuleId]);
 
     return (
         <VStack className="w-full h-full relative overflow-hidden bg-surface">
@@ -40,8 +53,8 @@ export default function RulesetManager() {
                     <ContextMenuTrigger className="w-full h-full">
                         <ScrollArea className="w-full h-full no-scrollbar bg-surface-base rounded-lg shadow-sm">
                             <div className="flex flex-col w-full min-h-full pb-10">
-                                {rulesets.map((ruleset) => {
-                                    const isSelected = selectedRuleId === ruleset.id;
+                                {rulesetDisplayDatas.map((ruleset) => {
+                                    const isSelected = currentSelectedRuleId === ruleset.id;
                                     return (
                                         <HStack onClick={() => onSelectRule(ruleset.id)} key={ruleset.id}
                                             className={`flex items-center justify-center gap-2 p-2 ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}

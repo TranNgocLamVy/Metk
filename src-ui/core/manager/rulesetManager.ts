@@ -9,8 +9,13 @@ import { RulesetRefManager } from "./rulesetRefManager";
 import { PathUtils } from "@/shared/utils/pathUtils";
 import { Console } from "@/shared/services/consoleService";
 import { CatchError } from "../decorator/catchResultError";
+import EventEmitter from "eventemitter3";
 
-export class RulesetManager {
+export interface RulesetManagerEvent {
+    onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
+}
+
+export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
     public readonly rulesetMetadatas: Map<string, RulesetMetadata> = new Map<string, RulesetMetadata>(); // id -> ruleMetadata
     private loadedRulesets: Map<string, Ruleset> = new Map<string, Ruleset>(); // id -> ruleset
 
@@ -19,7 +24,9 @@ export class RulesetManager {
     public constructor(
         private readonly tilesetManager: TilesetManager,
         private readonly projectPathSystem: ProjectPathSystem,
-    ) { }
+    ) {
+        super();
+    }
 
     public addRulesetMetadata(ruleMetadata: RulesetMetadata): void {
         this.rulesetMetadatas.set(ruleMetadata.id, ruleMetadata);
@@ -49,6 +56,8 @@ export class RulesetManager {
             this.tilesetManager.loadTilesets(tilesetDepIds),
             this.loadRulesets(rulesetDepIds),
         ])
+
+        this.emit("onRulesetManagerUpdated", this.serialize());
 
         return Result.Success(newRuleset);
     }
@@ -155,6 +164,7 @@ export class RulesetManager {
         const ruleset = this.loadedRulesets.get(rulesetData.id);
         if (!ruleset) return;
         ruleset.updateRuleset(rulesetData);
+        this.emit("onRulesetManagerUpdated", this.serialize());
         Console.success({ message: { key: "message.ruleset.updatedSuccess", options: { name: rulesetData.name } } })
     }
 
@@ -165,7 +175,13 @@ export class RulesetManager {
         if (this.loadedRulesets.has(id)) await this.unloadRuleset(id);
 
         this.rulesetMetadatas.delete(id);
+        this.loadedRulesets.delete(id);
+        this.pendingLoads.delete(id);
+
         Console.log({ message: { key: "message.ruleset.removeSuccess", options: { name: rulesetMetadata.name } } });
+
+        this.emit("onRulesetManagerUpdated", this.serialize());
+
         return Result.Success();
     }
 
@@ -188,11 +204,15 @@ export class RulesetManager {
             Console.error({ message: "message.ruleset.deleteFail", stacks: [deletionResult.message!, ...deletionResult.stacks!] })
             return Result.Error("message.ruleset.deleteFail", deletionResult);
         }
+
         this.rulesetMetadatas.delete(id);
         this.loadedRulesets.delete(id);
         this.pendingLoads.delete(id);
 
         Console.log({ message: { key: "message.ruleset.deleteSuccess", options: { name: rulesetMetadata.name } } });
+
+        this.emit("onRulesetManagerUpdated", this.serialize());
+        
         return Result.Success();
     }
 

@@ -2,12 +2,12 @@ import { appCore } from "@/core/appcore";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
-import { useRulesetManagerStore } from "@/view/stores/rulesetManagerStore";
+import { useRulesetStore } from "@/view/stores/rulesetStore";
 import { DialogService } from "./dialogService";
 import { Console } from "./consoleService";
 
 export class WorkspaceService {
-    private static saveWorkspaceTimeout: NodeJS.Timeout | null = null; 
+    private static saveWorkspaceTimeout: NodeJS.Timeout | null = null;
 
     public static async loadProjectWorkspace(projectId: string): Promise<Result> {
         const projectManager = appCore.projectManager;
@@ -31,17 +31,21 @@ export class WorkspaceService {
             return loadWorkspaceResult;
         }
         const workspace = loadWorkspaceResult.data;
-        
+
         const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         const tilesetSessionManager = workspace.tilesetSessionManager;
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
         if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
-        
-        useRulesetManagerStore.getState().refresh();
 
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 
         return Result.Success();
+    }
+
+    public static async unloadProjectWorkspace(): Promise<void> {
+        appCore.projectManager.unLoadProject();
+        appCore.workspaceManager.unloadWorkspace();
+        appCore.layoutManager.unloadLayout();
     }
 
     public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
@@ -131,7 +135,7 @@ export class WorkspaceService {
         const currentProject = appCore.editorContext.currentProject;
         const currentWorkspace = appCore.workspaceManager.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
-        
+
         const tilemapSessionManager = currentWorkspace.tilemapSessionManager;
         const tilemapSession = tilemapSessionManager.getSession(sessionId);
         if (!tilemapSession) return;
@@ -159,7 +163,6 @@ export class WorkspaceService {
         const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
         if (!rulesetSessionManager) return;
         rulesetSessionManager.setSelectedRuleId(rulesetId);
-        useRulesetManagerStore.getState().refresh();
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }
 }

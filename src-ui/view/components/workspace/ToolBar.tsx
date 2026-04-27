@@ -10,11 +10,12 @@ import { Button } from "../shadcn/button";
 import QuickToolTip from "../custom/QuickToolTip";
 
 export default function ToolBar() {
-	const { tools, activeTool, setTools } = useToolbarStore();
+	const { tools, activeTool, setTools, setActiveTool } = useToolbarStore();
 
 	useEffect(() => {
 		const toolManager = appCore.toolManager;
         const toolData: ToolbarItemDisplayData[] = [];
+
         toolManager.getToolContexts().forEach((toolContext) => {
             if (toolContext.displayOnToolbar) {
                 toolData.push({
@@ -27,6 +28,7 @@ export default function ToolBar() {
             }
         })
 		setTools(toolData.sort((a, b) => a.index - b.index));
+		setActiveTool(toolManager.getCurrentToolId())
 
 		return () => {
 			setTools([]);
