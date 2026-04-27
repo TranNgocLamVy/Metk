@@ -5,15 +5,15 @@ import TilesetViewCanvas from "./TilesetViewCanvas";
 import TilesetViewTabs from "./TilesetViewTabs";
 import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 import { useCallback, useEffect, useRef } from "react";
-import { TilesetSessionView } from "@/core/application/session/tilesetSessionView";
 import { useTilesetSessionEvent } from "@/view/hooks/useTilesetSessionEvent";
+import { TilesetView } from "@/core/application/view/tilesetView";
 
-export default function TilesetView() {
+export default function TilesetViewSelector() {
 	const { activeWorkspace } = useWorkspaceStore();
 	const { pixiApp, setTilesetSessions } = useTilesetSessionStore();
 
-	const activeSessionViewRef = useRef<{ id: string, view: TilesetSessionView } | null>(null);
-	const sessionViewRefMap = useRef<Map<string, TilesetSessionView>>(new Map());
+	const activeViewRef = useRef<{ id: string, view: TilesetView } | null>(null);
+	const viewRefMap = useRef<Map<string, TilesetView>>(new Map());
 
 	const updateTilesetSessionList = useCallback(() => {
 		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
@@ -24,32 +24,32 @@ export default function TilesetView() {
 		setTilesetSessions(sessionList);
 	}, [])
 
-	const activateSessionView = useCallback((sessionView: TilesetSessionView) => {
+	const activateView = useCallback((view: TilesetView) => {
 		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
 		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
 		const tilesetSessionManager = activeWorkspace.tilesetSessionManager;
 
-		sessionView.activateSession(pixiApp);
-		activeSessionViewRef.current = { id: sessionView.session.id, view: sessionView };
+		view.activateView(pixiApp);
+		activeViewRef.current = { id: view.session.id, view: view };
 
-		tilesetSessionManager.registerActiveSessionView(sessionView);
+		tilesetSessionManager.registerActiveView(view);
 
-		useTilesetSessionStore.getState().setActiveSession(sessionView.session);
+		useTilesetSessionStore.getState().setActiveSession(view.session);
 	}, [])
 
-	const deactivateCurrentSessionView = useCallback(() => {
-		const activeSessionView = activeSessionViewRef.current;
+	const deactivateCurrentView = useCallback(() => {
+		const activeView = activeViewRef.current;
 		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
 
-		if (!activeWorkspace || !activeSessionView) return;
+		if (!activeWorkspace || !activeView) return;
 
-		activeSessionView.view.unActivateSession();
-		activeSessionViewRef.current = null;
+		activeView.view.unActivateView();
+		activeViewRef.current = null;
 
 		const tilesetSessionManager = activeWorkspace!.tilesetSessionManager;
-		tilesetSessionManager.unregisterActiveSessionView();
+		tilesetSessionManager.unregisterActiveView();
 
 		useTilesetSessionStore.getState().setActiveSession(null);
 	}, [])
@@ -61,22 +61,22 @@ export default function TilesetView() {
 		const currentSession = tilesetSessionManager.activeSession;
 
 		if (currentSession) {
-			const newSessionView = new TilesetSessionView(currentSession);
-			sessionViewRefMap.current.set(currentSession.id, newSessionView);
-			activateSessionView(newSessionView);
+			const newView = new TilesetView(currentSession);
+			viewRefMap.current.set(currentSession.id, newView);
+			activateView(newView);
 		}
 
 		updateTilesetSessionList();
 
 		return () => {
-			sessionViewRefMap.current.forEach((sessionView) => {
-				sessionView.destroy();
+			viewRefMap.current.forEach((view) => {
+				view.destroy();
 			})
-			sessionViewRefMap.current.clear();
+			viewRefMap.current.clear();
 
-			activeSessionViewRef.current = null;
+			activeViewRef.current = null;
 
-			tilesetSessionManager.unregisterActiveSessionView();
+			tilesetSessionManager.unregisterActiveView();
 		}
 	}, [activeWorkspace, pixiApp])
 
@@ -85,18 +85,18 @@ export default function TilesetView() {
 		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
-		const activeSessionView = activeSessionViewRef.current;
-		if (activeSessionView && session.id === activeSessionView.id) return;
-		if (activeSessionView) deactivateCurrentSessionView();
+		const activeView = activeViewRef.current;
+		if (activeView && session.id === activeView.id) return;
+		if (activeView) deactivateCurrentView();
 
-		let newCurrentSessionView = sessionViewRefMap.current.get(session.id);
-		if (!newCurrentSessionView) {
-			newCurrentSessionView = new TilesetSessionView(session);
-			sessionViewRefMap.current.set(session.id, newCurrentSessionView);
+		let newCurrentView = viewRefMap.current.get(session.id);
+		if (!newCurrentView) {
+			newCurrentView = new TilesetView(session);
+			viewRefMap.current.set(session.id, newCurrentView);
 		}
 
 		updateTilesetSessionList();
-		activateSessionView(newCurrentSessionView);
+		activateView(newCurrentView);
 	})
 
 	useTilesetSessionEvent("onCreateTilesetSession", (session) => {
@@ -104,9 +104,9 @@ export default function TilesetView() {
 		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
-		if (sessionViewRefMap.current.has(session.id)) return;
-		const newSessionView = new TilesetSessionView(session);
-		sessionViewRefMap.current.set(session.id, newSessionView);
+		if (viewRefMap.current.has(session.id)) return;
+		const newView = new TilesetView(session);
+		viewRefMap.current.set(session.id, newView);
 
 		updateTilesetSessionList();
 	})
@@ -116,12 +116,12 @@ export default function TilesetView() {
 		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
-		const activeSessionView = activeSessionViewRef.current;
-		if (activeSessionView && sessionId === activeSessionView.id) deactivateCurrentSessionView();
+		const activeView = activeViewRef.current;
+		if (activeView && sessionId === activeView.id) deactivateCurrentView();
 
-		const sessionView = sessionViewRefMap.current.get(sessionId);
-		if (sessionView) sessionView.destroy();
-		sessionViewRefMap.current.delete(sessionId);
+		const view = viewRefMap.current.get(sessionId);
+		if (view) view.destroy();
+		viewRefMap.current.delete(sessionId);
 
 		updateTilesetSessionList();
 	})

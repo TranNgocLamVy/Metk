@@ -7,7 +7,7 @@ import { TilemapManager } from "./tilemapManager";
 import { Result } from "@/shared/types/result";
 import { Console } from "@/shared/services/consoleService";
 import { CatchError } from "../decorator/catchResultError";
-import { TilemapSessionView } from "../application/session/tilemapSessionView";
+import { TilemapView } from "../application/view/tilemapView";
 
 export type TilemapSessionManagerEvent = {
     onCreateTilemapSession: (session: TilemapSession) => void;
@@ -20,7 +20,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
     private tilemapMap: Map<string, string> = new Map<string, string>(); // tilemapId -> sessionId
     
     public activeSession: TilemapSession | null = null;
-    private activeSessionView: TilemapSessionView | null = null;
+    private activeView: TilemapView | null = null;
 
     public get tilemapsSession(): TilemapSession[] {
         return Array.from(this.tilemapSessionMap.values());
@@ -117,16 +117,16 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         return this.tilemapSessionMap.get(sessionId) || null;
     }
 
-    public getActiveSessionView(): TilemapSessionView | null {
-        return this.activeSessionView;
+    public getActiveView(): TilemapView | null {
+        return this.activeView;
     }
 
-    public registerActiveSessionView(view: TilemapSessionView | null) {
-        this.activeSessionView = view
+    public registerActiveView(view: TilemapView | null) {
+        this.activeView = view
     }
 
-    public unregisterActiveSessionView() {
-        this.activeSessionView = null;
+    public unregisterActiveView() {
+        this.activeView = null;
     }
 
     public serialize(): TilemapSessionManagerData {

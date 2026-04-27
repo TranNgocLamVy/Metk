@@ -14,7 +14,7 @@ import { Result } from "@/shared/types/result";
 export class SaveTilemapCommand implements ISystemCommand {
     public async execute(context: EditorContext): Promise<Result> {
         const currentProject = context.currentProject;
-        const tilemapSession = context.getCurrentTilemapSession();
+        const tilemapSession = context.getActiveTilemapSession();
         if (!currentProject) return Result.Cancel();
         if (!tilemapSession) return Result.Cancel();
         const tilemap = tilemapSession.tilemap;

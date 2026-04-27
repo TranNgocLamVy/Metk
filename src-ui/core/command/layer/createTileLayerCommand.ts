@@ -17,7 +17,7 @@ export class CreateTileLayerCommand implements IBaseCommand {
     ) { }
 
     public execute(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession()
+        const currentSession = context.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
@@ -37,7 +37,7 @@ export class CreateTileLayerCommand implements IBaseCommand {
     }
 
     public undo(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession()
+        const currentSession = context.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         const tileLayer = root.findLayer(this.tileLayerId) as TileLayer;

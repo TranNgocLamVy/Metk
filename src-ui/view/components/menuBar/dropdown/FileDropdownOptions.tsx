@@ -113,7 +113,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 		startIcon: <Save />,
 		disabled: () => {
 			const editorContext = appCore.editorContext;
-			const currentSession = editorContext.getCurrentTilemapSession();
+			const currentSession = editorContext.getActiveTilemapSession();
 			if (!currentSession) return true;
 			return !currentSession.isDirty;
 		},
@@ -180,7 +180,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 					startIcon: <FolderUp />,
 					disabled: () => {
 						const editorContext = appCore.editorContext;
-						const currentSession = editorContext.getCurrentTilemapSession();
+						const currentSession = editorContext.getActiveTilemapSession();
 						if (!currentSession) return true;
 						return !currentSession.isDirty;
 					},

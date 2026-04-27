@@ -151,14 +151,14 @@ const GridGroup: MenuDropDownGroupType = [
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const sessionView = appCore.editorContext.getCurrentTilemapSessionView();
-            if (!sessionView) return false;
-            return sessionView.grid.gridEnabled
+            const activeTilemapView = appCore.editorContext.getActiveTilemapView();
+            if (!activeTilemapView) return false;
+            return activeTilemapView.grid.gridEnabled
         },
         toggle() {
-            const sessionView = appCore.editorContext.getCurrentTilemapSessionView();
-            if (!sessionView) return;
-            return sessionView.toggleGrid();
+            const activeTilemapView = appCore.editorContext.getActiveTilemapView();
+            if (!activeTilemapView) return;
+            return activeTilemapView.toggleGrid();
         },
     }
 ];
@@ -171,13 +171,13 @@ const DeleteGroup: MenuDropDownGroupType = [
         variant: "destructive",
 		disabled: () => {
 			const editorContext = appCore.editorContext;
-			const currentTilemapSession = editorContext.getCurrentTilemapSession();
+			const currentTilemapSession = editorContext.getActiveTilemapSession();
 			if (!currentTilemapSession) return true;
 			return false;
 		},
         onClick: () => {
             const editorContext = appCore.editorContext;
-			const currentTilemapSession = editorContext.getCurrentTilemapSession();
+			const currentTilemapSession = editorContext.getActiveTilemapSession();
 			if (!currentTilemapSession) return;
 			TilemapService.deleteTilemap(currentTilemapSession.tilemap.id);
         }

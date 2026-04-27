@@ -8,7 +8,7 @@ import { useLayoutStore } from "@/view/stores/layoutStore";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import ContextBar from "./ContextBar";
-import TilesetView from "./tilesetView/TilesetView";
+import TilesetViewSelector from "./tilesetView/TilesetViewSelector";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
@@ -28,7 +28,7 @@ export default function Workspace() {
 		const component = node.getComponent();
 		switch (component) {
 			case "tilesetView":
-				return <TilesetView />;
+				return <TilesetViewSelector />;
 			case "layerManager":
 				return <LayerManager />;
 			case "tilemapEditor":

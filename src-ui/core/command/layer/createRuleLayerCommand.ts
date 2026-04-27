@@ -18,7 +18,7 @@ export class CreateRuleLayerCommand implements IBaseCommand {
     ) { }
 
     public execute(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession()
+        const currentSession = context.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const tilemap = currentSession.tilemap;
         const root = tilemap.rootLayer;
@@ -39,7 +39,7 @@ export class CreateRuleLayerCommand implements IBaseCommand {
     }
 
     public undo(context: EditorContext): Result {
-        const currentSession = context.getCurrentTilemapSession()
+        const currentSession = context.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         const ruleLayer = root.findLayer(this.ruleLayerId) as RuleLayer;

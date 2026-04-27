@@ -7,7 +7,7 @@ import TilemapEditorCanvas from "./TilemapEditorCanvas";
 import TilemapEditorTabs from "./TilemapEditorTabs";
 import { useTilemapSessionStore } from "@/view/stores/tilemapSessionStore";
 import { useCallback, useEffect, useRef } from "react";
-import { TilemapSessionView } from "@/core/application/session/tilemapSessionView";
+import { TilemapView } from "@/core/application/view/tilemapView";
 import { useTilemapSessionEvent } from "@/view/hooks/useTilemapSessionEvent";
 import { appCore } from "@/core/appcore";
 
@@ -15,8 +15,8 @@ export default function TilemapEditor() {
     const { activeWorkspace } = useWorkspaceStore();
     const { pixiApp, setTilemapSessions } = useTilemapSessionStore();
 
-    const activeSessionViewRef = useRef<{ id: string, view: TilemapSessionView } | null>(null);
-    const sessionViewRefMap = useRef<Map<string, TilemapSessionView>>(new Map());
+    const activeViewRef = useRef<{ id: string, view: TilemapView } | null>(null);
+    const viewRefMap = useRef<Map<string, TilemapView>>(new Map());
 
     const updateTilemapSessionList = useCallback(() => {
         const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
@@ -27,7 +27,7 @@ export default function TilemapEditor() {
         setTilemapSessions(sessionList);
     }, [])
 
-    const activateSessionView = useCallback((sessionView: TilemapSessionView) => {
+    const activateView = useCallback((view: TilemapView) => {
         const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
         const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
@@ -35,33 +35,33 @@ export default function TilemapEditor() {
         const toolManager = appCore.toolManager;
         const tilemapSessionManager = activeWorkspace.tilemapSessionManager;
 
-        sessionView.activateSession(pixiApp);
-        activeSessionViewRef.current = { id: sessionView.session.id, view: sessionView };
+        view.activateView(pixiApp);
+        activeViewRef.current = { id: view.session.id, view: view };
 
-        tilemapSessionManager.registerActiveSessionView(sessionView);
-        toolManager.setActiveSession(sessionView.session, sessionView);
+        tilemapSessionManager.registerActiveView(view);
+        toolManager.setActiveSession(view.session, view);
 
-        sessionView.session.on("onMarkChange", updateTilemapSessionList);
+        view.session.on("onMarkChange", updateTilemapSessionList);
 
-        useTilemapSessionStore.getState().setActiveSession(sessionView.session);
+        useTilemapSessionStore.getState().setActiveSession(view.session);
     }, [])
 
-    const deactivateCurrentSessionView = useCallback(() => {
-        const activeSessionView = activeSessionViewRef.current;
+    const deactivateCurrentView = useCallback(() => {
+        const activeView = activeViewRef.current;
         const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
         
-        if (!activeWorkspace || !activeSessionView) return;
+        if (!activeWorkspace || !activeView) return;
 
-        activeSessionView.view.unActivateSession();
-        activeSessionViewRef.current = null;
+        activeView.view.unActivateView();
+        activeViewRef.current = null;
 
         const toolManager = appCore.toolManager;
         toolManager.setActiveSession(null, null);
 
         const tilemapSessionManager = activeWorkspace!.tilemapSessionManager;
-        tilemapSessionManager.unregisterActiveSessionView();
+        tilemapSessionManager.unregisterActiveView();
 
-        activeSessionView.view.session.off("onMarkChange", updateTilemapSessionList);
+        activeView.view.session.off("onMarkChange", updateTilemapSessionList);
 
         useTilemapSessionStore.getState().setActiveSession(null);
     }, [])
@@ -75,53 +75,53 @@ export default function TilemapEditor() {
         const currentSession = tilemapSessionManager.activeSession;
 
         if (currentSession) {
-            const newSessionView = new TilemapSessionView(currentSession);
-            sessionViewRefMap.current.set(currentSession.id, newSessionView);
-            activateSessionView(newSessionView);
+            const newView = new TilemapView(currentSession);
+            viewRefMap.current.set(currentSession.id, newView);
+            activateView(newView);
         }
 
         updateTilemapSessionList();
 
         return () => {
-            sessionViewRefMap.current.forEach((sessionView) => {
-                sessionView.destroy();
+            viewRefMap.current.forEach((view) => {
+                view.destroy();
             })
-            sessionViewRefMap.current.clear();
+            viewRefMap.current.clear();
 
-            activeSessionViewRef.current?.view.session.off("onMarkChange", updateTilemapSessionList);
-            activeSessionViewRef.current = null;
+            activeViewRef.current?.view.session.off("onMarkChange", updateTilemapSessionList);
+            activeViewRef.current = null;
 
-            tilemapSessionManager.unregisterActiveSessionView();
+            tilemapSessionManager.unregisterActiveView();
             toolManager.setActiveSession(null, null);
         }
     }, [activeWorkspace, pixiApp])
 
-    useTilemapSessionEvent("onOpenTilemapSession", (session) => {
+    useTilemapSessionEvent("onOpenTilemapSession", async (session) => {
         const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
         const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
-        const activeSessionView = activeSessionViewRef.current;
-        if (activeSessionView && session.id === activeSessionView.id) return;
-        if (activeSessionView) deactivateCurrentSessionView();
+        const activeView = activeViewRef.current;
+        if (activeView && session.id === activeView.id) return;
+        if (activeView) deactivateCurrentView();
 
-        let newCurrentSessionView = sessionViewRefMap.current.get(session.id);
-        if (!newCurrentSessionView) {
-            newCurrentSessionView = new TilemapSessionView(session);
-            sessionViewRefMap.current.set(session.id, newCurrentSessionView);
+        let newCurrentView = viewRefMap.current.get(session.id);
+        if (!newCurrentView) {
+            newCurrentView = new TilemapView(session);
+            viewRefMap.current.set(session.id, newCurrentView);
         }
 
-        activateSessionView(newCurrentSessionView);
+        activateView(newCurrentView);
     })
 
-    useTilemapSessionEvent("onCreateTilemapSession", (session) => {
+    useTilemapSessionEvent("onCreateTilemapSession", async (session) => {
         const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
         const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
-        if (sessionViewRefMap.current.has(session.id)) return;
-        const newSessionView = new TilemapSessionView(session);
-        sessionViewRefMap.current.set(session.id, newSessionView);
+        if (viewRefMap.current.has(session.id)) return;
+        const newView = new TilemapView(session);
+        viewRefMap.current.set(session.id, newView);
         
         updateTilemapSessionList();
     })
@@ -131,12 +131,12 @@ export default function TilemapEditor() {
         const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
-        const activeSessionView = activeSessionViewRef.current;
-        if (activeSessionView && sessionId === activeSessionView.id) deactivateCurrentSessionView();
+        const activeView = activeViewRef.current;
+        if (activeView && sessionId === activeView.id) deactivateCurrentView();
 
-        const sessionView = sessionViewRefMap.current.get(sessionId);
-        if (sessionView) sessionView.destroy();
-        sessionViewRefMap.current.delete(sessionId);
+        const view = viewRefMap.current.get(sessionId);
+        if (view) view.destroy();
+        viewRefMap.current.delete(sessionId);
 
         updateTilemapSessionList();
     })

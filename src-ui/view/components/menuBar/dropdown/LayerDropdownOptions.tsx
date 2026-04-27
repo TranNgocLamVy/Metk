@@ -4,13 +4,13 @@ import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Columns3Cog, Copy, 
 
 const isTilemapSessionOpen = (): boolean => {
 	const editorContext = appCore.editorContext;
-	const tilemapSession = editorContext.getCurrentTilemapSession();
+	const tilemapSession = editorContext.getActiveTilemapSession();
 	return !!tilemapSession;
 }
 
 const numSelectedLayers = (): number => {
 	const editorContext = appCore.editorContext;
-	const tilemapSession = editorContext.getCurrentTilemapSession();
+	const tilemapSession = editorContext.getActiveTilemapSession();
 	if (!tilemapSession) return 0;
 	return tilemapSession.layerState.selectedLayers.length;
 }

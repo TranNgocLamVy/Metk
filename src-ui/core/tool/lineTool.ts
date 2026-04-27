@@ -11,7 +11,7 @@ import { GroupLayer } from "../application/tile/layer/groupLayer";
 
 import icon from "@/assets/icons/ruler.svg?raw";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
-import { TilemapSessionView } from "../application/session/tilemapSessionView";
+import { TilemapView } from "../application/view/tilemapView";
 
 @Tool({
     id: "tool.line",
@@ -29,7 +29,7 @@ export class LineTool implements ITool {
     private activeDrawStrategy: IDrawStrategy | null = null;
 
     private currentSession: TilemapSession | null = null;
-    private currentSessionView: TilemapSessionView | null = null;
+    private currentView: TilemapView | null = null;
 
     private overlayContainer: Container | null = null;
 
@@ -76,12 +76,12 @@ export class LineTool implements ITool {
         this.currentMousePosition = null!;
     }
 
-    public attach(session: TilemapSession, view: TilemapSessionView): void {
+    public attach(session: TilemapSession, view: TilemapView): void {
         this.currentSession = session;
-        this.currentSessionView = view;
+        this.currentView = view;
 
-        const viewport = this.currentSessionView.viewport;
-        this.overlayContainer = this.currentSessionView.overlayerContainer;
+        const viewport = this.currentView.viewport;
+        this.overlayContainer = this.currentView.overlayerContainer;
 
         viewport.on("pointerdown", this.bindPointerOnDown);
         viewport.on("pointermove", this.bindPointerOnMove);
@@ -94,8 +94,8 @@ export class LineTool implements ITool {
     }
 
     public detach(): void {
-        if (!this.currentSession || !this.currentSessionView) return;
-        const viewport = this.currentSessionView.viewport;
+        if (!this.currentSession || !this.currentView) return;
+        const viewport = this.currentView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
         viewport.off("pointermove", this.bindPointerOnMove);
@@ -223,7 +223,7 @@ export class LineTool implements ITool {
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {
-        const localPosition = this.currentSessionView!.viewport.toLocal(new Point(e.global.x, e.global.y));
+        const localPosition = this.currentView!.viewport.toLocal(new Point(e.global.x, e.global.y));
         return { x: localPosition.x, y: localPosition.y };
     }
 
