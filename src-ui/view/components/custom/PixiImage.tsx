@@ -1,13 +1,18 @@
+import { appCore } from "@/core/appcore";
 import { TextureUtils } from "@/shared/utils/textureUtils";
-import { Application, Texture } from "pixi.js";
+import { Texture } from "pixi.js";
 import { useEffect, useState } from "react";
 
-export default function PixiImage({ texture }: { texture: Texture, pixiApp?: Application }) {
+export default function PixiImage({ texture }: { texture: Texture | null }) {
     const [imgSrc, setImgSrc] = useState<string>('');
 
     useEffect(() => {
-        if (!texture) return;
-        TextureUtils.extractTexture(texture).then(setImgSrc);
+        const loadTexture = async () => {
+            const renderTexture = texture ? texture : await appCore.textureManager.getErrorTexture();
+            const imageSrc = await TextureUtils.extractTexture(renderTexture);
+            setImgSrc(imageSrc);
+        }
+        loadTexture();
     }, [texture]);
 
     if (!imgSrc) return null;

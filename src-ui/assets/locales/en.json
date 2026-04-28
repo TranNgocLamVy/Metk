@@ -39,6 +39,9 @@
                 "remove": "Remove Tileset",
                 "delete": "Delete Tileset"
             },
+            "texture": {
+                "import": "Import Texture"
+            },
             "ruleset": {
                 "create": "New Ruleset",
                 "open": "Open Ruleset",
@@ -468,6 +471,12 @@
                 "title": "Save Ruleset"
             }
         },
+        "import": {
+            "textureMismatchSize": {
+                "title": "Invalid Texture Size",
+                "description": "The imported texture has different dimensions than the original, which may affect rendering. Replace anyway?"
+            }
+        },
         "delete": {
             "tilemap": {
                 "title": "Delete Tilemap",
@@ -504,9 +513,7 @@
         }
     },
     "message": {
-        "project": {
-
-        },
+        "project": {},
         "tilemap": {
             "loadSuccess": "Tilemap loaded",
             "createSuccess": "Tilemap created successfully",
@@ -518,7 +525,6 @@
             "deleteSuccess": "Tilemap deleted: {{name}}",
             "exportSuccess": "Tilemap '{{name}}' exported successfull",
             "importSuccess": "Tilemap '{{name}}' imported successfully",
-
             "loadFail": "Tilemap load failed: name: {{name}} - id: {{id}}",
             "createFail": "Tilemap creation failed",
             "openFail": "Tilemap open failed",
@@ -540,7 +546,6 @@
             "updatedSuccess": "Tileset updated: {{name}}",
             "deleteSuccess": "Tileset deleted: {{name}}",
             "importSuccess": "Tileset '{{name}}' imported successfully",
-
             "loadFail": "Tileset load failed",
             "createFail": "Tileset creation failed",
             "openFail": "Tileset open failed",
@@ -552,6 +557,11 @@
             "mismatchId": "Mismatching id between tileset",
             "unknownError": "Unknown error when load tileset"
         },
+        "texture": {
+            "missing": "Missing texture for tileset: {{name}}",
+            "importSuccess": "Texture imported successfully",
+            "importFail": "Texture import failed"
+        },
         "ruleset": {
             "loadSuccess": "Ruleset loaded",
             "createSuccess": "Ruleset created successfully",
@@ -561,7 +571,6 @@
             "deleteSuccess": "Ruleset deleted: {{name}}",
             "removeSuccess": "Ruleset removed: {{name}}",
             "importSuccess": "Ruleset imported successfully",
-
             "loadFail": "Ruleset load failed: name: {{name}} - id: {{id}}",
             "createFail": "Ruleset creation failed",
             "openFail": "Ruleset open failed",
@@ -584,10 +593,10 @@
             },
             "unknownError": {
                 "default": "Unknown error",
-
                 "loadProject": "Unknown error when load project",
                 "loadTilemap": "Unknown error when load tilemap",
                 "loadTileset": "Unknown error when load tileset",
+                "loadTexture": "Unknown error when load texture",
                 "loadRuleset": "Unknown error when load ruleset",
                 "loadTilemapSession": "Unknown error when load tilemap session",
                 "loadTilesetSession": "Unknown error when load tileset session"

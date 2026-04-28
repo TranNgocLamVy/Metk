@@ -16,6 +16,8 @@ export class TilesetRenderer {
 
     private sprites: Sprite[] = [];
 
+    private bindOnTextureReloaded: (tilesetId: string) => void;
+
     constructor(context: CreateTilesetRendererContext) {
         this.tileset = context.tileset as Tileset;
         this.gap = context.gap;
@@ -23,16 +25,28 @@ export class TilesetRenderer {
         this.container = new Container();
         this.container.position.set(0, 0);
 
-        // TODO: Fix: Get textureManager from passing context
-        const textureManager = appCore.editorContext.textureManager;
+        this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
+        appCore.textureManager.on("onTextureReloaded", this.bindOnTextureReloaded);
 
-        this.tileset.tiles.forEach((tile, index) => {
-            const tex = textureManager.getTileTexture(this.tileset.id, index);
-            if (!tex) return;
-            const sprite = this.makeTileSprite(tex, index, this.container);
+        this.renderTiles();
+    }
+
+    public async renderTiles(): Promise<void> {
+        const textureManager = appCore.editorContext.textureManager;
+        this.container.removeChildren();
+        let errorTexture: Texture | null = null;
+        for (let i = 0; i < this.tileset.tiles.length; i++) {
+            let texture = textureManager.getTileTexture(this.tileset.id, i);
+            if (!texture) {
+                if (!errorTexture) errorTexture = await textureManager.getErrorTexture();
+                texture = errorTexture;
+            }
+            const sprite = this.makeTileSprite(texture, i, this.container);
+            sprite.width = this.tileset.tilewidth;
+            sprite.height = this.tileset.tileheight;
             this.sprites.push(sprite);
             this.container.addChild(sprite);
-        })
+        }
     }
 
     public setGap(gap: number): void {
@@ -64,7 +78,15 @@ export class TilesetRenderer {
         return { x, y };
     }
 
+    private onTextureReloaded(tilesetId: string) {
+        if (tilesetId === this.tileset.id) {
+            this.renderTiles();
+        }
+    }
+
     public destroy(): void {
-        this.container.destroy({ children: true });
+        this.sprites.forEach(s => s.destroy());
+        this.container.destroy();
+        appCore.textureManager.off("onTextureReloaded", this.bindOnTextureReloaded);
     }
 }

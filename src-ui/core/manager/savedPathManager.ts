@@ -12,6 +12,10 @@ export class SavedPathManager {
         savePathData.exportPaths.forEach((data) => {
             if (data.exportPath) this.exportPathMap.set(data.tilemapId, data.exportPath);
         })
+        this.tilemapDir = savePathData.tilemapDir;
+        this.tilesetDir = savePathData.tilesetDir;
+        this.rulesetDir = savePathData.rulesetDir;
+        this.textureDir = savePathData.textureDir;
     }
 
     public getExportPath(tilemapId: string): string | null {

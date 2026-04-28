@@ -103,6 +103,11 @@ export class Tileset extends BaseObject<TilesetEvent> {
             });
         }
     }
+
+    public updateTexturePath(textureRelPath: string) {
+        this.image.source = textureRelPath;
+        this.eventEmitter.emit("updateProperty", "image", this.image);
+    }
 }
 
 export class Tile extends BaseObject {

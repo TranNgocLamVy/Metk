@@ -13,14 +13,16 @@ type CreateRuleLayerRendererContext = {
 export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     private sprites: Map<string, Sprite> = new Map(); // Id -> Sprite
     private bindOnTilesChanged: (coordinates: Coordinate[]) => void
-
+    private bindOnTextureReloaded: (tilesetId: string) => void;
     constructor(context: CreateRuleLayerRendererContext) {
         super(context.layer, context.tilemap);
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
+        this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
+        this.layer.eventEmitter.on("rulesetRefsOutputChanged", this.bindOnTilesChanged);
+        appCore.textureManager.on("onTextureReloaded", this.bindOnTextureReloaded);
 
         this.renderLayer();
-        this.layer.eventEmitter.on("rulesetRefsOutputChanged", this.bindOnTilesChanged);
     }
 
     private renderLayer(): void {
@@ -42,10 +44,9 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         let currentSprite = this.sprites.get(key);
 
         if (!rulesetRef) {
-            if (currentSprite) {
-                currentSprite.destroy();
-                this.sprites.delete(key);
-            }
+            if (!currentSprite) return;
+            currentSprite.destroy();
+            this.sprites.delete(key);
             return;
         }
 
@@ -56,38 +57,46 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         }
 
         const drawPotision = this.layer.coordToPos({ col: x, row: y});
-
-        currentSprite.width = this.tilemap.tilewidth;
-        currentSprite.height = this.tilemap.tileheight;
         currentSprite.x = drawPotision.x;
         currentSprite.y = drawPotision.y;
 
+        // TODO: Get textureManager from passing context
         const textureManager = appCore.editorContext.textureManager;
-        const output = rulesetRef.output;
-        
-        let hasRenderedTexture = false;
 
-        if (output != undefined) {
-            const texture = textureManager.getTileTexture(output.tilesetId, output.tileId);
-            if (texture) {
-                currentSprite.texture = texture;
-                currentSprite.tint = 0xFFFFFF; // Clear tint to show natural texture colors
-                hasRenderedTexture = true;
-            }
-        }
-        
-        // Fallback to ruleset color if output is unresolved or texture is missing
-        if (!hasRenderedTexture) {
-            const ruleset = this.layer.rulesetRefManager.rulesetManager.getRulesetById(rulesetRef.rulesetId);
+        const output = rulesetRef.output;
+        const outputTexture = output ? textureManager.getTileTexture(output.tilesetId, output.tileId) : null;
+        const ruleset = this.layer.rulesetRefManager.rulesetManager.getRulesetById(rulesetRef.rulesetId);
+
+        if (!output && ruleset) {
             currentSprite.texture = Texture.WHITE;
             currentSprite.tint = ruleset ? new Color(ruleset.color) : 0xFF0000;
+            currentSprite.width = this.tilemap.tilewidth;
+            currentSprite.height = this.tilemap.tileheight;
+        } else if (outputTexture) {
+            currentSprite.texture = outputTexture;
+            currentSprite.tint = 0xFFFFFF; // Clear tint to show natural texture colors
+            currentSprite.width = outputTexture.width;
+            currentSprite.height = outputTexture.height;
+        } else {
+            const errorTexture = await textureManager.getErrorTexture();
+            currentSprite.texture = errorTexture;
+            currentSprite.tint = 0xFFFFFF; // Clear tint to show natural texture colors
+            currentSprite.width = this.tilemap.tilewidth;
+            currentSprite.height = this.tilemap.tileheight;
+        }
+    }
+
+    private onTextureReloaded(tilesetId: string) {
+        const tilesetIds = this.tilemap.tilesetRefManager.serialize().refs.map(ref => ref.id);
+        if (tilesetIds.includes(tilesetId)) {
+            this.renderLayer();
         }
     }
 
     public override destroy(): void {
-        this.layer.eventEmitter.off("rulesetRefsOutputChanged", this.bindOnTilesChanged);
         super.destroy();
-
+        this.layer.eventEmitter.off("rulesetRefsOutputChanged", this.bindOnTilesChanged);
+        appCore.textureManager.off("onTextureReloaded", this.bindOnTextureReloaded);
         this.sprites.forEach(s => s.destroy());
         this.sprites.clear();
     }

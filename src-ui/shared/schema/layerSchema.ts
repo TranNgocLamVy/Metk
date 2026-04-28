@@ -75,7 +75,7 @@ export const defaultRuleLayerData = (data: Pick<RuleLayerData, "parentId" | "wid
     return {
         id: uuidv4(),
         parentId: data.parentId,
-        name: "New Tile Layer",
+        name: "New Rule Layer",
         type: "auto_rule" as const,
         width: data.width,
         height: data.height,

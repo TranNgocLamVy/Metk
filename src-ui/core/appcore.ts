@@ -78,8 +78,6 @@ export class AppCore {
         const projectRepoData = projectRepoResult.data;
         AppCore.getIns().projectManager.load(projectRepoData);
 
-        await AppCore.getIns().textureManager.loadDefaultTextures();
-
         this.isLoaded = true;
         return Result.Success(this);
     }

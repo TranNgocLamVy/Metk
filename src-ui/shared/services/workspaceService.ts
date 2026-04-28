@@ -1,14 +1,10 @@
 import { appCore } from "@/core/appcore";
-import { useTilesetSessionStore } from "@/view/stores/tilesetSessionStore";
 
 import { Result } from "../types/result";
-import { useRulesetStore } from "@/view/stores/rulesetStore";
 import { DialogService } from "./dialogService";
 import { Console } from "./consoleService";
 
 export class WorkspaceService {
-    private static saveWorkspaceTimeout: NodeJS.Timeout | null = null;
-
     public static async loadProjectWorkspace(projectId: string): Promise<Result> {
         const projectManager = appCore.projectManager;
 
@@ -32,12 +28,11 @@ export class WorkspaceService {
         }
         const workspace = loadWorkspaceResult.data;
 
-        const tilesetPixiApp = useTilesetSessionStore.getState().pixiApp;
         const tilesetSessionManager = workspace.tilesetSessionManager;
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
-        if (currentTilesetSessionId && tilesetPixiApp) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
+        if (currentTilesetSessionId) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false }); // Can be remove
 
         return Result.Success();
     }

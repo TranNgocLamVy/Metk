@@ -20,8 +20,6 @@ export default function OutputList() {
                     if (!tilesetId) return null;
                     const textureManager = appCore.editorContext.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, tileRef.tileId);
-                    if (!tilesetTexture) return null;
-                    
                     return (
                         <div key={`${tilesetId}-${tileRef.tileId}`} className='w-full aspect-square border border-foreground/20'>
                             <PixiImage texture={tilesetTexture} />

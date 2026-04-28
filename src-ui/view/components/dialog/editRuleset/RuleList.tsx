@@ -62,7 +62,6 @@ function RuleItem({ rule, index }: { rule: Rule, index: number }) {
                         if (!tilesetId) return null;
                         const textureManager = appCore.editorContext.textureManager;
                         const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
-                        if (!tilesetTexture) return null;
                         return <PixiImage texture={tilesetTexture} />;
                     })()}
                 </div>

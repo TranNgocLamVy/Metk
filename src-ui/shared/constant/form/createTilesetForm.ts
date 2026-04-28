@@ -37,6 +37,7 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                         multiple: false,
                         label: "form.tileset.image.source",
                         required: true,
+                        filter: { name: "Image", extensions: ["png", "jpg", "jpeg"]} 
                     },
                     {
                         id: "useTransparentColor",

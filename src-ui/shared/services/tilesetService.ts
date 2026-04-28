@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { appCore } from "@/core/appcore";
-import { TilesetData, TilesetMetadata } from "@/shared/schema/tilesetSchema";
+import { TilesetData } from "@/shared/schema/tilesetSchema";
 
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { PathUtils } from "../utils/pathUtils";
@@ -12,6 +12,8 @@ import { DialogService } from "./dialogService";
 import { createTilesetForm } from "../constant/form/createTilesetForm";
 import i18n from "@/core/service/i18n";
 import { Console } from "./consoleService";
+import { readFile } from "@tauri-apps/plugin-fs";
+import { TextureUtils } from "../utils/textureUtils";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
@@ -41,17 +43,20 @@ export class TilesetService {
 
         const imageRelPath = PathUtils.relative(tilesetAbsDir, imageAbsPath);
 
-        // TODO: Load texture to get texture's size
+        const fileBuffer = await readFile(imageAbsPath); // TODO: move readFile to infrastructure;
+        const image = await TextureUtils.processImage(fileBuffer);
+        const columns = Math.ceil(image.width / form.image.setting.tile.tilewidth);
+        const rows = Math.ceil(image.height / form.image.setting.tile.tileheight);
 
         const tilesetData: TilesetData = {
             id: uuidv4(),
             name: form.tileset.name,
-            columns: 0,
-            rows: 0,
+            columns: columns,
+            rows: rows,
             image: {
                 source: imageRelPath,
-                width: 0,
-                height: 0,
+                width: image.width,
+                height: image.height,
             },
             tiles: [],
             tilewidth: form.image.setting.tile.tilewidth,
@@ -133,7 +138,7 @@ export class TilesetService {
             currentProject.rulesetManager.removeTilesetRef(tilesetId)
         ])
 
-        // TODO: Unload texture
+        appCore.textureManager.forceUnloadTexture(tilesetId);
 
         if (removeResult.status !== Result.Status.Success) return Result.Cancel();
 
