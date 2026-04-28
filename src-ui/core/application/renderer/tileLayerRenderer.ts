@@ -14,16 +14,18 @@ type CreateTileLayerRendererContext = {
 export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     private sprites: Map<string, Sprite> = new Map(); // key: `${col},${row}` -> Sprite
 
-    private bindOnTilesChanged: (coords: Coordinate[]) => void
+    private bindOnTilesChanged: (coords: Coordinate[]) => void;
+    private bindOnTextureReloaded: (tilesetId: string) => void;
 
     constructor(context: CreateTileLayerRendererContext) {
         super(context.layer, context.tilemap);
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
-
-        // Initial render
+        this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
+        this.layer.eventEmitter.on("tilesChanged", this.bindOnTilesChanged)
+        appCore.textureManager.on("onTextureReloaded", this.bindOnTextureReloaded);
+        
         this.renderLayer();
-        this.layer.eventEmitter.on("tilesChanged", this.bindOnTilesChanged);
     }
 
     private renderLayer(): void {
@@ -44,43 +46,53 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     private async renderTile(col: number, row: number): Promise<void> {
         const tileRef = this.layer.getTileRefAt({ col: col, row: row });
         const key = `${col},${row}`;
-        const currentSprite = this.sprites.get(key);
+        let currentSprite = this.sprites.get(key);
         if (!tileRef) {
-            if (currentSprite) {
-                currentSprite.destroy();
-                this.sprites.delete(key);
-            }
+            if (!currentSprite) return;
+            currentSprite.destroy();
+            this.sprites.delete(key);
             return;
         }
 
-        // TODO: Fix: Get textureManager from passing context
-        const textureManager = appCore.editorContext.textureManager;
-        const texture = textureManager.getTileTexture(tileRef.tilesetId, tileRef.tileId);
-
-        // TODO: Handle unfound tileset, render error texture
-        if (!texture) return;
+        if (!currentSprite) {
+            currentSprite = new Sprite();
+            this.container.addChild(currentSprite);
+            this.sprites.set(key, currentSprite);
+        }
 
         const drawPotision = this.layer.coordToPos({ col, row });
-
-        if (currentSprite) {
-            currentSprite.texture = texture;
-            currentSprite.x = drawPotision.x;
-            currentSprite.y = drawPotision.y;
+        currentSprite.x = drawPotision.x;
+        currentSprite.y = drawPotision.y;
+        
+        // TODO: Get textureManager from passing context
+        const textureManager = appCore.editorContext.textureManager;
+        const texture = textureManager.getTileTexture(tileRef.tilesetId, tileRef.tileId);
+        
+        if (!texture) {
+            const errorTexture = await textureManager.getErrorTexture();
+            currentSprite.texture = errorTexture;
+            currentSprite.width = this.tilemap.tilewidth;
+            currentSprite.height = this.tilemap.tileheight;
         } else {
-            const sprite = new Sprite(texture);
-            sprite.x = drawPotision.x;
-            sprite.y = drawPotision.y;
+            currentSprite.texture = texture;
+            currentSprite.width = texture.width;
+            currentSprite.height = texture.height;
+        }
+    }
 
-            this.container.addChild(sprite);
-            this.sprites.set(key, sprite);
+    private onTextureReloaded(tilesetId: string) {
+        const tilesetIds = this.tilemap.tilesetRefManager.serialize().refs.map(ref => ref.id);
+        if (tilesetIds.includes(tilesetId)) {
+            this.renderLayer();
         }
     }
 
     public override destroy(): void {
-        this.layer.eventEmitter.off("tilesChanged", this.bindOnTilesChanged);
         super.destroy();
-        
+        this.layer.eventEmitter.off("tilesChanged", this.bindOnTilesChanged);
+        appCore.textureManager.off("onTextureReloaded", this.bindOnTextureReloaded);
         this.sprites.forEach(s => s.destroy());
         this.sprites.clear();
+
     }
 }

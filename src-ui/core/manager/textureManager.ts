@@ -1,19 +1,34 @@
-import { ImageSource, Rectangle, Texture } from "pixi.js";
+import { EventEmitter } from "eventemitter3";
+import { Assets, ImageSource, Rectangle, Texture } from "pixi.js";
 import { Result } from "@/shared/types/result";
 import { Tileset } from "../application/tile/tileset";
 import { exists, readFile } from "@tauri-apps/plugin-fs";
+import errorTexture from "@/assets/sprites/Missing_texture.png"
+import { TextureUtils } from "@/shared/utils/textureUtils";
+import { Console } from "@/shared/services/consoleService";
+import { CatchError } from "../decorator/catchResultError";
 
-export class TextureManager {
+interface TextureManagerEvent {
+    onTextureReloaded: (tilesetId: string) => void;
+}
+
+export class TextureManager extends EventEmitter<TextureManagerEvent> {
     private tileTexturesCache: Map<string, Map<number, Texture>> = new Map(); // tilesetId -> Map<tileId, Texture>
     private baseTexturesCache: Map<string, Texture> = new Map(); // tilesetId -> Base Texture
 
     private refCounts: Map<string, number> = new Map();
     private pendingLoads: Map<string, Promise<Result>> = new Map();
+    private errorTexture: Texture | null = null;
 
-    constructor() { }
+    constructor() {
+        super();
+    }
 
-    public async loadDefaultTextures(): Promise<void> {
-
+    public async getErrorTexture(): Promise<Texture> {
+        if (this.errorTexture) return this.errorTexture;
+        const texture = await Assets.load({ src: errorTexture, data: { scaleMode: 'nearest' } });
+        this.errorTexture = texture;
+        return texture;
     }
 
     public async retainTilesetGraphics(tileset: Tileset): Promise<Result> {
@@ -36,7 +51,22 @@ export class TextureManager {
     private async performLoad(tileset: Tileset): Promise<Result> {
         const tilesetAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(tileset.image.source);
         const loadResult = await this.loadTexture(tilesetAbsPath);
-        if (loadResult.status === Result.Status.Error) return loadResult;
+        if (loadResult.status === Result.Status.Error) {
+            const customId = "loadTextureFail:" + tileset.id;
+            Console.error({
+                message: { key: "message.texture.missing", options: { name: tileset.name } },
+                stacks: loadResult.message ? [loadResult.message] : [],
+                actions: [{
+                    label: "global.action.texture.import", variant: "outline",
+                    onClick: async () => {
+                        const { TextureService } = await import("@/shared/services/textureService");
+                        return await TextureService.importTexture(tileset.id);
+                    }
+
+                }]
+            }, customId)
+            return loadResult;
+        }
 
         const baseTexture = loadResult.data!;
         this.baseTexturesCache.set(tileset.id, baseTexture);
@@ -54,25 +84,13 @@ export class TextureManager {
         return Result.Success();
     }
 
+    @CatchError("message.system.unknownError.loadTexture")
     private async loadTexture(textureAbsPath: string): Promise<Result<Texture | null>> {
-        // TODO: Move load texture logic into Infrastructure
-        const exist = await exists(textureAbsPath);
-        if (!exist) return Result.Error(`Texture file not found at ${textureAbsPath}`);
-        try {
-            const fileBuffer = await readFile(textureAbsPath);
-
-            const blob = new Blob([new Uint8Array(fileBuffer)], { type: 'image' });
-            const url = URL.createObjectURL(blob);
-
-            const image = new Image();
-            image.src = url;
-            await image.decode();
-
-            const texture = new Texture({ source: new ImageSource({ resource: image, scaleMode: "nearest" }) })
-            return Result.Success(texture);
-        } catch (error) {
-            return Result.Error(`Failed to load texture error: ${error}`);
-        }
+        const exist = await exists(textureAbsPath); // TODO: Move load texture logic into Infrastructure
+        if (!exist) return Result.Error({ key: "message.system.fs.fileNotFoundAt", options: { path: textureAbsPath } });
+        const fileBuffer = await readFile(textureAbsPath);
+        const texture = await TextureUtils.processTexture(fileBuffer);
+        return Result.Success(texture);
     }
 
     public releaseTilesetGraphics(tilesetId: string): void {
@@ -87,11 +105,30 @@ export class TextureManager {
         } else {
             this.refCounts.set(tilesetId, newCount);
         }
+        this.emit("onTextureReloaded", tilesetId);
     }
 
     public forceUnloadTexture(tilesetId: string): void {
         this.refCounts.delete(tilesetId);
         this.destroyTextures(tilesetId);
+        this.emit("onTextureReloaded", tilesetId);
+    }
+
+    public updateTilesetTexture(tileset: Tileset, texture: Texture): void {
+        this.destroyTextures(tileset.id);
+
+        this.baseTexturesCache.set(tileset.id, texture);
+
+        tileset.checkTextureSize(texture.width, texture.height);
+
+        const slicedTextures = this.sliceTexture(texture, tileset.tilewidth, tileset.tileheight);
+        const tiletextureMap = new Map<number, Texture>();
+
+        const sortedTiles = Array.from(tileset.tiles).sort((a, b) => a.id - b.id);
+        sortedTiles.forEach((tile, index) => { if (slicedTextures[index]) tiletextureMap.set(tile.id, slicedTextures[index]) });
+
+        this.tileTexturesCache.set(tileset.id, tiletextureMap);
+        this.emit("onTextureReloaded", tileset.id);
     }
 
     private destroyTextures(tilesetId: string): void {
