@@ -26,7 +26,6 @@ type SuccessResult<T = any> = {
 };
 
 function ErrorResult<T = any>(input?: TranslatableMessage, stacksResult?: ErrorResult): ErrorResult<T> {
-    console.trace(input, stacksResult);
     const message: TranslatableMessage = typeof input === "string" ? { key: input } : input ?? "";
     const stacks = [ stacksResult?.message, ...(stacksResult?.stacks ?? []) ];
     return { status: "Error", message: message, stacks: stacks.filter(stacks => stacks !== undefined) };

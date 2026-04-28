@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { Assets, ImageSource, Rectangle, Texture } from "pixi.js";
+import { Assets, Rectangle, Texture } from "pixi.js";
 import { Result } from "@/shared/types/result";
 import { Tileset } from "../application/tile/tileset";
 import { exists, readFile } from "@tauri-apps/plugin-fs";
@@ -81,6 +81,8 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
         sortedTiles.forEach((tile, index) => { if (slicedTextures[index]) tiletextureMap.set(tile.id, slicedTextures[index]) });
 
         this.tileTexturesCache.set(tileset.id, tiletextureMap);
+
+        this.emit("onTextureReloaded", tileset.id);
         return Result.Success();
     }
 

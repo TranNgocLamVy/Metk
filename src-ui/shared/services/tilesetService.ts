@@ -32,18 +32,18 @@ export class TilesetService {
         const tilesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
 
-        const imageAbsPath = form.image.source[0];
-        if (!imageAbsPath) return;
+        const textureAbsPath = form.image.source[0];
+        if (!textureAbsPath) return;
 
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
         currentWorkspace.savedPathManager.setTilesetDir(tilesetAbsDir);
 
-        const imageAbsDir = PathUtils.dirname(imageAbsPath);
-        currentWorkspace.savedPathManager.setTextureDir(imageAbsDir);
+        const textureAbsDir = PathUtils.dirname(textureAbsPath);
+        currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
 
-        const imageRelPath = PathUtils.relative(tilesetAbsDir, imageAbsPath);
+        const imageRelPath = PathUtils.relative(tilesetAbsDir, textureAbsPath);
 
-        const fileBuffer = await readFile(imageAbsPath); // TODO: move readFile to infrastructure;
+        const fileBuffer = await readFile(textureAbsPath); // TODO: move readFile to infrastructure;
         const image = await TextureUtils.processImage(fileBuffer);
         const columns = Math.ceil(image.width / form.image.setting.tile.tilewidth);
         const rows = Math.ceil(image.height / form.image.setting.tile.tileheight);
@@ -82,9 +82,18 @@ export class TilesetService {
     }
 
     public static async importTileset(refTilesetId?: string): Promise<Result> {
-        const rulesetAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
-        if (!rulesetAbsPath) return Result.Cancel();
-        const loadTilesetResult = await TilesetStorageService.load(rulesetAbsPath);
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const defaultTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
+
+        const tilesetAbsPath = await FileDialogUtils.open({ defaultPath: defaultTilesetDir, multiple: false, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        if (!tilesetAbsPath) return Result.Cancel();
+
+        const loadTilesetResult = await TilesetStorageService.load(tilesetAbsPath);
         if (loadTilesetResult.status !== Result.Status.Success) {
             Console.error({
                 message: "message.tileset.importFail",
@@ -92,6 +101,9 @@ export class TilesetService {
             })
             return Result.Error(loadTilesetResult.message);
         }
+
+        const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
+        currentWorkspace.savedPathManager.setTilesetDir(tilesetAbsDir);
 
         const tilesetData = loadTilesetResult.data;
         if (refTilesetId && tilesetData.id !== refTilesetId) {
@@ -102,19 +114,13 @@ export class TilesetService {
             return Result.Cancel();
         }
 
-        const editorContext = appCore.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
-
-        if (!currentProject || !currentWorkspace) return Result.Cancel();
-
-        await currentProject.tilesetManager.addTileset(tilesetData, rulesetAbsPath);
+        await currentProject.tilesetManager.addTileset(tilesetData, tilesetAbsPath);
 
         await editorContext.projectManager.saveCurrrentProject();
 
         WorkspaceService.createTilesetSession(tilesetData.id);
 
-        Console.success({ message: "message.tileset.importSuccess" });
+        Console.success({ message: { key: "message.tileset.importSuccess", options: { name: tilesetData.name }}});
 
         return Result.Success();
     }

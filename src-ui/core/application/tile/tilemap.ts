@@ -2,8 +2,6 @@
 import { BaseObject, BaseObjectEvents } from "@/core/application/baseObject";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { TilemapData, TilemapOrientation } from "@/shared/schema/tilemapSchema";
-import { Result } from "@/shared/types/result";
-
 import { RootLayer } from "./layer/rootLayer";
 import { FilePathSystem } from "@/infrastructure/projectPathSystem";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
