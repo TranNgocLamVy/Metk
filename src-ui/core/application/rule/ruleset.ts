@@ -88,7 +88,6 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public addEmptyRule(): void {
         const ruleData: RuleData = { id: uuidv4(), constraints: "", outputs: "" };
         const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager);
-        console.log(newRule.serialize());
         this.rules.push(newRule);
     }
 
