@@ -60,8 +60,17 @@ export class RulesetService {
     }
 
     public static async importRuleset(refRulesetId?: string): Promise<Result> {
-        const rulesetAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const defaultRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
+
+        const rulesetAbsPath = await FileDialogUtils.open({ defaultPath: defaultRulesetDir, multiple: false, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return Result.Cancel();
+
         const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);
         if (loadRulesetResult.status !== Result.Status.Success) {
             Console.error({
@@ -71,6 +80,9 @@ export class RulesetService {
             return Result.Error(loadRulesetResult.message);
         }
 
+        const rulesetAbsDir = PathUtils.dirname(rulesetAbsPath);
+        currentWorkspace.savedPathManager.setRulesetDir(rulesetAbsDir);
+
         const rulesetData = loadRulesetResult.data;
         if (refRulesetId && rulesetData.id !== refRulesetId) {
             Console.error({
@@ -79,12 +91,6 @@ export class RulesetService {
             });
             return Result.Cancel();
         }
-
-        const editorContext = appCore.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
-
-        if (!currentProject || !currentWorkspace) return Result.Cancel();
 
         await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
 

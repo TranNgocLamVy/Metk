@@ -10,7 +10,15 @@ import { DialogService } from "./dialogService";
 
 export class TextureService {
     public static async importTexture(tilesetId: string): Promise<Result> {
-        const textureAbsPath =  await FileDialogUtils.open({ multiple: false, filters: [{ name: "Texture", extensions: ["png", "jpg", "jpeg"] }] });
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const defaultTextureDir = currentWorkspace.savedPathManager.getTextureDir();
+
+        const textureAbsPath = await FileDialogUtils.open({ defaultPath: defaultTextureDir, multiple: false, filters: [{ name: "Texture", extensions: ["png", "jpg", "jpeg"] }] });
         if (!textureAbsPath) return Result.Cancel();
 
         const buffer = await readFile(textureAbsPath);
@@ -20,6 +28,9 @@ export class TextureService {
         } catch (error) {
             return Result.Error("message.texture.importFail", Result.Error((error as any).message));
         }
+
+        const textureAbsDir = PathUtils.dirname(textureAbsPath);
+        currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
 
         const tilesetManager = appCore.editorContext.currentProject?.tilesetManager;
         if (!tilesetManager) return Result.Cancel();

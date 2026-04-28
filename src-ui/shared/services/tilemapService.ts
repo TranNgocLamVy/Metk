@@ -1,7 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-
 import { appCore } from "@/core/appcore";
-
 import { TilemapData } from "../schema/tilemapSchema";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { Result } from "../types/result";
@@ -24,9 +22,9 @@ export class TilemapService {
         const form = await DialogService.openFormDialog(createTilemapForm());
         if (!form) return;
 
-        const defaultDir = currentWorkspace.savedPathManager.getTilemapDir();
+        const defaultTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
 
-        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultTilemapDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return;
 
         const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
@@ -64,8 +62,17 @@ export class TilemapService {
     }
 
     public static async importTilemap(refTilemapId?: string): Promise<Result> {
-        const tilemapAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const editorContext = appCore.editorContext;
+        const currentProject = editorContext.currentProject;
+        const currentWorkspace = editorContext.currentWorkspace;
+
+        if (!currentProject || !currentWorkspace) return Result.Cancel();
+
+        const defaultTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
+
+        const tilemapAbsPath = await FileDialogUtils.open({ defaultPath: defaultTilemapDir, multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return Result.Cancel();
+
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);
         if (loadTilemapResult.status !== Result.Status.Success) {
             Console.error({
@@ -75,6 +82,9 @@ export class TilemapService {
             return Result.Error(loadTilemapResult.message);
         }
 
+        const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
+        currentWorkspace.savedPathManager.setTilemapDir(tilemapAbsDir);
+
         const tilemapData = loadTilemapResult.data;
         if (refTilemapId && tilemapData.id !== refTilemapId) {
             Console.error({
@@ -83,12 +93,6 @@ export class TilemapService {
             });
             return Result.Cancel();
         }
-
-        const editorContext = appCore.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
-
-        if (!currentProject || !currentWorkspace) return Result.Cancel();
 
         await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
 
