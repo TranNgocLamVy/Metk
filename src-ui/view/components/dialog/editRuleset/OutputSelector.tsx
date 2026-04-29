@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Application } from 'pixi.js';
 import { Application as PixiApplication } from '@pixi/react';
 import useResizeObserver from '@/view/hooks/useResizeObserver';
@@ -6,39 +6,16 @@ import { Button } from '@/view/components/shadcn/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/view/components/shadcn/dropdown-menu';
 import { ScrollArea, ScrollBar } from '@/view/components/shadcn/scroll-area';
 import { Plus } from 'lucide-react';
-
-import { appCore } from '@/core/appcore';
 import { HStack, VStack } from '../../custom/stack/Stack';
-import { Result } from '@/shared/types/result';
-import { EditRulesetSession } from './session';
-import { useEditRuleset } from './EditRulesetContext';
 import { LocalizedText } from '../../custom/LocalizeText';
+import { useEditRuleset } from './ContextProvider';
 
 export default function OutputSelector() {
-    const { ruleset, selectedRule, version, refresh } = useEditRuleset();
+    const { tilesetList, dependedTilesets, rulesetSession, selectedRule, actions, triggerUpdate } = useEditRuleset();
+
     const [pixiApp, setPixiApp] = useState<Application | null>(null);
-    const sessionRef = useRef<EditRulesetSession | null>(null);
+
     const [activeTilesetId, setActiveTilesetId] = useState<string | null>(null);
-
-    const usedTilesets = useMemo(() => {
-        return ruleset.tilesetRefManager.serialize();
-    }, [ruleset, version]);
-
-    const selectTileset = async (tilesetId: string) => {
-        const session = sessionRef.current;
-        if (!session) return;
-        const currentProject = appCore.editorContext.currentProject;
-        if (!currentProject) return;
-
-        const tilesetManager = currentProject.tilesetManager;
-        const tilesetResult = await tilesetManager.loadTileset(tilesetId);
-        if (tilesetResult.status !== Result.Status.Success) return;
-
-        const tileset = tilesetResult.data;
-        session.setTileset(tileset);
-        session.setCurrentRule(selectedRule);
-        setActiveTilesetId(tileset.id);
-    };
 
     const containerRef = useResizeObserver<HTMLDivElement>(
         (entry) => {
@@ -47,31 +24,70 @@ export default function OutputSelector() {
             const h = entry.contentRect.height;
             pixiApp.renderer?.resize(w - 4, h - 4);
         },
-        [pixiApp, version]
+        [pixiApp]
     );
 
-    const onInit = (app: Application) => {
-        const session = new EditRulesetSession(ruleset, refresh);
-        sessionRef.current = session;
-        session.activatePixiApp(app);
-        session.setCurrentRule(selectedRule);
-        // TODO: Select first tileset after loading
+    const onInit = useCallback( (app: Application) => {
+        rulesetSession.activatePixiApp(app);
+        rulesetSession.setCurrentRule(selectedRule);
         setPixiApp(app);
-        refresh();
-    };
+
+        if (dependedTilesets.length > 0) {
+            const activeId = dependedTilesets[0].id;
+            actions.selectTileset(activeId).then(() => {
+                setActiveTilesetId(activeId);
+                triggerUpdate();
+            })
+        }
+    }, [rulesetSession, selectedRule, dependedTilesets, actions, triggerUpdate]);
+
+    const selectTileset = useCallback(async (tilesetId: string) => {
+        await actions.selectTileset(tilesetId);
+        setActiveTilesetId(tilesetId);
+        triggerUpdate();
+    }, [actions, triggerUpdate]);
 
     return (
         <VStack className="w-full h-full gap-2">
             <HStack>
-                <TilesetSelector selectTileset={selectTileset} />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0">
+                            <Plus className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
+                        {tilesetList.length === 0 ? (
+                            <DropdownMenuItem disabled className="h-7"><LocalizedText message="dialog.editRuleset.noTileset" /></DropdownMenuItem>
+                        ) : (
+                            tilesetList.map((ts) => (
+                                <DropdownMenuItem key={ts.id} onClick={() => selectTileset(ts.id)} className="h-dropdown-menu text-xs">
+                                    {ts.name}
+                                </DropdownMenuItem>
+                            ))
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <ScrollArea className="flex-1 whitespace-nowrap bg-surface-base">
                     <HStack className="flex">
-                        {usedTilesets.refs.map((tilesetRef) => (
-                            <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant="empty" size="sm" className={`rounded-none border-none h-8 text-foreground cursor-pointer ${activeTilesetId === tilesetRef.id ? "bg-surface-overlay rs_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}>
-                                <style>{`.rs_tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: calc(100%); height: 2px; background-color: var(--foreground); }`}</style>
-                                {tilesetRef.name}
-                            </Button>
-                        ))}
+                        <style>{`.rs_tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: calc(100%); height: 2px; background-color: var(--foreground); }`}</style>
+                        {dependedTilesets.map((tilesetRef) => {
+                            const isActive = activeTilesetId === tilesetRef.id;
+
+                            if (isActive) {
+                                return (
+                                    <Button key={tilesetRef.id} variant="empty" size="sm" className="rounded-none border-none h-8 text-foreground cursor-pointer bg-surface-overlay rs_tab relative">
+                                        {tilesetRef.name}
+                                    </Button>
+                                )
+                            }
+
+                            return (
+                                <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant="empty" size="sm" className="rounded-none border-none h-8 text-foreground cursor-pointer bg-transparent hover:bg-surface-overlay">
+                                    {tilesetRef.name}
+                                </Button>
+                            )
+                        })}
                     </HStack>
                     <ScrollBar orientation="horizontal" className="invisible" />
                 </ScrollArea>
@@ -82,43 +98,5 @@ export default function OutputSelector() {
                 </div>
             </div>
         </VStack>
-    );
-}
-
-function TilesetSelector({ selectTileset }: { selectTileset: (id: string) => void }) {
-
-    const { ruleset, version, refresh } = useEditRuleset();
-
-    const allTilesets = useMemo(() => {
-        const currentProject = appCore.editorContext.currentProject;
-        if (!currentProject) return [];
-        return currentProject.tilesetManager.serialize();
-    }, [version]);
-
-    const handleAddTileset = async (tilesetId: string) => {
-        const index = ruleset.tilesetRefManager.getTilesetRefIndex(tilesetId);
-        if (index > -1) selectTileset(tilesetId);
-        refresh();
-    };
-
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0">
-                    <Plus className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
-                {allTilesets.length === 0 ? (
-                    <DropdownMenuItem disabled className="h-7"><LocalizedText message="dialog.editRuleset.noTileset" /></DropdownMenuItem>
-                ) : (
-                    allTilesets.map((ts) => (
-                        <DropdownMenuItem key={ts.id} onClick={() => handleAddTileset(ts.id)} className="h-dropdown-menu text-xs">
-                            {ts.name}
-                        </DropdownMenuItem>
-                    ))
-                )}
-            </DropdownMenuContent>
-        </DropdownMenu>
     );
 }

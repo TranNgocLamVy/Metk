@@ -94,7 +94,9 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public duplicateRule(ruleId: string): void {
         const rule = this.getRule(ruleId);
         if (!rule) return;
-        const newRule = new Rule(rule.serialize(), this.size, this.tilesetRefManager, this.rulesetRefManager);
+        const ruleData = rule.serialize();
+        ruleData.id = uuidv4();
+        const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager);
         this.rules.push(newRule);
     }
 

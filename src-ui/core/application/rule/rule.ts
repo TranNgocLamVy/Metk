@@ -116,7 +116,7 @@ export class Rule extends BaseObject<RuleEvent> {
         return this.outputs;
     }
 
-    public getConstaints(): RuleConstraint[] {
+    public getConsrtaints(): RuleConstraint[] {
         return this.constraints;
     }
 
