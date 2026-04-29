@@ -5,8 +5,9 @@ import { Ruleset } from '@/core/application/rule/ruleset';
 import { Rule } from '@/core/application/rule/rule';
 import { Viewport } from 'pixi-viewport';
 import { DrawLineOption, GraphicUtils } from '@/shared/utils/graphicUtils';
+import { Result } from '@/shared/types/result';
 
-export class EditRulesetSession {
+export class RulesetOutputSelector {
     private pixiApp: Application;
     public viewport: Viewport;
     private spriteContainer: Container;
@@ -21,7 +22,10 @@ export class EditRulesetSession {
     private isInit: boolean = false;
 
 
-    constructor(private currentRuleset: Ruleset, private refresh: () => void) { }
+    constructor(
+        private currentRuleset: Ruleset, 
+        private triggerUpdate: () => void
+    ) { }
 
     private initSession(pixiApp: Application) {
         this.pixiApp = pixiApp;
@@ -82,31 +86,28 @@ export class EditRulesetSession {
         this.renderGrid();
     }
 
+    public async setActiveTileset(tilesetId: string) {
+        if (this.currentTileset?.id === tilesetId) return;
 
-    public async setTileset(tileset: Tileset | null) {
-        if (this.currentTileset === tileset) return;
+        const currentProject = appCore.editorContext.currentProject;
+        if (!currentProject) return;
 
+        const tilesetManager = currentProject.tilesetManager;
+        const tilesetResult = await tilesetManager.loadTileset(tilesetId);
+        if (tilesetResult.status !== Result.Status.Success) return;
+
+        const tileset = tilesetResult.data;
+        
         const textureManager = appCore.editorContext.textureManager;
-
+        
         if (this.currentTileset) {
             textureManager.releaseTilesetGraphics(this.currentTileset.id);
             const childrenToDestroy = this.spriteContainer.removeChildren();
             childrenToDestroy.forEach(child => child.destroy());
         }
 
-        this.currentTileset = tileset;
-
-        if (!tileset) {
-            this.renderHighlights();
-            return;
-        }
-
         await textureManager.retainTilesetGraphics(tileset);
-
-        if (this.currentTileset !== tileset) {
-            textureManager.releaseTilesetGraphics(tileset.id);
-            return;
-        }
+        this.currentTileset = tileset;
 
         tileset.tiles.forEach((tile, index) => {
             const tex = textureManager.getTileTexture(tileset.id, index);
@@ -145,7 +146,7 @@ export class EditRulesetSession {
         } else {
             this.currentRule.addOutput(tileId, tilesetId, 1);
         }
-        this.refresh();
+        this.triggerUpdate();
         this.renderHighlights();
     }
 

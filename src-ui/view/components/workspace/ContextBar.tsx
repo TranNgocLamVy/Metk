@@ -12,7 +12,7 @@ export default function ContextBar() {
 
     return (
         <HStack align="center" className="w-full h-8 bg-surface-base px-2">
-            <HStack align="center" className="gap-1 w-full">
+            <HStack align="center" className="gap-1 w-fit">
                 <HStack className="w-fit gap-1">
                     <Button variant={"ghost"} className="h-6 w-fit shrink-0 [&_svg:not([class*='size-'])]:size-3" onClick={() => toggleWithType("log")}>
                         <Info />
@@ -47,6 +47,12 @@ export default function ContextBar() {
                     )}
                 </HStack>
 
+            </HStack>
+            <HStack align="center" justify="center" className="ml-auto text-xs">
+                <span className="text-foreground">App is in early development stage, expect bugs and missing features. Report issues: </span>
+                <a href="https://github.com/TranNgocLamVy/Metk/issues" target="_blank" rel="noopener noreferrer" className="text-accent underline ml-1" >
+                    Here
+                </a>
             </HStack>
         </HStack>
     );
