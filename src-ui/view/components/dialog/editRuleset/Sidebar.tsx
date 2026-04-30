@@ -21,15 +21,15 @@ export default function EditRulesetSidebar({ dialogId }: EditRulesetSidebarProps
     const { ruleset } = useEditRuleset();
 
     const handleSave = useCallback(async () => {
-            const currentProject = appCore.editorContext.currentProject;
-            if (!currentProject) return;
-    
-            const rulesetManager = currentProject.rulesetManager;
-            rulesetManager.updateRuleset(ruleset.serialize());
-            await rulesetManager.saveRuleset(ruleset.id);
-    
-            closeDialog(dialogId);
-        }, [ruleset, closeDialog, dialogId]);
+        const currentProject = appCore.editorContext.currentProject;
+        if (!currentProject) return;
+
+        const rulesetManager = currentProject.rulesetManager;
+        rulesetManager.updateRuleset(ruleset.serialize());
+        await rulesetManager.saveRuleset(ruleset.id);
+
+        closeDialog(dialogId);
+    }, [ruleset, closeDialog, dialogId]);
 
     return (
         <VStack className="w-fit h-full bg-surface-overlay p-2 gap-2">

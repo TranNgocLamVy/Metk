@@ -45,6 +45,9 @@ export class Project {
         this.tilesetManager.loadTilesetsMetadata(this.data.tilesets);
         this.tilemapManager.loadTilemapsMetada(this.data.tilemaps);
         this.rulesetManager.loadRulesetMetadata(this.data.rulesets);
+
+        // Default to load all ruleset since ruleset is light and fast to load, and most of the time user will need them all. Can optimize later if needed.
+        await this.rulesetManager.loadRulesets(this.data.rulesets.map(ruleset => ruleset.id)); 
     }
 
     public async unload() {

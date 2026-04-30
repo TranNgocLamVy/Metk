@@ -155,8 +155,10 @@ export class WorkspaceService {
 
     //================ ruleset ================
     public static async selectRuleset(rulesetId: string | null): Promise<void> {
+        const currentProject = appCore.editorContext.currentProject;
         const rulesetSessionManager = appCore.workspaceManager.currentWorkspace?.rulesetSessionManager;
-        if (!rulesetSessionManager) return;
+        if (!currentProject || !rulesetSessionManager) return;
+        if (rulesetId) await currentProject.rulesetManager.loadRuleset(rulesetId);
         rulesetSessionManager.setSelectedRuleId(rulesetId);
         WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
     }

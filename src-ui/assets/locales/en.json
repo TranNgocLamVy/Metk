@@ -452,7 +452,7 @@
                 "delete": "Delete"
             },
             "requirement": "Requirement",
-            "allowEmpty": "Allow empty",
+            "empty": "Empty",
             "targets": "Targets",
             "noTileset": "No available tileset",
             "none": "None"

@@ -12,6 +12,7 @@ type CreateRuleLayerRendererContext = {
 
 export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     private sprites: Map<string, Sprite> = new Map(); // Id -> Sprite
+    private bindOnRulesetUpdated: (rulesetId: string) => void;
     private bindOnTilesChanged: (coordinates: Coordinate[]) => void
     private bindOnTextureReloaded: (tilesetId: string) => void;
     constructor(context: CreateRuleLayerRendererContext) {
@@ -19,9 +20,13 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
         this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
+        this.bindOnRulesetUpdated = this.onRulesetUpdated.bind(this);
+
         this.layer.eventEmitter.on("rulesetRefsOutputChanged", this.bindOnTilesChanged);
         appCore.textureManager.on("onTextureReloaded", this.bindOnTextureReloaded);
+        this.layer.rulesetRefManager.rulesetManager.on("onRulesetUpdated", this.bindOnRulesetUpdated);
 
+        this.layer.reCalculateAllOutputs();
         this.renderLayer();
     }
 
@@ -72,7 +77,7 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
             currentSprite.tint = ruleset ? new Color(ruleset.color) : 0xFF0000;
             currentSprite.width = this.tilemap.tilewidth;
             currentSprite.height = this.tilemap.tileheight;
-        } else if (outputTexture) {
+        } else if (outputTexture && ruleset) {
             currentSprite.texture = outputTexture;
             currentSprite.tint = 0xFFFFFF; // Clear tint to show natural texture colors
             currentSprite.width = outputTexture.width;
@@ -80,9 +85,16 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         } else {
             const errorTexture = await textureManager.getErrorTexture();
             currentSprite.texture = errorTexture;
-            currentSprite.tint = 0xFFFFFF; // Clear tint to show natural texture colors
+            currentSprite.tint = 0xFFFFFF;
             currentSprite.width = this.tilemap.tilewidth;
             currentSprite.height = this.tilemap.tileheight;
+        }
+    }
+
+    private onRulesetUpdated(rulesetId: string) {
+        if (this.tilemap.rulesetRefManager.serialize().refs.map(r => r.id).includes(rulesetId)) {
+            this.layer.reCalculateAllOutputs();
+            this.renderLayer();
         }
     }
 
@@ -97,6 +109,7 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         super.destroy();
         this.layer.eventEmitter.off("rulesetRefsOutputChanged", this.bindOnTilesChanged);
         appCore.textureManager.off("onTextureReloaded", this.bindOnTextureReloaded);
+        this.layer.rulesetRefManager.rulesetManager.off("onRulesetUpdated", this.bindOnRulesetUpdated);
         this.sprites.forEach(s => s.destroy());
         this.sprites.clear();
     }
