@@ -38,7 +38,7 @@ export class Rule extends BaseObject<RuleEvent> {
         }
         if (constraints.length < this.size * this.size) {
             for (let i = constraints.length; i < this.size * this.size; i++) {
-                constraints.push(new RuleConstraint({ requirement: RuleRequirement.ANY, targetIndexs: [], allowEmpty: true }, this.rulesetRefManager));
+                constraints.push(new RuleConstraint({ requirement: RuleRequirement.ANY, targetIndexs: [], allowEmpty: false }, this.rulesetRefManager));
             }
         }
         return constraints;
@@ -223,16 +223,20 @@ export class RuleConstraint {
     }
 
     public isSatisfied(targetId: string | null): boolean {
-        if (targetId === null) return this.allowEmpty;
-        const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
-        switch (this.requirement) {
-            case RuleRequirement.ANY:
-                return true;
-            case RuleRequirement.IS:
-                return this.targetIndexs.includes(targetIndex);
-            case RuleRequirement.NOT:
-                return !this.targetIndexs.includes(targetIndex);
+        if (this.requirement === RuleRequirement.ANY) {
+            return true;
+        } else if (this.requirement === RuleRequirement.EMPTY) {
+            return targetId === null;
+        } else if (this.requirement === RuleRequirement.IS) {
+            if (targetId === null) return this.allowEmpty;
+            const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
+            if (targetIndex === -1) return false;
+        } else if (this.requirement === RuleRequirement.NOT) {
+            if (targetId === null) return !this.allowEmpty;
+            const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
+            if (targetIndex === -1) return false;
         }
+        return false;
     }
 
     public serialize(): string {

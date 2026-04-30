@@ -1,12 +1,11 @@
 import { RuleRequirement } from "@/shared/schema/rulesetSchema";
-import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareX } from "lucide-react";
+import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import PixiImage from "../../custom/PixiImage";
 import { appCore } from "@/core/appcore";
-import { HStack, VStack } from "../../custom/stack/Stack";
+import { VStack } from "../../custom/stack/Stack";
 import { useCallback, WheelEvent } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { LocalizedText } from "../../custom/LocalizeText";
-import { Checkbox } from "../../shadcn/checkbox";
 import { useEditRuleset } from "./ContextProvider";
 
 
@@ -60,9 +59,9 @@ function ConstraintsGrid() {
     const middleIndex = ((gridSize * gridSize) - 1) / 2;
 
     const requirementIcons = [
-        { requirement: RuleRequirement.ANY, icon: <CircleQuestionMark /> },
-        { requirement: RuleRequirement.IS, icon: <SquareCheck /> },
-        { requirement: RuleRequirement.NOT, icon: <SquareX /> },
+        { requirement: RuleRequirement.EMPTY, icon: <SquareDashed /> },
+        { requirement: RuleRequirement.IS, icon: <SquareCheck size={32} className="text-green-500 p-1 bg-black/20" /> },
+        { requirement: RuleRequirement.NOT, icon: <SquareX size={32} className="text-red-500 p-1 bg-black/20" /> },
     ]
 
     return (
@@ -99,7 +98,7 @@ function ConstraintsGrid() {
                 }
 
                 return (
-                    <div key={index} onClick={() => setSelectedConstraintIndex(index)} className={`aspect-square bg-surface-overlay-sunken relative p-2 flex items-center justify-center ${isSelected ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent hover:border-transparent"}`}
+                    <div key={index} onClick={() => setSelectedConstraintIndex(index)} className={`aspect-square bg-surface-overlay-sunken relative p-2 flex items-center justify-center ${isSelected ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent/50 hover:border-transparent"}`}
                     >
                         {firstConstraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstConstraintColor }} />}
                         <div className="absolute">
@@ -143,9 +142,12 @@ function RequirementEditor() {
 
     const requirementList = [
         { requirement: RuleRequirement.ANY, name: "ANY", icon: <CircleQuestionMark /> },
+        { requirement: RuleRequirement.EMPTY, name: "EMPTY", icon: <SquareDashed /> },
         { requirement: RuleRequirement.IS, name: "IS", icon: <SquareCheck /> },
         { requirement: RuleRequirement.NOT, name: "NOT", icon: <SquareX /> },
     ]
+
+    const needTarget = selectedConstraint.getRequirement() === RuleRequirement.IS || selectedConstraint.getRequirement() === RuleRequirement.NOT;
 
     return (
         <VStack className="flex-1 gap-6">
@@ -168,17 +170,23 @@ function RequirementEditor() {
                 </div>
             </VStack>
 
-            <HStack align="center" className="w-full h-fit gap-2">
-                <Checkbox checked={allowEmpty} onCheckedChange={actions.updateAllowEmpty} />
-                <span className="text-base"><LocalizedText message="dialog.editRuleset.allowEmpty" /></span>
-            </HStack>
-
             <VStack className="gap-2">
                 <span className="text-base"><LocalizedText message="dialog.editRuleset.targets" /></span>
                 <div className="grid grid-cols-7 w-full gap-2">
+                    <div onClick={() => { if (needTarget) actions.toggleAllowEmpty() }} className={`bg-surface-overlay-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${allowEmpty && "outline-2 outline-accent"}`} >
+                        <div className="size-8 aspect-square relative flex items-center justify-center border-2 border-foreground border-dashed">
+                            {allowEmpty && (
+                                <div className="absolute">
+                                    <Check size={24} className="text-green-500 p-1 bg-black/10" strokeWidth={4} />
+                                </div>
+                            )}
+                        </div>
+                        <span className="text-[8px]">
+                            <LocalizedText message="dialog.editRuleset.empty" />
+                        </span>
+                    </div>
                     {rulesetList.map((ruleset) => {
                         const selected = constraintTargets.includes(ruleset.id) && selectedConstraint.getRequirement() !== RuleRequirement.ANY;
-                        const needTarget = selectedConstraint.getRequirement() === RuleRequirement.IS || selectedConstraint.getRequirement() === RuleRequirement.NOT;
                         return (
                             <div key={ruleset.id} onClick={() => { if (needTarget) actions.toggleTarget(ruleset.id) }}
                                 className={`bg-surface-overlay-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${selected && "outline-2 outline-accent"}`}

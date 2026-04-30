@@ -82,11 +82,11 @@ export function useRulesetController(initialRuleset: Ruleset) {
             }
             triggerUpdate();
         },
-        updateAllowEmpty: (allow: boolean) => {
+        toggleAllowEmpty: () => {
             if (!selectedRule) return;
             const constraint = selectedRule.getConstraint(selectedConstraintIndex);
             if (constraint) {
-                constraint.setAllowEmpty(allow);
+                constraint.setAllowEmpty(!constraint.getAllowEmpty());
                 triggerUpdate();
             }
         },

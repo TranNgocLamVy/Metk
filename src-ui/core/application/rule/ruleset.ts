@@ -9,7 +9,7 @@ import { RulesetRefData } from "@/shared/schema/layerSchema";
 import { Console } from "@/shared/services/consoleService";
 
 interface RulesetEvent extends BaseObjectEvents {
-    onChange: () => void
+    onUpdated: () => void
 }
 
 export class Ruleset extends BaseObject<RulesetEvent> {
@@ -64,7 +64,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
             }
         }
         this.rules = this.rules.filter((rule) => processedRuleIds.has(rule.id));
-        this.eventEmitter.emit("onChange");
+        this.eventEmitter.emit("onUpdated");
     }
 
     public calculateOutput(context: (RulesetRefData | null)[][]): { tileId: number, tilesetId: string } | null {

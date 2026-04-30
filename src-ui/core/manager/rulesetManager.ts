@@ -13,6 +13,7 @@ import EventEmitter from "eventemitter3";
 
 export interface RulesetManagerEvent {
     onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
+    onRulesetUpdated: (rulesetId: string) => void;
 }
 
 export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
@@ -165,6 +166,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         if (!ruleset) return;
         ruleset.updateRuleset(rulesetData);
         this.emit("onRulesetManagerUpdated", this.serialize());
+        this.emit("onRulesetUpdated", rulesetData.id);
         Console.success({ message: { key: "message.ruleset.updatedSuccess", options: { name: rulesetData.name } } })
     }
 

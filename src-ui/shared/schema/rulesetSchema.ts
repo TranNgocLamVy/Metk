@@ -4,8 +4,9 @@ import { TilesetRefDataSchema } from "./tilesetSchema";
 
 export enum RuleRequirement {
     ANY = 0,
-    IS = 1,
-    NOT = 2,
+    EMPTY = 1,
+    IS = 2,
+    NOT = 3,
 }
 export type RuleConstraintData = {
     requirement: RuleRequirement,

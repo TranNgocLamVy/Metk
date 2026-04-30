@@ -160,6 +160,7 @@ export class LineTool implements ITool {
     }
 
     private onPointerOutside(e: FederatedPointerEvent) {
+        if (!this.isDragging) this.clearHoverPreview();
         this.clearDrawPreview();
     }
 
