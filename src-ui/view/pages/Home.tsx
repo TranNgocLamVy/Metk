@@ -28,7 +28,7 @@ export default function HomePage() {
 						<LocalizedText message="home.importProject" />
 					</Button>
 
-					<Button variant={"link"} onClick={() => { navigate('/create') }}>
+					<Button variant={"link"} onClick={ProjectService.createProject}>
 						<FolderPlus />
 						<LocalizedText message="home.newProject" />
 					</Button>
