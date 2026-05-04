@@ -1,7 +1,7 @@
 import { ProjectData, ProjectDataSchema, ProjectMetadata, ProjectRepoSchema } from "@/shared/schema/projectSchema";
 import { TilemapData, TilemapDataSchema } from "@/shared/schema/tilemapSchema";
 import { TauriFileSystemProvider } from "./tauriFileSystemProvider";
-import { JsonFileRepository } from "./jsonFileRepository";
+import { JsonStorageService } from "./jsonStorageService";
 import { ArkTypeJsonSerializer } from "./arkTypeJsonSerializer";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { TilesetData, TilesetDataSchema } from "@/shared/schema/tilesetSchema";
@@ -11,10 +11,13 @@ import { IJsonModel } from "flexlayout-react";
 
 export const TauriFileStorage = new TauriFileSystemProvider();
 
-export const ProjectMetadataRepo = new JsonFileRepository<ProjectMetadata[]>(TauriFileStorage, new ArkTypeJsonSerializer(ProjectRepoSchema), { baseDir: BaseDirectory.AppData });
-export const ProjectStorageService = new JsonFileRepository<ProjectData>(TauriFileStorage, new ArkTypeJsonSerializer(ProjectDataSchema));
-export const TilemapStorageService = new JsonFileRepository<TilemapData>(TauriFileStorage, new ArkTypeJsonSerializer(TilemapDataSchema));
-export const TilesetStorageService = new JsonFileRepository<TilesetData>(TauriFileStorage, new ArkTypeJsonSerializer(TilesetDataSchema));
-export const WorkspaceStorageService = new JsonFileRepository<WorkpsaceData>(TauriFileStorage, new ArkTypeJsonSerializer(WorkpsaceDataSchema));
-export const LayoutStorageService = new JsonFileRepository<IJsonModel>(TauriFileStorage, new ArkTypeJsonSerializer());
-export const RulesetStorageService = new JsonFileRepository<RulesetData>(TauriFileStorage, new ArkTypeJsonSerializer(RulesetDataSchema));
+export const ProjectMetadataRepo = new JsonStorageService<ProjectMetadata[]>(TauriFileStorage, new ArkTypeJsonSerializer(ProjectRepoSchema), { baseDir: BaseDirectory.AppData });
+export const ProjectStorageService = new JsonStorageService<ProjectData>(
+    TauriFileStorage, 
+    new ArkTypeJsonSerializer(ProjectDataSchema)
+);
+export const TilemapStorageService = new JsonStorageService<TilemapData>(TauriFileStorage, new ArkTypeJsonSerializer(TilemapDataSchema));
+export const TilesetStorageService = new JsonStorageService<TilesetData>(TauriFileStorage, new ArkTypeJsonSerializer(TilesetDataSchema));
+export const WorkspaceStorageService = new JsonStorageService<WorkpsaceData>(TauriFileStorage, new ArkTypeJsonSerializer(WorkpsaceDataSchema));
+export const LayoutStorageService = new JsonStorageService<IJsonModel>(TauriFileStorage, new ArkTypeJsonSerializer());
+export const RulesetStorageService = new JsonStorageService<RulesetData>(TauriFileStorage, new ArkTypeJsonSerializer(RulesetDataSchema));
