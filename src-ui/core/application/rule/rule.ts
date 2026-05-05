@@ -173,7 +173,8 @@ export class RuleOutput {
 }
 
 export class RuleConstraint {
-    private targetIndexs: number[] = [];
+    private targetIndexs: Set<number> = new Set();
+    private targetIds: Set<string> = new Set();
     private requirement: RuleRequirement = RuleRequirement.ANY;
     private allowEmpty: boolean = true;
 
@@ -181,29 +182,34 @@ export class RuleConstraint {
         data: RuleConstraintData,
         private readonly rulesetRefManager: RulesetRefManager
     ) {
-        this.targetIndexs = data.targetIndexs;
+        this.targetIndexs = new Set(data.targetIndexs);
         this.requirement = data.requirement;
         this.allowEmpty = data.allowEmpty;
+
+        this.targetIndexs.forEach((index) => {
+            const targetId = this.rulesetRefManager.getRulesetRefId(index);
+            if (targetId) this.targetIds.add(targetId);
+        });
     }
 
     public getTargetIds(): string[] {
-        return this.targetIndexs.map(target => this.rulesetRefManager.getRulesetRefId(target)).filter(target => target !== null);
+        return Array.from(this.targetIds);  
     }
 
     public addTarget(target: string | number): void {
         const targetIndex = typeof target === "string" ? this.rulesetRefManager.getRulesetRefIndex(target) : target;
         if (targetIndex === -1) return;
-        this.targetIndexs.push(targetIndex);
+        this.targetIndexs.add(targetIndex);
+        const targetId = this.rulesetRefManager.getRulesetRefId(targetIndex);
+        if (targetId) this.targetIds.add(targetId);
     }
 
     public removeTarget(target: string | number): void {
         const targetIndex = typeof target === "string" ? this.rulesetRefManager.getRulesetRefIndex(target) : target;
         if (targetIndex === -1) return;
-        this.targetIndexs = this.targetIndexs.filter((target) => target !== targetIndex);
-    }
-
-    public clearAllTargets(): void {
-        this.targetIndexs = [];
+        this.targetIndexs.delete(targetIndex);
+        const targetId = this.rulesetRefManager.getRulesetRefId(targetIndex);
+        if (targetId) this.targetIds.delete(targetId);
     }
 
     public setRequirement(requirement: RuleRequirement): void {
@@ -229,17 +235,15 @@ export class RuleConstraint {
             return targetId === null;
         } else if (this.requirement === RuleRequirement.IS) {
             if (targetId === null) return this.allowEmpty;
-            const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
-            if (targetIndex === -1) return false;
+            return this.targetIds.has(targetId);
         } else if (this.requirement === RuleRequirement.NOT) {
             if (targetId === null) return !this.allowEmpty;
-            const targetIndex = this.rulesetRefManager.getRulesetRefIndex(targetId);
-            if (targetIndex === -1) return false;
+            return !this.targetIds.has(targetId);
         }
         return false;
     }
 
     public serialize(): string {
-        return `${this.requirement}:${this.allowEmpty ? 1 : 0}:${this.targetIndexs.join(".")}`;
+        return `${this.requirement}:${this.allowEmpty ? 1 : 0}:${Array.from(this.targetIndexs).join(".")}`;
     }
 }
