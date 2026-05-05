@@ -40,7 +40,7 @@ export class AppCore {
 
         this.contextManager = new ContextManager();
         this.systemCommandManager = new SystemCommandManager(this.contextManager, this.editorContext);
-        this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);""
+        this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
         
         // Set Context
         this.toolManager.setEditorContext(this.editorContext);

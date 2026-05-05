@@ -31,13 +31,14 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.name = rulesetData.name;
         this.color = rulesetData.color;
         this.size = rulesetData.size;
-        this.rules = rulesetData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager, this.rulesetRefManager));
 
         this.tilesetRefManager.loadData(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
         this.rulesetRefManager.loadData(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
         
         this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
         this.rulesetRefManager.replaceRulesetRef(0, this.id);
+
+        this.rules = rulesetData.rules.map((rule) => new Rule(rule, this.size, this.tilesetRefManager, this.rulesetRefManager));
     }
 
     public updateRuleset(rulesetData: RulesetData): void {
