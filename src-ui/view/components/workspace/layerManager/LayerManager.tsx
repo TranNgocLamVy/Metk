@@ -47,11 +47,11 @@ export default function LayerManager() {
 		updateLayerView();
 		setSelectedLayer(activeSession.layerState.selectedLayers);
 		activeSession.on("onSelectedLayersChanged", setSelectedLayer);
-		activeSession.on("onLayerChange", updateLayerView);
+		activeSession.on("onMarkChange", updateLayerView);
 
 		return () => {
 			activeSession.off("onSelectedLayersChanged", setSelectedLayer);
-			activeSession.off("onLayerChange", updateLayerView)
+			activeSession.off("onMarkChange", updateLayerView)
 			setLayerViews([]);
 			setSelectedLayer([]);
 		}
@@ -79,7 +79,7 @@ export default function LayerManager() {
 	}, [])
 
 	const onOpenChange = useCallback((open: boolean) => {
-		if (activeSession) activeSession.targetLayer = null;
+		if (activeSession) useLayerManagerStore.getState().setTargetParentLayer(null);
 	}, [activeSession]);
 
 	if (!activeSession) {

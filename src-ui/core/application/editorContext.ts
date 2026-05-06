@@ -19,8 +19,6 @@ type EditorContextEvent = {
 }
 
 export class EditorContext {
-    public eventEmitter = new EventEmitter<EditorContextEvent>();
-    
     constructor(
         public readonly projectManager: ProjectManager,
         public readonly workspaceManager: WorkspaceManager,
