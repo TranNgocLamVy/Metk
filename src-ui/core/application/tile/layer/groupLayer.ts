@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { GroupLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
-import { LayerUtils } from "@/shared/utils/layerUtils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
@@ -28,6 +27,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         this.opacity = groupLayerData.opacity;
         this.visible = groupLayerData.visible;
         this.locked = groupLayerData.locked;
+        this.isOpen = groupLayerData.open;
     }
 
     public getLayers(): BaseLayer<any>[] {
@@ -88,6 +88,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
 
     public toggleOpen(force?: boolean): void {
         this.isOpen = force === undefined ? !this.isOpen : force;
+        this.eventEmitter.emit("updateProperty", "isOpen", this.isOpen);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void) {
@@ -104,6 +105,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
             opacity: this.opacity,
             visible: this.visible,
             locked: this.locked,
+            open: this.isOpen
         }
     }
 

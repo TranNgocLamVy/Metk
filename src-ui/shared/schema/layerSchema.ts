@@ -96,6 +96,7 @@ export const GroupLayerSchema = type({
     type: type("'group'"),
     name: type("string").default("Untitled Layer"),
     opacity: type("number").default(1),
+    open: type("boolean").default(true),
     visible: type("boolean").default(true),
     locked: type("boolean").default(false),
 })
@@ -107,6 +108,7 @@ export const defaultGroupLayerData = (data: Pick<GroupLayerData, "parentId">): G
         name: "New Group Layer",
         type: "group" as const,
         opacity: 1,
+        open: true,
         visible: true,
         locked: false,
     }

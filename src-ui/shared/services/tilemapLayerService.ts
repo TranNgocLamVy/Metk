@@ -1,5 +1,5 @@
 import { appCore } from "@/core/appcore";
-import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
+import { BaseLayer, IGroupLayer } from "@/core/application/tile/layer/baseLayer";
 import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
 import { RootLayer } from "@/core/application/tile/layer/rootLayer";
 import { CreateTileLayerCommand } from "@/core/command/layer/createTileLayerCommand";
@@ -15,8 +15,21 @@ import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLay
 import { WorkspaceService } from "./workspaceService";
 import { defaultGroupLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layerSchema";
 import { CreateRuleLayerCommand } from "@/core/command/layer/createRuleLayerCommand";
+import { ToggleOpenGroupLayerCommand } from "@/core/command/layer/toggleOpenGroupLayerCommand";
+import { Tilemap } from "@/core/application/tile/tilemap";
 
 export class TilemapLayerService {
+    public static getSelectedParentLayer(tilemap: Tilemap): IGroupLayer | null {
+        const selectedIds = Array.from(useLayerManagerStore.getState().selectedLayers).reverse();
+        
+        for (const id of selectedIds) {
+            const layer = tilemap.rootLayer.findLayer(id);
+            if (layer instanceof GroupLayer) return layer;
+        }
+
+        return null;        
+    }
+    
     public static async createNewTileLayer() {
         const editorContext = appCore.editorContext;
 
@@ -25,7 +38,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-        const targetLayer = currentSession.targetLayer;
+        const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -48,7 +61,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-        const targetLayer = currentSession.targetLayer;
+        const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -71,7 +84,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-        const targetLayer = currentSession.targetLayer;
+        const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -195,6 +208,22 @@ export class TilemapLayerService {
             historyManager.execute(toggleVisibilityCommand, editorContext);
         });
         historyManager.commitTransaction();
+    }
+
+    public static toggleOpenGroupLayer(id: string, force?: boolean) {
+        const editorContext = appCore.editorContext;
+
+        const currentSession = editorContext.getActiveTilemapSession();
+        const historyManager = editorContext.getCurrentHistoryManager();
+
+        if (!currentSession || !historyManager) return;
+        const root = currentSession.tilemap.rootLayer;
+        const targetLayer = root.findLayer(id);
+        if (!targetLayer) return;
+        if (!(targetLayer instanceof GroupLayer)) return;
+
+        const toggleOpenGroupLayerCommand = new ToggleOpenGroupLayerCommand(id, force);
+        toggleOpenGroupLayerCommand.execute(editorContext);
     }
 
     public static toggleSelectedLayersLock() {

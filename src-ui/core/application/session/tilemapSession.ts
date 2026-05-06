@@ -7,12 +7,10 @@ import { EditorContext } from "../editorContext";
 import { Tilemap } from "../tile/tilemap";
 import { Tileset } from "../tile/tileset";
 import EventEmitter from "eventemitter3";
-import { BaseLayer } from "../tile/layer/baseLayer";
 
 interface TilemapSessionEvents {
     onMarkChange: (isDirty: boolean) => void;
     onSelectedLayersChanged: (layerIds: string[]) => void;
-    onLayerChange: () => void;
 }
 
 export class TilemapSession extends EventEmitter<TilemapSessionEvents> implements IBaseSession {
@@ -24,7 +22,6 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
     public viewState: ViewState;
     public layerState: LayerState;
-    public targetLayer: BaseLayer<any> | null = null;
     
     private bindOnTilemapChange: () => void;
     constructor(
@@ -82,7 +79,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
     public markLayerChange(): void {
         this.isDirty = true;
-        this.emit("onLayerChange");
+        this.emit("onMarkChange", this.isDirty);
     }
 
     public markAsClean(): void {
