@@ -24,6 +24,7 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         targetLayer.toggleLock(this.newIsLocked);
 
         currentSession.markLayerChange();
+        currentSession.emit("onSelectedLayersChanged", currentSession.layerState.selectedLayers);
 
         return Result.Success();
     }
@@ -39,6 +40,7 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         targetLayer.toggleLock(this.oldIsLocked);
 
         currentSession.markLayerChange();
+        currentSession.emit("onSelectedLayersChanged", currentSession.layerState.selectedLayers);
 
         return Result.Success();
     }

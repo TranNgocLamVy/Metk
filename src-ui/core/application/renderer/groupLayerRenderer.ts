@@ -37,6 +37,18 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
         this.layer.eventEmitter.on("layerReordered", this.bindOnLayerReordered);
     }
 
+    public findChildRenderer(layerId: string): BaseLayerRenderer | null {
+        if (this.layer.id === layerId) return this;
+        if (this.childRenderers.has(layerId)) return this.childRenderers.get(layerId)!;
+        for (const childRenderer of this.childRenderers.values()) {
+            if (childRenderer instanceof GroupLayerRenderer) {
+                const found = childRenderer.findChildRenderer(layerId);
+                if (found) return found;
+            }
+        }
+        return null;
+    }
+
     private rebuildChildren = () => {
         this.layer.getLayers().forEach(childLayer => {
             if (!this.childRenderers.has(childLayer.id)) {

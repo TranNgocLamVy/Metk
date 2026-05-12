@@ -1,16 +1,12 @@
 import { Container, FederatedPointerEvent, Point } from "pixi.js";
 import { IDrawStrategy, DrawPayload } from "./drawStrategy/IDrawStrategy";
 import { ITool } from "@/core/interface/ITool";
-import { TilemapSession } from "@/core/application/session/tilemapSession";
-import { DrawTileStrategy } from "./drawStrategy/drawTileStrategy";
-import { DrawRuleStrategy } from "./drawStrategy/drawRuleStrategy";
 import { EditorContext } from "@/core/application/editorContext";
 import { Tool } from "@/core/decorator/tool";
-import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
-import { GroupLayer } from "../application/tile/layer/groupLayer";
 
 import icon from "@/assets/icons/bucket.svg?raw";
 import { TilemapView } from "../application/view/tilemapView";
+import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
 
 @Tool({
     id: "tool.bucket",
@@ -24,10 +20,8 @@ import { TilemapView } from "../application/view/tilemapView";
     when: "inWorkspace && !isModalOpen",
 })
 export class BucketTool implements ITool {
-    private drawStrategys: IDrawStrategy[] = [];
     private activeDrawStrategy: IDrawStrategy | null = null;
 
-    private currentSession: TilemapSession | null = null;
     private currentView: TilemapView | null = null;
 
     private overlayContainer: Container | null = null;
@@ -38,25 +32,18 @@ export class BucketTool implements ITool {
     private startRegionCoordinate: Coordinate | null = null;
     private endRegionCoordinate: Coordinate | null = null;
 
-    private targetLayer: BaseLayer<any> | null = null;
+    private targetLayerRenderer: BaseLayerRenderer | null = null;
 
     private bindPointerOnDown: (event: FederatedPointerEvent) => void;
     private bindPointerOnMove: (event: FederatedPointerEvent) => void;
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
     private bindPointerOutside: (event: FederatedPointerEvent) => void;
-    private bindOnSelectedLayersChanged: () => void;
 
     constructor(private readonly editorContext: EditorContext) {
-        this.drawStrategys = [
-            new DrawTileStrategy(),
-            new DrawRuleStrategy()
-        ];
-
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
         this.bindPointerOutside = this.onPointerOutside.bind(this);
-        this.bindOnSelectedLayersChanged = this.updateActiveDrawStrategy.bind(this);
     }
 
     public onEnable(): void {
@@ -68,8 +55,7 @@ export class BucketTool implements ITool {
         this.clearDrawPreview();
     }
 
-    public attach(session: TilemapSession, view: TilemapView): void {
-        this.currentSession = session;
+    public attachView(view: TilemapView): void {
         this.currentView = view;
 
         const viewport = this.currentView.viewport;
@@ -80,13 +66,10 @@ export class BucketTool implements ITool {
         viewport.on("pointerup", this.bindPointerOnUp);
         viewport.on("pointerupoutside", this.bindPointerOnUp);
         viewport.addEventListener("mouseleave", this.bindPointerOutside);
-
-        this.updateActiveDrawStrategy();
-        this.currentSession.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
     }
 
     public detach(): void {
-        if (!this.currentSession || !this.currentView) return;
+        if (!this.currentView) return;
         const viewport = this.currentView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
@@ -95,8 +78,7 @@ export class BucketTool implements ITool {
         viewport.off("pointerupoutside", this.bindPointerOnUp);
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
-        this.currentSession.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
-        this.currentSession = null;
+        this.currentView = null;
 
         this.overlayContainer = null;
 
@@ -104,15 +86,23 @@ export class BucketTool implements ITool {
 
         this.startRegionCoordinate = null;
         this.endRegionCoordinate = null;
-        this.targetLayer = null;
+        this.targetLayerRenderer = null;
+    }
+
+    public setDrawStrategy(strategy: IDrawStrategy | null): void {
+        this.activeDrawStrategy = strategy;
+    }
+
+    public setTargetLayerRenderer(layerRenderer: BaseLayerRenderer | null): void {
+        this.targetLayerRenderer = layerRenderer;
     }
 
     private onPointerDown(e: FederatedPointerEvent): void {
         if (e.button !== 0) return;
-        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
+        if (!this.currentView || !this.targetLayerRenderer || !this.activeDrawStrategy) return;
 
         const pos = this.getLocalPos(e);
-        const coord = this.targetLayer.posToCoord(pos);
+        const coord = this.targetLayerRenderer.posToCoord(pos);
         const key = `${coord.col},${coord.row}`;
 
         if (!this.currentFloodRegion.has(key)) {
@@ -121,16 +111,16 @@ export class BucketTool implements ITool {
 
         const historyManager = this.editorContext.getCurrentHistoryManager();
 
-        if (historyManager && this.activeDrawStrategy && this.targetLayer && this.stampsDataMap.size > 0) {
-            this.activeDrawStrategy.commit(this.targetLayer, Array.from(this.stampsDataMap.values()), this.editorContext);
+        if (historyManager && this.activeDrawStrategy && this.targetLayerRenderer && this.stampsDataMap.size > 0) {
+            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.stampsDataMap.values()), this.editorContext);
         }
         this.clearDrawPreview();
     }
 
     private onPointerMove(e: FederatedPointerEvent): void {
-        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
+        if (!this.currentView || !this.targetLayerRenderer || !this.activeDrawStrategy) return;
 
-        const coord = this.targetLayer.posToCoord(this.getLocalPos(e));
+        const coord = this.targetLayerRenderer.posToCoord(this.getLocalPos(e));
         const key = `${coord.col},${coord.row}`;
 
         if (this.currentFloodRegion.has(key)) return;
@@ -144,18 +134,21 @@ export class BucketTool implements ITool {
         this.clearDrawPreview();
     }
 
-    private calculateFloodRegion(layer: BaseLayer<any>, start: Coordinate): void {
+    private calculateFloodRegion(start: Coordinate): void {
         this.currentFloodRegion.clear();
 
-        const layerWidth = (layer as any).width ?? this.currentSession!.tilemap.width;
-        const layerHeight = (layer as any).height ?? this.currentSession!.tilemap.height;
+        const layerRenderer = this.targetLayerRenderer;
+        if (!layerRenderer) return;
+
+        const layerWidth = (layerRenderer as any).width ?? this.currentView!.session.tilemap.width;
+        const layerHeight = (layerRenderer as any).height ?? this.currentView!.session.tilemap.height;
 
         this.startRegionCoordinate = { ...start };
         this.endRegionCoordinate = { ...start };
 
         if (start.col < 0 || start.col >= layerWidth || start.row < 0 || start.row >= layerHeight) return;
 
-        const targetRef = this.activeDrawStrategy!.getRefAt(layer.coordToPos(start), layer);
+        const targetRef = this.activeDrawStrategy!.getRefAt(layerRenderer.coordToPos(start), layerRenderer);
         const startKey = `${start.col},${start.row}`;
         this.currentFloodRegion.add(startKey);
 
@@ -186,7 +179,7 @@ export class BucketTool implements ITool {
                 this.endRegionCoordinate.col = Math.max(this.endRegionCoordinate.col, n.col);
                 this.endRegionCoordinate.row = Math.max(this.endRegionCoordinate.row, n.row);
 
-                const ref = this.activeDrawStrategy!.getRefAt(layer.coordToPos(n), layer);
+                const ref = this.activeDrawStrategy!.getRefAt(layerRenderer.coordToPos(n), layerRenderer);
                 if (ref === targetRef) {
                     this.currentFloodRegion.add(nKey);
                     queue.push(n);
@@ -196,16 +189,16 @@ export class BucketTool implements ITool {
     }
 
     private updateDrawPayload(start: Coordinate): void {
-        if (!this.activeDrawStrategy || !this.currentSession || !this.overlayContainer || !this.targetLayer) return;
+        if (!this.activeDrawStrategy || !this.currentView || !this.overlayContainer || !this.targetLayerRenderer) return;
 
         this.clearDrawPreview();
-        this.calculateFloodRegion(this.targetLayer, start);
+        this.calculateFloodRegion(start);
 
         const bounds = this.getBounds(this.startRegionCoordinate!, this.endRegionCoordinate!);
         const drawCoordinates = this.getDrawCoordinates(bounds);
 
         drawCoordinates.forEach((drawCoordinate) => {
-            const drawPayloads = this.activeDrawStrategy!.getPayload(this.targetLayer!.coordToPos(drawCoordinate), this.targetLayer!, this.editorContext, this.currentSession!);
+            const drawPayloads = this.activeDrawStrategy!.getPayload(this.targetLayerRenderer!.coordToPos(drawCoordinate), this.targetLayerRenderer!, this.editorContext, this.currentView!.session);
             if (drawPayloads.length <= 0) return;
             drawPayloads.forEach((drawPayload) => {
                 if (!this.currentFloodRegion.has(drawPayload.key)) {
@@ -244,32 +237,6 @@ export class BucketTool implements ITool {
             }
         }
         return points;
-    }
-
-    private updateActiveDrawStrategy(): void {
-        if (!this.currentSession) return;
-        
-        this.targetLayer = null;
-        this.activeDrawStrategy = null;
-
-        const selectedIds = this.currentSession.layerState.selectedLayers;
-        if (selectedIds.length === 0) return;
-
-
-        let targetLayer: BaseLayer<any> | null = null;
-        for (const id of selectedIds) {
-            const layer = this.currentSession.tilemap.rootLayer.findLayer(id);
-            if (layer && !(layer instanceof GroupLayer)) {
-                targetLayer = layer;
-                break;
-            }
-        }
-
-        if (!targetLayer || targetLayer?.locked || !targetLayer?.visible) return;
-
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(targetLayer!, this)) || null;
-        if (!this.activeDrawStrategy) return;
-        this.targetLayer = targetLayer;
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {

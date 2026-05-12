@@ -6,25 +6,27 @@ import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { SetTilesCommand } from "@/core/command/tile/setTilesCommand";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { ITool } from "@/core/interface/ITool";
+import { BaseLayerRenderer } from "@/core/application/renderer/baseLayerRenderer";
+import { TileLayerRenderer } from "@/core/application/renderer/tileLayerRenderer";
 
 
 export class DrawTileStrategy implements IDrawStrategy {
     // TODO: Get this from config in the future
     public static readonly spriteAlpha = 0.9;
 
-    public canHandle(layer: BaseLayer<any>, tool: ITool): boolean {
-        return layer instanceof TileLayer;
+    public canHandle(layerRenderer: BaseLayerRenderer<any>, tool: ITool): boolean {
+        return layerRenderer.layer instanceof TileLayer;
     }
 
-    public getRefAt(pos: Position, layer: TileLayer): any {
-        const coord = layer.posToCoord(pos);
-        return layer.getTileRefAt(coord);
+    public getRefAt(pos: Position, layerRenderer: TileLayerRenderer): any {
+        const coord = layerRenderer.posToCoord(pos);
+        return layerRenderer.layer.getTileRefAt(coord);
     }
 
-    public comparePosition(pos1: Position, pos2: Position, layer: TileLayer): boolean {
-        if (!pos1 || !pos2 || !layer) return false;
-        const coord1 = layer.posToCoord(pos1);
-        const coord2 = layer.posToCoord(pos2);
+    public comparePosition(pos1: Position, pos2: Position, layerRenderer: TileLayerRenderer): boolean {
+        if (!pos1 || !pos2 || !layerRenderer) return false;
+        const coord1 = layerRenderer.posToCoord(pos1);
+        const coord2 = layerRenderer.posToCoord(pos2);
         return coord1.col === coord2.col && coord1.row === coord2.row;
     }
 
@@ -36,11 +38,11 @@ export class DrawTileStrategy implements IDrawStrategy {
         return { width, height };
     }
 
-    public drawHoverPreview(pos: Position, layer: TileLayer, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
+    public drawHoverPreview(pos: Position, layerRenderer: TileLayerRenderer, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
         const selectedTiles = editorContext.getSelectedTile();
         if (!selectedTiles) return [];
 
-        const coord = layer.posToCoord(pos); // TODO: Check again, very sus
+        const coord = layerRenderer.posToCoord(pos); // TODO: Check again, very sus
 
         const sprites: Sprite[] = [];
         for (let r = 0; r < selectedTiles.length; r++) {
@@ -58,7 +60,7 @@ export class DrawTileStrategy implements IDrawStrategy {
 
                 const sprite = new Sprite(texture);
                 sprite.alpha = DrawTileStrategy.spriteAlpha;
-                const drawPotision = layer.coordToPos({ col, row });
+                const drawPotision = layerRenderer.coordToPos({ col, row });
                 sprite.position.set(drawPotision.x, drawPotision.y);
                 overlayContainer.addChild(sprite);
                 sprites.push(sprite);
@@ -67,11 +69,11 @@ export class DrawTileStrategy implements IDrawStrategy {
         return sprites;
     }
 
-    public getPayload(pos: Position, layer: TileLayer, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
+    public getPayload(pos: Position, layerRenderer: TileLayerRenderer, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
         const selectedTiles = editorContext.getSelectedTile();
         if (!selectedTiles) return [];
 
-        const coord = layer.posToCoord(pos);
+        const coord = layerRenderer.posToCoord(pos);
 
         const data: DrawPayload[] = [];
         for (let r = 0; r < selectedTiles.length; r++) {
@@ -89,7 +91,7 @@ export class DrawTileStrategy implements IDrawStrategy {
 
                 const sprite = new Sprite(texture);
                 sprite.alpha = DrawTileStrategy.spriteAlpha;
-                const drawPotision = layer.coordToPos({ col, row });
+                const drawPotision = layerRenderer.coordToPos({ col, row });
                 sprite.position.set(drawPotision.x, drawPotision.y);
                 data.push({ key: `${col},${row}`, sprite, coordinate: { col, row }, position: drawPotision, tileId: tile.id, tilesetId: tile.tileset.id });
             }
@@ -97,7 +99,7 @@ export class DrawTileStrategy implements IDrawStrategy {
         return data;
     }
 
-    public commit(layer: TileLayer, previewData: DrawPayload[], editorContext: EditorContext): void {
+    public commit(layerRenderer: TileLayerRenderer, previewData: DrawPayload[], editorContext: EditorContext): void {
         const historyManager = editorContext.getCurrentHistoryManager();
         if (!historyManager) return;
 
@@ -109,7 +111,7 @@ export class DrawTileStrategy implements IDrawStrategy {
         if (updates.length == 0) return;
 
         historyManager.startTransaction();
-        historyManager.execute(new SetTilesCommand(layer.id, updates), editorContext);
+        historyManager.execute(new SetTilesCommand(layerRenderer.layer.id, updates), editorContext);
         historyManager.commitTransaction();
     }
 }

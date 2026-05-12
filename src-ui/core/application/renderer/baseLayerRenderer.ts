@@ -30,6 +30,14 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
         this.container.alpha = this.layer.opacity;
     }
 
+    public posToCoord(pos: Position): Coordinate {
+        throw new Error("Method not implemented.");
+    }
+
+    public coordToPos(coord: Coordinate): Position {
+        throw new Error("Method not implemented.");
+    }
+
     public destroy(): void {
         (this.layer.eventEmitter as any).off("updateProperty", this.bindOnPropertyUpdate);
         this.container.destroy({ children: true, texture: false });

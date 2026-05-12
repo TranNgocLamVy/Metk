@@ -61,7 +61,7 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
             this.sprites.set(key, currentSprite);
         }
 
-        const drawPotision = this.layer.coordToPos({ col: x, row: y});
+        const drawPotision = this.coordToPos({ col: x, row: y});
         currentSprite.x = drawPotision.x;
         currentSprite.y = drawPotision.y;
 
@@ -102,6 +102,48 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         const tilesetIds = this.tilemap.tilesetRefManager.serialize().refs.map(ref => ref.id);
         if (tilesetIds.includes(tilesetId)) {
             this.renderLayer();
+        }
+    }
+
+    public override posToCoord(pos: Position): Coordinate {
+        switch (this.tilemap.orientation) {
+            case "orthogonal":
+                const col = Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tilewidth) - this.layer.coordinate.col;
+                const row = Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileheight) - this.layer.coordinate.row;
+                return { col, row };
+            case "isometric":
+                // TODO: Implement isometric
+                return { col: 0, row: 0 };
+            case "oblique":
+                // TODO: Implement oblique
+                return { col: 0, row: 0 };
+            case "staggered":
+                // TODO: Implement staggered
+                return { col: 0, row: 0 };
+            case "hexagonal":
+                // TODO: Implement hexagonal
+                return { col: 0, row: 0 };
+        }
+    }
+
+    public override coordToPos(coord: Coordinate): Position {
+        switch (this.tilemap.orientation) {
+            case "orthogonal":
+                const x = (coord.col + this.layer.coordinate.col) * this.tilemap.tilewidth + this.layer.offset.x;
+                const y = (coord.row + this.layer.coordinate.row) * this.tilemap.tileheight + this.layer.offset.y;
+                return { x, y };
+            case "isometric":
+                // TODO: Implement isometric
+                return { x: 0, y: 0 };
+            case "oblique":
+                // TODO: Implement oblique
+                return { x: 0, y: 0 };
+            case "staggered":
+                // TODO: Implement staggered
+                return { x: 0, y: 0 };
+            case "hexagonal":
+                // TODO: Implement hexagonal
+                return { x: 0, y: 0 };
         }
     }
 

@@ -6,7 +6,7 @@ import { TileLayerData, TileRefData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface TileLayerEvents extends BaseLayerEvents {
@@ -26,8 +26,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
 
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager, tilemapProps: TilemapProps) {
-        super(tileLayerData.id, tilesetRefManager, rulesetRefManager, tilemapProps);
+    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
+        super(tileLayerData.id, tilesetRefManager, rulesetRefManager);
 
         this.parentLayer = parentLayer;
 
@@ -129,48 +129,6 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return Result.Success(result);
     }
 
-    public override posToCoord(pos: Position): Coordinate {
-        switch (this.tilemapProps.orientation) {
-            case "orthogonal":
-                const col = Math.floor((pos.x - this.offset.x) / this.tilemapProps.tileWidth) - this.coordinate.col;
-                const row = Math.floor((pos.y - this.offset.y) / this.tilemapProps.tileHeight) - this.coordinate.row;
-                return { col, row };
-            case "isometric":
-                // TODO: Implement isometric
-                return { col: 0, row: 0 };
-            case "oblique":
-                // TODO: Implement oblique
-                return { col: 0, row: 0 };
-            case "staggered":
-                // TODO: Implement staggered
-                return { col: 0, row: 0 };
-            case "hexagonal":
-                // TODO: Implement hexagonal
-                return { col: 0, row: 0 };
-        }
-    }
-
-    public override coordToPos(coord: Coordinate): Position {
-        switch (this.tilemapProps.orientation) {
-            case "orthogonal":
-                const x = (coord.col + this.coordinate.col) * this.tilemapProps.tileWidth + this.offset.x;
-                const y = (coord.row + this.coordinate.row) * this.tilemapProps.tileHeight + this.offset.y;
-                return { x, y };
-            case "isometric":
-                // TODO: Implement isometric
-                return { x: 0, y: 0 };
-            case "oblique":
-                // TODO: Implement oblique
-                return { x: 0, y: 0 };
-            case "staggered":
-                // TODO: Implement staggered
-                return { x: 0, y: 0 };
-            case "hexagonal":
-                // TODO: Implement hexagonal
-                return { x: 0, y: 0 };
-        }
-    }
-
     public override serialize(): TileLayerData {
         const layerData = this.tilesRef.map(row => row.map(tileRef => {
             if (!tileRef) return "0";
@@ -187,8 +145,8 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
             width: this.size.width,
             height: this.size.height,
             opacity: this.opacity,
-            visible: this.visible,
-            locked: this.locked,
+            visible: this._visible,
+            locked: this._locked,
             offsetx: this.offset.x,
             offsety: this.offset.y,
             layerData: layerData,
@@ -198,7 +156,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override clone(): TileLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
+        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {
