@@ -8,6 +8,7 @@ import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { ITool } from "@/core/interface/ITool";
 import { BaseLayerRenderer } from "@/core/application/renderer/baseLayerRenderer";
 import { TileLayerRenderer } from "@/core/application/renderer/tileLayerRenderer";
+import { Tile } from "@/core/application/tile/tileset";
 
 
 export class DrawTileStrategy implements IDrawStrategy {
@@ -31,7 +32,7 @@ export class DrawTileStrategy implements IDrawStrategy {
     }
 
     public getBrushSize(editorContext: EditorContext): { width: number, height: number } {
-        const selectedTiles = editorContext.getSelectedTile();
+        const selectedTiles = this.getSelectedTiles(editorContext);
         if (!selectedTiles) return { width: 1, height: 1 };
         const height = selectedTiles.length;
         const width = selectedTiles[0].length;
@@ -39,7 +40,7 @@ export class DrawTileStrategy implements IDrawStrategy {
     }
 
     public drawHoverPreview(pos: Position, layerRenderer: TileLayerRenderer, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
-        const selectedTiles = editorContext.getSelectedTile();
+        const selectedTiles = this.getSelectedTiles(editorContext);
         if (!selectedTiles) return [];
 
         const coord = layerRenderer.posToCoord(pos); // TODO: Check again, very sus
@@ -70,7 +71,7 @@ export class DrawTileStrategy implements IDrawStrategy {
     }
 
     public getPayload(pos: Position, layerRenderer: TileLayerRenderer, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
-        const selectedTiles = editorContext.getSelectedTile();
+        const selectedTiles = this.getSelectedTiles(editorContext);
         if (!selectedTiles) return [];
 
         const coord = layerRenderer.posToCoord(pos);
@@ -113,5 +114,38 @@ export class DrawTileStrategy implements IDrawStrategy {
         historyManager.startTransaction();
         historyManager.execute(new SetTilesCommand(layerRenderer.layer.id, updates), editorContext);
         historyManager.commitTransaction();
+    }
+
+    // TODO: Cache this when selection changes in tileset session
+    private getSelectedTiles(editorContext: EditorContext): (Tile | null)[][] | null {
+        const session = editorContext.getActiveTilesetSession();
+        if (!session) return null;
+        
+        let minRow = Infinity, maxRow = -Infinity, minCol = Infinity, maxCol = -Infinity;
+        session.selectionState.selectedTilesSet.forEach((tileId) => {
+            const { row, col } = session.tileset.getCoordinatesFromTile(tileId)!;
+            minRow = Math.min(minRow, row);
+            maxRow = Math.max(maxRow, row);
+            minCol = Math.min(minCol, col);
+            maxCol = Math.max(maxCol, col);
+        })
+
+        const rows: (Tile | null)[][] = [];
+        for (let curRow = minRow; curRow <= maxRow; curRow++) {
+            const colsArr: (Tile | null)[] = [];
+            for (let curCol = minCol; curCol <= maxCol; curCol++) {
+                const absRow = curRow;
+                const absCol = curCol;
+                const tile = session.tileset.getTileFromCoordinates(absRow, absCol);
+                if (session.selectionState.selectedTilesSet.find((id) => tile && id === tile.id) === undefined) {
+                    colsArr.push(null);
+                } else {
+                    colsArr.push(tile);
+                }
+            }
+            rows.push(colsArr);
+        }
+        
+        return rows;
     }
 }
