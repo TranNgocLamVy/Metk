@@ -1,5 +1,3 @@
-import EventEmitter from "eventemitter3";
-
 import { HistoryManager } from "../manager/historyManager";
 import { ProjectManager } from "../manager/projectManager";
 import { ToolManager } from "../manager/toolManager";
@@ -7,16 +5,10 @@ import { WorkspaceManager } from "../manager/workspaceManager";
 import { Project } from "./project";
 import { TilemapSession } from "./session/tilemapSession";
 import { TilesetSession } from "./session/tilesetSession";
-import { Tile } from "./tile/tileset";
 import { Workspace } from "./workspace";
 import { TextureManager } from "../manager/textureManager";
-import { Ruleset } from "./rule/ruleset";
 import { TilemapView } from "./view/tilemapView";
 import { TilesetView } from "./view/tilesetView";
-
-type EditorContextEvent = {
-    onOpenTilemapSession: () => void,
-}
 
 export class EditorContext {
     constructor(
@@ -68,28 +60,5 @@ export class EditorContext {
         const currentMapSession = currentWorkspace.tilemapSessionManager.activeSession;
         if (!currentMapSession) return null;
         return currentMapSession.historyManager;
-    }
-
-    // Access the Tileset Session
-    public getSelectedTile(): (Tile | null)[][] | null {
-        const tilesetSessionManager = this.currentWorkspace?.tilesetSessionManager;
-        if (!tilesetSessionManager) return null;
-        const activeSession = tilesetSessionManager.getActiveView();
-        if (!activeSession) return null;
-        return activeSession.selector.getSelectedTiles();
-    }
-
-    public getSelectedRuleset(): Ruleset | null {
-        const selectedRuleId = this.workspaceManager.currentWorkspace?.rulesetSessionManager.getSelectedRuleId();
-        if (!selectedRuleId) return null;
-        const currentProject = this.currentProject;
-        if (!currentProject) return null;
-        return currentProject.rulesetManager.getRulesetById(selectedRuleId);
-    }
-
-    public getPivot(): Coordinate | null {
-        const currentTilesetSession = this.getActiveTilesetSession();
-        if (!currentTilesetSession) return null;
-        return currentTilesetSession.getPivot();
     }
 }

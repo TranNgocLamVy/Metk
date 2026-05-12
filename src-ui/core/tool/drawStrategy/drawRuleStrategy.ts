@@ -33,7 +33,7 @@ export class DrawRuleStrategy implements IDrawStrategy {
     }
 
     public drawHoverPreview(pos: Position, layerRenderer: RuleLayerRenderer, editorContext: EditorContext, session: TilemapSession, overlayContainer: Container): Sprite[] {
-        const selectedRuleset = editorContext.getSelectedRuleset();
+        const selectedRuleset = this.getSelectedRuleset(editorContext);
         if (!selectedRuleset) return [];
 
         const coord = layerRenderer.posToCoord(pos); // TODO: Check again, very sus
@@ -54,7 +54,7 @@ export class DrawRuleStrategy implements IDrawStrategy {
     }
 
     public getPayload(pos: Position, layerRenderer: RuleLayerRenderer, editorContext: EditorContext, session: TilemapSession): DrawPayload[] {
-        const selectedRuleset = editorContext.getSelectedRuleset();
+        const selectedRuleset = this.getSelectedRuleset(editorContext);
         if (!selectedRuleset) return [];
 
         const coord = layerRenderer.posToCoord(pos);
@@ -86,5 +86,13 @@ export class DrawRuleStrategy implements IDrawStrategy {
         historyManager.startTransaction();
         historyManager.execute(new SetRuleRefsCommand(layerRenderer.layer.id, updates), editorContext);
         historyManager.commitTransaction();
+    }
+
+    private getSelectedRuleset(editorContext: EditorContext) {
+        const selectedRuleId = editorContext.workspaceManager.currentWorkspace?.rulesetSessionManager.getSelectedRuleId();
+        if (!selectedRuleId) return null;
+        const currentProject = editorContext.currentProject;
+        if (!currentProject) return null;
+        return currentProject.rulesetManager.getRulesetById(selectedRuleId);
     }
 }
