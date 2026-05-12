@@ -3,6 +3,7 @@ import { Container, Graphics } from "pixi.js";
 import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { GroupLayerRenderer } from "./groupLayerRenderer";
+import { BaseLayerRenderer } from "./baseLayerRenderer";
 
 type CreateTilemapRendererContext = {
     tilemap: Tilemap
@@ -27,6 +28,10 @@ export class TilemapRenderer {
         this.borderGraphic = new Graphics();
         this.container.addChild(this.borderGraphic);
         this.renderBorder();
+    }
+
+    public findLayerRenderer(layerId: string): BaseLayerRenderer | null {
+        return this.rootRenderer.findChildRenderer(layerId);
     }
 
     private renderBorder(): void {

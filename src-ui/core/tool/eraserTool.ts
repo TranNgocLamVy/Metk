@@ -12,12 +12,10 @@ import { IBaseCommand } from "../interface/IBaseCommand";
 import { SetTilesCommand } from "../command/tile/setTilesCommand";
 import { SetRuleRefsCommand } from "../command/tile/setRulesCommand";
 import { IDrawStrategy } from "./drawStrategy/IDrawStrategy";
-import { GroupLayer } from "../application/tile/layer/groupLayer";
-import { BaseLayer } from "../application/tile/layer/baseLayer";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
-import { DrawTileStrategy } from "./drawStrategy/drawTileStrategy";
-import { DrawRuleStrategy } from "./drawStrategy/drawRuleStrategy";
 import { TilemapView } from "../application/view/tilemapView";
+import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
+import { RuleLayer } from "../application/tile/layer/ruleLayer";
 
 @Tool({
     id: "tool.eraser",
@@ -31,10 +29,8 @@ import { TilemapView } from "../application/view/tilemapView";
     when: "inWorkspace && !isModalOpen",
 })
 export class EraserTool implements ITool {
-    private drawStrategys: IDrawStrategy[];
     private activeDrawStrategy: IDrawStrategy | null = null;
 
-    private currentSession: TilemapSession | null = null;
     private currentView: TilemapView | null = null;
 
     private overlayContainer: Container | null = null;
@@ -47,7 +43,7 @@ export class EraserTool implements ITool {
     private previewGraphics: Graphics | null = null;
     private static eraserSize: number = 1;
 
-    private targetLayer: BaseLayer<any> | null = null;
+    private targetLayerRenderer: BaseLayerRenderer | null = null;
 
     private isEnabled: boolean = false;
 
@@ -55,22 +51,15 @@ export class EraserTool implements ITool {
     private bindPointerOnMove: (event: FederatedPointerEvent) => void;
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
     private bindPointerOutside: (event: FederatedPointerEvent) => void;
-    private bindOnSelectedLayersChanged: () => void;
     private originalWheelEvent: (e: FederatedWheelEvent) => boolean;
 
     private eraseCommandStack: IBaseCommand[] = [];
 
     constructor(private readonly editorContext: EditorContext) {
-        this.drawStrategys = [
-            new DrawTileStrategy(),
-            new DrawRuleStrategy()
-        ];
-
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
         this.bindPointerOutside = this.onPointerOutside.bind(this);
-        this.bindOnSelectedLayersChanged = this.updateActiveDrawStrategy.bind(this);
     }
 
     public onEnable(): void {
@@ -86,14 +75,13 @@ export class EraserTool implements ITool {
         this.isDragging = false;
         this.previousPreviewCoordinate = null!;
         this.currentPreviewCoordinate = null!;
-        this.targetLayer = null;
+        this.targetLayerRenderer = null;
         this.eraseCoordinateSet.clear();
 
         this.reverseErase();
     }
 
-    public attach(session: TilemapSession, view: TilemapView): void {
-        this.currentSession = session;
+    public attachView(view: TilemapView): void {
         this.currentView = view;
 
         const viewport = this.currentView.viewport;
@@ -109,9 +97,6 @@ export class EraserTool implements ITool {
         viewport.on("pointerupoutside", this.bindPointerOnUp);
         viewport.addEventListener("mouseleave", this.bindPointerOutside);
 
-        this.updateActiveDrawStrategy();
-        this.currentSession.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
-
         const wheelPlugin = viewport.plugins.get('wheel');
         const originalWheelEvent = wheelPlugin!.wheel;
         this.originalWheelEvent = originalWheelEvent;
@@ -123,7 +108,7 @@ export class EraserTool implements ITool {
     }
 
     public detach(): void {
-        if (!this.currentSession || !this.currentView) return;
+        if (!this.currentView) return;
         const viewport = this.currentView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
@@ -131,12 +116,11 @@ export class EraserTool implements ITool {
         viewport.off("pointerup", this.bindPointerOnUp);
         viewport.off("pointerupoutside", this.bindPointerOnUp);
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
-        this.currentSession.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
 
         const wheelPlugin = viewport.plugins.get('wheel')!;
         wheelPlugin.wheel = this.originalWheelEvent;
 
-        this.currentSession = null;
+        this.currentView = null;
 
         if (this.previewGraphics) this.previewGraphics.destroy();
         this.previewGraphics = null;
@@ -144,24 +128,32 @@ export class EraserTool implements ITool {
         this.isDragging = false;
         this.previousPreviewCoordinate = null!;
         this.currentPreviewCoordinate = null!;
-        this.targetLayer = null;
+        this.targetLayerRenderer = null;
         this.eraseCoordinateSet.clear();
 
         this.reverseErase();
     }
 
+    public setDrawStrategy(strategy: IDrawStrategy | null): void {
+        this.activeDrawStrategy = strategy;
+    }
+
+    public setTargetLayerRenderer(layerRenderer: BaseLayerRenderer | null): void {
+        this.targetLayerRenderer = layerRenderer;
+    }
+
     private onPointerDown(e: FederatedPointerEvent) {
         if (e.button !== 0) return;
-        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
+        if (!this.currentView || !this.targetLayerRenderer || !this.activeDrawStrategy) return;
         this.isDragging = true;
-        this.previousPreviewCoordinate = this.targetLayer.posToCoord(this.getLocalPos(e));
+        this.previousPreviewCoordinate = this.targetLayerRenderer.posToCoord(this.getLocalPos(e));
         this.eraseMove(e);
     }
 
     private onPointerMove(e: FederatedPointerEvent) {
-        if (!this.currentSession || !this.targetLayer || !this.activeDrawStrategy) return;
+        if (!this.currentView || !this.targetLayerRenderer || !this.activeDrawStrategy) return;
 
-        const newCoordinate = this.targetLayer.posToCoord(this.getLocalPos(e));
+        const newCoordinate = this.targetLayerRenderer.posToCoord(this.getLocalPos(e));
         this.currentPreviewCoordinate = newCoordinate;
         this.drawPreviewErase();
 
@@ -170,7 +162,7 @@ export class EraserTool implements ITool {
     }
 
     private onPointerUp(e: FederatedPointerEvent) {
-        if (!this.currentSession) return;
+        if (!this.currentView) return;
         if (!this.isDragging) return;
         this.isDragging = false;
         this.eraseEnd(e);
@@ -188,13 +180,13 @@ export class EraserTool implements ITool {
     }
 
     private drawPreviewErase() {
-        if (!this.currentSession || !this.previewGraphics || !this.targetLayer) return;
+        if (!this.currentView || !this.previewGraphics || !this.targetLayerRenderer) return;
 
         this.previewGraphics.clear();
 
-        const startPoint = this.targetLayer.coordToPos(this.currentPreviewCoordinate);
+        const startPoint = this.targetLayerRenderer.coordToPos(this.currentPreviewCoordinate);
 
-        const endPoint = this.targetLayer.coordToPos({
+        const endPoint = this.targetLayerRenderer.coordToPos({
             col: this.currentPreviewCoordinate.col + EraserTool.eraserSize,
             row: this.currentPreviewCoordinate.row + EraserTool.eraserSize
         });
@@ -212,7 +204,7 @@ export class EraserTool implements ITool {
     private eraseMove(e: FederatedPointerEvent) {
         if (!this.isDragging) return;
 
-        if (!this.targetLayer) return;
+        if (!this.targetLayerRenderer) return;
 
         const drawCoordinates = GeometryUtils.calculateLine(this.previousPreviewCoordinate, this.currentPreviewCoordinate);
         if (drawCoordinates.length == 0) drawCoordinates.push(this.currentPreviewCoordinate);
@@ -224,14 +216,14 @@ export class EraserTool implements ITool {
                 for (let c = 0; c < EraserTool.eraserSize; c++) {
                     const targetX = drawCoordinate.col + c;
                     const targetY = drawCoordinate.row + r;
-                    if (targetX < 0 || targetX >= this.currentSession!.tilemap.width ||
-                        targetY < 0 || targetY >= this.currentSession!.tilemap.height) {
+                    if (targetX < 0 || targetX >= this.currentView!.session.tilemap.width ||
+                        targetY < 0 || targetY >= this.currentView!.session.tilemap.height) {
                         continue;
                     }
                     const coord = { col: targetX, row: targetY };
                     const key = `${coord.col},${coord.row}`;
                     if (this.eraseCoordinateSet.has(key)) continue;
-                    if (!this.activeDrawStrategy!.getRefAt(this.targetLayer!.coordToPos(coord), this.targetLayer!)) continue;
+                    if (!this.activeDrawStrategy!.getRefAt(this.targetLayerRenderer!.coordToPos(coord), this.targetLayerRenderer!)) continue;
 
                     this.eraseCoordinateSet.add(key);
                     eraseCoordinates.push(coord);
@@ -243,13 +235,13 @@ export class EraserTool implements ITool {
             let eraseCommand: IBaseCommand;
 
             // TODO: Move this into strategy
-            if (this.targetLayer instanceof TileLayer) {
-                eraseCommand = new SetTilesCommand(this.targetLayer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+            if (this.targetLayerRenderer.layer instanceof TileLayer) {
+                eraseCommand = new SetTilesCommand(this.targetLayerRenderer.layer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+            } else if (this.targetLayerRenderer.layer instanceof RuleLayer) {
+                eraseCommand = new SetRuleRefsCommand(this.targetLayerRenderer.layer.id, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
             } else {
-                eraseCommand = new SetRuleRefsCommand(this.targetLayer.id, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
-            } // Expand to other layer types
-
-            if (!eraseCommand) return;
+                return;
+            }
             eraseCommand.execute(this.editorContext);
             this.eraseCommandStack.push(eraseCommand);
         }
@@ -271,31 +263,6 @@ export class EraserTool implements ITool {
         const batchCommand = new BatchCommand(this.eraseCommandStack);
         historyManager.pushToUndoStack(batchCommand);
         this.eraseCommandStack = [];
-    }
-
-    private updateActiveDrawStrategy(): void {
-        if (!this.currentSession) return;
-        
-        this.targetLayer = null;
-        this.activeDrawStrategy = null;
-
-        const selectedIds = this.currentSession.layerState.selectedLayers;
-        if (selectedIds.length === 0) return;
-
-        let targetLayer: BaseLayer<any> | null = null;
-        for (const id of selectedIds) {
-            const layer = this.currentSession.tilemap.rootLayer.findLayer(id);
-            if (layer && !(layer instanceof GroupLayer)) {
-                targetLayer = layer;
-                break;
-            }
-        }
-
-        if (!targetLayer || targetLayer?.locked || !targetLayer?.visible) return;
-
-        this.activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(targetLayer!, this)) || null;
-        if (!this.activeDrawStrategy) return;
-        this.targetLayer = targetLayer;
     }
 
     private getLocalPos(e: FederatedPointerEvent): Position {

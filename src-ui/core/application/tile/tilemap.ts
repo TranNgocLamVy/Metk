@@ -45,16 +45,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilesetRefManager.loadData(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
         this.rulesetRefManager.loadData(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
 
-        this.rootLayer = new RootLayer(
-            tilemapData.layers, 
-            this.tilesetRefManager, 
-            this.rulesetRefManager, 
-            { 
-                tileWidth: this.tilewidth, 
-                tileHeight: this.tileheight,
-                orientation: this.orientation,
-            }
-        );
+        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager);
     }
 
     public serialize(): TilemapData {

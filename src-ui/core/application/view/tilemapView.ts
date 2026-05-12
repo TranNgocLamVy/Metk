@@ -13,7 +13,7 @@ export class TilemapView implements IBaseView {
     public viewport: Viewport;
     private pixiApp: Application;
 
-    private renderer: TilemapRenderer;
+    public renderer: TilemapRenderer;
     public overlayerContainer: Container;
     public grid: TilemapGridRenderer;
 

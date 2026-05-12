@@ -4,7 +4,7 @@ import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
 import { GroupLayerData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface GroupLayerEvents extends BaseLayerEvents {
@@ -17,8 +17,8 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public layers: BaseLayer[] = [];
     public isOpen: boolean = false;
 
-    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager, tilemapProps: TilemapProps) {
-        super(groupLayerData.id, tilesetRefManager, rulesetRefManager, tilemapProps);
+    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
+        super(groupLayerData.id, tilesetRefManager, rulesetRefManager);
 
         this.parentLayer = parentLayer;
 
@@ -103,8 +103,8 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
             type: "group",
             name: this.name,
             opacity: this.opacity,
-            visible: this.visible,
-            locked: this.locked,
+            visible: this._visible,
+            locked: this._locked,
             open: this.isOpen
         }
     }
@@ -112,7 +112,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override clone(): GroupLayer {
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
-        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
+        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
     }
 
     public override removeRulesetRef(rulesetIndex: number): void {

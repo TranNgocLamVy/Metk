@@ -1,12 +1,15 @@
 import { EditorContext } from "../application/editorContext";
-import { TilemapSession } from "../application/session/tilemapSession";
+import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
 import { TilemapView } from "../application/view/tilemapView";
+import { IDrawStrategy } from "../tool/drawStrategy/IDrawStrategy";
 
 export interface ITool {
     onEnable(): void;
     onDisable(): void;
-    attach(session: TilemapSession, view: TilemapView): void;
+    attachView(view: TilemapView): void;
     detach(): void;
+    setDrawStrategy(strategy: IDrawStrategy | null): void;
+    setTargetLayerRenderer(layerRenderer: BaseLayerRenderer | null): void;
 }
 
 export type IToolContructor = new (editorContext: EditorContext) => ITool; 

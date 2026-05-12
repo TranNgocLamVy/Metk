@@ -24,6 +24,7 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
         targetLayer.toggleVisibility(this.newIsVisible);
 
         currentSession.markLayerChange();
+        currentSession.emit("onSelectedLayersChanged", currentSession.layerState.selectedLayers);
 
         return Result.Success();
     }
@@ -39,7 +40,7 @@ export class ToggleLayerVisibilityCommand implements IBaseCommand {
         targetLayer.toggleVisibility(this.oldIsVisible);
 
         currentSession.markLayerChange();
-        
+        currentSession.emit("onSelectedLayersChanged", currentSession.layerState.selectedLayers);
         return Result.Success();
     }
 

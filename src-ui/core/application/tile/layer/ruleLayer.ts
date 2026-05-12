@@ -6,7 +6,7 @@ import { RuleLayerData, RulesetRefData } from "@/shared/schema/layerSchema";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrixUtils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer, TilemapProps } from "./baseLayer";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./baseLayer";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
 
 interface RuleLayerEvents extends BaseLayerEvents {
@@ -25,9 +25,8 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         parentLayer: IGroupLayer, 
         tilesetRefManager: TilesetRefManager, 
         rulesetRefManager: RulesetRefManager,
-        tilemapProps: TilemapProps,
     ) {
-        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, tilemapProps);
+        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager);
 
         this.parentLayer = parentLayer;
         this.name = ruleLayerData.name;
@@ -235,48 +234,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         return rulesetRefs;
     }
 
-    public override posToCoord(pos: Position): Coordinate {
-        switch (this.tilemapProps.orientation) {
-            case "orthogonal":
-                const col = Math.floor((pos.x - this.offset.x) / this.tilemapProps.tileWidth) - this.coordinate.col;
-                const row = Math.floor((pos.y - this.offset.y) / this.tilemapProps.tileHeight) - this.coordinate.row;
-                return { col, row };
-            case "isometric":
-                // TODO: Implement isometric
-                return { col: 0, row: 0 };
-            case "oblique":
-                // TODO: Implement oblique
-                return { col: 0, row: 0 };
-            case "staggered":
-                // TODO: Implement staggered
-                return { col: 0, row: 0 };
-            case "hexagonal":
-                // TODO: Implement hexagonal
-                return { col: 0, row: 0 };
-        }
-    }
-
-    public override coordToPos(coord: Coordinate): Position {
-        switch (this.tilemapProps.orientation) {
-            case "orthogonal":
-                const x = (coord.col + this.coordinate.col) * this.tilemapProps.tileWidth + this.offset.x;
-                const y = (coord.row + this.coordinate.row) * this.tilemapProps.tileHeight + this.offset.y;
-                return { x, y };
-            case "isometric":
-                // TODO: Implement isometric
-                return { x: 0, y: 0 };
-            case "oblique":
-                // TODO: Implement oblique
-                return { x: 0, y: 0 };
-            case "staggered":
-                // TODO: Implement staggered
-                return { x: 0, y: 0 };
-            case "hexagonal":
-                // TODO: Implement hexagonal
-                return { x: 0, y: 0 };
-        }
-    }
-
     public override serialize(): RuleLayerData {
         const layerData = this.rulesetsRef.map(row => row.map(tileRef => {
             if (!tileRef) return "0";
@@ -293,8 +250,8 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
             width: this.size.width,
             height: this.size.height,
             opacity: this.opacity,
-            visible: this.visible,
-            locked: this.locked,
+            visible: this._visible,
+            locked: this._locked,
             offsetx: this.offset.x,
             offsety: this.offset.y,
             layerData: layerData,
@@ -304,7 +261,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public override clone(): RuleLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.tilemapProps);
+        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

@@ -3,28 +3,33 @@ import { Result } from "@/shared/types/result";
 
 import { BaseObject, BaseObjectEvents } from "../../baseObject";
 import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
-import { TilemapOrientation } from "@/shared/schema/tilemapSchema";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
 
-}
-
-export type TilemapProps = {
-    tileWidth: number;
-    tileHeight: number;
-    orientation: TilemapOrientation;
 }
 
 export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends BaseObject<T> {
     public readonly id: string;
     public name: string;
     public opacity: number = 1;
-    public visible: boolean = true;
-    public locked: boolean = false;
+    protected _visible: boolean = true;
+    protected _locked: boolean = false;
+    
+    public get visible() { return this._visible && this.parentLayer ? this.parentLayer.visible : this._visible }
+    public set visible(value: boolean) {
+        this._visible = value;
+        (this.eventEmitter as any).emit("updateProperty", "visible", this._visible);
+    }
+
+    public get locked() { return this._locked || (this.parentLayer ? this.parentLayer.locked : false) }
+    public set locked(value: boolean) {
+        this._locked = value;
+        (this.eventEmitter as any).emit("updateProperty", "locked", this._locked);
+    }
 
     public parentLayer: IGroupLayer;
 
-    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly rulesetRefManager: RulesetRefManager, public readonly tilemapProps: TilemapProps) {
+    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly rulesetRefManager: RulesetRefManager) {
         super();
         this.id = id;
     }
@@ -87,14 +92,6 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         // pass
     }
 
-    public posToCoord(pos: Position): Coordinate {
-        throw new Error("Method not implemented.");
-    }
-
-    public coordToPos(coord: Coordinate): Position {
-        throw new Error("Method not implemented.");
-    }
-
     public traverse(cb: (layer: BaseLayer<any>) => void): void {
         throw new Error("Method not implemented.");
     }
@@ -113,8 +110,9 @@ export interface IGroupLayer {
     parentLayer: IGroupLayer | null;
     tilesetRefManager: TilesetRefManager;
     rulesetRefManager: RulesetRefManager;
-    tilemapProps: TilemapProps;
     layers: BaseLayer<any>[];
+    visible: boolean;
+    locked: boolean;
     getLayerIndex(layerId: string): number;
     addLayer(newLayer: BaseLayer<any>): Result;
     pushLayer(newLayer: BaseLayer<any>): Result;

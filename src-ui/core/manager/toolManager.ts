@@ -1,10 +1,14 @@
 import EventEmitter from "eventemitter3";
 
 import { EditorContext } from "../application/editorContext";
-import { TilemapSession } from "../application/session/tilemapSession";
 import { ToolContext } from "../decorator/tool";
 import { ITool, IToolContructor } from "../interface/ITool";
 import { TilemapView } from "../application/view/tilemapView";
+import { IDrawStrategy } from "../tool/drawStrategy/IDrawStrategy";
+import { DrawTileStrategy } from "../tool/drawStrategy/drawTileStrategy";
+import { DrawRuleStrategy } from "../tool/drawStrategy/drawRuleStrategy";
+import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
+import { GroupLayerRenderer } from "../application/renderer/groupLayerRenderer";
 
 type ToolManagerEvent = {
     onToolChanged: (toolId: string | null) => void;
@@ -19,12 +23,23 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
     private editorContext: EditorContext;
 
-    private activeTilemapSession: TilemapSession | null = null;
     private activeTilemapView: TilemapView | null = null;
+
+    private drawStrategys: IDrawStrategy[];
+
+    private bindOnSelectedLayersChanged: (layerIds: string[]) => void;
 
     constructor() {
         super();
+
         this.initializeDecoratedTools();
+
+        this.drawStrategys = [
+            new DrawTileStrategy(),
+            new DrawRuleStrategy()
+        ];
+
+        this.bindOnSelectedLayersChanged = this.onSelectedLayersChanged.bind(this);
     }
 
     public setEditorContext(editorContext: EditorContext) {
@@ -53,15 +68,40 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         this.toolMap.set(toolId, brushConstructor);
     }
 
-    public setActiveSession(session: TilemapSession | null, view: TilemapView | null) {
-        this.activeTilemapSession = session;
+    public setActiveSession(view: TilemapView | null) {
+        if (this.activeTilemapView) this.activeTilemapView.session.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+
         this.activeTilemapView = view;
 
         if (this.currentTool) this.currentTool.detach();
 
-        if (session && view && this.currentTool) {
-            this.currentTool.attach(session, view);
+        if (view && this.currentTool) {
+            this.currentTool.attachView(view);
+            view.session.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+            this.onSelectedLayersChanged();
         }
+    }
+
+    private onSelectedLayersChanged() {
+        if (!this.activeTilemapView || !this.currentTool) return;
+
+        let targetLayerRenderer: BaseLayerRenderer | null = null;
+        const layerIds = this.activeTilemapView.session.layerState.selectedLayers;
+        for (const id of layerIds) {
+            const layerRenderer = this.activeTilemapView.renderer.findLayerRenderer(id);
+            if (!layerRenderer || layerRenderer instanceof GroupLayerRenderer) continue;
+            if (!layerRenderer.layer.visible || layerRenderer.layer.locked) continue;
+            targetLayerRenderer = layerRenderer;
+            break;
+        }
+        this.currentTool.setTargetLayerRenderer(targetLayerRenderer);
+        if (!targetLayerRenderer) {
+            this.currentTool.setDrawStrategy(null);
+        } else {   
+            const activeDrawStrategy = this.drawStrategys.find(s => s.canHandle(targetLayerRenderer, this.currentTool!)) || null;
+            this.currentTool.setDrawStrategy(activeDrawStrategy);
+        }
+
     }
 
     public startTool(toolId: string) {
@@ -74,8 +114,9 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
             this.currentTool.onEnable();
 
-            if (this.activeTilemapSession && this.activeTilemapView) {
-                this.currentTool.attach(this.activeTilemapSession, this.activeTilemapView);
+            if (this.activeTilemapView) {
+                this.currentTool.attachView(this.activeTilemapView);
+                this.onSelectedLayersChanged();
             }
             this.emit("onToolChanged", toolId);
         }
@@ -101,8 +142,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
     public resumeTool() {
         if (this.currentTool) {
             this.currentTool.onEnable();
-            if (this.activeTilemapSession && this.activeTilemapView) {
-                this.currentTool.attach(this.activeTilemapSession, this.activeTilemapView);
+            if (this.activeTilemapView) {
+                this.currentTool.attachView(this.activeTilemapView);
             }
         }
     }
