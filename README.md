@@ -1,43 +1,15 @@
 # Metk (Map Editor Toolkit)
 
-Metk is a specialized tilemap editor designed for high-performance level design workflows. Built on the Tauri framework, it implements a decoupled architecture that separates native host operations from application logic and user interface concerns.
+**Metk** is a comprehensive 2D tilemap editor designed to make building game levels easy. It speeds up your workflow by providing multiple drawing tools, multi-layer editing, and ruleset-based auto-tiling. Once your design is complete, you can easily export your maps into standard formats (like JSON or .tmx) that are ready to drop directly into any game engine.
 
-## Technical Architecture
-
-The project follows a layered architectural pattern to ensure scalability and maintainability:
-
-1. **Host Layer (Rust/Tauri):**
-   - Manages native OS windowing and lifecycle.
-   - Provides secure, typed IPC (Inter-Process Communication) for filesystem access and system-level configurations.
-
-2. **Core Layer (TypeScript):**
-   - **AppCore & Managers:** Orchestrates the lifecycle of Projects, Tilemaps, Tilesets, and Tools.
-   - **Command System:** Implements a robust undo/redo architecture where editor actions are encapsulated as discrete Command objects.
-   - **Session Management:** Handles active editing contexts for both tilemaps and tilesets independently.
-
-3. **Infrastructure Layer:**
-   - **Data Integrity:** Utilizes ArkType for runtime schema validation and safe JSON serialization.
-   - **Storage Providers:** Abstraction layer for filesystem operations, currently optimized for Tauri's native API.
-
-4. **View & Rendering Layer (React):**
-   - **Workspace:** Powered by FlexLayout, offering a professional, dockable IDE-style interface.
-   - **Rendering:** PIXIJS for High-performance HTML5 Canvas engine tailored for grid-based manipulation.
-   - **State:** Synchronized via specialized stores (Zustand/Custom) that bridge UI components with the Core logic.
-
-## Project Structure
-
-- `src-tauri/`: Native Rust environment and desktop integration.
-- `src-ui/`: Main frontend codebase.
-  - `core/`: Pure business logic, command implementations, and manager systems.
-  - `infrastructure/`: Serializers and external service providers.
-  - `shared/`: Centralized ArkType schemas and TypeScript definitions.
-  - `view/`: React components, workspace layouts, and UI state stores.
-
-## Development
+# Installing Metk
 
 ### Requirements
-- Node.js (LTS)
+- Node.js
 - Rust Toolchain (cargo, rustc)
+- Window: Microsoft C++ Build Tools
+- Linux: TODO:
+- macOS: TODO:
 
 ### Build Process
 1. Clone the repository.
