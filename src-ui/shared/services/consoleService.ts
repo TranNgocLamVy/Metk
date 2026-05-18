@@ -1,4 +1,4 @@
-import { useConsoleStore } from "@/view/stores/consoleStore";
+import { useConsoleStore } from "@/ui/stores/consoleStore";
 import { Result } from "../types/result";
 import { v4 as uuidv4 } from "uuid";
 

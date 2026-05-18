@@ -6,7 +6,7 @@ import { defaultProjectData } from "../schema/projectSchema";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
 import { Project } from "@/core/application/project";
 import { DialogService } from "./dialogService";
-import { useNavigationStore } from "@/view/stores/navigationStore";
+import { useNavigationStore } from "@/ui/stores/navigationStore";
 import { PathUtils } from "../utils/pathUtils";
 import { createProjectForm } from "../constant/form/createProjectForm";
 import { Console } from "./consoleService";

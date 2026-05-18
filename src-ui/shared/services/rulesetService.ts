@@ -5,7 +5,7 @@ import { RulesetData } from "@/shared/schema/rulesetSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { appCore } from "@/core/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
-import { useRulesetStore } from "@/view/stores/rulesetStore";
+import { useRulesetStore } from "@/ui/stores/rulesetStore";
 import { DialogService } from "./dialogService";
 import { createRulesetForm } from "../constant/form/createRulesetForm";
 import { WorkspaceService } from "./workspaceService";

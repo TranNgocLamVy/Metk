@@ -3,7 +3,7 @@ import { SystemCommand } from "@/core/decorator/command";
 import { ISystemCommand } from "@/core/interface/IBaseCommand";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { Result } from "@/shared/types/result";
-import { useDialogStore } from "@/view/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialogStore";
 
 @SystemCommand({
     id: "workspace.openFile",
