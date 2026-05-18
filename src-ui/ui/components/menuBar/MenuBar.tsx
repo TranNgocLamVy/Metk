@@ -1,5 +1,5 @@
 import { HStack } from "@/ui/components/custom/stack/Stack";
-import { useTheme } from "@/ui/components/providers/ThemeProvider";
+import { useTheme } from "@/app/providers/theme.provider";
 import { FileDropdownOptions } from "./dropdown/FileDropdownOptions";
 import { EditDropdownOptions } from "./dropdown/EditDropdownOptions";
 import { ViewDropdownOptions } from "./dropdown/ViewDropdownOptions";

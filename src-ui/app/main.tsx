@@ -4,22 +4,20 @@ import "@/assets/style/shadcn.css";
 
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
-import { I18nextProvider } from "react-i18next";
-import { Route, HashRouter as Router, Routes } from "react-router-dom";
+import { HashRouter as Router } from "react-router-dom";
 
-import i18n from "@/shared/services/i18n";
+import ThemeProvider from "@/app/providers/theme.provider";
 import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { FallbackRender } from "@/ui/components/layout/FallbackRender";
 import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOverlay";
 import MainContainer from "@/ui/components/layout/MainContainer";
 import MenuBar from "@/ui/components/menuBar/MenuBar";
-import { ThemeProvider } from "@/ui/components/providers/ThemeProvider";
 import { Toaster } from "@/ui/components/shadcn/sonner";
-import HomePage from "./routes/Home";
-import WorkspacePage from "./routes/Workspace";
+import I18nProvider from "./providers/i18n.provider";
+import AppRoutes from "./routes";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<I18nextProvider i18n={i18n}>
+	<I18nProvider>
 		<ErrorBoundary fallbackRender={FallbackRender}>
 			<ThemeProvider>
 				<MenuBar />
@@ -28,13 +26,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 						<Toaster position="bottom-right" richColors closeButton={false} />
 						<DialogRoot />
 						<LanguageLoadingOverlay />
-						<Routes>
-							<Route path={"/"} element={<HomePage />} />
-							<Route path={"/workspace/:projectId"} element={<WorkspacePage />} />
-						</Routes>
+						<AppRoutes />
 					</MainContainer>
 				</Router>
 			</ThemeProvider>
 		</ErrorBoundary>
-	</I18nextProvider>,
+	</I18nProvider>,
 );

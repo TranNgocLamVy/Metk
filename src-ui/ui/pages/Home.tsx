@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { ProjectService } from "@/shared/services/projectService";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
-import { useContextScope } from "../../ui/hooks/useContextScope";
+import { useContextScope } from "../hooks/useContextScope";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
-import { useProjectStore } from "../../ui/stores/projectStore";
+import { useProjectStore } from "../stores/projectStore";
 
 export default function HomePage() {
 	const navigate = useNavigate();
