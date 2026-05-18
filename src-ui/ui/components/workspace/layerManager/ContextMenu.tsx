@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp, Copy, Folder, Grid3x3, Plus, Trash2 } from "lucide-react";
 
-import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { useTilemapSessionStore } from "@/ui/stores/tilemapSessionStore";
+import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 
 const isTilemapSessionOpen = (): boolean => {
 	const activeSession = useTilemapSessionStore.getState().activeSession;

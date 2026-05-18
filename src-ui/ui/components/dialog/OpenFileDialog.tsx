@@ -1,6 +1,6 @@
-import { appCore } from "@/editor/appcore";
-import { WorkspaceService } from "@/shared/services/workspaceService";
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+import { WorkspaceService } from "@/shared/services/workspace.service";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "./dialogRegistry";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../shadcn/dialog";
@@ -13,7 +13,7 @@ interface OpenFileModalProps extends BaseDialogProps {
 export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
     const { closeDialog } = useDialogStore();
 
-    const currentProject = appCore.editorContext.currentProject;
+    const currentProject = appKernel.editorContext.currentProject;
     if (!currentProject) return null;
 
     const tilemaps = currentProject.tilemapManager.serialize();

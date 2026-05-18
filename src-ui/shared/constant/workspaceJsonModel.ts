@@ -1,4 +1,4 @@
-import { IJsonBorderNode, IJsonModel, IJsonRowNode } from "flexlayout-react";
+import {  IJsonModel, IJsonRowNode } from "flexlayout-react";
 
 const workspaceRowNode: IJsonRowNode = {
     type: "row",

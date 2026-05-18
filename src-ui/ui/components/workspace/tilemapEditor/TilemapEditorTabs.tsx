@@ -1,9 +1,9 @@
 import { X } from "lucide-react";
 import { Fragment, useRef } from "react";
 
-import { WorkspaceService } from "@/shared/services/workspaceService";
-import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll";
-import { useTilemapSessionStore } from "@/ui/stores/tilemapSessionStore";
+import { WorkspaceService } from "@/shared/services/workspace.service";
+import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 
 import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";

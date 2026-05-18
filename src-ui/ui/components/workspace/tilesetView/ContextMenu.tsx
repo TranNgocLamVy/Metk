@@ -1,8 +1,8 @@
 import { Grid3x3, Pen, Plus, Trash2 } from "lucide-react";
 
-import { appCore } from "@/editor/appcore";
-import { TilesetService } from "@/shared/services/tilesetService";
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+import { TilesetService } from "@/shared/services/tileset.service";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { DialogZLevel } from "@/shared/types/dialog";
 
 const Group1: MenuDropDownGroupType = [
@@ -33,12 +33,12 @@ const Group2: MenuDropDownGroupType = [
         label: "workspace.tilesetSelector.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const activeTilesetView = appCore.editorContext.getActiveTilesetView();
+            const activeTilesetView = appKernel.editorContext.getActiveTilesetView();
             if (!activeTilesetView) return false;
             return activeTilesetView.gridEnabled;
         },
         toggle() {
-            const activeTilesetView = appCore.editorContext.getActiveTilesetView();
+            const activeTilesetView = appKernel.editorContext.getActiveTilesetView();
             if (!activeTilesetView) return false;
             activeTilesetView.toggleGrid();
         },
@@ -52,13 +52,13 @@ const Group3: MenuDropDownGroupType = [
         startIcon: <Trash2 />,
         variant: "destructive",
         disabled() {
-            const editorContext = appCore.editorContext;
+            const editorContext = appKernel.editorContext;
             const currentTilesetSession = editorContext.getActiveTilesetSession();
             if (!currentTilesetSession) return true;
             return false;
         },
         onClick() {
-            const editorContext = appCore.editorContext;
+            const editorContext = appKernel.editorContext;
             const currentTilesetSession = editorContext.getActiveTilesetSession();
             if (!currentTilesetSession) return;
             TilesetService.deleteTileset(currentTilesetSession.tileset.id); 

@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 
-import useResizeObserver from "@/ui/hooks/useResizeObserver";
-import { useTilemapSessionStore } from "@/ui/stores/tilemapSessionStore";
+import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
 import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
@@ -10,8 +10,8 @@ import { LocalizedText } from "../../custom/LocalizeText";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialogStore";
-import { TilemapService } from "@/shared/services/tilemapService";
+import { useDialogStore } from "@/ui/stores/dialog.store";
+import { TilemapService } from "@/shared/services/tilemap.service";
 import { useEffect } from "react";
 
 export default function TilemapEditorCanvas() {

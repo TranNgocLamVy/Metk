@@ -1,13 +1,13 @@
 import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
 
-import { ProjectService } from "@/shared/services/projectService";
-import { TilemapService } from "@/shared/services/tilemapService";
-import { TilesetService } from "@/shared/services/tilesetService";
-import { RulesetService } from "@/shared/services/rulesetService";
-import { appCore } from "@/editor/appcore";
+import { ProjectService } from "@/shared/services/project.service";
+import { TilemapService } from "@/shared/services/tilemap.service";
+import { TilesetService } from "@/shared/services/tileset.service";
+import { RulesetService } from "@/shared/services/ruleset.service";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialogStore";
-import { executeCommand } from "@/editor/service/commandService";
+import { useDialogStore } from "@/ui/stores/dialog.store";
+import { executeCommand } from "@/shared/services/command.service";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -30,7 +30,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.action.new.tilemap",
 					startIcon: <SquarePlus />,
-					disabled: () => !(appCore.projectManager.currentProject != null),
+					disabled: () => !(appKernel.projectManager.currentProject != null),
                     onClick() {
 						TilemapService.createTilemap();
 					},
@@ -39,7 +39,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.action.new.tileset",
 					startIcon: <Grid2x2Plus />,
-					disabled: () => !(appCore.projectManager.currentProject != null),
+					disabled: () => !(appKernel.projectManager.currentProject != null),
                     onClick() {
 						TilesetService.createTileset();
 					},
@@ -48,7 +48,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.file.action.new.ruleset",
 					startIcon: <Grid2x2Plus />,
-					disabled: () => !(appCore.projectManager.currentProject != null),
+					disabled: () => !(appKernel.projectManager.currentProject != null),
                     onClick() {
 						RulesetService.createRuleset();
 					},
@@ -60,7 +60,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.file.action.open.file",
 		startIcon: <FolderOpen />,
-		disabled: () => !(appCore.projectManager.currentProject != null),
+		disabled: () => !(appKernel.projectManager.currentProject != null),
         onClick: () => executeCommand("workspace.openFile")
 	},
 	{
@@ -112,7 +112,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 		label: "menu.file.action.save",
 		startIcon: <Save />,
 		disabled: () => {
-			const editorContext = appCore.editorContext;
+			const editorContext = appKernel.editorContext;
 			const currentSession = editorContext.getActiveTilemapSession();
 			if (!currentSession) return true;
 			return !currentSession.isDirty;
@@ -131,7 +131,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 		label: "menu.file.action.saveAll",
 		startIcon: <SaveAll />,
 		disabled: () => {
-			const currentWorkspace = appCore.workspaceManager.currentWorkspace;
+			const currentWorkspace = appKernel.workspaceManager.currentWorkspace;
 			if (!currentWorkspace) return true;
 			const tilemapsSession = currentWorkspace.tilemapSessionManager.tilemapsSession;
 			return !tilemapsSession.some(s => s.isDirty);
@@ -179,7 +179,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 					label: "menu.file.action.export.exportTMX",
 					startIcon: <FolderUp />,
 					disabled: () => {
-						const editorContext = appCore.editorContext;
+						const editorContext = appKernel.editorContext;
 						const currentSession = editorContext.getActiveTilemapSession();
 						if (!currentSession) return true;
 						return !currentSession.isDirty;

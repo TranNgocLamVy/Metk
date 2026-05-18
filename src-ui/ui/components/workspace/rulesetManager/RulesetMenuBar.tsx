@@ -2,10 +2,10 @@ import { Pen, Plus, Trash2 } from "lucide-react";
 import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import QuickToolTip from "../../custom/QuickToolTip";
-import { RulesetService } from "@/shared/services/rulesetService";
+import { RulesetService } from "@/shared/services/ruleset.service";
 import { useCallback, useMemo } from "react";
-import { useRulesetStore } from "@/ui/stores/rulesetStore";
-import { DialogService } from "@/shared/services/dialogService";
+import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { DialogService } from "@/shared/services/dialog.service";
 
 export default function RulesetMenuBar() {
     const { currentSelectedRuleId } = useRulesetStore();

@@ -1,7 +1,7 @@
 import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
-import { appCore } from "@/editor/appcore";
-import { TilemapService } from "@/shared/services/tilemapService";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+import { TilemapService } from "@/shared/services/tilemap.service";
 
 const ActionGroup: MenuDropDownGroupType = [
     {
@@ -20,12 +20,12 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		label: "workspace.tilemapEditor.contextMenu.undo",
 		startIcon: <Undo />,
 		disabled() {
-			const editorContext = appCore.editorContext;
+			const editorContext = appKernel.editorContext;
 			const historyManager = editorContext.getCurrentHistoryManager();
 			return !historyManager?.canUndo;
 		},
 		onClick() {
-			const editorContext = appCore.editorContext;
+			const editorContext = appKernel.editorContext;
 			editorContext.getCurrentHistoryManager()?.undo(editorContext);
 		},
 	},
@@ -34,12 +34,12 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		label: "workspace.tilemapEditor.contextMenu.redo",
 		startIcon: <Redo />,
 		disabled() {
-			const editorContext = appCore.editorContext;
+			const editorContext = appKernel.editorContext;
 			const historyManager = editorContext.getCurrentHistoryManager();
 			return !historyManager?.canRedo;
 		},
 		onClick() {
-			const editorContext = appCore.editorContext;
+			const editorContext = appKernel.editorContext;
 			editorContext.getCurrentHistoryManager()?.redo(editorContext);
 		},
 	},
@@ -123,9 +123,9 @@ const BrushGroup: MenuDropDownGroupType = [
 				{
 					type: "radio",
 					label: "workspace.tilemapEditor.contextMenu.currentTool",
-					value: () => appCore.toolManager.getCurrentToolId()!,
+					value: () => appKernel.toolManager.getCurrentToolId()!,
 					onValueChange(value) {
-						appCore.toolManager.startTool(value);
+						appKernel.toolManager.startTool(value);
 					},
 					items: [
 						{
@@ -151,12 +151,12 @@ const GridGroup: MenuDropDownGroupType = [
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const activeTilemapView = appCore.editorContext.getActiveTilemapView();
+            const activeTilemapView = appKernel.editorContext.getActiveTilemapView();
             if (!activeTilemapView) return false;
             return activeTilemapView.grid.gridEnabled
         },
         toggle() {
-            const activeTilemapView = appCore.editorContext.getActiveTilemapView();
+            const activeTilemapView = appKernel.editorContext.getActiveTilemapView();
             if (!activeTilemapView) return;
             return activeTilemapView.toggleGrid();
         },
@@ -170,13 +170,13 @@ const DeleteGroup: MenuDropDownGroupType = [
         startIcon: <Trash2 />,
         variant: "destructive",
 		disabled: () => {
-			const editorContext = appCore.editorContext;
+			const editorContext = appKernel.editorContext;
 			const currentTilemapSession = editorContext.getActiveTilemapSession();
 			if (!currentTilemapSession) return true;
 			return false;
 		},
         onClick: () => {
-            const editorContext = appCore.editorContext;
+            const editorContext = appKernel.editorContext;
 			const currentTilemapSession = editorContext.getActiveTilemapSession();
 			if (!currentTilemapSession) return;
 			TilemapService.deleteTilemap(currentTilemapSession.tilemap.id);

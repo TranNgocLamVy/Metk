@@ -1,4 +1,4 @@
-import { useDialogStore } from '@/ui/stores/dialogStore';
+import { useDialogStore } from '@/ui/stores/dialog.store';
 import { Fragment } from 'react';
 import { DialogRegistry } from './dialogRegistry';
 import BaseModalWrapper from './BaseModalWrapper';

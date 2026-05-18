@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 
-import useResizeObserver from "@/ui/hooks/useResizeObserver";
-import { useTilesetSessionStore } from "@/ui/stores/tilesetSessionStore";
+import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
+import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
 import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
@@ -10,7 +10,7 @@ import { LocalizedText } from "../../custom/LocalizeText";
 import { VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { useEffect } from "react";
 
 export default function TilesetViewCanvas() {

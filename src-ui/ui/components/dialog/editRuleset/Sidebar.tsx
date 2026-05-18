@@ -5,9 +5,9 @@ import { SketchPicker } from "react-color";
 import { Button } from "../../shadcn/button";
 import { Copy, EllipsisVertical, GripHorizontal, Plus, Trash2 } from "lucide-react";
 import { DialogClose } from "../../shadcn/dialog";
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { LocalizedText } from "../../custom/LocalizeText";
-import { appCore } from "@/editor/appcore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import PixiImage from "../../custom/PixiImage";
 import { useEditRuleset } from "./ContextProvider";
@@ -21,7 +21,7 @@ export default function EditRulesetSidebar({ dialogId }: EditRulesetSidebarProps
     const { ruleset } = useEditRuleset();
 
     const handleSave = useCallback(async () => {
-        const currentProject = appCore.editorContext.currentProject;
+        const currentProject = appKernel.editorContext.currentProject;
         if (!currentProject) return;
 
         const rulesetManager = currentProject.rulesetManager;
@@ -115,7 +115,7 @@ function RuleList() {
                                     const firstOutput = ruleOutputs[0];
                                     const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(firstOutput.tilesetIndex);
                                     if (!tilesetId) return null;
-                                    const textureManager = appCore.editorContext.textureManager;
+                                    const textureManager = appKernel.editorContext.textureManager;
                                     const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                                     return <PixiImage texture={tilesetTexture} />;
                                 })()}

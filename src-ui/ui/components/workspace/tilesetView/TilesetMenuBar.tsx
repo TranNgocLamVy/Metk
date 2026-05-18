@@ -2,16 +2,16 @@ import { Pen, Plus, Trash2 } from "lucide-react";
 import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import QuickToolTip from "../../custom/QuickToolTip";
-import { TilesetService } from "@/shared/services/tilesetService";
+import { TilesetService } from "@/shared/services/tileset.service";
 import { useCallback } from "react";
-import { useTilesetSessionStore } from "@/ui/stores/tilesetSessionStore";
-import { appCore } from "@/editor/appcore";
+import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 
 export default function TilesetMenuBar() {
     const { activeSession } = useTilesetSessionStore();
 
     const onDeleteTileset = useCallback(() => {
-        const tilesetSession = appCore.editorContext.getActiveTilesetSession();
+        const tilesetSession = appKernel.editorContext.getActiveTilesetSession();
         if (!tilesetSession) return;
         const selectedTilesetId = tilesetSession.tileset.id;
         TilesetService.deleteTileset(selectedTilesetId);

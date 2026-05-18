@@ -1,9 +1,9 @@
 import { X } from "lucide-react";
 import { useRef } from "react";
 
-import { WorkspaceService } from "@/shared/services/workspaceService";
-import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll";
-import { useTilesetSessionStore } from "@/ui/stores/tilesetSessionStore";
+import { WorkspaceService } from "@/shared/services/workspace.service";
+import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
+import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 
 import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";

@@ -3,8 +3,8 @@ import "@/assets/style/flexLayout/workspace.css";
 import { Action, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
 import { useRef } from "react";
 
-import { useRelativeFlexLayout } from "@/ui/hooks/useRelativeFlexLayout";
-import { useLayoutStore } from "@/ui/stores/layoutStore";
+import { useRelativeFlexLayout } from "@/ui/hooks/useRelativeFlexLayout.hook";
+import { useLayoutStore } from "@/ui/stores/layout.store";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import ContextBar from "./ContextBar";
@@ -12,7 +12,7 @@ import TilesetViewSelector from "./tilesetView/TilesetViewSelector";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
-import { appCore } from "@/editor/appcore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { LocalizedText } from "../custom/LocalizeText";
 
 export default function Workspace() {
@@ -64,7 +64,7 @@ export default function Workspace() {
 	}
 
 	const onModelChange = (model: Model, action: Action) => {
-		appCore.layoutManager.updateLayout(model.toJson());
+		appKernel.layoutManager.updateLayout(model.toJson());
 	};
 
 	return (

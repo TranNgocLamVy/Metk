@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { ScrollArea } from "../../shadcn/scroll-area";
-import { useConsoleStore } from "@/ui/stores/consoleStore";
+import { useConsoleStore } from "@/ui/stores/console.store";
 import { Info, CheckCircle2, AlertTriangle, X } from "lucide-react";
 import { Button } from "../../shadcn/button";
 import { LocalizedText } from "../../custom/LocalizeText";

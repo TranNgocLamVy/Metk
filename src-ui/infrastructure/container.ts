@@ -1,12 +1,12 @@
-import { ProjectData, ProjectDataSchema, ProjectMetadata, ProjectRepoSchema } from "@/shared/schema/projectSchema";
-import { TilemapData, TilemapDataSchema } from "@/shared/schema/tilemapSchema";
+import { ProjectData, ProjectDataSchema, ProjectMetadata, ProjectRepoSchema } from "@/shared/schema/project.schema";
+import { TilemapData, TilemapDataSchema } from "@/shared/schema/tilemap.schema";
 import { TauriFileSystemProvider } from "./tauriFileSystemProvider";
 import { JsonStorageService } from "./jsonStorageService";
 import { ArkTypeJsonSerializer } from "./arkTypeJsonSerializer";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
-import { TilesetData, TilesetDataSchema } from "@/shared/schema/tilesetSchema";
+import { TilesetData, TilesetDataSchema } from "@/shared/schema/tileset.schema";
 import { WorkpsaceData, WorkpsaceDataSchema } from "@/shared/schema/workspaceSchema";
-import { RulesetData, RulesetDataSchema } from "@/shared/schema/rulesetSchema";
+import { RulesetData, RulesetDataSchema } from "@/shared/schema/ruleset.schema";
 import { IJsonModel } from "flexlayout-react";
 
 export const TauriFileStorage = new TauriFileSystemProvider();

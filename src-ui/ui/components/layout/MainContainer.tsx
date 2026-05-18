@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useNavigationStore } from "@/ui/stores/navigationStore";
+import { useNavigationStore } from "@/ui/stores/navigation.store";
 
 import SecurityShield from "./SecurityShield";
 

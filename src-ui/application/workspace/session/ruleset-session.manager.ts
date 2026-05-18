@@ -1,0 +1,29 @@
+import { RulesetSessionManagerData } from "@/shared/schema/ruleset-session.schema";
+import { EditorFacade } from "@/application/editor.facade";
+
+
+
+export class RulesetSessionManager {
+    private selectedRuleId: string | null = null;
+
+    constructor(
+        tilesetSessionManagerData: RulesetSessionManagerData,
+        private readonly editorContext: EditorFacade
+    ) {
+        this.selectedRuleId = tilesetSessionManagerData.selectedRuleId;
+    }
+
+    public getSelectedRuleId(): string | null {
+        return this.selectedRuleId;
+    }
+
+    public setSelectedRuleId(ruleId: string | null) {
+        this.selectedRuleId = ruleId;
+    }
+
+    public serialize(): RulesetSessionManagerData {
+        return {
+            selectedRuleId: this.selectedRuleId,
+        }
+    }
+}

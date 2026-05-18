@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Fragment } from "react";
 
-import { appCore } from "@/editor/appcore";
-import { ToolbarItemDisplayData, useToolbarStore } from "@/ui/stores/toolbarStore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+import { ToolbarItemDisplayData, useToolbarStore } from "@/ui/stores/toolbar.store";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import SVGIcon from "../custom/icons/SvgIcon";
@@ -13,7 +13,7 @@ export default function ToolBar() {
 	const { tools, activeTool, setTools, setActiveTool } = useToolbarStore();
 
 	useEffect(() => {
-		const toolManager = appCore.toolManager;
+		const toolManager = appKernel.toolManager;
         const toolData: ToolbarItemDisplayData[] = [];
 
         toolManager.getToolContexts().forEach((toolContext) => {
@@ -36,7 +36,7 @@ export default function ToolBar() {
 	}, [])
 
 	const changeTool = (toolId: string) => {
-		const toolManager = appCore.toolManager;
+		const toolManager = appKernel.toolManager;
 		toolManager.startTool(toolId);
 	};
 

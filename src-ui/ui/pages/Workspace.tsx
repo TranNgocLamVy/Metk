@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { WorkspaceService } from "@/shared/services/workspaceService";
+import { WorkspaceService } from "@/shared/services/workspace.service";
 import LoadingOverlay from "@/ui/components/layout/LoadingOverlay";
 import Workspace from "@/ui/components/workspace/Workspace";
-import { useAppcore } from "@/ui/stores/appCoreStore";
+import { useAppcore } from "@/ui/stores/appcore.store";
 import { Result } from "@/shared/types/result";
 
 export default function WorkspacePage() {

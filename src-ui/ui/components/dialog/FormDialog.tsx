@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useState } from "react";
 
-import { Field, FormDialogOptions, GroupFieldInput, ShapeFromInputs, Simplify } from "@/shared/types/formDialog";
+import { Field, FormDialogOptions, GroupFieldInput, ShapeFromInputs, Simplify } from "@/shared/types/form-dialog";
 import { Button } from "@/ui/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
 
@@ -10,10 +10,10 @@ import { NumberInputField } from "../formField/NumberInputField";
 import FolderPickerField from "../formField/FolderPickerField";
 import FilePickerField from "../formField/FilePickerField";
 import { BaseDialogProps } from "./dialogRegistry";
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { ColorPickerField } from "../formField/ColorPickerField";
 import { LocalizedText } from "../custom/LocalizeText";
-import { Console } from "@/shared/services/consoleService";
+import { Console } from "@/shared/services/console.service";
 
 interface FormDialogProps extends BaseDialogProps {
     formDialog: FormDialogOptions;

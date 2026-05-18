@@ -1,4 +1,4 @@
-import { RulesetService } from "@/shared/services/rulesetService";
+import { RulesetService } from "@/shared/services/ruleset.service";
 import { Plus } from "lucide-react";
 
 const CreateActionGroup: MenuDropDownGroupType = [

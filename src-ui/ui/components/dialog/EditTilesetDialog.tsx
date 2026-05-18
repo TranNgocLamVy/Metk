@@ -1,4 +1,4 @@
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "./dialogRegistry";
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Dialog, DialogClose } from "../shadcn/dialog";
 import { Button } from "../shadcn/button";

@@ -1,7 +1,7 @@
 import { Info, TriangleAlert } from "lucide-react";
 import { HStack } from "../custom/stack/Stack";
 import { Button } from "../shadcn/button";
-import { useConsoleStore } from "@/ui/stores/consoleStore";
+import { useConsoleStore } from "@/ui/stores/console.store";
 import { LocalizedText } from "../custom/LocalizeText";
 
 export default function ContextBar() {

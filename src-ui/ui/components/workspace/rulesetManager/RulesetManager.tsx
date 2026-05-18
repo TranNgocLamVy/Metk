@@ -1,17 +1,15 @@
-import { useRulesetStore } from "@/ui/stores/rulesetStore";
+import { useRulesetStore } from "@/ui/stores/ruleset.store";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
 import { ScrollArea, ScrollBar } from "../../shadcn/scroll-area";
 import { useCallback, useEffect } from "react";
 import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
 import { RulesetManagerContextMenu } from "./ContextMenu";
-import { WorkspaceService } from "@/shared/services/workspaceService";
+import { WorkspaceService } from "@/shared/services/workspace.service";
 import RulesetMenuBar from "./RulesetMenuBar";
-import { useRulesetManagerEvent } from "@/ui/hooks/useRulesetManagerEvent";
-import { useWorkspaceStore } from "@/ui/stores/workspaceStore";
-import { useProjectStore } from "@/ui/stores/projectStore";
-
-
+import { useRulesetManagerEvent } from "@/ui/hooks/useRulesetManagerEvent.hook";
+import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useProjectStore } from "@/ui/stores/project.store";
 
 export default function RulesetManager() {
     const { activeWorkspace } = useWorkspaceStore();

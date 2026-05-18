@@ -1,7 +1,7 @@
-import { RuleRequirement } from "@/shared/schema/rulesetSchema";
+import { RuleRequirement } from "@/shared/schema/ruleset.schema";
 import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import PixiImage from "../../custom/PixiImage";
-import { appCore } from "@/editor/appcore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { VStack } from "../../custom/stack/Stack";
 import { useCallback, WheelEvent } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";
@@ -88,7 +88,7 @@ function ConstraintsGrid() {
                             </div>
                         );
                     }
-                    const textureManager = appCore.editorContext.textureManager;
+                    const textureManager = appKernel.editorContext.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                     return (
                         <div key={index} className="aspect-square bg-surface-overlay relative p-2 flex items-center justify-center cursor-not-allowed">
@@ -120,7 +120,7 @@ function OutputList() {
                 {ruleOutputs.map((output) => {
                     const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(output.tilesetIndex);
                     if (!tilesetId) return null;
-                    const textureManager = appCore.editorContext.textureManager;
+                    const textureManager = appKernel.editorContext.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, output.tileId);
                     return (
                         <div key={`${tilesetId}-${output.tileId}`} className='w-full aspect-square border border-foreground/20'>

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Application } from 'pixi.js';
 import { Application as PixiApplication } from '@pixi/react';
-import useResizeObserver from '@/ui/hooks/useResizeObserver';
+import useResizeObserver from '@/ui/hooks/useResizeObserver.hook';
 import { Button } from '@/ui/components/shadcn/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/components/shadcn/dropdown-menu';
 import { ScrollArea, ScrollBar } from '@/ui/components/shadcn/scroll-area';

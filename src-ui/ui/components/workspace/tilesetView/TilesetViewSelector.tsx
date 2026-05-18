@@ -1,12 +1,12 @@
-import { useWorkspaceStore } from "@/ui/stores/workspaceStore";
+import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import { VStack } from "../../custom/stack/Stack";
 import TilesetMenuBar from "./TilesetMenuBar";
 import TilesetViewCanvas from "./TilesetViewCanvas";
 import TilesetViewTabs from "./TilesetViewTabs";
-import { useTilesetSessionStore } from "@/ui/stores/tilesetSessionStore";
+import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 import { useCallback, useEffect, useRef } from "react";
-import { useTilesetSessionEvent } from "@/ui/hooks/useTilesetSessionEvent";
-import { TilesetView } from "@/graphics/view/tilesetView";
+import { useTilesetSessionEvent } from "@/ui/hooks/useTilesetSessionEvent.hook";
+import { TilesetView } from "@/graphics/view/tileset.view";
 
 export default function TilesetViewSelector() {
 	const { activeWorkspace } = useWorkspaceStore();

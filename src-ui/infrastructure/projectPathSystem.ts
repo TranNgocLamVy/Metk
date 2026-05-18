@@ -1,4 +1,4 @@
-import { PathUtils } from "@/shared/utils/pathUtils";
+import { PathUtils } from "@/shared/utils/path.utils";
 
 export class ProjectPathSystem {
     public children: Map<string, FilePathSystem> = new Map<string, FilePathSystem>();

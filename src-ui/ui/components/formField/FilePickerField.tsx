@@ -1,5 +1,5 @@
-import { FileFilter } from "@/shared/types/formDialog";
-import { FileDialogUtils } from "@/shared/utils/fileDialogUtils";
+import { FileFilter } from "@/shared/types/form-dialog";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
 import { Tooltip, TooltipContent } from "@/ui/components/shadcn/tooltip";

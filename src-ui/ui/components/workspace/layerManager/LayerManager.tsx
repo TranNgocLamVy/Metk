@@ -1,7 +1,7 @@
 import { DragEvent, useCallback, useEffect } from "react";
 
-import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { LayerView, useLayerManagerStore } from "@/ui/stores/layerManagerStore";
+import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { VStack } from "../../custom/stack/Stack";
 import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
@@ -10,13 +10,13 @@ import { ScrollArea } from "../../shadcn/scroll-area";
 import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerNodeRow from "./LayerNodeRow";
 import LayerMenuBar from "./LayerMenuBar";
-import { useTilemapSessionStore } from "@/ui/stores/tilemapSessionStore";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { LocalizedText } from "../../custom/LocalizeText";
 import { Button } from "../../shadcn/button";
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { BaseLayer } from "@/editor/application/tile/layer/baseLayer";
-import { GroupLayer } from "@/editor/application/tile/layer/groupLayer";
+import { BaseLayer } from "@/editor/model/tilemap/layer/base-layer";
+import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 
 export default function LayerManager() {
 	const { layerViews, selectedLayers, setLayerViews, setSelectedLayer } = useLayerManagerStore();

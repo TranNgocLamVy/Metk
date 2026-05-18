@@ -1,10 +1,10 @@
 import { Application, Container, Sprite, Graphics } from 'pixi.js';
-import { Tileset } from '@/editor/application/tile/tileset';
-import { appCore } from '@/editor/appcore';
-import { Ruleset } from '@/editor/application/rule/ruleset';
-import { Rule } from '@/editor/application/rule/rule';
+import { Tileset } from '@/editor/model/tileset/tileset';
+import { appKernel } from '@/application/bootstrap/app-kernel';
+import { Ruleset } from '@/editor/model/ruleset/ruleset';
+import { Rule } from '@/editor/model/ruleset/rule';
 import { Viewport } from 'pixi-viewport';
-import { DrawLineOption, GraphicUtils } from '@/shared/utils/graphicUtils';
+import { DrawLineOption, GraphicUtils } from '@/shared/utils/graphic-utils';
 import { Result } from '@/shared/types/result';
 
 export class RulesetOutputSelector {
@@ -89,7 +89,7 @@ export class RulesetOutputSelector {
     public async setActiveTileset(tilesetId: string) {
         if (this.currentTileset?.id === tilesetId) return;
 
-        const currentProject = appCore.editorContext.currentProject;
+        const currentProject = appKernel.editorContext.currentProject;
         if (!currentProject) return;
 
         const tilesetManager = currentProject.tilesetManager;
@@ -98,7 +98,7 @@ export class RulesetOutputSelector {
 
         const tileset = tilesetResult.data;
         
-        const textureManager = appCore.editorContext.textureManager;
+        const textureManager = appKernel.editorContext.textureManager;
         
         if (this.currentTileset) {
             textureManager.releaseTilesetGraphics(this.currentTileset.id);
@@ -214,7 +214,7 @@ export class RulesetOutputSelector {
 
     public destroy() {
         if (!this.isInit) return;
-        if (this.currentTileset) appCore.editorContext.textureManager.releaseTilesetGraphics(this.currentTileset.id)
+        if (this.currentTileset) appKernel.editorContext.textureManager.releaseTilesetGraphics(this.currentTileset.id)
         if (this.pixiApp) this.pixiApp.stage.removeChild(this.viewport);
         this.viewport.destroy({ children: true });
     }

@@ -1,4 +1,4 @@
-import { FileDialogUtils } from "@/shared/utils/fileDialogUtils";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
 import { Tooltip, TooltipContent } from "@/ui/components/shadcn/tooltip";

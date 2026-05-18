@@ -3,10 +3,10 @@ import { HStack, VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
 import QuickToolTip from "../../custom/QuickToolTip";
-import { useLayerManagerStore } from "@/ui/stores/layerManagerStore";
+import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 import { useMemo } from "react";
 import { Separator } from "../../shadcn/separator";
-import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
+import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { LocalizedText } from "../../custom/LocalizeText";
 export default function LayerMenuBar() {
     const { layerViews, selectedLayers } = useLayerManagerStore();

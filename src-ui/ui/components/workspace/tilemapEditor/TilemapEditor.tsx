@@ -1,15 +1,15 @@
 
-import { useWorkspaceStore } from "@/ui/stores/workspaceStore";
+import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import { VStack } from "../../custom/stack/Stack";
 import WorkspaceConsole from "../console/Console";
 import ToolBar from "../ToolBar";
 import TilemapEditorCanvas from "./TilemapEditorCanvas";
 import TilemapEditorTabs from "./TilemapEditorTabs";
-import { useTilemapSessionStore } from "@/ui/stores/tilemapSessionStore";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { useCallback, useEffect, useRef } from "react";
-import { TilemapView } from "@/graphics/view/tilemapView";
-import { useTilemapSessionEvent } from "@/ui/hooks/useTilemapSessionEvent";
-import { appCore } from "@/editor/appcore";
+import { TilemapView } from "@/graphics/view/tilemap.view";
+import { useTilemapSessionEvent } from "@/ui/hooks/useTilemapSessionEvent.hook";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 
 export default function TilemapEditor() {
     const { activeWorkspace } = useWorkspaceStore();
@@ -32,7 +32,7 @@ export default function TilemapEditor() {
         const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
-        const toolManager = appCore.toolManager;
+        const toolManager = appKernel.toolManager;
         const tilemapSessionManager = activeWorkspace.tilemapSessionManager;
 
         view.activateView(pixiApp);
@@ -55,7 +55,7 @@ export default function TilemapEditor() {
         activeView.view.unActivateView();
         activeViewRef.current = null;
 
-        const toolManager = appCore.toolManager;
+        const toolManager = appKernel.toolManager;
         toolManager.setActiveSession(null);
 
         const tilemapSessionManager = activeWorkspace!.tilemapSessionManager;
@@ -68,16 +68,16 @@ export default function TilemapEditor() {
 
     useEffect(() => {
         if (!activeSession) return;
-        appCore.contextManager.setFlag("tilmapSessionOpened", true, activeSession.id);
+        appKernel.contextManager.setFlag("tilmapSessionOpened", true, activeSession.id);
         return () => {
-            appCore.contextManager.setFlag("tilmapSessionOpened", false, activeSession.id);
+            appKernel.contextManager.setFlag("tilmapSessionOpened", false, activeSession.id);
         }
     }, [activeSession])
 
     useEffect(() => {
         if (!activeWorkspace || !pixiApp) return;
 
-        const toolManager = appCore.toolManager;
+        const toolManager = appKernel.toolManager;
         const tilemapSessionManager = activeWorkspace.tilemapSessionManager;
         const currentSession = tilemapSessionManager.activeSession;
 

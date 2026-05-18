@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { JsonFormatter } from "@/shared/utils/jsonFormatter";
+import { JsonFormatter } from "@/shared/utils/jsonFormatter.utils";
 import { ISerializer } from "@/infrastructure/interface/ISerializer";
 import { Result } from "../shared/types/result";
 

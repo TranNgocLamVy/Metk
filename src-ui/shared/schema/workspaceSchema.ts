@@ -1,10 +1,10 @@
 import { type } from "arktype";
 
-import { TilemapSessionManagerSchema } from "./tilemapSessionSchema";
-import { TilesetSessionManagerSchema } from "./tilesetSessionSchema";
-import { ToolStateSchema } from "./toolSessionSchema";
-import { RulesetSessionManagerSchema } from "./rulesetSessionSchema";
-import { SavedPathSchema } from "./savedPathSchema";
+import { TilemapSessionManagerSchema } from "./tilemap-session.schema";
+import { TilesetSessionManagerSchema } from "./tileset-session.schema";
+import { ToolStateSchema } from "./tool-session.schema";
+import { RulesetSessionManagerSchema } from "./ruleset-session.schema";
+import { SavedPathSchema } from "./saved-path.schema";
 
 export const WorkpsaceDataSchema = type("string.json.parse").to({
     savedPath: SavedPathSchema.default(() => ({ exportPaths: [] })),

@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 import { useState, useCallback, useMemo } from 'react';
-import { Ruleset } from '@/editor/application/rule/ruleset';
-import { RuleRequirement } from '@/shared/schema/rulesetSchema';
+import { Ruleset } from '@/editor/model/ruleset/ruleset';
+import { RuleRequirement } from '@/shared/schema/ruleset.schema';
 import { RulesetOutputSelector } from './renderer/RulesetOutputSelector';
-import { useRulesetStore } from '@/ui/stores/rulesetStore';
-import { appCore } from '@/editor/appcore';
+import { useRulesetStore } from '@/ui/stores/ruleset.store';
+import { appKernel } from '@/application/bootstrap/app-kernel';
 
 export function useRulesetController(initialRuleset: Ruleset) {
     const [version, setVersion] = useState<number>(0);
@@ -13,7 +13,7 @@ export function useRulesetController(initialRuleset: Ruleset) {
     const { rulesetDisplayDatas: rulesetList } = useRulesetStore();
     
     const tilesetList = useMemo(() => {
-        const currentProject = appCore.editorContext.currentProject;
+        const currentProject = appKernel.editorContext.currentProject;
         if (!currentProject) return [];
         return currentProject.tilesetManager.serialize();
     }, [version])

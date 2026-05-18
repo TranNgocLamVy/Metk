@@ -1,11 +1,11 @@
-import { useDialogStore } from "@/ui/stores/dialogStore";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "../dialogRegistry";
 import { DialogContent, Dialog, DialogTitle } from "../../shadcn/dialog";
 import { useMemo } from "react";
-import { appCore } from "@/editor/appcore";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import OutputSelector from "./OutputSelector";
-import { Ruleset } from "@/editor/application/rule/ruleset";
+import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { LocalizedText } from "../../custom/LocalizeText";
 import EditRulesetSidebar from "./Sidebar";
 import RuleEditor from "./RuleEditor";
@@ -18,7 +18,7 @@ interface EditRulesetDialogProps extends BaseDialogProps {
 
 export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProps) {
     const ruleset = useMemo(() => {
-        const editorContext = appCore.editorContext;
+        const editorContext = appKernel.editorContext;
         const currentProject = editorContext.currentProject;
         if (!currentProject) return null;
         const rulesetManager = currentProject.rulesetManager;

@@ -1,13 +1,13 @@
 import { ChevronDown, ChevronRight, Eye, EyeOff, Folder, FolderOpen, Grid, LockKeyhole, LockOpen } from "lucide-react";
 import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
-import { GroupLayer } from "@/editor/application/tile/layer/groupLayer";
-import { TilemapLayerService } from "@/shared/services/tilemapLayerService";
-import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layerManagerStore";
+import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
+import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { Button } from "../../shadcn/button";
-import { TileLayer } from "@/editor/application/tile/layer/tileLayer";
-import { RuleLayer } from "@/editor/application/tile/layer/ruleLayer";
+import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 
 type LayerNodeRowProps = {
 	view: LayerView;

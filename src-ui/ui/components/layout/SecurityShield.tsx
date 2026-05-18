@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { KeyUtils } from "@/shared/utils/keyUtils";
+import { KeyUtils } from "@/shared/utils/key.utils";
 
 export default function SecurityShield() {
 	useEffect(() => {
