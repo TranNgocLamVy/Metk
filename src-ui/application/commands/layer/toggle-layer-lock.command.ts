@@ -12,8 +12,8 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         private readonly newIsLocked: boolean
     ) { }
 
-    public execute(context: EditorFacade): Result {
-        const currentSession = context.getActiveTilemapSession()
+    public execute(editorFacade: EditorFacade): Result {
+        const currentSession = editorFacade.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
 
@@ -29,8 +29,8 @@ export class ToggleLayerLockCommand implements IBaseCommand {
         return Result.Success();
     }
 
-    public undo(context: EditorFacade): Result {
-        const currentSession = context.getActiveTilemapSession()
+    public undo(editorFacade: EditorFacade): Result {
+        const currentSession = editorFacade.getActiveTilemapSession()
         if (!currentSession) return Result.Error("Current session not found");
         const root = currentSession.tilemap.rootLayer;
         

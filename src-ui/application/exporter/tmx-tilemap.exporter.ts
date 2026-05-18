@@ -15,7 +15,7 @@ type XMLBuilder = ReturnType<typeof create>;
 export class TmxTilemapExporter implements ITilemapExporter {
     private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // id -> firstGid
 
-    public export(tilemap: Tilemap, exportPath: string, editorContext: EditorFacade): Uint8Array {
+    public export(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): Uint8Array {
 
         const builder: XMLBuilder = create({ version: '1.0', encoding: 'UTF-8' })
 
@@ -30,7 +30,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
             tileheight: tilemap.tileheight,
         });
 
-        this.getTilesets(tilemap, exportPath, editorContext).forEach((tileset) => map.import(tileset.root()));
+        this.getTilesets(tilemap, exportPath, editorFacade).forEach((tileset) => map.import(tileset.root()));
 
         const layers = this.getLayers(tilemap.rootLayer.layers, 0, tilemap);
 
@@ -40,7 +40,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
         return new TextEncoder().encode(xml);
     }
 
-    private getTilesets(tilemap: Tilemap, exportPath: string, editorContext: EditorFacade): XMLBuilder[] {
+    private getTilesets(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): XMLBuilder[] {
         const tilesetRefManager = tilemap.tilesetRefManager;
         const tilesetManager = tilesetRefManager.tilesetManager;
 

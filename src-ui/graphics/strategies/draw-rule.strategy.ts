@@ -28,12 +28,12 @@ export class DrawRuleStrategy implements IDrawStrategy {
         return coord1.col === coord2.col && coord1.row === coord2.row;
     }
 
-    public getBrushSize(editorContext: EditorFacade): { width: number, height: number } {
+    public getBrushSize(editorFacade: EditorFacade): { width: number, height: number } {
         return { width: 1, height: 1 };
     }
 
-    public drawHoverPreview(pos: Position, layerRenderer: RuleLayerRenderer, editorContext: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[] {
-        const selectedRuleset = this.getSelectedRuleset(editorContext);
+    public drawHoverPreview(pos: Position, layerRenderer: RuleLayerRenderer, editorFacade: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[] {
+        const selectedRuleset = this.getSelectedRuleset(editorFacade);
         if (!selectedRuleset) return [];
 
         const coord = layerRenderer.posToCoord(pos); // TODO: Check again, very sus
@@ -53,8 +53,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
         return [sprite];
     }
 
-    public getPayload(pos: Position, layerRenderer: RuleLayerRenderer, editorContext: EditorFacade, session: TilemapSession): DrawPayload[] {
-        const selectedRuleset = this.getSelectedRuleset(editorContext);
+    public getPayload(pos: Position, layerRenderer: RuleLayerRenderer, editorFacade: EditorFacade, session: TilemapSession): DrawPayload[] {
+        const selectedRuleset = this.getSelectedRuleset(editorFacade);
         if (!selectedRuleset) return [];
 
         const coord = layerRenderer.posToCoord(pos);
@@ -72,8 +72,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
         return [{ key: `${coord.col},${coord.row}`, sprite, coordinate: coord, position: drawPotision, rulesetId: selectedRuleset.id }];
     }
 
-    public commit(layerRenderer: RuleLayerRenderer, previewData: DrawPayload[], editorContext: EditorFacade): void {
-        const historyManager = editorContext.getCurrentHistoryManager();
+    public commit(layerRenderer: RuleLayerRenderer, previewData: DrawPayload[], editorFacade: EditorFacade): void {
+        const historyManager = editorFacade.getCurrentHistoryManager();
         if (!historyManager) return;
 
         const updates = previewData.map((data) => {
@@ -84,14 +84,14 @@ export class DrawRuleStrategy implements IDrawStrategy {
         if (updates.length == 0) return;
 
         historyManager.startTransaction();
-        historyManager.execute(new SetRulesCommand(layerRenderer.layer.id, updates), editorContext);
+        historyManager.execute(new SetRulesCommand(layerRenderer.layer.id, updates), editorFacade);
         historyManager.commitTransaction();
     }
 
-    private getSelectedRuleset(editorContext: EditorFacade) {
-        const selectedRuleId = editorContext.workspaceManager.currentWorkspace?.rulesetSessionManager.getSelectedRuleId();
+    private getSelectedRuleset(editorFacade: EditorFacade) {
+        const selectedRuleId = editorFacade.workspaceManager.currentWorkspace?.rulesetSessionManager.getSelectedRuleId();
         if (!selectedRuleId) return null;
-        const currentProject = editorContext.currentProject;
+        const currentProject = editorFacade.currentProject;
         if (!currentProject) return null;
         return currentProject.rulesetManager.getRulesetById(selectedRuleId);
     }

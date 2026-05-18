@@ -53,7 +53,7 @@ export class EraserTool implements ITool {
 
     private eraseCommandStack: IBaseCommand[] = [];
 
-    constructor(private readonly editorContext: EditorFacade) {
+    constructor(private readonly editorFacade: EditorFacade) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
@@ -240,7 +240,7 @@ export class EraserTool implements ITool {
             } else {
                 return;
             }
-            eraseCommand.execute(this.editorContext);
+            eraseCommand.execute(this.editorFacade);
             this.eraseCommandStack.push(eraseCommand);
         }
 
@@ -250,7 +250,7 @@ export class EraserTool implements ITool {
     private eraseEnd(e: FederatedPointerEvent) {
         this.eraseCoordinateSet.clear();
 
-        const historyManager = this.editorContext.getCurrentHistoryManager();
+        const historyManager = this.editorFacade.getCurrentHistoryManager();
         if (!historyManager) {
             this.reverseErase();
             return;
@@ -269,7 +269,7 @@ export class EraserTool implements ITool {
     }
 
     private reverseErase() {
-        this.eraseCommandStack.reverse().forEach(cmd => cmd.undo(this.editorContext));
+        this.eraseCommandStack.reverse().forEach(cmd => cmd.undo(this.editorFacade));
         this.eraseCommandStack = [];
     }
 }

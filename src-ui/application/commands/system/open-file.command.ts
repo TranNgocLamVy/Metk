@@ -13,7 +13,7 @@ import { useDialogStore } from "@/ui/stores/dialog.store";
     when: "projectOpened && !isModalOpen",
 })
 export class OpenFileCommand implements ISystemCommand {
-    public execute(context: EditorFacade): Result {
+    public execute(editorFacade: EditorFacade): Result {
         useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal });
         return Result.Success();
     }

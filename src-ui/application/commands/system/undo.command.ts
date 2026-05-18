@@ -11,10 +11,10 @@ import { Result } from "@/shared/types/result";
     when: "tilmapSessionOpened && !isModalOpen",
 })
 export class UndoCommand implements ISystemCommand {
-    public execute(context: EditorFacade): Result {
-        const historyManager = context.getCurrentHistoryManager();
+    public execute(editorFacade: EditorFacade): Result {
+        const historyManager = editorFacade.getCurrentHistoryManager();
         if (!historyManager) return Result.Cancel();
-        historyManager.undo(context);
+        historyManager.undo(editorFacade);
         return Result.Success();
     }
 }

@@ -16,8 +16,8 @@ import { ExportStorageService } from "@/infrastructure/exportStorageService";
     when: "tilmapSessionOpened && !isModalOpen",
 })
 export class ExportTilemapTMXCommand implements ISystemCommand {
-    public async execute(context: EditorFacade): Promise<Result> {
-        const workspace = context.currentWorkspace;
+    public async execute(editorFacade: EditorFacade): Promise<Result> {
+        const workspace = editorFacade.currentWorkspace;
         if (!workspace) return Result.Cancel();
 
         const tilemapSession = workspace.tilemapSessionManager.activeSession;
@@ -39,7 +39,7 @@ export class ExportTilemapTMXCommand implements ISystemCommand {
 
         const exporter = new TmxTilemapExporter(); // TODO: get custom exporter from appcore
 
-        const buffer = exporter.export(tilemap, exportPath, context);
+        const buffer = exporter.export(tilemap, exportPath, editorFacade);
 
         const exportStorageService = new ExportStorageService();
 
@@ -47,7 +47,7 @@ export class ExportTilemapTMXCommand implements ISystemCommand {
 
         if (result.status === Result.Status.Success) {
             exportPathManager.setExportPath(tilemap.id, exportPath);
-            await context.workspaceManager.saveCurrentWorkspace();
+            await editorFacade.workspaceManager.saveCurrentWorkspace();
             Console.success({ message: "message.tilemap.exportSuccess"});
         }
 

@@ -21,7 +21,7 @@ export default function EditRulesetSidebar({ dialogId }: EditRulesetSidebarProps
     const { ruleset } = useEditRuleset();
 
     const handleSave = useCallback(async () => {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
         const rulesetManager = currentProject.rulesetManager;
@@ -115,7 +115,7 @@ function RuleList() {
                                     const firstOutput = ruleOutputs[0];
                                     const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(firstOutput.tilesetIndex);
                                     if (!tilesetId) return null;
-                                    const textureManager = appKernel.editorContext.textureManager;
+                                    const textureManager = appKernel.editorFacade.textureManager;
                                     const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                                     return <PixiImage texture={tilesetTexture} />;
                                 })()}

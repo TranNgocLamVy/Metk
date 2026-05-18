@@ -39,11 +39,11 @@ export class TilesetSelectorRenderer {
     private bindOnPointerMove: (event: FederatedPointerEvent) => void;
     private bindOnPointerUp: (event: FederatedPointerEvent) => void;
 
-    constructor(context: CreateTilesetViewSelectorContext) {
-        this.tileset = context.tileset;
-        this.tilesetSession = context.tilesetSession;
-        this.parent = context.parent;
-        this.gap = context.gap;
+    constructor(editorFacade: CreateTilesetViewSelectorContext) {
+        this.tileset = editorFacade.tileset;
+        this.tilesetSession = editorFacade.tilesetSession;
+        this.parent = editorFacade.parent;
+        this.gap = editorFacade.gap;
 
         this.graphics = new Graphics();
         this.parent.addChild(this.graphics);

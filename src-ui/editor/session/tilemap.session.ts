@@ -27,7 +27,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
     constructor(
         public readonly tilemap: Tilemap,
         tilemapSessionData: TilemapSessionData,
-        public readonly editorContext: EditorFacade
+        public readonly editorFacade: EditorFacade
     ) {
         super();
         this.id = tilemapSessionData.id;
@@ -49,7 +49,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
     public async loadTilemapSession(): Promise<void> {
         const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
-        const currentProject = this.editorContext.currentProject;
+        const currentProject = this.editorFacade.currentProject;
         if (!currentProject) return;
         const tilesetManager = currentProject.tilesetManager;
         const tilesets: Tileset[] = [];
@@ -57,7 +57,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
             const tileset = tilesetManager.getTilesetById(id);
             if (tileset) tilesets.push(tileset);
         }
-        const textureManager = this.editorContext.textureManager;
+        const textureManager = this.editorFacade.textureManager;
         await Promise.all(tilesets.map(t => textureManager.retainTilesetGraphics(t)));
     }
 
@@ -98,7 +98,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
     public destroy() {
         const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
-        const textureManager = this.editorContext.textureManager;
+        const textureManager = this.editorFacade.textureManager;
         for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id); // TODO: Move this to view
     }
 }

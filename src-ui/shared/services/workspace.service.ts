@@ -50,7 +50,7 @@ export class WorkspaceService {
 
     //================ tileset ================
     public static async createTilesetSession(tilesetId: string): Promise<void> {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
         const tilesetResult = await currentProject.tilesetManager.loadTileset(tilesetId);
@@ -99,7 +99,7 @@ export class WorkspaceService {
 
     //================ tilemap ================
     public static async createTilemapSession(tilemapId: string) {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
         const tilemapResult = await currentProject.tilemapManager.loadTilemap(tilemapId);
@@ -127,7 +127,7 @@ export class WorkspaceService {
     }
 
     public static async closeTilemapSession(sessionId: string, force?: boolean): Promise<void> {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         const currentWorkspace = appKernel.workspaceManager.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
 
@@ -155,7 +155,7 @@ export class WorkspaceService {
 
     //================ ruleset ================
     public static async selectRuleset(rulesetId: string | null): Promise<void> {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         const rulesetSessionManager = appKernel.workspaceManager.currentWorkspace?.rulesetSessionManager;
         if (!currentProject || !rulesetSessionManager) return;
         if (rulesetId) await currentProject.rulesetManager.loadRuleset(rulesetId);

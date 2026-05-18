@@ -18,8 +18,8 @@ export class SetTilesCommand implements IBaseCommand {
         this.data = [...data];
     }
 
-    public execute(context: EditorFacade): Result {
-        const currentSession = context.getActiveTilemapSession();
+    public execute(editorFacade: EditorFacade): Result {
+        const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
@@ -38,10 +38,10 @@ export class SetTilesCommand implements IBaseCommand {
         return result
     }
 
-    public undo(context: EditorFacade): Result {
+    public undo(editorFacade: EditorFacade): Result {
         if (this.oldData.length === 0) return Result.Cancel("No tile changed");
 
-        const currentSession = context.getActiveTilemapSession();
+        const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;

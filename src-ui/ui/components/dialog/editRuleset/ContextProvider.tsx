@@ -13,7 +13,7 @@ export function useRulesetController(initialRuleset: Ruleset) {
     const { rulesetDisplayDatas: rulesetList } = useRulesetStore();
     
     const tilesetList = useMemo(() => {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return [];
         return currentProject.tilesetManager.serialize();
     }, [version])

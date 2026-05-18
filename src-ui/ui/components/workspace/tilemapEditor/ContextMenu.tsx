@@ -20,13 +20,13 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		label: "workspace.tilemapEditor.contextMenu.undo",
 		startIcon: <Undo />,
 		disabled() {
-			const editorContext = appKernel.editorContext;
-			const historyManager = editorContext.getCurrentHistoryManager();
+			const editorFacade = appKernel.editorFacade;
+			const historyManager = editorFacade.getCurrentHistoryManager();
 			return !historyManager?.canUndo;
 		},
 		onClick() {
-			const editorContext = appKernel.editorContext;
-			editorContext.getCurrentHistoryManager()?.undo(editorContext);
+			const editorFacade = appKernel.editorFacade;
+			editorFacade.getCurrentHistoryManager()?.undo(editorFacade);
 		},
 	},
 	{
@@ -34,13 +34,13 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		label: "workspace.tilemapEditor.contextMenu.redo",
 		startIcon: <Redo />,
 		disabled() {
-			const editorContext = appKernel.editorContext;
-			const historyManager = editorContext.getCurrentHistoryManager();
+			const editorFacade = appKernel.editorFacade;
+			const historyManager = editorFacade.getCurrentHistoryManager();
 			return !historyManager?.canRedo;
 		},
 		onClick() {
-			const editorContext = appKernel.editorContext;
-			editorContext.getCurrentHistoryManager()?.redo(editorContext);
+			const editorFacade = appKernel.editorFacade;
+			editorFacade.getCurrentHistoryManager()?.redo(editorFacade);
 		},
 	},
 ];
@@ -151,12 +151,12 @@ const GridGroup: MenuDropDownGroupType = [
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
         checked() {
-            const activeTilemapView = appKernel.editorContext.getActiveTilemapView();
+            const activeTilemapView = appKernel.editorFacade.getActiveTilemapView();
             if (!activeTilemapView) return false;
             return activeTilemapView.grid.gridEnabled
         },
         toggle() {
-            const activeTilemapView = appKernel.editorContext.getActiveTilemapView();
+            const activeTilemapView = appKernel.editorFacade.getActiveTilemapView();
             if (!activeTilemapView) return;
             return activeTilemapView.toggleGrid();
         },
@@ -170,14 +170,14 @@ const DeleteGroup: MenuDropDownGroupType = [
         startIcon: <Trash2 />,
         variant: "destructive",
 		disabled: () => {
-			const editorContext = appKernel.editorContext;
-			const currentTilemapSession = editorContext.getActiveTilemapSession();
+			const editorFacade = appKernel.editorFacade;
+			const currentTilemapSession = editorFacade.getActiveTilemapSession();
 			if (!currentTilemapSession) return true;
 			return false;
 		},
         onClick: () => {
-            const editorContext = appKernel.editorContext;
-			const currentTilemapSession = editorContext.getActiveTilemapSession();
+            const editorFacade = appKernel.editorFacade;
+			const currentTilemapSession = editorFacade.getActiveTilemapSession();
 			if (!currentTilemapSession) return;
 			TilemapService.deleteTilemap(currentTilemapSession.tilemap.id);
         }

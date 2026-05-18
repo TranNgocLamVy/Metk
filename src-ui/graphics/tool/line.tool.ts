@@ -42,7 +42,7 @@ export class LineTool implements ITool {
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
     private bindPointerOutside: (event: FederatedPointerEvent) => void;
 
-    constructor(private readonly editorContext: EditorFacade) {
+    constructor(private readonly editorFacade: EditorFacade) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
@@ -139,10 +139,10 @@ export class LineTool implements ITool {
     private onPointerUp(e: FederatedPointerEvent): void {
         if (!this.currentView || !this.isDragging) return;
 
-        const historyManager = this.editorContext.getCurrentHistoryManager();
+        const historyManager = this.editorFacade.getCurrentHistoryManager();
 
         if (historyManager && this.activeDrawStrategy && this.targetLayerRenderer && this.drawPayloads.size > 0) {
-            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.drawPayloads.values()), this.editorContext);
+            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.drawPayloads.values()), this.editorFacade);
         }
 
         this.clearDrawPreview();
@@ -162,7 +162,7 @@ export class LineTool implements ITool {
         if (!this.currentView || !this.overlayContainer || !this.targetLayerRenderer) return;
 
         if (this.activeDrawStrategy) {
-            this.hoverSprites = this.activeDrawStrategy.drawHoverPreview(pos, this.targetLayerRenderer, this.editorContext, this.currentView.session, this.overlayContainer);
+            this.hoverSprites = this.activeDrawStrategy.drawHoverPreview(pos, this.targetLayerRenderer, this.editorFacade, this.currentView.session, this.overlayContainer);
         }
     }
 
@@ -179,7 +179,7 @@ export class LineTool implements ITool {
         const drawPositions = drawCoordinates.map(c => this.targetLayerRenderer!.coordToPos(c));
 
         drawPositions.forEach((drawPosition) => {
-            const drawPayloads = this.activeDrawStrategy!.getPayload(drawPosition, this.targetLayerRenderer!, this.editorContext, this.currentView!.session);
+            const drawPayloads = this.activeDrawStrategy!.getPayload(drawPosition, this.targetLayerRenderer!, this.editorFacade, this.currentView!.session);
             if (drawPayloads.length <= 0) return;
             drawPayloads.forEach((drawPayload) => {
                 if (this.drawPayloads.has(drawPayload.key)) this.drawPayloads.get(drawPayload.key)!.sprite.destroy();

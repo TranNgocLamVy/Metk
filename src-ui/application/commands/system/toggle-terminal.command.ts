@@ -12,7 +12,7 @@ import { useConsoleStore } from "@/ui/stores/console.store";
     when: "!isModalOpen",
 })
 export class ToggleConsoleCommand implements ISystemCommand {
-    public execute(context: EditorFacade): Result {
+    public execute(editorFacade: EditorFacade): Result {
         useConsoleStore.getState().toggleConsole();
         return Result.Success();
     }

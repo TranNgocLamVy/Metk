@@ -11,7 +11,7 @@ export class SystemCommandManager {
 
     constructor(
         private readonly contextManager: ActivationContext,
-        private readonly editorContext: EditorFacade
+        private readonly editorFacade: EditorFacade
     ) {
         this.initializeDecoratedCommands();
     }
@@ -39,7 +39,7 @@ export class SystemCommandManager {
         }
 
         const command = new commandConstructor();
-        const result = await command.execute(this.editorContext);
+        const result = await command.execute(this.editorFacade);
         if (result.status === Result.Status.Error) {
             Console.error({ message: result.message });
         }

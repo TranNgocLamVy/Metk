@@ -17,9 +17,9 @@ export class TilemapGridRenderer {
 
     private bindDrawGrid: () => void;
 
-    constructor(context: CreateGridRendererContext) {
-        this.viewport = context.viewport;
-        this.tilemap = context.tilemap;
+    constructor(editorFacade: CreateGridRendererContext) {
+        this.viewport = editorFacade.viewport;
+        this.tilemap = editorFacade.tilemap;
 
         this.graphics = new Graphics();
 

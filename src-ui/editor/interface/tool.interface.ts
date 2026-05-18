@@ -12,4 +12,4 @@ export interface ITool {
     setTargetLayerRenderer(layerRenderer: BaseLayerRenderer | null): void;
 }
 
-export type IToolContructor = new (editorContext: EditorFacade) => ITool; 
+export type IToolContructor = new (editorFacade: EditorFacade) => ITool; 

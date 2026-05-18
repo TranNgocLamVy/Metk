@@ -23,8 +23,8 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
     private bindOnLayerRemoved: (layerId: string) => void
     private bindOnLayerReordered: () => void
 
-    constructor(context: CreateGroupRendererContext) {
-        super(context.layer, context.tilemap);
+    constructor(editorFacade: CreateGroupRendererContext) {
+        super(editorFacade.layer, editorFacade.tilemap);
 
         this.rebuildChildren();
 

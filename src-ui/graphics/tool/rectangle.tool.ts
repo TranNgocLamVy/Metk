@@ -39,7 +39,7 @@ export class RectangleTool implements ITool {
     private bindPointerOnMove: (event: FederatedPointerEvent) => void;
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
 
-    constructor(private readonly editorContext: EditorFacade) {
+    constructor(private readonly editorFacade: EditorFacade) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
@@ -122,10 +122,10 @@ export class RectangleTool implements ITool {
     private onPointerUp(e: FederatedPointerEvent): void {
         if (!this.currentView || !this.isDragging) return;
 
-        const historyManager = this.editorContext.getCurrentHistoryManager();
+        const historyManager = this.editorFacade.getCurrentHistoryManager();
 
         if (historyManager && this.activeDrawStrategy && this.targetLayerRenderer && this.drawPayloads.size > 0) {
-            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.drawPayloads.values()), this.editorContext);
+            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.drawPayloads.values()), this.editorFacade);
         }
 
         this.clearDrawPreview();
@@ -143,7 +143,7 @@ export class RectangleTool implements ITool {
         const { boundary, drawPositions } = this.calculateDrawPositions(this.startMousePosition, this.currentMousePosition, shiftKey);
 
         drawPositions.forEach((drawPosition) => {
-            const drawPayloads = this.activeDrawStrategy!.getPayload(drawPosition, this.targetLayerRenderer!, this.editorContext, this.currentView!.session);
+            const drawPayloads = this.activeDrawStrategy!.getPayload(drawPosition, this.targetLayerRenderer!, this.editorFacade, this.currentView!.session);
             if (drawPayloads.length <= 0) return;
             drawPayloads.forEach((drawPayload) => {
                 if (drawPayload.coordinate.col > boundary.maxX || drawPayload.coordinate.row > boundary.maxY) {
@@ -181,7 +181,7 @@ export class RectangleTool implements ITool {
             maxY = Math.max(startCoord.row, maxY);
         }
 
-        const size = this.activeDrawStrategy!.getBrushSize(this.editorContext);
+        const size = this.activeDrawStrategy!.getBrushSize(this.editorFacade);
 
         const width = Math.ceil(Math.abs(maxX - minX + 1) / size.width);
         const height = Math.ceil(Math.abs(maxY - minY + 1) / size.height);

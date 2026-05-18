@@ -88,7 +88,7 @@ function ConstraintsGrid() {
                             </div>
                         );
                     }
-                    const textureManager = appKernel.editorContext.textureManager;
+                    const textureManager = appKernel.editorFacade.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                     return (
                         <div key={index} className="aspect-square bg-surface-overlay relative p-2 flex items-center justify-center cursor-not-allowed">
@@ -120,7 +120,7 @@ function OutputList() {
                 {ruleOutputs.map((output) => {
                     const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(output.tilesetIndex);
                     if (!tilesetId) return null;
-                    const textureManager = appKernel.editorContext.textureManager;
+                    const textureManager = appKernel.editorFacade.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, output.tileId);
                     return (
                         <div key={`${tilesetId}-${output.tileId}`} className='w-full aspect-square border border-foreground/20'>

@@ -14,15 +14,15 @@ export class BatchCommand implements IBaseCommand {
         this.commands = commands;
     }
 
-    public execute(context: EditorFacade): Result {
-        const results = this.commands.map(cmd => cmd.execute(context))
+    public execute(editorFacade: EditorFacade): Result {
+        const results = this.commands.map(cmd => cmd.execute(editorFacade))
         const success = results.every(result => result.status === Result.Status.Success)
         const message = results.map(result => result.message).filter(msg => msg != undefined).join("\n")
         return success ? Result.Success() : Result.Error(message);
     }
 
-    public undo(context: EditorFacade): Result {
-        const results = [...this.commands].reverse().map(cmd => cmd.undo(context));
+    public undo(editorFacade: EditorFacade): Result {
+        const results = [...this.commands].reverse().map(cmd => cmd.undo(editorFacade));
         const success = results.every(result => result.status === Result.Status.Success)
         const message = results.map(result => result.message).filter(msg => msg != undefined).join("\n")
         return success ? Result.Success() : Result.Error(message);

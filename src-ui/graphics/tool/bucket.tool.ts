@@ -39,7 +39,7 @@ export class BucketTool implements ITool {
     private bindPointerOnUp: (event: FederatedPointerEvent) => void;
     private bindPointerOutside: (event: FederatedPointerEvent) => void;
 
-    constructor(private readonly editorContext: EditorFacade) {
+    constructor(private readonly editorFacade: EditorFacade) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
         this.bindPointerOnMove = this.onPointerMove.bind(this);
         this.bindPointerOnUp = this.onPointerUp.bind(this);
@@ -109,10 +109,10 @@ export class BucketTool implements ITool {
             this.updateDrawPayload(coord);
         }
 
-        const historyManager = this.editorContext.getCurrentHistoryManager();
+        const historyManager = this.editorFacade.getCurrentHistoryManager();
 
         if (historyManager && this.activeDrawStrategy && this.targetLayerRenderer && this.stampsDataMap.size > 0) {
-            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.stampsDataMap.values()), this.editorContext);
+            this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.stampsDataMap.values()), this.editorFacade);
         }
         this.clearDrawPreview();
     }
@@ -198,7 +198,7 @@ export class BucketTool implements ITool {
         const drawCoordinates = this.getDrawCoordinates(bounds);
 
         drawCoordinates.forEach((drawCoordinate) => {
-            const drawPayloads = this.activeDrawStrategy!.getPayload(this.targetLayerRenderer!.coordToPos(drawCoordinate), this.targetLayerRenderer!, this.editorContext, this.currentView!.session);
+            const drawPayloads = this.activeDrawStrategy!.getPayload(this.targetLayerRenderer!.coordToPos(drawCoordinate), this.targetLayerRenderer!, this.editorFacade, this.currentView!.session);
             if (drawPayloads.length <= 0) return;
             drawPayloads.forEach((drawPayload) => {
                 if (!this.currentFloodRegion.has(drawPayload.key)) {
@@ -224,7 +224,7 @@ export class BucketTool implements ITool {
         const points: Coordinate[] = [];
         const { minX, maxX, minY, maxY } = bounds;
 
-        let size = this.activeDrawStrategy!.getBrushSize(this.editorContext);
+        let size = this.activeDrawStrategy!.getBrushSize(this.editorFacade);
 
         const width = Math.ceil(Math.abs(maxX - minX + 1) / size.width);
         const height = Math.ceil(Math.abs(maxY - minY + 1) / size.height);

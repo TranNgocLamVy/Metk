@@ -14,9 +14,9 @@ import i18n from "@/shared/services/i18n.service";
 export class TilemapService {
 
     public static async createTilemap(): Promise<void> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
 
         const form = await DialogService.openFormDialog(createTilemapForm());
@@ -53,7 +53,7 @@ export class TilemapService {
         }
 
         await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
         await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         WorkspaceService.createTilemapSession(tilemapData.id);
@@ -62,9 +62,9 @@ export class TilemapService {
     }
 
     public static async importTilemap(refTilemapId?: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
 
         if (!currentProject || !currentWorkspace) return Result.Cancel();
 
@@ -96,7 +96,7 @@ export class TilemapService {
 
         await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
         WorkspaceService.createTilemapSession(tilemapData.id);
 
@@ -106,8 +106,8 @@ export class TilemapService {
     }
 
     public static async removeTilemap(tilemapId: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
 
         if (!currentProject) return Result.Cancel();
 
@@ -120,9 +120,9 @@ export class TilemapService {
         const removeResult = await currentProject.tilemapManager.removeTilemapMetadata(tilemapId);
         if (removeResult.status !== Result.Status.Success) return Result.Cancel();
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
-        const tilemapSession = editorContext.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
+        const tilemapSession = editorFacade.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
         if (tilemapSession) {
             await WorkspaceService.closeTilemapSession(tilemapSession.id);
             await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
@@ -132,8 +132,8 @@ export class TilemapService {
     }
 
     public static async deleteTilemap(tilemapId: string): Promise<void> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
 
         if (!currentProject) return;
 
@@ -146,9 +146,9 @@ export class TilemapService {
         const deleteTilemapResult = await currentProject.tilemapManager.deleteTilemap(tilemapId);
         if (deleteTilemapResult.status !== Result.Status.Success) return;
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
-        const tilemapSession = editorContext.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
+        const tilemapSession = editorFacade.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
         if (tilemapSession) {
             await WorkspaceService.closeTilemapSession(tilemapSession.id, true);
             await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });

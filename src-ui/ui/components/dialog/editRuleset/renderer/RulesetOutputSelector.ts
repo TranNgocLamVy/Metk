@@ -89,7 +89,7 @@ export class RulesetOutputSelector {
     public async setActiveTileset(tilesetId: string) {
         if (this.currentTileset?.id === tilesetId) return;
 
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
         const tilesetManager = currentProject.tilesetManager;
@@ -98,7 +98,7 @@ export class RulesetOutputSelector {
 
         const tileset = tilesetResult.data;
         
-        const textureManager = appKernel.editorContext.textureManager;
+        const textureManager = appKernel.editorFacade.textureManager;
         
         if (this.currentTileset) {
             textureManager.releaseTilesetGraphics(this.currentTileset.id);
@@ -214,7 +214,7 @@ export class RulesetOutputSelector {
 
     public destroy() {
         if (!this.isInit) return;
-        if (this.currentTileset) appKernel.editorContext.textureManager.releaseTilesetGraphics(this.currentTileset.id)
+        if (this.currentTileset) appKernel.editorFacade.textureManager.releaseTilesetGraphics(this.currentTileset.id)
         if (this.pixiApp) this.pixiApp.stage.removeChild(this.viewport);
         this.viewport.destroy({ children: true });
     }

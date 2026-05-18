@@ -3,14 +3,14 @@ import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Columns3Cog, Copy, Eye, Folder, Grid2X2, Group, Image, Layers, Layers2, Lock, Scan, Scissors, Shapes, Trash2, Ungroup } from "lucide-react";
 
 const isTilemapSessionOpen = (): boolean => {
-	const editorContext = appKernel.editorContext;
-	const tilemapSession = editorContext.getActiveTilemapSession();
+	const editorFacade = appKernel.editorFacade;
+	const tilemapSession = editorFacade.getActiveTilemapSession();
 	return !!tilemapSession;
 }
 
 const numSelectedLayers = (): number => {
-	const editorContext = appKernel.editorContext;
-	const tilemapSession = editorContext.getActiveTilemapSession();
+	const editorFacade = appKernel.editorFacade;
+	const tilemapSession = editorFacade.getActiveTilemapSession();
 	if (!tilemapSession) return 0;
 	return tilemapSession.layerState.selectedLayers.length;
 }

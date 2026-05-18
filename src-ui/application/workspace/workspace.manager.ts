@@ -15,15 +15,15 @@ type WorkspaceManagerEvent = {
 
 export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
     public currentWorkspace: Workspace | null = null;
-    private editorContext: EditorFacade;
+    private editorFacade: EditorFacade;
     private saveTimeout: NodeJS.Timeout | null = null;
 
     public constructor() {
         super();
     }
 
-    public setEditorContext(editorContext: EditorFacade) {
-        this.editorContext = editorContext;
+    public setEditorContext(editorFacade: EditorFacade) {
+        this.editorFacade = editorFacade;
     }
 
     public async loadProjectWorkspace(project: Project): Promise<Result<Workspace>> {
@@ -34,14 +34,14 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
 
         const workspaceExist = await WorkspaceStorageService.exists(workspaceAbsPath);
         if (!workspaceExist) {
-            this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
+            this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
             await this.saveCurrentWorkspace();
         } else {            
             const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
             if (loadSessionResult.status === Result.Status.Success) {
-                this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
+                this.currentWorkspace = new Workspace(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
             } else {
-                this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorContext);
+                this.currentWorkspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
                 await this.saveCurrentWorkspace();
             }
         }

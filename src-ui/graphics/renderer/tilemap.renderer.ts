@@ -15,8 +15,8 @@ export class TilemapRenderer {
     private borderGraphic: Graphics;
     public tilemap: Tilemap
 
-    constructor(context: CreateTilemapRendererContext) {
-        this.tilemap = context.tilemap;
+    constructor(editorFacade: CreateTilemapRendererContext) {
+        this.tilemap = editorFacade.tilemap;
 
         this.container = new Container({ isRenderGroup: true });
         this.container.label = "Tilemap-Root";

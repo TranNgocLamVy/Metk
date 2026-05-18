@@ -30,7 +30,7 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
 
     constructor(
         public readonly tilesetSessionManagerData: TilesetSessionManagerData,
-        private readonly editorContext: EditorFacade
+        private readonly editorFacade: EditorFacade
     ) {
         super();
     }
@@ -43,7 +43,7 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
                 return Result.Error(tilesetResult.message);
             }
             const tileset = tilesetResult.data;
-            const tilesetSession = new TilesetSession(tileset, sessionData, this.editorContext);
+            const tilesetSession = new TilesetSession(tileset, sessionData, this.editorFacade);
             await tilesetSession.loadTilesetSession();
 
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
@@ -58,7 +58,7 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
 
         const newTilesetSessionData = defaultTilesetSessionData(tileset.id);
 
-        const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData, this.editorContext);
+        const newTilesetSession = new TilesetSession(tileset, newTilesetSessionData, this.editorFacade);
         await newTilesetSession.loadTilesetSession();
 
         this.tilesetSessionMap.set(newTilesetSession.id, newTilesetSession);

@@ -18,9 +18,9 @@ export class TilesetGridRenderer {
 
     private bindOnTilesetUpdate: () => void;
 
-    constructor(context: CreateGridRendererContext) {
-        this.viewport = context.viewport;
-        this.tileset = context.tileset;
+    constructor(editorFacade: CreateGridRendererContext) {
+        this.viewport = editorFacade.viewport;
+        this.tileset = editorFacade.tileset;
         
         this.graphics = new Graphics();
 

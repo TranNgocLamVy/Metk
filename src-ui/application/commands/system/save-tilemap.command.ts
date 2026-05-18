@@ -12,9 +12,9 @@ import { Result } from "@/shared/types/result";
     when: "tilmapSessionOpened && !isModalOpen",
 })
 export class SaveTilemapCommand implements ISystemCommand {
-    public async execute(context: EditorFacade): Promise<Result> {
-        const currentProject = context.currentProject;
-        const tilemapSession = context.getActiveTilemapSession();
+    public async execute(editorFacade: EditorFacade): Promise<Result> {
+        const currentProject = editorFacade.currentProject;
+        const tilemapSession = editorFacade.getActiveTilemapSession();
         if (!currentProject) return Result.Cancel();
         if (!tilemapSession) return Result.Cancel();
         const tilemap = tilemapSession.tilemap;

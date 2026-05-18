@@ -17,9 +17,9 @@ import { TextureUtils } from "../utils/texture.utils";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
 
         const defaultTextureDir = currentWorkspace.savedPathManager.getTextureDir();
@@ -73,7 +73,7 @@ export class TilesetService {
         }
 
         await currentProject.tilesetManager.addTileset(tilesetData, tilesetAbsPath);
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
         await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
         await WorkspaceService.createTilesetSession(tilesetData.id);
@@ -82,9 +82,9 @@ export class TilesetService {
     }
 
     public static async importTileset(refTilesetId?: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
 
         if (!currentProject || !currentWorkspace) return Result.Cancel();
 
@@ -116,7 +116,7 @@ export class TilesetService {
 
         await currentProject.tilesetManager.addTileset(tilesetData, tilesetAbsPath);
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
         WorkspaceService.createTilesetSession(tilesetData.id);
 
@@ -126,8 +126,8 @@ export class TilesetService {
     }
 
     public static async removeTileset(tilesetId: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
 
         if (!currentProject) return Result.Cancel();
 
@@ -148,9 +148,9 @@ export class TilesetService {
 
         if (removeResult.status !== Result.Status.Success) return Result.Cancel();
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
-        const tilesetSession = editorContext.currentWorkspace?.tilesetSessionManager.getSessionByTilesetId(tilesetId);
+        const tilesetSession = editorFacade.currentWorkspace?.tilesetSessionManager.getSessionByTilesetId(tilesetId);
         if (tilesetSession) {
             await WorkspaceService.closeTilesetSession(tilesetSession.id);
             await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
@@ -160,9 +160,9 @@ export class TilesetService {
     }
 
     public static async deleteTileset(tilesetId: string): Promise<void> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
 
         if (!currentProject || !currentWorkspace) return;
 
@@ -184,7 +184,7 @@ export class TilesetService {
 
         if (deleteResult.status !== Result.Status.Success) return;
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
         const tilesetSession = currentWorkspace.tilesetSessionManager.getSessionByTilesetId(tilesetId);
         if (tilesetSession) await WorkspaceService.closeTilesetSession(tilesetSession.id);

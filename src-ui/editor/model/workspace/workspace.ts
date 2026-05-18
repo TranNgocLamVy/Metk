@@ -23,12 +23,12 @@ export class Workspace {
         private readonly tilesetManager: TilesetManager, 
         private readonly tilemapManager: TilemapManager,
         public readonly projectPathSystem: ProjectPathSystem,
-        private readonly editorContext: EditorFacade,
+        private readonly editorFacade: EditorFacade,
     ) {
-        this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorContext);
-        this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorContext);
-        this.rulesetSessionManager = new RulesetSessionManager(workspaceData.ruleset, this.editorContext);
-        this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorContext);
+        this.tilesetSessionManager = new TilesetSessionManager(workspaceData.tilesets, this.editorFacade);
+        this.tilemapSessionManager = new TilemapSessionManager(workspaceData.tilemaps, this.editorFacade);
+        this.rulesetSessionManager = new RulesetSessionManager(workspaceData.ruleset, this.editorFacade);
+        this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorFacade);
         this.savedPathManager = new WorkspaceSavedPathManager(workspaceData.savedPath, this.projectPathSystem);
     }
 

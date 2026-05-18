@@ -68,9 +68,9 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.eventEmitter.emit("onUpdated");
     }
 
-    public calculateOutput(context: (RulesetRefData | null)[][]): { tileId: number, tilesetId: string } | null {
+    public calculateOutput(editorFacade: (RulesetRefData | null)[][]): { tileId: number, tilesetId: string } | null {
         for (const rule of this.rules) {
-            if (rule.isSatisfied(context)) {
+            if (rule.isSatisfied(editorFacade)) {
                 const output = rule.calculateOutput();
                 if (output != null) return output;
             }

@@ -28,7 +28,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
 
     constructor(
         public readonly tilemapSessionManagerData: TilemapSessionManagerData,
-        private readonly editorContext: EditorFacade
+        private readonly editorFacade: EditorFacade
     ) {
         super();
     }
@@ -39,7 +39,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
             const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);
             if (tilemapResult.status !== Result.Status.Success) return Result.Error(tilemapResult.message); 
             const tilemap = tilemapResult.data;
-            const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorContext);
+            const tilemapSession = new TilemapSession(tilemap, sessionData, this.editorFacade);
             await tilemapSession.loadTilemapSession();
 
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
@@ -60,7 +60,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
 
         const newTilemapSessionData = defaultTilemapSessionData(tilemap.id);
 
-        const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData, this.editorContext);
+        const newTilemapSession = new TilemapSession(tilemap, newTilemapSessionData, this.editorFacade);
         await newTilemapSession.loadTilemapSession();
         
         this.tilemapSessionMap.set(newTilemapSession.id, newTilemapSession);
@@ -93,7 +93,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         this.tilemapSessionMap.delete(sessionId);
         this.tilemapMap.delete(tilemapSession.tilemap.id);
         
-        const currentProject = this.editorContext.currentProject;
+        const currentProject = this.editorFacade.currentProject;
         if (!currentProject) return;
 
         const tilemapManager = currentProject.tilemapManager;

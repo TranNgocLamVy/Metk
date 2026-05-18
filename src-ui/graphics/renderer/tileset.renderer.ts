@@ -18,9 +18,9 @@ export class TilesetRenderer {
 
     private bindOnTextureReloaded: (tilesetId: string) => void;
 
-    constructor(context: CreateTilesetRendererContext) {
-        this.tileset = context.tileset as Tileset;
-        this.gap = context.gap;
+    constructor(editorFacade: CreateTilesetRendererContext) {
+        this.tileset = editorFacade.tileset as Tileset;
+        this.gap = editorFacade.gap;
 
         this.container = new Container();
         this.container.position.set(0, 0);
@@ -32,7 +32,7 @@ export class TilesetRenderer {
     }
 
     public async renderTiles(): Promise<void> {
-        const textureManager = appKernel.editorContext.textureManager;
+        const textureManager = appKernel.editorFacade.textureManager;
         this.container.removeChildren();
         let errorTexture: Texture | null = null;
         for (let i = 0; i < this.tileset.tiles.length; i++) {

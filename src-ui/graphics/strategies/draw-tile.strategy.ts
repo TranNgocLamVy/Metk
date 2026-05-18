@@ -31,16 +31,16 @@ export class DrawTileStrategy implements IDrawStrategy {
         return coord1.col === coord2.col && coord1.row === coord2.row;
     }
 
-    public getBrushSize(editorContext: EditorFacade): { width: number, height: number } {
-        const selectedTiles = this.getSelectedTiles(editorContext);
+    public getBrushSize(editorFacade: EditorFacade): { width: number, height: number } {
+        const selectedTiles = this.getSelectedTiles(editorFacade);
         if (!selectedTiles) return { width: 1, height: 1 };
         const height = selectedTiles.length;
         const width = selectedTiles[0].length;
         return { width, height };
     }
 
-    public drawHoverPreview(pos: Position, layerRenderer: TileLayerRenderer, editorContext: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[] {
-        const selectedTiles = this.getSelectedTiles(editorContext);
+    public drawHoverPreview(pos: Position, layerRenderer: TileLayerRenderer, editorFacade: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[] {
+        const selectedTiles = this.getSelectedTiles(editorFacade);
         if (!selectedTiles) return [];
 
         const coord = layerRenderer.posToCoord(pos); // TODO: Check again, very sus
@@ -56,7 +56,7 @@ export class DrawTileStrategy implements IDrawStrategy {
                 const row = coord.row + r;
                 if (col < 0 || col >= session.tilemap.width || row < 0 || row >= session.tilemap.height) continue;
 
-                const texture = editorContext.textureManager.getTileTexture(tile.tileset.id, tile.id);
+                const texture = editorFacade.textureManager.getTileTexture(tile.tileset.id, tile.id);
                 if (!texture) continue;
 
                 const sprite = new Sprite(texture);
@@ -70,8 +70,8 @@ export class DrawTileStrategy implements IDrawStrategy {
         return sprites;
     }
 
-    public getPayload(pos: Position, layerRenderer: TileLayerRenderer, editorContext: EditorFacade, session: TilemapSession): DrawPayload[] {
-        const selectedTiles = this.getSelectedTiles(editorContext);
+    public getPayload(pos: Position, layerRenderer: TileLayerRenderer, editorFacade: EditorFacade, session: TilemapSession): DrawPayload[] {
+        const selectedTiles = this.getSelectedTiles(editorFacade);
         if (!selectedTiles) return [];
 
         const coord = layerRenderer.posToCoord(pos);
@@ -87,7 +87,7 @@ export class DrawTileStrategy implements IDrawStrategy {
                 const row = coord.row + r;
                 if (!session.tilemap.isInBoundary({ col, row })) continue;
 
-                const texture = editorContext.textureManager.getTileTexture(tile.tileset.id, tile.id);
+                const texture = editorFacade.textureManager.getTileTexture(tile.tileset.id, tile.id);
                 if (!texture) continue;
 
                 const sprite = new Sprite(texture);
@@ -100,8 +100,8 @@ export class DrawTileStrategy implements IDrawStrategy {
         return data;
     }
 
-    public commit(layerRenderer: TileLayerRenderer, previewData: DrawPayload[], editorContext: EditorFacade): void {
-        const historyManager = editorContext.getCurrentHistoryManager();
+    public commit(layerRenderer: TileLayerRenderer, previewData: DrawPayload[], editorFacade: EditorFacade): void {
+        const historyManager = editorFacade.getCurrentHistoryManager();
         if (!historyManager) return;
 
         const updates = previewData.map((data) => {
@@ -112,13 +112,13 @@ export class DrawTileStrategy implements IDrawStrategy {
         if (updates.length == 0) return;
 
         historyManager.startTransaction();
-        historyManager.execute(new SetTilesCommand(layerRenderer.layer.id, updates), editorContext);
+        historyManager.execute(new SetTilesCommand(layerRenderer.layer.id, updates), editorFacade);
         historyManager.commitTransaction();
     }
 
     // TODO: Cache this when selection changes in tileset session
-    private getSelectedTiles(editorContext: EditorFacade): (Tile | null)[][] | null {
-        const session = editorContext.getActiveTilesetSession();
+    private getSelectedTiles(editorFacade: EditorFacade): (Tile | null)[][] | null {
+        const session = editorFacade.getActiveTilesetSession();
         if (!session) return null;
         
         let minRow = Infinity, maxRow = -Infinity, minCol = Infinity, maxCol = -Infinity;

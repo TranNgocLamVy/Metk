@@ -4,13 +4,13 @@ import { EditorFacade } from "@/application/editor.facade";
 
 export interface IBaseCommand {
     readonly id: string;
-    execute(context: EditorFacade): Result;
-    undo(context: EditorFacade): Result;
+    execute(editorFacade: EditorFacade): Result;
+    undo(editorFacade: EditorFacade): Result;
     delete(): void;
 }
 
 export type ISystemCommandConstructor = new () => ISystemCommand
 
 export interface ISystemCommand {
-    execute(context: EditorFacade): Result | Promise<Result>;
+    execute(editorFacade: EditorFacade): Result | Promise<Result>;
 }

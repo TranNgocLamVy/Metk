@@ -8,7 +8,7 @@ export class RulesetSessionManager {
 
     constructor(
         tilesetSessionManagerData: RulesetSessionManagerData,
-        private readonly editorContext: EditorFacade
+        private readonly editorFacade: EditorFacade
     ) {
         this.selectedRuleId = tilesetSessionManagerData.selectedRuleId;
     }

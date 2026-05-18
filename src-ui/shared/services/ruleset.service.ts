@@ -16,9 +16,9 @@ import { PathUtils } from "../utils/path.utils";
 export class RulesetService {
 
     public static async createRuleset(): Promise<void> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
 
         const form = await DialogService.openFormDialog(createRulesetForm);
@@ -53,16 +53,16 @@ export class RulesetService {
 
         await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
         await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
 
         Console.success({ message: "message.ruleset.createSuccess" });
     }
 
     public static async importRuleset(refRulesetId?: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
 
         if (!currentProject || !currentWorkspace) return Result.Cancel();
 
@@ -94,7 +94,7 @@ export class RulesetService {
 
         await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
         Console.success({ message: "message.ruleset.importSuccess" });
 
@@ -102,8 +102,8 @@ export class RulesetService {
     }
 
     public static async removeRuleset(rulesetId: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
 
         if (!currentProject) return Result.Cancel();
 
@@ -122,9 +122,9 @@ export class RulesetService {
 
         if (removeResult.status !== Result.Status.Success) return Result.Cancel();
 
-        await editorContext.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
-        const rulesetSessionManager = editorContext.currentWorkspace?.rulesetSessionManager;
+        const rulesetSessionManager = editorFacade.currentWorkspace?.rulesetSessionManager;
         if (removeResult.status == Result.Status.Success && rulesetSessionManager) {
             const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
             if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
@@ -135,7 +135,7 @@ export class RulesetService {
     }
 
     public static async deleteRuleset(rulesetId: string): Promise<void> {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
         const rulesetManager = currentProject.rulesetManager;
 

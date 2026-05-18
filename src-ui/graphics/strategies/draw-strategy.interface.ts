@@ -15,15 +15,15 @@ export interface DrawPayload {
 export interface IDrawStrategy {
     canHandle(layerRenderer: BaseLayerRenderer<any>, tool: ITool): boolean;
 
-    getBrushSize(editorContext: EditorFacade): { width: number, height: number };
+    getBrushSize(editorFacade: EditorFacade): { width: number, height: number };
 
     comparePosition(pos1: Position, pos2: Position, layer: BaseLayerRenderer<any>): boolean;
 
     getRefAt(pos: Position, layer: BaseLayerRenderer<any>): any;
 
-    drawHoverPreview(pos: Position, layer: BaseLayerRenderer<any>, editorContext: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[];
+    drawHoverPreview(pos: Position, layer: BaseLayerRenderer<any>, editorFacade: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[];
 
-    getPayload(pos: Position, layer: BaseLayerRenderer<any>, editorContext: EditorFacade, session: TilemapSession): DrawPayload[];
+    getPayload(pos: Position, layer: BaseLayerRenderer<any>, editorFacade: EditorFacade, session: TilemapSession): DrawPayload[];
 
-    commit(layer: BaseLayerRenderer<any>, previewData: DrawPayload[], editorContext: EditorFacade): void;
+    commit(layer: BaseLayerRenderer<any>, previewData: DrawPayload[], editorFacade: EditorFacade): void;
 }

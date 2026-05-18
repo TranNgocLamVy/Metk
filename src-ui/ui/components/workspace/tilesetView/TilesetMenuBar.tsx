@@ -11,7 +11,7 @@ export default function TilesetMenuBar() {
     const { activeSession } = useTilesetSessionStore();
 
     const onDeleteTileset = useCallback(() => {
-        const tilesetSession = appKernel.editorContext.getActiveTilesetSession();
+        const tilesetSession = appKernel.editorFacade.getActiveTilesetSession();
         if (!tilesetSession) return;
         const selectedTilesetId = tilesetSession.tileset.id;
         TilesetService.deleteTileset(selectedTilesetId);

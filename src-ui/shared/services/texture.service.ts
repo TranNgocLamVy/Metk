@@ -10,9 +10,9 @@ import { DialogService } from "./dialog.service";
 
 export class TextureService {
     public static async importTexture(tilesetId: string): Promise<Result> {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
-        const currentWorkspace = editorContext.currentWorkspace;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
+        const currentWorkspace = editorFacade.currentWorkspace;
 
         if (!currentProject || !currentWorkspace) return Result.Cancel();
 
@@ -32,7 +32,7 @@ export class TextureService {
         const textureAbsDir = PathUtils.dirname(textureAbsPath);
         currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
 
-        const tilesetManager = appKernel.editorContext.currentProject?.tilesetManager;
+        const tilesetManager = appKernel.editorFacade.currentProject?.tilesetManager;
         if (!tilesetManager) return Result.Cancel();
 
         const tileset = tilesetManager.getTilesetById(tilesetId);

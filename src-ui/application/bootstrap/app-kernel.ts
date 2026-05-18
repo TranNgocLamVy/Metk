@@ -26,7 +26,7 @@ export class AppKernel {
     public readonly keybindingManager: KeybindingManager;
     public readonly textureManager: TextureManager;
 
-    public readonly editorContext: EditorFacade;
+    public readonly editorFacade: EditorFacade;
 
 
     private constructor() {
@@ -36,15 +36,15 @@ export class AppKernel {
         this.layoutManager = new LayoutManager();
         this.toolManager = new ToolManager();
         this.textureManager = new TextureManager();
-        this.editorContext = new EditorFacade(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager);
+        this.editorFacade = new EditorFacade(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager);
 
         this.contextManager = new ActivationContext();
-        this.systemCommandManager = new SystemCommandManager(this.contextManager, this.editorContext);
+        this.systemCommandManager = new SystemCommandManager(this.contextManager, this.editorFacade);
         this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
         
         // Set Context
-        this.toolManager.setEditorContext(this.editorContext);
-        this.workspaceManager.setEditorContext(this.editorContext);
+        this.toolManager.setEditorContext(this.editorFacade);
+        this.workspaceManager.setEditorContext(this.editorFacade);
     }
 
     public static initialize() {

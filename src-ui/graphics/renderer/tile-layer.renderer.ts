@@ -17,8 +17,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     private bindOnTilesChanged: (coords: Coordinate[]) => void;
     private bindOnTextureReloaded: (tilesetId: string) => void;
 
-    constructor(context: CreateTileLayerRendererContext) {
-        super(context.layer, context.tilemap);
+    constructor(editorFacade: CreateTileLayerRendererContext) {
+        super(editorFacade.layer, editorFacade.tilemap);
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
         this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
@@ -64,8 +64,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         currentSprite.x = drawPotision.x;
         currentSprite.y = drawPotision.y;
         
-        // TODO: Get textureManager from passing context
-        const textureManager = appKernel.editorContext.textureManager;
+        // TODO: Get textureManager from passing editorFacade
+        const textureManager = appKernel.editorFacade.textureManager;
         const texture = textureManager.getTileTexture(tileRef.tilesetId, tileRef.tileId);
         
         if (!texture) {

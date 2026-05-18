@@ -13,7 +13,7 @@ interface OpenFileModalProps extends BaseDialogProps {
 export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
     const { closeDialog } = useDialogStore();
 
-    const currentProject = appKernel.editorContext.currentProject;
+    const currentProject = appKernel.editorFacade.currentProject;
     if (!currentProject) return null;
 
     const tilemaps = currentProject.tilemapManager.serialize();

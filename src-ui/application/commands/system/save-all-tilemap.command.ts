@@ -12,9 +12,9 @@ import { Result } from "@/shared/types/result";
     when: "tilmapSessionOpened && !isModalOpen",
 })
 export class SaveAllTilemapCommand implements ISystemCommand {
-    public async execute(context: EditorFacade): Promise<Result> {
-        const currentProject = context.currentProject;
-        const workspace = context.currentWorkspace;
+    public async execute(editorFacade: EditorFacade): Promise<Result> {
+        const currentProject = editorFacade.currentProject;
+        const workspace = editorFacade.currentWorkspace;
 
         if (!currentProject) return Result.Cancel();
         if (!workspace) return Result.Cancel();

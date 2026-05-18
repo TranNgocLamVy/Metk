@@ -16,8 +16,8 @@ export class HistoryManager {
         this.limit = limit;
     }
 
-    public execute(command: IBaseCommand, context: EditorFacade) {
-        command.execute(context);
+    public execute(command: IBaseCommand, editorFacade: EditorFacade) {
+        command.execute(editorFacade);
         if (this.isTransactionActive) {
             this.currentBatch.push(command);
         } else {
@@ -49,33 +49,33 @@ export class HistoryManager {
         this.notifyUI();
     }
 
-    public cancelTransaction(context: EditorFacade) {
+    public cancelTransaction(editorFacade: EditorFacade) {
         if (!this.isTransactionActive) return;
 
-        [...this.currentBatch].reverse().forEach(cmd => cmd.undo(context));
+        [...this.currentBatch].reverse().forEach(cmd => cmd.undo(editorFacade));
 
         this.isTransactionActive = false;
         this.currentBatch = [];
         this.notifyUI();
     }
 
-    public undo(context: EditorFacade) {
+    public undo(editorFacade: EditorFacade) {
         if (this.undoStack.length === 0) return;
 
         const cmd = this.undoStack.pop();
         if (cmd) {
-            cmd.undo(context);
+            cmd.undo(editorFacade);
             this.redoStack.push(cmd);
             this.notifyUI();
         }
     }
 
-    public redo(context: EditorFacade) {
+    public redo(editorFacade: EditorFacade) {
         if (this.redoStack.length === 0) return;
 
         const cmd = this.redoStack.pop();
         if (cmd) {
-            cmd.execute(context);
+            cmd.execute(editorFacade);
             this.undoStack.push(cmd);
             this.notifyUI();
         }

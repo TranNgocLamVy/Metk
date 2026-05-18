@@ -21,7 +21,7 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
 
     public historyManager: HistoryManager;
 
-    constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorContext: EditorFacade) {
+    constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorFacade: EditorFacade) {
         super();
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
@@ -32,7 +32,7 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
     }
 
     public async loadTilesetSession(): Promise<void> {
-        const textureManager = this.editorContext.textureManager;
+        const textureManager = this.editorFacade.textureManager;
         await textureManager.retainTilesetGraphics(this.tileset);
     }
 
@@ -66,7 +66,7 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
     }
 
     public destroy(): void {
-        const textureManager = this.editorContext.textureManager;
+        const textureManager = this.editorFacade.textureManager;
         textureManager.releaseTilesetGraphics(this.tileset.id); // TODO: Move this to view
     }
 }

@@ -7,13 +7,13 @@ export class ToolSessionManager {
 
     constructor(
         private toolSessionData: ToolStateData,
-        private readonly editorContext: EditorFacade
+        private readonly editorFacade: EditorFacade
     ) {
         this.bindOnToolChanged = this.onToolChange.bind(this);
     }
 
     public async load() {
-        const toolManager = this.editorContext.toolManager;
+        const toolManager = this.editorFacade.toolManager;
         if (this.toolSessionData?.currentTool) {
             toolManager.startTool(this.toolSessionData.currentTool);
         }
@@ -21,13 +21,13 @@ export class ToolSessionManager {
     }
 
     public async destroy() {
-        this.editorContext.toolManager.off("onToolChanged", this.bindOnToolChanged);
+        this.editorFacade.toolManager.off("onToolChanged", this.bindOnToolChanged);
     }
 
     public async onToolChange() {
-        const currentTool = this.editorContext.toolManager.getCurrentToolId() ?? undefined;
+        const currentTool = this.editorFacade.toolManager.getCurrentToolId() ?? undefined;
         this.updateToolState({ currentTool });
-        await this.editorContext.workspaceManager.saveCurrentWorkspace();
+        await this.editorFacade.workspaceManager.saveCurrentWorkspace();
     }
 
     public async updateToolState(toolStateData: Partial<ToolStateData>) {

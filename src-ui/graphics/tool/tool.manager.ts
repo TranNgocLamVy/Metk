@@ -21,7 +21,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
     private currentTool: ITool | null;
     private currentToolId: string | null;
 
-    private editorContext: EditorFacade;
+    private editorFacade: EditorFacade;
 
     private activeTilemapView: TilemapView | null = null;
 
@@ -42,8 +42,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         this.bindOnSelectedLayersChanged = this.onSelectedLayersChanged.bind(this);
     }
 
-    public setEditorContext(editorContext: EditorFacade) {
-        this.editorContext = editorContext;
+    public setEditorContext(editorFacade: EditorFacade) {
+        this.editorFacade = editorFacade;
     }
 
     private initializeDecoratedTools() {
@@ -109,7 +109,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
         const ToolConstructor = this.toolMap.get(toolId);
         if (ToolConstructor) {
-            this.currentTool = new ToolConstructor(this.editorContext);
+            this.currentTool = new ToolConstructor(this.editorFacade);
             this.currentToolId = toolId;
 
             this.currentTool.onEnable();

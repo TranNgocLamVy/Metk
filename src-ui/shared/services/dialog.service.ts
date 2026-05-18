@@ -25,7 +25,7 @@ export class DialogService {
     }
 
     public static async openEditRulesetDialog(id: string): Promise<void> {
-        const currentProject = appKernel.editorContext.currentProject;
+        const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
         const rulesetManager = currentProject.rulesetManager;

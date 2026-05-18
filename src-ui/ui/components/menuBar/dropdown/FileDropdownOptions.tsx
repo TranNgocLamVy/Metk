@@ -112,8 +112,8 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 		label: "menu.file.action.save",
 		startIcon: <Save />,
 		disabled: () => {
-			const editorContext = appKernel.editorContext;
-			const currentSession = editorContext.getActiveTilemapSession();
+			const editorFacade = appKernel.editorFacade;
+			const currentSession = editorFacade.getActiveTilemapSession();
 			if (!currentSession) return true;
 			return !currentSession.isDirty;
 		},
@@ -179,8 +179,8 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 					label: "menu.file.action.export.exportTMX",
 					startIcon: <FolderUp />,
 					disabled: () => {
-						const editorContext = appKernel.editorContext;
-						const currentSession = editorContext.getActiveTilemapSession();
+						const editorFacade = appKernel.editorFacade;
+						const currentSession = editorFacade.getActiveTilemapSession();
 						if (!currentSession) return true;
 						return !currentSession.isDirty;
 					},

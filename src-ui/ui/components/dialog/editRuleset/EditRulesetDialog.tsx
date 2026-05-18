@@ -18,8 +18,8 @@ interface EditRulesetDialogProps extends BaseDialogProps {
 
 export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProps) {
     const ruleset = useMemo(() => {
-        const editorContext = appKernel.editorContext;
-        const currentProject = editorContext.currentProject;
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
         if (!currentProject) return null;
         const rulesetManager = currentProject.rulesetManager;
         return rulesetManager.cloneRuleset(rulesetId);

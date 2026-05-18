@@ -15,8 +15,8 @@ export class SetRulesCommand implements IBaseCommand {
         private readonly updates: { coordinate: Coordinate, rulesetId: string | null }[]
     ) {}
 
-    public execute(context: EditorFacade): Result {
-        const currentSession = context.getActiveTilemapSession();
+    public execute(editorFacade: EditorFacade): Result {
+        const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;
@@ -35,10 +35,10 @@ export class SetRulesCommand implements IBaseCommand {
         return result
     }
 
-    public undo(context: EditorFacade): Result {
+    public undo(editorFacade: EditorFacade): Result {
         if (this.oldRules.length === 0) return Result.Cancel("No rule changed");
 
-        const currentSession = context.getActiveTilemapSession();
+        const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return Result.Error("Tilemap not found");
 
         const tilemap = currentSession.tilemap;

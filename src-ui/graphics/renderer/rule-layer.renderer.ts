@@ -15,8 +15,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     private bindOnRulesetUpdated: (rulesetId: string) => void;
     private bindOnTilesChanged: (coordinates: Coordinate[]) => void
     private bindOnTextureReloaded: (tilesetId: string) => void;
-    constructor(context: CreateRuleLayerRendererContext) {
-        super(context.layer, context.tilemap);
+    constructor(editorFacade: CreateRuleLayerRendererContext) {
+        super(editorFacade.layer, editorFacade.tilemap);
 
         this.bindOnTilesChanged = this.onTilesChanged.bind(this);
         this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
@@ -65,8 +65,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         currentSprite.x = drawPotision.x;
         currentSprite.y = drawPotision.y;
 
-        // TODO: Get textureManager from passing context
-        const textureManager = appKernel.editorContext.textureManager;
+        // TODO: Get textureManager from passing editorFacade
+        const textureManager = appKernel.editorFacade.textureManager;
 
         const output = rulesetRef.output;
         const outputTexture = output ? textureManager.getTileTexture(output.tilesetId, output.tileId) : null;
