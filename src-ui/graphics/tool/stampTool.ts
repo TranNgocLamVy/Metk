@@ -1,8 +1,8 @@
 import { Container, FederatedPointerEvent, Point, Sprite } from "pixi.js";
 
 import { IDrawStrategy, DrawPayload } from "../drawStrategy/IDrawStrategy";
-import { ITool } from "@/core/interface/ITool";
-import { EditorContext } from "@/core/application/editorContext";
+import { ITool } from "@/editor/interface/ITool";
+import { EditorContext } from "@/editor/application/editorContext";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
 
 import icon from "@/assets/icons/stamp.svg?raw";

@@ -1,4 +1,4 @@
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 import { useDialogStore } from "@/ui/stores/dialogStore";
 import { BaseDialogProps } from "./dialogRegistry";

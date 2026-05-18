@@ -1,7 +1,7 @@
-import { EditorContext } from "@/core/application/editorContext";
+import { EditorContext } from "@/editor/application/editorContext";
 import { BaseLayerRenderer } from "@/graphics/renderer/baseLayerRenderer";
-import { TilemapSession } from "@/core/application/session/tilemapSession";
-import { ITool } from "@/core/interface/ITool";
+import { TilemapSession } from "@/editor/application/session/tilemapSession";
+import { ITool } from "@/editor/interface/ITool";
 import { Container, Sprite } from "pixi.js";
 
 export interface DrawPayload {

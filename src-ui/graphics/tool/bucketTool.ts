@@ -1,5 +1,5 @@
-import { EditorContext } from "@/core/application/editorContext";
-import { ITool } from "@/core/interface/ITool";
+import { EditorContext } from "@/editor/application/editorContext";
+import { ITool } from "@/editor/interface/ITool";
 import { Container, FederatedPointerEvent, Point } from "pixi.js";
 import { DrawPayload, IDrawStrategy } from "../drawStrategy/IDrawStrategy";
 

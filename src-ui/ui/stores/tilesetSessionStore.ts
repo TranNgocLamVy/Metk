@@ -1,6 +1,6 @@
 import { Application } from "pixi.js";
 import { create } from "zustand";
-import { TilesetSession } from "@/core/application/session/tilesetSession";
+import { TilesetSession } from "@/editor/application/session/tilesetSession";
 
 type TilesetSessionDisplayData = {
     sessionId: string;

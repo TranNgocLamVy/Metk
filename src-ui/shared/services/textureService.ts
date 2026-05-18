@@ -1,4 +1,4 @@
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { Result } from "../types/result";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { readFile } from "@tauri-apps/plugin-fs";

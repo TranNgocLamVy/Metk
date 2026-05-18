@@ -1,10 +1,10 @@
 import { Sprite } from "pixi.js";
 
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { Tilemap } from "@/core/application/tile/tilemap";
+import { TileLayer } from "@/editor/application/tile/layer/tileLayer";
+import { Tilemap } from "@/editor/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 
 type CreateTileLayerRendererContext = {
     layer: TileLayer;

@@ -1,7 +1,7 @@
 import { Viewport } from "pixi-viewport";
 import { Graphics } from "pixi.js";
 
-import { Tileset } from "@/core/application/tile/tileset";
+import { Tileset } from "@/editor/application/tile/tileset";
 import { DrawLineOption, GraphicUtils } from "@/shared/utils/graphicUtils";
 
 type CreateGridRendererContext = {

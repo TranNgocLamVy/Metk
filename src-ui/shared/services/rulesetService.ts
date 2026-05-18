@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Result } from "@/shared/types/result";
 import { RulesetData } from "@/shared/schema/rulesetSchema";
 import { RulesetStorageService } from "@/infrastructure/container";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { useRulesetStore } from "@/ui/stores/rulesetStore";
 import { DialogService } from "./dialogService";

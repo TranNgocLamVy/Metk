@@ -9,7 +9,7 @@ import { useTilemapSessionStore } from "@/ui/stores/tilemapSessionStore";
 import { useCallback, useEffect, useRef } from "react";
 import { TilemapView } from "@/graphics/view/tilemapView";
 import { useTilemapSessionEvent } from "@/ui/hooks/useTilemapSessionEvent";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 
 export default function TilemapEditor() {
     const { activeWorkspace } = useWorkspaceStore();

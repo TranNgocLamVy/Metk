@@ -1,12 +1,12 @@
-import { BaseLayer, IGroupLayer } from "@/core/application/tile/layer/baseLayer";
-import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
-import { RootLayer } from "@/core/application/tile/layer/rootLayer";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { Tilemap } from "@/core/application/tile/tilemap";
+import { BaseLayer, IGroupLayer } from "@/editor/application/tile/layer/baseLayer";
+import { GroupLayer } from "@/editor/application/tile/layer/groupLayer";
+import { RootLayer } from "@/editor/application/tile/layer/rootLayer";
+import { TileLayer } from "@/editor/application/tile/layer/tileLayer";
+import { Tilemap } from "@/editor/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
 import { TileLayerRenderer } from "./tileLayerRenderer";
-import { RuleLayer } from "../../core/application/tile/layer/ruleLayer";
+import { RuleLayer } from "../../editor/application/tile/layer/ruleLayer";
 import { RuleLayerRenderer } from "./ruleLayerRenderer";
 
 type GroupLike = GroupLayer | RootLayer;

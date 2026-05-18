@@ -1,4 +1,4 @@
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { TextureUtils } from "@/shared/utils/textureUtils";
 import { Texture } from "pixi.js";
 import { useEffect, useState } from "react";

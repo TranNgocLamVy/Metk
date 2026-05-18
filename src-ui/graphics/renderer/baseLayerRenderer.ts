@@ -1,7 +1,7 @@
 import { Container } from "pixi.js";
 
-import { BaseLayer, BaseLayerEvents } from "@/core/application/tile/layer/baseLayer";
-import { Tilemap } from "@/core/application/tile/tilemap";
+import { BaseLayer, BaseLayerEvents } from "@/editor/application/tile/layer/baseLayer";
+import { Tilemap } from "@/editor/application/tile/tilemap";
 
 export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any>> {
     public container: Container;

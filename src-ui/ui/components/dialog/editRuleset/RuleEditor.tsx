@@ -1,7 +1,7 @@
 import { RuleRequirement } from "@/shared/schema/rulesetSchema";
 import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import PixiImage from "../../custom/PixiImage";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { VStack } from "../../custom/stack/Stack";
 import { useCallback, WheelEvent } from "react";
 import { ScrollArea } from "../../shadcn/scroll-area";

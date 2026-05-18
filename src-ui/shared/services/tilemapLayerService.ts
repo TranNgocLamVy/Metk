@@ -1,22 +1,22 @@
-import { appCore } from "@/core/appcore";
-import { BaseLayer, IGroupLayer } from "@/core/application/tile/layer/baseLayer";
-import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
-import { RootLayer } from "@/core/application/tile/layer/rootLayer";
-import { CreateTileLayerCommand } from "@/core/command/layer/createTileLayerCommand";
-import { DeleteLayerCommand } from "@/core/command/layer/deleteLayerCommand";
-import { DuplicateLayerCommand } from "@/core/command/layer/duplicateLayerCommand";
-import { MoveLayerCommand } from "@/core/command/layer/moveLayerCommand";
-import { RenameLayerCommand } from "@/core/command/layer/renameLayerCommand";
-import { ToggleLayerLockCommand } from "@/core/command/layer/toggleLayerLockCommand";
-import { ToggleLayerVisibilityCommand } from "@/core/command/layer/toggleLayerVisibilityCommand";
+import { appCore } from "@/editor/appcore";
+import { BaseLayer, IGroupLayer } from "@/editor/application/tile/layer/baseLayer";
+import { GroupLayer } from "@/editor/application/tile/layer/groupLayer";
+import { RootLayer } from "@/editor/application/tile/layer/rootLayer";
+import { CreateTileLayerCommand } from "@/editor/command/layer/createTileLayerCommand";
+import { DeleteLayerCommand } from "@/editor/command/layer/deleteLayerCommand";
+import { DuplicateLayerCommand } from "@/editor/command/layer/duplicateLayerCommand";
+import { MoveLayerCommand } from "@/editor/command/layer/moveLayerCommand";
+import { RenameLayerCommand } from "@/editor/command/layer/renameLayerCommand";
+import { ToggleLayerLockCommand } from "@/editor/command/layer/toggleLayerLockCommand";
+import { ToggleLayerVisibilityCommand } from "@/editor/command/layer/toggleLayerVisibilityCommand";
 import { DropPosition, useLayerManagerStore } from "@/ui/stores/layerManagerStore";
 
-import { CreateGroupLayerCommand } from "../../core/command/layer/createGroupLayerCommand";
+import { CreateGroupLayerCommand } from "../../editor/command/layer/createGroupLayerCommand";
 import { WorkspaceService } from "./workspaceService";
 import { defaultGroupLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layerSchema";
-import { CreateRuleLayerCommand } from "@/core/command/layer/createRuleLayerCommand";
-import { ToggleOpenGroupLayerCommand } from "@/core/command/layer/toggleOpenGroupLayerCommand";
-import { Tilemap } from "@/core/application/tile/tilemap";
+import { CreateRuleLayerCommand } from "@/editor/command/layer/createRuleLayerCommand";
+import { ToggleOpenGroupLayerCommand } from "@/editor/command/layer/toggleOpenGroupLayerCommand";
+import { Tilemap } from "@/editor/application/tile/tilemap";
 
 export class TilemapLayerService {
     public static getSelectedParentLayer(tilemap: Tilemap): IGroupLayer | null {

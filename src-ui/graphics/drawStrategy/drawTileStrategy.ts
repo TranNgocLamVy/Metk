@@ -1,14 +1,14 @@
 import { Container, Sprite } from "pixi.js";
 import { IDrawStrategy, DrawPayload } from "./IDrawStrategy";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { EditorContext } from "@/core/application/editorContext";
-import { TilemapSession } from "@/core/application/session/tilemapSession";
-import { SetTilesCommand } from "@/core/command/tile/setTilesCommand";
-import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
-import { ITool } from "@/core/interface/ITool";
+import { TileLayer } from "@/editor/application/tile/layer/tileLayer";
+import { EditorContext } from "@/editor/application/editorContext";
+import { TilemapSession } from "@/editor/application/session/tilemapSession";
+import { SetTilesCommand } from "@/editor/command/tile/setTilesCommand";
+import { BaseLayer } from "@/editor/application/tile/layer/baseLayer";
+import { ITool } from "@/editor/interface/ITool";
 import { BaseLayerRenderer } from "@/graphics/renderer/baseLayerRenderer";
 import { TileLayerRenderer } from "@/graphics/renderer/tileLayerRenderer";
-import { Tile } from "@/core/application/tile/tileset";
+import { Tile } from "@/editor/application/tile/tileset";
 
 
 export class DrawTileStrategy implements IDrawStrategy {

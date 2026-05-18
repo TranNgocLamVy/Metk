@@ -1,7 +1,7 @@
 import { Container, Sprite, Texture } from "pixi.js";
 
-import { Tileset } from "@/core/application/tile/tileset";
-import { appCore } from "@/core/appcore";
+import { Tileset } from "@/editor/application/tile/tileset";
+import { appCore } from "@/editor/appcore";
 
 export type CreateTilesetRendererContext = {
     tileset: Tileset;

@@ -5,7 +5,7 @@ import QuickToolTip from "../../custom/QuickToolTip";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { useCallback } from "react";
 import { useTilesetSessionStore } from "@/ui/stores/tilesetSessionStore";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 
 export default function TilesetMenuBar() {
     const { activeSession } = useTilesetSessionStore();

@@ -1,10 +1,10 @@
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { FileDialogUtils } from "../utils/fileDialogUtils";
 import { Result } from "../types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
 import { defaultProjectData } from "../schema/projectSchema";
 import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
-import { Project } from "@/core/application/project";
+import { Project } from "@/editor/application/project";
 import { DialogService } from "./dialogService";
 import { useNavigationStore } from "@/ui/stores/navigationStore";
 import { PathUtils } from "../utils/pathUtils";

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { appCore } from '@/core/appcore';
-import { Workspace } from '@/core/application/workspace';
+import { appCore } from '@/editor/appcore';
+import { Workspace } from '@/editor/application/workspace';
 
 interface WorkspaceState {
     activeWorkspace: Workspace | null;

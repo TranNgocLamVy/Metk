@@ -2,7 +2,7 @@ import { useDialogStore } from "@/ui/stores/dialogStore";
 import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/types/formDialog";
 import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "../types/confirmationDialog";
 import { DialogZLevel } from "../types/dialog";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 
 
 export class DialogService {

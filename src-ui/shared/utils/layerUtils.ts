@@ -1,11 +1,11 @@
-import { BaseLayer, IGroupLayer } from "@/core/application/tile/layer/baseLayer";
-import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { TilesetRefManager } from "@/core/manager/tilesetRefManager";
+import { BaseLayer, IGroupLayer } from "@/editor/application/tile/layer/baseLayer";
+import { GroupLayer } from "@/editor/application/tile/layer/groupLayer";
+import { TileLayer } from "@/editor/application/tile/layer/tileLayer";
+import { TilesetRefManager } from "@/editor/manager/tilesetRefManager";
 
 import { GroupLayerData, LayerData, RuleLayerData, TileLayerData } from "../schema/layerSchema";
-import { RulesetRefManager } from "@/core/manager/rulesetRefManager";
-import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
+import { RulesetRefManager } from "@/editor/manager/rulesetRefManager";
+import { RuleLayer } from "@/editor/application/tile/layer/ruleLayer";
 
 export class LayerUtils {
     public static createLayeFromData(layerData: LayerData, parent: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager): BaseLayer | null {

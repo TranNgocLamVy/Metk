@@ -1,4 +1,4 @@
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { useEffect, useId } from "react";
 
 export function useContextScope(flag: string, isActive: boolean = true) {

@@ -1,6 +1,6 @@
 import { Grid3x3, Pen, Plus, Trash2 } from "lucide-react";
 
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { useDialogStore } from "@/ui/stores/dialogStore";
 import { DialogZLevel } from "@/shared/types/dialog";

@@ -7,7 +7,7 @@ import { Copy, EllipsisVertical, GripHorizontal, Plus, Trash2 } from "lucide-rea
 import { DialogClose } from "../../shadcn/dialog";
 import { useDialogStore } from "@/ui/stores/dialogStore";
 import { LocalizedText } from "../../custom/LocalizeText";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import PixiImage from "../../custom/PixiImage";
 import { useEditRuleset } from "./ContextProvider";

@@ -1,8 +1,8 @@
 import { Application, Container, Sprite, Graphics } from 'pixi.js';
-import { Tileset } from '@/core/application/tile/tileset';
-import { appCore } from '@/core/appcore';
-import { Ruleset } from '@/core/application/rule/ruleset';
-import { Rule } from '@/core/application/rule/rule';
+import { Tileset } from '@/editor/application/tile/tileset';
+import { appCore } from '@/editor/appcore';
+import { Ruleset } from '@/editor/application/rule/ruleset';
+import { Rule } from '@/editor/application/rule/rule';
 import { Viewport } from 'pixi-viewport';
 import { DrawLineOption, GraphicUtils } from '@/shared/utils/graphicUtils';
 import { Result } from '@/shared/types/result';

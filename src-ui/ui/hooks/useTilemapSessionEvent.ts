@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { useWorkspaceStore } from '../stores/workspaceStore';
-import { TilemapSessionManagerEvent } from '@/core/manager/tilemapSessionManager';
+import { TilemapSessionManagerEvent } from '@/editor/manager/tilemapSessionManager';
 import { useTilemapSessionStore } from '../stores/tilemapSessionStore';
 
 export function useTilemapSessionEvent<TEvent extends keyof TilemapSessionManagerEvent>(eventName: TEvent, callback: TilemapSessionManagerEvent[TEvent]) {

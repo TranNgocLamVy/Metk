@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 
 export type ToolbarItemDisplayData = {
     id: string;

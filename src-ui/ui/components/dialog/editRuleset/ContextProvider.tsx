@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 import { useState, useCallback, useMemo } from 'react';
-import { Ruleset } from '@/core/application/rule/ruleset';
+import { Ruleset } from '@/editor/application/rule/ruleset';
 import { RuleRequirement } from '@/shared/schema/rulesetSchema';
 import { RulesetOutputSelector } from './renderer/RulesetOutputSelector';
 import { useRulesetStore } from '@/ui/stores/rulesetStore';
-import { appCore } from '@/core/appcore';
+import { appCore } from '@/editor/appcore';
 
 export function useRulesetController(initialRuleset: Ruleset) {
     const [version, setVersion] = useState<number>(0);

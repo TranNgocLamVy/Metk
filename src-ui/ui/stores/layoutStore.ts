@@ -1,4 +1,4 @@
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { Model } from "flexlayout-react";
 import { create } from "zustand";
 

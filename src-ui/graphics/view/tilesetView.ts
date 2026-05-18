@@ -1,8 +1,8 @@
 import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
-import { TilesetSession } from "@/core/application/session/tilesetSession";
-import { IBaseView } from "@/core/interface/IBaseSession";
+import { TilesetSession } from "@/editor/application/session/tilesetSession";
+import { IBaseView } from "@/editor/interface/IBaseSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
 import { TilesetGridRenderer } from "../renderer/tilesetGridRenderer";

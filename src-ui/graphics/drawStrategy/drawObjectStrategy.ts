@@ -1,6 +1,6 @@
-// import { EditorContext } from "@/core/application/editorContext";
+// import { EditorContext } from "@/editor/application/editorContext";
 // import { DrawPayload, IDrawStrategy } from "./IDrawStrategy";
-// import { TilemapSession } from "@/core/application/session/tilemapSession";
+// import { TilemapSession } from "@/editor/application/session/tilemapSession";
 // import { Container, Sprite } from "pixi.js";
 
 

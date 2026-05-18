@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { useWorkspaceStore } from '../stores/workspaceStore';
-import { TilesetSessionManagerEvent } from '@/core/manager/tilesetSessionManager';
+import { TilesetSessionManagerEvent } from '@/editor/manager/tilesetSessionManager';
 import { useTilesetSessionStore } from '../stores/tilesetSessionStore';
 
 export function useTilesetSessionEvent<TEvent extends keyof TilesetSessionManagerEvent>(eventName: TEvent, callback: TilesetSessionManagerEvent[TEvent]) {

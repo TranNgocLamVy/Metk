@@ -1,6 +1,6 @@
 import { Container, Graphics } from "pixi.js";
 
-import { Tilemap } from "@/core/application/tile/tilemap";
+import { Tilemap } from "@/editor/application/tile/tilemap";
 
 import { GroupLayerRenderer } from "./groupLayerRenderer";
 import { BaseLayerRenderer } from "./baseLayerRenderer";

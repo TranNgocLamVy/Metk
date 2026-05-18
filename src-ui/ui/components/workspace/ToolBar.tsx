@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Fragment } from "react";
 
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { ToolbarItemDisplayData, useToolbarStore } from "@/ui/stores/toolbarStore";
 
 import { HStack, VStack } from "../custom/stack/Stack";

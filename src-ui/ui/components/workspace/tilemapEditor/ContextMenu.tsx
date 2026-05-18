@@ -1,6 +1,6 @@
 import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { TilemapService } from "@/shared/services/tilemapService";
 
 const ActionGroup: MenuDropDownGroupType = [

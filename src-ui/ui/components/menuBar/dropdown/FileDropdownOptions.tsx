@@ -4,10 +4,10 @@ import { ProjectService } from "@/shared/services/projectService";
 import { TilemapService } from "@/shared/services/tilemapService";
 import { TilesetService } from "@/shared/services/tilesetService";
 import { RulesetService } from "@/shared/services/rulesetService";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/ui/stores/dialogStore";
-import { executeCommand } from "@/core/service/commandService";
+import { executeCommand } from "@/editor/service/commandService";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{

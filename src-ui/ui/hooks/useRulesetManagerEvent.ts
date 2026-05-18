@@ -1,4 +1,4 @@
-import { RulesetManagerEvent } from "@/core/manager/rulesetManager";
+import { RulesetManagerEvent } from "@/editor/manager/rulesetManager";
 import { useProjectStore } from "../stores/projectStore";
 import { useEffect } from "react";
 

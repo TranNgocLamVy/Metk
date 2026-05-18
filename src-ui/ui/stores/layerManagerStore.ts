@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { BaseLayer, IGroupLayer } from "@/core/application/tile/layer/baseLayer";
+import { BaseLayer, IGroupLayer } from "@/editor/application/tile/layer/baseLayer";
 
 export type LayerView = {
     id: string;

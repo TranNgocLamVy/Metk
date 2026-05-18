@@ -1,19 +1,19 @@
 import { Container, FederatedPointerEvent, FederatedWheelEvent, Graphics, Point } from "pixi.js";
 
 import eraser from "@/assets/icons/eraser.svg?raw";
-import { EditorContext } from "@/core/application/editorContext";
-import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
-import { TileLayer } from "@/core/application/tile/layer/tileLayer";
-import { SetRuleRefsCommand } from "@/core/command/tile/setRulesCommand";
-import { SetTilesCommand } from "@/core/command/tile/setTilesCommand";
-import { IBaseCommand } from "@/core/interface/IBaseCommand";
-import { ITool } from "@/core/interface/ITool";
+import { EditorContext } from "@/editor/application/editorContext";
+import { RuleLayer } from "@/editor/application/tile/layer/ruleLayer";
+import { TileLayer } from "@/editor/application/tile/layer/tileLayer";
+import { SetRuleRefsCommand } from "@/editor/command/tile/setRulesCommand";
+import { SetTilesCommand } from "@/editor/command/tile/setTilesCommand";
+import { IBaseCommand } from "@/editor/interface/IBaseCommand";
+import { ITool } from "@/editor/interface/ITool";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
 import { IDrawStrategy } from "../drawStrategy/IDrawStrategy";
 import { BaseLayerRenderer } from "../renderer/baseLayerRenderer";
 import { TilemapView } from "../view/tilemapView";
 import { Tool } from "./tool.decorator";
-import { BatchCommand } from "@/core/command/batchCommand";
+import { BatchCommand } from "@/editor/command/batchCommand";
 
 @Tool({
     id: "tool.eraser",

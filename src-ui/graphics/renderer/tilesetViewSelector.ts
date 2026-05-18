@@ -1,7 +1,7 @@
 import { Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 
-import { TilesetSession } from "@/core/application/session/tilesetSession";
-import { Tile, Tileset } from "@/core/application/tile/tileset";
+import { TilesetSession } from "@/editor/application/session/tilesetSession";
+import { Tile, Tileset } from "@/editor/application/tile/tileset";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
 export type CreateTilesetViewSelectorContext = {

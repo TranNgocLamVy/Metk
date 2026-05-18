@@ -1,5 +1,5 @@
-import { appCore } from "@/core/appcore";
-import { executeCommand } from "@/core/service/commandService";
+import { appCore } from "@/editor/appcore";
+import { executeCommand } from "@/editor/service/commandService";
 import { ClipboardPaste, Copy, Redo, Scissors, SquareDashed, SquareDashedMousePointer, SquareMousePointer, Trash2, Undo, UserRoundCog } from "lucide-react";
 
 const EditDropdownOptionGroup1: MenuDropDownGroupType = [

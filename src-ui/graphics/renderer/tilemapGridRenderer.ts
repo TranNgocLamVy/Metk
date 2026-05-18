@@ -1,7 +1,7 @@
 import { Viewport } from "pixi-viewport";
 import { Graphics, Point } from "pixi.js";
 
-import { Tilemap } from "@/core/application/tile/tilemap";
+import { Tilemap } from "@/editor/application/tile/tilemap";
 import { DrawDashLineOption, DrawLineOption, GraphicUtils } from "@/shared/utils/graphicUtils";
 
 type CreateGridRendererContext = {

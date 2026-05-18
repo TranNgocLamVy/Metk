@@ -12,7 +12,7 @@ import TilesetViewSelector from "./tilesetView/TilesetViewSelector";
 import LayerManager from "./layerManager/LayerManager";
 import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
-import { appCore } from "@/core/appcore";
+import { appCore } from "@/editor/appcore";
 import { LocalizedText } from "../custom/LocalizeText";
 
 export default function Workspace() {

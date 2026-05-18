@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 import { create } from "zustand";
 
-import { TilemapSession } from "@/core/application/session/tilemapSession";
+import { TilemapSession } from "@/editor/application/session/tilemapSession";
 
 type TilemapSessionDisplayData = {
     name: string;

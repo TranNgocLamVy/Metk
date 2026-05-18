@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { appCore } from '@/core/appcore';
-import { Project } from '@/core/application/project';
+import { appCore } from '@/editor/appcore';
+import { Project } from '@/editor/application/project';
 import { ProjectMetadata } from '@/shared/schema/projectSchema';
 
 interface ProjectState {

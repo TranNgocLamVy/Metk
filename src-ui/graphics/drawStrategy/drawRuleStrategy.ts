@@ -1,9 +1,9 @@
 import { IDrawStrategy, DrawPayload } from "./IDrawStrategy";
-import { EditorContext } from "@/core/application/editorContext";
-import { TilemapSession } from "@/core/application/session/tilemapSession";
+import { EditorContext } from "@/editor/application/editorContext";
+import { TilemapSession } from "@/editor/application/session/tilemapSession";
 import { Color, Container, Sprite, Texture } from "pixi.js";
-import { SetRuleRefsCommand } from "@/core/command/tile/setRulesCommand";
-import { ITool } from "@/core/interface/ITool";
+import { SetRuleRefsCommand } from "@/editor/command/tile/setRulesCommand";
+import { ITool } from "@/editor/interface/ITool";
 import { BaseLayerRenderer } from "@/graphics/renderer/baseLayerRenderer";
 import { RuleLayerRenderer } from "@/graphics/renderer/ruleLayerRenderer";
 

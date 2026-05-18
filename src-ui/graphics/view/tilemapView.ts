@@ -1,8 +1,8 @@
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 
-import { TilemapSession } from "@/core/application/session/tilemapSession";
-import { IBaseView } from "@/core/interface/IBaseSession";
+import { TilemapSession } from "@/editor/application/session/tilemapSession";
+import { IBaseView } from "@/editor/interface/IBaseSession";
 import { WorkspaceService } from "@/shared/services/workspaceService";
 
 import { TilemapGridRenderer } from "../renderer/tilemapGridRenderer";

@@ -1,5 +1,5 @@
-import { appCore } from "@/core/appcore";
-import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
+import { appCore } from "@/editor/appcore";
+import { RuleLayer } from "@/editor/application/tile/layer/ruleLayer";
 import i18n, { i18nService } from "@/shared/services/i18n";
 import { useNavigationStore } from "@/ui/stores/navigationStore";
 

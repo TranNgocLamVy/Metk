@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { DialogConfig, DialogItem } from '@/shared/types/dialog';
 import { DialogType } from '../components/dialog/dialogRegistry';
-import { appCore } from '@/core/appcore';
+import { appCore } from '@/editor/appcore';
 
 interface DialogState {
     dialogs: DialogItem[];

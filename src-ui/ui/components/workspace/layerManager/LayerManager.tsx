@@ -15,8 +15,8 @@ import { LocalizedText } from "../../custom/LocalizeText";
 import { Button } from "../../shadcn/button";
 import { useDialogStore } from "@/ui/stores/dialogStore";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
-import { GroupLayer } from "@/core/application/tile/layer/groupLayer";
+import { BaseLayer } from "@/editor/application/tile/layer/baseLayer";
+import { GroupLayer } from "@/editor/application/tile/layer/groupLayer";
 
 export default function LayerManager() {
 	const { layerViews, selectedLayers, setLayerViews, setSelectedLayer } = useLayerManagerStore();
