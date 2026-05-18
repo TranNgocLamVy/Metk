@@ -7,7 +7,7 @@ import { TilemapManager } from "./tilemapManager";
 import { Result } from "@/shared/types/result";
 import { Console } from "@/shared/services/consoleService";
 import { CatchError } from "../decorator/catchResultError";
-import { TilemapView } from "../application/view/tilemapView";
+import { TilemapView } from "../../graphics/view/tilemapView";
 
 export type TilemapSessionManagerEvent = {
     onCreateTilemapSession: (session: TilemapSession) => void;

@@ -1,7 +1,7 @@
 import { create, exists, mkdir, readFile, readTextFile, remove, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { IStorageProvider, StorageOptions } from "./interface/IStorageProvider";
 import { Result } from "@/shared/types/result";
-import i18n from "@/core/service/i18n";
+import i18n from "@/shared/services/i18n";
 
 export class TauriFileSystemProvider implements IStorageProvider {
     public async exists(path: string, options?: StorageOptions): Promise<boolean> {

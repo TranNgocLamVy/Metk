@@ -7,7 +7,7 @@ import { Tileset } from "../application/tile/tileset";
 import { TilesetManager } from "./tilesetManager";
 import { Console } from "@/shared/services/consoleService";
 import { CatchError } from "../decorator/catchResultError";
-import { TilesetView } from "../application/view/tilesetView";
+import { TilesetView } from "../../graphics/view/tilesetView";
 
 export type TilesetSessionManagerEvent = {
     onCreateTilesetSession: (session: TilesetSession) => void;

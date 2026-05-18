@@ -1,21 +1,19 @@
 import { Container, FederatedPointerEvent, FederatedWheelEvent, Graphics, Point } from "pixi.js";
 
 import eraser from "@/assets/icons/eraser.svg?raw";
-
-import { EditorContext } from "../application/editorContext";
-import { TilemapSession } from "../application/session/tilemapSession";
-import { TileLayer } from "../application/tile/layer/tileLayer";
-import { BatchCommand } from "../command/batchCommand";
-import { Tool } from "../decorator/tool";
-import { ITool } from "../interface/ITool";
-import { IBaseCommand } from "../interface/IBaseCommand";
-import { SetTilesCommand } from "../command/tile/setTilesCommand";
-import { SetRuleRefsCommand } from "../command/tile/setRulesCommand";
-import { IDrawStrategy } from "./drawStrategy/IDrawStrategy";
+import { EditorContext } from "@/core/application/editorContext";
+import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
+import { TileLayer } from "@/core/application/tile/layer/tileLayer";
+import { SetRuleRefsCommand } from "@/core/command/tile/setRulesCommand";
+import { SetTilesCommand } from "@/core/command/tile/setTilesCommand";
+import { IBaseCommand } from "@/core/interface/IBaseCommand";
+import { ITool } from "@/core/interface/ITool";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
-import { TilemapView } from "../application/view/tilemapView";
-import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
-import { RuleLayer } from "../application/tile/layer/ruleLayer";
+import { IDrawStrategy } from "../drawStrategy/IDrawStrategy";
+import { BaseLayerRenderer } from "../renderer/baseLayerRenderer";
+import { TilemapView } from "../view/tilemapView";
+import { Tool } from "./tool.decorator";
+import { BatchCommand } from "@/core/command/batchCommand";
 
 @Tool({
     id: "tool.eraser",

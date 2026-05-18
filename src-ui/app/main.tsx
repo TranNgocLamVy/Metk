@@ -12,11 +12,10 @@ import MainContainer from "@/ui/components/layout/MainContainer";
 import MenuBar from "@/ui/components/menuBar/MenuBar";
 import { ThemeProvider } from "@/ui/components/providers/ThemeProvider";
 import { Toaster } from "@/ui/components/shadcn/sonner";
-
-import i18n from "./core/service/i18n";
-import { LanguageLoadingOverlay } from "./ui/components/layout/LanguageLoadingOverlay";
-import { appRoutes } from "./ui/pages";
-import DialogRoot from "./ui/components/dialog/DialogRoot";
+import i18n from "@/shared/services/i18n";
+import DialogRoot from "@/ui/components/dialog/DialogRoot";
+import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOverlay";
+import { appRoutes } from "./routes";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<I18nextProvider i18n={i18n}>

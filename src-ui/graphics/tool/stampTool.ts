@@ -1,35 +1,36 @@
 import { Container, FederatedPointerEvent, Point, Sprite } from "pixi.js";
-import { IDrawStrategy, DrawPayload } from "./drawStrategy/IDrawStrategy";
+
+import { IDrawStrategy, DrawPayload } from "../drawStrategy/IDrawStrategy";
 import { ITool } from "@/core/interface/ITool";
 import { EditorContext } from "@/core/application/editorContext";
-import { Tool } from "@/core/decorator/tool";
-
-import icon from "@/assets/icons/ruler.svg?raw";
 import { GeometryUtils } from "@/shared/utils/geometryUtils";
-import { TilemapView } from "../application/view/tilemapView";
-import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
+
+import icon from "@/assets/icons/stamp.svg?raw";
+import { Tool } from "./tool.decorator";
+import { TilemapView } from "../view/tilemapView";
+import { BaseLayerRenderer } from "../renderer/baseLayerRenderer";
 
 @Tool({
-    id: "tool.line",
-    label: "workspace.tool.line.label",
+    id: "tool.stamp",
+    label: "workspace.tool.stamp.label",
     displayOnToolbar: {
         icon: icon,
-        tooltip: "workspace.tool.line.description",
-        index: 1,
+        tooltip: "workspace.tool.stamp.description",
+        index: 0,
     },
-    shortcuts: ["L"],
+    shortcuts: ["S"],
     when: "inWorkspace && !isModalOpen",
 })
-export class LineTool implements ITool {
+export class StampTool implements ITool {
     private activeDrawStrategy: IDrawStrategy | null = null;
 
     private currentView: TilemapView | null = null;
 
     private overlayContainer: Container | null = null;
 
-    private startMousePosition: Position = null!;
     private previousMousePosition: Position = null!;
     private currentMousePosition: Position = null!;
+
     private isDragging: boolean = false;
 
     private hoverSprites: Sprite[] = [];
@@ -51,6 +52,7 @@ export class LineTool implements ITool {
 
     public onEnable(): void {
         this.drawPayloads = new Map<string, DrawPayload>();
+        this.hoverSprites = [];
     }
 
     public onDisable(): void {
@@ -58,16 +60,15 @@ export class LineTool implements ITool {
         this.clearHoverPreview();
 
         this.isDragging = false;
-        this.startMousePosition = null!;
         this.previousMousePosition = null!;
         this.currentMousePosition = null!;
-        this.targetLayerRenderer = null;
     }
 
     public attachView(view: TilemapView): void {
         this.currentView = view;
 
         const viewport = this.currentView.viewport;
+
         this.overlayContainer = this.currentView.overlayerContainer;
 
         viewport.on("pointerdown", this.bindPointerOnDown);
@@ -78,7 +79,7 @@ export class LineTool implements ITool {
     }
 
     public detach(): void {
-        if (!this.currentView || !this.currentView) return;
+        if (!this.currentView) return;
         const viewport = this.currentView.viewport;
 
         viewport.off("pointerdown", this.bindPointerOnDown);
@@ -88,18 +89,13 @@ export class LineTool implements ITool {
         viewport.removeEventListener("mouseleave", this.bindPointerOutside);
 
         this.currentView = null;
-
         this.overlayContainer = null;
 
-        this.clearHoverPreview();
-
-        this.clearDrawPreview();
-
         this.isDragging = false;
-        this.startMousePosition = null!;
-        this.previousMousePosition = null!;
-        this.currentMousePosition = null!;
         this.targetLayerRenderer = null;
+
+        this.clearHoverPreview();
+        this.clearDrawPreview();
     }
 
     public setDrawStrategy(strategy: IDrawStrategy | null): void {
@@ -110,15 +106,17 @@ export class LineTool implements ITool {
         this.targetLayerRenderer = layerRenderer;
     }
 
-    private onPointerDown(e: FederatedPointerEvent): void {
-        if (!this.currentView || e.button !== 0 || !this.targetLayerRenderer || !this.activeDrawStrategy) return;
+    private onPointerDown(e: FederatedPointerEvent) {
+        if (!this.currentView || e.button !== 0) return;
+
+        if (!this.targetLayerRenderer || !this.activeDrawStrategy) return;
 
         this.isDragging = true;
-        this.startMousePosition = this.currentMousePosition = this.previousMousePosition = this.getLocalPos(e);
+        this.previousMousePosition = this.currentMousePosition = this.getLocalPos(e);
         this.updateDrawPayload();
     }
 
-    private onPointerMove(e: FederatedPointerEvent): void {
+    private onPointerMove(e: FederatedPointerEvent) {
         if (!this.currentView || !this.activeDrawStrategy || !this.targetLayerRenderer) return;
 
         const newMousePosition = this.getLocalPos(e);
@@ -126,55 +124,46 @@ export class LineTool implements ITool {
         this.currentMousePosition = newMousePosition;
 
         if (this.activeDrawStrategy.comparePosition(this.previousMousePosition, newMousePosition, this.targetLayerRenderer)) return;
+        this.drawHoverPreview(newMousePosition);
 
-        this.clearDrawPreview();
-
-        if (!this.isDragging) {
-            this.drawHoverPreview(newMousePosition);
-        } else {   
-            this.updateDrawPayload();
-        }
+        if (!this.isDragging) return;
+        this.updateDrawPayload();
     }
 
-    private onPointerUp(e: FederatedPointerEvent): void {
+    private onPointerUp(e: FederatedPointerEvent) {
         if (!this.currentView || !this.isDragging) return;
+        this.isDragging = false;
 
-        const historyManager = this.editorContext.getCurrentHistoryManager();
-
-        if (historyManager && this.activeDrawStrategy && this.targetLayerRenderer && this.drawPayloads.size > 0) {
+        if (this.activeDrawStrategy && this.targetLayerRenderer) {
             this.activeDrawStrategy.commit(this.targetLayerRenderer, Array.from(this.drawPayloads.values()), this.editorContext);
         }
 
         this.clearDrawPreview();
-        this.isDragging = false;
-        this.startMousePosition = null!;
-        this.currentMousePosition = null!;
     }
 
     private onPointerOutside(e: FederatedPointerEvent) {
-        if (!this.isDragging) this.clearHoverPreview();
-        this.clearDrawPreview();
+        this.clearHoverPreview();
     }
 
-    private drawHoverPreview(pos: Position): void {
-        this.clearHoverPreview();
+    private drawHoverPreview(position: Position) {
+        if (!this.currentView || !this.overlayContainer) return;
 
-        if (!this.currentView || !this.overlayContainer || !this.targetLayerRenderer) return;
+        this.hoverSprites.forEach(sprite => sprite.destroy());
+        this.hoverSprites = [];
 
         if (this.activeDrawStrategy) {
-            this.hoverSprites = this.activeDrawStrategy.drawHoverPreview(pos, this.targetLayerRenderer, this.editorContext, this.currentView.session, this.overlayContainer);
+            this.hoverSprites = this.activeDrawStrategy.drawHoverPreview(position, this.targetLayerRenderer!, this.editorContext, this.currentView.session, this.overlayContainer);
         }
     }
 
-    private updateDrawPayload(): void {
-        this.clearDrawPreview();
+    private updateDrawPayload() {
+        if (!this.isDragging || !this.activeDrawStrategy || !this.currentView || !this.overlayContainer) return;
 
-        if (!this.activeDrawStrategy || !this.currentView || !this.overlayContainer || !this.startMousePosition || !this.currentMousePosition) return;
+        const startCoordinate = this.targetLayerRenderer!.posToCoord(this.previousMousePosition);
+        const endCoordinate = this.targetLayerRenderer!.posToCoord(this.currentMousePosition);
 
-        const startCoord = this.targetLayerRenderer!.posToCoord(this.startMousePosition);
-        const endCoord = this.targetLayerRenderer!.posToCoord(this.currentMousePosition);
-        
-        const drawCoordinates = GeometryUtils.calculateLine(startCoord, endCoord);
+        const drawCoordinates = GeometryUtils.calculateLine(startCoordinate, endCoordinate);
+        if (drawCoordinates.length == 0) drawCoordinates.push(endCoordinate);
 
         const drawPositions = drawCoordinates.map(c => this.targetLayerRenderer!.coordToPos(c));
 
@@ -194,7 +183,7 @@ export class LineTool implements ITool {
         return { x: localPosition.x, y: localPosition.y };
     }
 
-    private clearDrawPreview(): void {
+    private clearDrawPreview() {
         this.drawPayloads.forEach((data) => data.sprite.destroy());
         this.drawPayloads.clear();
     }

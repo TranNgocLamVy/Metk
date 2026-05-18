@@ -5,7 +5,7 @@ import { ViewState } from "@/shared/schema/viewState";
 import { TilesetSessionData } from "@/shared/schema/tilesetSessionSchema";
 
 import { Tileset } from "../tile/tileset";
-import { TilesetView } from "../view/tilesetView";
+import { TilesetView } from "../../../graphics/view/tilesetView";
 import { EditorContext } from "../editorContext";
 import EventEmitter from "eventemitter3";
 

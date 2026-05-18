@@ -1,12 +1,12 @@
-import { Container, FederatedPointerEvent, Point } from "pixi.js";
-import { IDrawStrategy, DrawPayload } from "./drawStrategy/IDrawStrategy";
-import { ITool } from "@/core/interface/ITool";
 import { EditorContext } from "@/core/application/editorContext";
-import { Tool } from "@/core/decorator/tool";
+import { ITool } from "@/core/interface/ITool";
+import { Container, FederatedPointerEvent, Point } from "pixi.js";
+import { DrawPayload, IDrawStrategy } from "../drawStrategy/IDrawStrategy";
 
 import icon from "@/assets/icons/bucket.svg?raw";
-import { TilemapView } from "../application/view/tilemapView";
-import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
+import { BaseLayerRenderer } from "../renderer/baseLayerRenderer";
+import { TilemapView } from "../view/tilemapView";
+import { Tool } from "./tool.decorator";
 
 @Tool({
     id: "tool.bucket",

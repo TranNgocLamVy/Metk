@@ -6,7 +6,7 @@ import { Tilemap } from "@/core/application/tile/tilemap";
 
 import { BaseLayerRenderer } from "./baseLayerRenderer";
 import { TileLayerRenderer } from "./tileLayerRenderer";
-import { RuleLayer } from "../tile/layer/ruleLayer";
+import { RuleLayer } from "../../core/application/tile/layer/ruleLayer";
 import { RuleLayerRenderer } from "./ruleLayerRenderer";
 
 type GroupLike = GroupLayer | RootLayer;

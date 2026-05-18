@@ -3,7 +3,7 @@ import { Color, Sprite, Texture } from "pixi.js";
 import { Tilemap } from "@/core/application/tile/tilemap";
 import { BaseLayerRenderer } from "./baseLayerRenderer";
 import { appCore } from "@/core/appcore";
-import { RuleLayer } from "../tile/layer/ruleLayer";
+import { RuleLayer } from "../../core/application/tile/layer/ruleLayer";
 
 type CreateRuleLayerRendererContext = {
     layer: RuleLayer;

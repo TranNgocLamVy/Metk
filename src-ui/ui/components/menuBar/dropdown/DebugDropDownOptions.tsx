@@ -1,6 +1,6 @@
 import { appCore } from "@/core/appcore";
 import { RuleLayer } from "@/core/application/tile/layer/ruleLayer";
-import i18n, { i18nService } from "@/core/service/i18n";
+import i18n, { i18nService } from "@/shared/services/i18n";
 import { useNavigationStore } from "@/ui/stores/navigationStore";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [

@@ -1,14 +1,14 @@
 import EventEmitter from "eventemitter3";
 
 import { EditorContext } from "../application/editorContext";
-import { ToolContext } from "../decorator/tool";
 import { ITool, IToolContructor } from "../interface/ITool";
-import { TilemapView } from "../application/view/tilemapView";
-import { IDrawStrategy } from "../tool/drawStrategy/IDrawStrategy";
-import { DrawTileStrategy } from "../tool/drawStrategy/drawTileStrategy";
-import { DrawRuleStrategy } from "../tool/drawStrategy/drawRuleStrategy";
-import { BaseLayerRenderer } from "../application/renderer/baseLayerRenderer";
-import { GroupLayerRenderer } from "../application/renderer/groupLayerRenderer";
+import { TilemapView } from "../../graphics/view/tilemapView";
+import { BaseLayerRenderer } from "../../graphics/renderer/baseLayerRenderer";
+import { GroupLayerRenderer } from "../../graphics/renderer/groupLayerRenderer";
+import { IDrawStrategy } from "@/graphics/drawStrategy/IDrawStrategy";
+import { DrawTileStrategy } from "@/graphics/drawStrategy/drawTileStrategy";
+import { DrawRuleStrategy } from "@/graphics/drawStrategy/drawRuleStrategy";
+import { ToolContext } from "@/graphics/tool/tool.decorator";
 
 type ToolManagerEvent = {
     onToolChanged: (toolId: string | null) => void;

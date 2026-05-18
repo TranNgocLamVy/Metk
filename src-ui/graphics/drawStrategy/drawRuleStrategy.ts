@@ -4,8 +4,8 @@ import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { Color, Container, Sprite, Texture } from "pixi.js";
 import { SetRuleRefsCommand } from "@/core/command/tile/setRulesCommand";
 import { ITool } from "@/core/interface/ITool";
-import { BaseLayerRenderer } from "@/core/application/renderer/baseLayerRenderer";
-import { RuleLayerRenderer } from "@/core/application/renderer/ruleLayerRenderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/baseLayerRenderer";
+import { RuleLayerRenderer } from "@/graphics/renderer/ruleLayerRenderer";
 
 
 export class DrawRuleStrategy implements IDrawStrategy {

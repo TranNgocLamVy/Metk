@@ -1,4 +1,4 @@
-import { ToolManager } from "../manager/toolManager";
+import { ToolManager } from "@/core/manager/toolManager";
 
 export type ToolContext = {
     id: string;

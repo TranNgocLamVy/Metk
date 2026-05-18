@@ -6,8 +6,8 @@ import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { SetTilesCommand } from "@/core/command/tile/setTilesCommand";
 import { BaseLayer } from "@/core/application/tile/layer/baseLayer";
 import { ITool } from "@/core/interface/ITool";
-import { BaseLayerRenderer } from "@/core/application/renderer/baseLayerRenderer";
-import { TileLayerRenderer } from "@/core/application/renderer/tileLayerRenderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/baseLayerRenderer";
+import { TileLayerRenderer } from "@/graphics/renderer/tileLayerRenderer";
 import { Tile } from "@/core/application/tile/tileset";
 
 

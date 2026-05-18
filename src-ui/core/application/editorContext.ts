@@ -7,8 +7,8 @@ import { TilemapSession } from "./session/tilemapSession";
 import { TilesetSession } from "./session/tilesetSession";
 import { Workspace } from "./workspace";
 import { TextureManager } from "../manager/textureManager";
-import { TilemapView } from "./view/tilemapView";
-import { TilesetView } from "./view/tilesetView";
+import { TilemapView } from "../../graphics/view/tilemapView";
+import { TilesetView } from "../../graphics/view/tilesetView";
 
 export class EditorContext {
     constructor(

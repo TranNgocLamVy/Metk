@@ -1,5 +1,5 @@
 import { EditorContext } from "@/core/application/editorContext";
-import { BaseLayerRenderer } from "@/core/application/renderer/baseLayerRenderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/baseLayerRenderer";
 import { TilemapSession } from "@/core/application/session/tilemapSession";
 import { ITool } from "@/core/interface/ITool";
 import { Container, Sprite } from "pixi.js";

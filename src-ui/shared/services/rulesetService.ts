@@ -9,7 +9,7 @@ import { useRulesetStore } from "@/ui/stores/rulesetStore";
 import { DialogService } from "./dialogService";
 import { createRulesetForm } from "../constant/form/createRulesetForm";
 import { WorkspaceService } from "./workspaceService";
-import i18n from "@/core/service/i18n";
+import i18n from "@/shared/services/i18n";
 import { Console } from "./consoleService";
 import { PathUtils } from "../utils/pathUtils";
 

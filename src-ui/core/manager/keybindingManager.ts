@@ -1,10 +1,10 @@
 import { KeyUtils } from "@/shared/utils/keyUtils";
 
 import { CommandContext } from "../decorator/command";
-import { ToolContext } from "../decorator/tool";
 import { Keybinding, UserKeybindingOverride } from "../interface/IKeybinding";
 import { SystemCommandManager } from "./systemCommandManager";
 import { ToolManager } from "./toolManager";
+import { ToolContext } from "@/graphics/tool/tool.decorator";
 
 export class KeybindingManager {
     private defaultKeyBinding: Keybinding[] = [];

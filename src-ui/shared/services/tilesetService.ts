@@ -10,7 +10,7 @@ import { Result } from "../types/result";
 import { TilesetStorageService } from "@/infrastructure/container";
 import { DialogService } from "./dialogService";
 import { createTilesetForm } from "../constant/form/createTilesetForm";
-import i18n from "@/core/service/i18n";
+import i18n from "@/shared/services/i18n";
 import { Console } from "./consoleService";
 import { readFile } from "@tauri-apps/plugin-fs";
 import { TextureUtils } from "../utils/textureUtils";

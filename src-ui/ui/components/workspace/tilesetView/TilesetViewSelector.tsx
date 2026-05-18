@@ -6,7 +6,7 @@ import TilesetViewTabs from "./TilesetViewTabs";
 import { useTilesetSessionStore } from "@/ui/stores/tilesetSessionStore";
 import { useCallback, useEffect, useRef } from "react";
 import { useTilesetSessionEvent } from "@/ui/hooks/useTilesetSessionEvent";
-import { TilesetView } from "@/core/application/view/tilesetView";
+import { TilesetView } from "@/graphics/view/tilesetView";
 
 export default function TilesetViewSelector() {
 	const { activeWorkspace } = useWorkspaceStore();

@@ -9,7 +9,7 @@ import { PathUtils } from "../utils/pathUtils";
 import { DialogService } from "./dialogService";
 import { createTilemapForm } from "../constant/form/createTilemapForm";
 import { Console } from "./consoleService";
-import i18n from "@/core/service/i18n";
+import i18n from "@/shared/services/i18n";
 
 export class TilemapService {
 
