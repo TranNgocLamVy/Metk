@@ -32,7 +32,7 @@ export class ProjectService {
 
         const openProject = await DialogService.openPermissionDialog({ title: "Project opened successfully", description: "Do you want to open this project?" })
 
-        if (openProject) useNavigationStore.getState().navigate!(`/project/${project.id}`);
+        if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
     }
 
     public static async createProject(): Promise<void> {
@@ -71,7 +71,7 @@ export class ProjectService {
 
         const openProject = await DialogService.openPermissionDialog({ title: "Project created successfully", description: "Do you want to open the project?" })
 
-        if (openProject) useNavigationStore.getState().navigate!(`/project/${project.id}`);
+        if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
     }
 
     public static async removeProject(projectId: string): Promise<void> {

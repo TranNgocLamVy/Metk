@@ -7,8 +7,8 @@ import Workspace from "@/ui/components/workspace/Workspace";
 import { useAppcore } from "@/ui/stores/appCoreStore";
 import { Result } from "@/shared/types/result";
 
-export default function Project() {
-	const { id } = useParams();
+export default function WorkspacePage() {
+	const { projectId } = useParams();
 	const navigate = useNavigate();
 
 	const [isLoading, setIsLoading] = useState(true);
@@ -26,11 +26,11 @@ export default function Project() {
 
 	useEffect(() => {
 		if (!isAppcoreLoaded) return;
-		loadProject(id!);
+		loadProject(projectId!);
 		return () => {
 			WorkspaceService.unloadProjectWorkspace();
 		}
-	}, [id, isAppcoreLoaded]);
+	}, [projectId, isAppcoreLoaded]);
 
 	return (
 		<div className="w-full h-full relative">

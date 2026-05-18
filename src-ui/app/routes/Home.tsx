@@ -37,7 +37,7 @@ export default function HomePage() {
 				<VStack className="w-full gap-2 py-1 overflow-y-auto">
 					{projects.map((project) => (
 							<HStack align="center" justify="start" key={project.id} className="gap-4 min-w-160 group">
-								<Button variant={"link"} onClick={() => navigate(`/project/${project.id}`)}>
+								<Button variant={"link"} onClick={() => navigate(`/workspace/${project.id}`)}>
 									{project.name}
 								</Button>
 								<h3 className="text-xs text-foreground cursor-default">{project.directory}</h3>
