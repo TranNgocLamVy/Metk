@@ -1,7 +1,7 @@
 import { Result } from "@/shared/types/result";
 
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilesetStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";

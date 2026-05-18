@@ -1,5 +1,5 @@
 import { Result } from "@/shared/types/result";
-import { StorageOptions } from "./IStorageProvider";
+import { StorageOptions } from "./storage-provider.interface";
 
 
 

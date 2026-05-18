@@ -1,7 +1,7 @@
 import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
 import { TilemapManager } from "@/application/resources/tilemap/tilemap.manager";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
-import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { ProjectData, ProjectMetadata } from "@/shared/schema/project.schema";
 
 

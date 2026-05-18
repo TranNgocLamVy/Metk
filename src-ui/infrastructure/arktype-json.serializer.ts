@@ -1,6 +1,6 @@
 import { type } from "arktype";
 import { JsonFormatter } from "@/shared/utils/jsonFormatter.utils";
-import { ISerializer } from "@/infrastructure/interface/ISerializer";
+import { ISerializer } from "@/infrastructure/interface/serializer.interface";
 import { Result } from "../shared/types/result";
 
 export class ArkTypeJsonSerializer<T> implements ISerializer<T> {

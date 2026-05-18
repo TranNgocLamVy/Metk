@@ -1,7 +1,7 @@
 import { RulesetData, RulesetMetadata } from "@/shared/schema/ruleset.schema";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { TilesetManager } from "../tileset/tileset.manager";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { Result } from "@/shared/types/result";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { TilesetRefManager } from "../references/tileset-ref.manager";

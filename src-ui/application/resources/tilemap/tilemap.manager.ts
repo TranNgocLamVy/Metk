@@ -3,7 +3,7 @@ import { Result } from "@/shared/types/result";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TilesetManager } from "../tileset/tileset.manager";
 import { TilesetRefManager } from "../references/tileset-ref.manager";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilemapStorageService } from "@/infrastructure/container";
 import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { RulesetManager } from "../ruleset/ruleset.manager";

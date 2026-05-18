@@ -1,6 +1,6 @@
 import { Rule } from "./rule";
 import { RuleData, RulesetData } from "@/shared/schema/ruleset.schema";
-import { FilePathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { BaseObject, BaseObjectEvents } from "../base-object";
 import { v4 as uuidv4 } from "uuid";

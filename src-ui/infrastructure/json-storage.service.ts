@@ -1,8 +1,8 @@
 import { Result } from "@/shared/types/result";
-import { ISerializer } from "./interface/ISerializer";
-import { IStorageProvider, StorageOptions } from "./interface/IStorageProvider";
+import { ISerializer } from "./interface/serializer.interface";
+import { IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
 import { exists } from '@tauri-apps/plugin-fs';
-import { IStorageService } from "./interface/IStorageService";
+import { IStorageService } from "./interface/storage-service.interface";
 
 export class JsonStorageService<T> implements IStorageService {
     private writeQueues: Map<string, Promise<Result>> = new Map();

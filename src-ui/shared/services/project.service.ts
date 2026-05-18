@@ -3,7 +3,7 @@ import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { Result } from "../types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
 import { defaultProjectData } from "../schema/project.schema";
-import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { DialogService } from "./dialog.service";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 import { PathUtils } from "../utils/path.utils";

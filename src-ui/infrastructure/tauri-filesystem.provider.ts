@@ -1,5 +1,5 @@
 import { create, exists, mkdir, readFile, readTextFile, remove, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import { IStorageProvider, StorageOptions } from "./interface/IStorageProvider";
+import { IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
 import { Result } from "@/shared/types/result";
 import i18n from "@/shared/services/i18n.service";
 

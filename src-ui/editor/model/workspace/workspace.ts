@@ -7,7 +7,7 @@ import { TilemapSessionManager } from "@/application/workspace/session/tilemap-s
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { TilesetSessionManager } from "@/application/workspace/session/tileset-session.manager";
 import { EditorFacade } from "@/application/editor.facade";
-import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { RulesetSessionManager } from "@/application/workspace/session/ruleset-session.manager";
 import { ToolSessionManager } from "@/application/workspace/session/tool-session.manager";
 

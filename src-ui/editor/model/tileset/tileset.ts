@@ -1,7 +1,7 @@
 import { BaseObject, BaseObjectEvents } from "@/editor/model/base-object";
 import { TileData, TilesetData } from "@/shared/schema/tileset.schema";
 import { Result } from "@/shared/types/result";
-import { FilePathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 
 
 interface TilesetEvent extends BaseObjectEvents {

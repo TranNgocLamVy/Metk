@@ -1,6 +1,6 @@
 import { RulesetRefData } from "@/shared/schema/ruleset.schema";
 import { RulesetManager } from "../ruleset/ruleset.manager";
-import { FilePathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 
 /** Manages references to rulesets, maintaining a mapping between ruleset IDs and their numerical indices. */
 export class RulesetRefManager {

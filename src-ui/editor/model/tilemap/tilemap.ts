@@ -3,7 +3,7 @@ import { BaseObject, BaseObjectEvents } from "@/editor/model/base-object";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { TilemapData, TilemapOrientation } from "@/shared/schema/tilemap.schema";
 import { RootLayer } from "./layer/root-layer";
-import { FilePathSystem } from "@/infrastructure/projectPathSystem";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 
 interface TilemapEvent extends BaseObjectEvents {

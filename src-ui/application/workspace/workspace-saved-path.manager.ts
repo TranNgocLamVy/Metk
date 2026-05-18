@@ -1,4 +1,4 @@
-import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { ExportPathData, SavedPathData } from "@/shared/schema/saved-path.schema";
 
 export class WorkspaceSavedPathManager {

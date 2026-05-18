@@ -1,7 +1,7 @@
 import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { ProjectStorageService } from "@/infrastructure/container";
-import { ProjectPathSystem } from "@/infrastructure/projectPathSystem";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import EventEmitter from "eventemitter3";
 import { ProjectMetadata, ProjectRepoData } from "@/shared/schema/project.schema";
 import { Project } from "@/editor/model/project/project";

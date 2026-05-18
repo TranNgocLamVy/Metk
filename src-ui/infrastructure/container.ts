@@ -1,8 +1,8 @@
 import { ProjectData, ProjectDataSchema, ProjectMetadata, ProjectRepoSchema } from "@/shared/schema/project.schema";
 import { TilemapData, TilemapDataSchema } from "@/shared/schema/tilemap.schema";
-import { TauriFileSystemProvider } from "./tauriFileSystemProvider";
-import { JsonStorageService } from "./jsonStorageService";
-import { ArkTypeJsonSerializer } from "./arkTypeJsonSerializer";
+import { TauriFileSystemProvider } from "./tauri-filesystem.provider";
+import { JsonStorageService } from "./json-storage.service";
+import { ArkTypeJsonSerializer } from "./arktype-json.serializer";
 import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { TilesetData, TilesetDataSchema } from "@/shared/schema/tileset.schema";
 import { WorkpsaceData, WorkpsaceDataSchema } from "@/shared/schema/workspaceSchema";

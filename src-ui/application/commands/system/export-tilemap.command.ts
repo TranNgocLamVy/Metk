@@ -6,7 +6,7 @@ import { save } from "@tauri-apps/plugin-dialog";
 
 import { Console } from "@/shared/services/console.service";
 import { SystemCommand } from "../command.decorator";
-import { ExportStorageService } from "@/infrastructure/exportStorageService";
+import { ExportStorageService } from "@/infrastructure/export-storage.service";
 
 @SystemCommand({
     id: "workspace.tilemap.export.tmx",
