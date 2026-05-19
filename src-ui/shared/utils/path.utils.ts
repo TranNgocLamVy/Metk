@@ -1,9 +1,17 @@
 import { basename, dirname, extname, join, normalize, relative } from "pathe";
 
-import { sep } from "@tauri-apps/api/path";
+const getSystemSeparator = (): "/" | "\\" => {
+    const processPlatform = typeof process !== "undefined" ? process.platform : undefined;
+    if (processPlatform === "win32") return "\\";
+
+    const navigatorPlatform = typeof navigator !== "undefined" ? navigator.platform : undefined;
+    if (navigatorPlatform && /win/i.test(navigatorPlatform)) return "\\";
+
+    return "/";
+};
 
 export class PathUtils {
-    public static separator: string = sep();
+    public static separator: string = getSystemSeparator();
     
     /**
      * 
@@ -36,7 +44,7 @@ export class PathUtils {
     }
 
     public static toUserFriendlyPath(pathStr: string): string {
-        const systemSeparator = sep();
+        const systemSeparator = getSystemSeparator();
         if (systemSeparator === '\\') {
             return pathStr.replace(/\//g, '\\');
         }
