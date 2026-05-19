@@ -40,7 +40,7 @@ export default defineConfig(async () => ({
 	test: {
 		environment: "jsdom",
 		globals: true,
-		setupFiles: ["./src-test/vitest.setup.ts"],
+		setupFiles: ["./src-test/setup/vitest.setup.ts"],
 		css: true,
 		include: [
 			"src-test/**/*.test.ts",
