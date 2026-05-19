@@ -15,14 +15,13 @@
         "label": "main",
         "title": "Map Editor Toolkit",
         "width": 1000,
-        "minWidth": 600,
+        "minWidth": 1000,
         "height": 600,
         "minHeight": 600,
         "resizable": true,
         "fullscreen": false,
         "closable": true,
-        "center": true,
-        "dragDropEnabled": false
+        "center": true
       }
     ],
     "security": {

@@ -32,7 +32,7 @@
     
 
   },
-  "include": ["src-ui"],
+  "include": ["src-ui", "src-test"],
   "references": [
     {
       "path": "./tsconfig.node.json"
