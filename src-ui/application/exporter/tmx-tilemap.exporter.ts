@@ -16,6 +16,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
     private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // id -> firstGid
 
     public export(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): Uint8Array {
+        this.tilesetFirstGidMap.clear();
 
         const builder: XMLBuilder = create({ version: '1.0', encoding: 'UTF-8' })
 
