@@ -47,7 +47,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
 
         let firstGidCount = 1;
         const tilesets = tilesetRefManager.serialize().refs.sort((a, b) => a.index - b.index).map((tilesetRef) => {
-            const tileset = tilesetManager.getTilesetById(tilesetRef.id)!;
+            const tileset = tilesetManager.getTilesetById(tilesetRef.id);
+            if (!tileset) return null;
 
             const firstGrid = firstGidCount;
             const tilesetIndex = tilesetRefManager.getTilesetRefIndex(tilesetRef.id);
@@ -85,7 +86,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
                     }
                 }
             })
-        })
+        }).filter((tileset) => tileset != null);
         return tilesets;
     }
 

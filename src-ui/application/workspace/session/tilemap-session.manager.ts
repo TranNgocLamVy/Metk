@@ -35,7 +35,7 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
 
     @CatchError("message.system.unknownError.loadTilemapSession")
     public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<Result> {
-        await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
+        const loadResults = await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
             const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);
             if (tilemapResult.status !== Result.Status.Success) return Result.Error(tilemapResult.message); 
             const tilemap = tilemapResult.data;
@@ -44,7 +44,11 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
 
             this.tilemapSessionMap.set(tilemapSession.id, tilemapSession);
             this.tilemapMap.set(tilemap.id, tilemapSession.id);
+            return Result.Success();
         }))
+
+        const failedLoadResult = loadResults.find(result => result.status !== Result.Status.Success);
+        if (failedLoadResult) return failedLoadResult;
 
         if (this.tilemapSessionManagerData.currentTilemapSessionId) {
             const activeSession = this.tilemapSessionMap.get(this.tilemapSessionManagerData.currentTilemapSessionId);

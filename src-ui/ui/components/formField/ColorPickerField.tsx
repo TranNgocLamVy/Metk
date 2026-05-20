@@ -64,7 +64,7 @@ export function ColorPickerField(props: ColorPickerProps) {
 
 	return (
 		<VStack className="gap-2">
-			<Label><LocalizedText message={label} /></Label>
+			<Label htmlFor={id}><LocalizedText message={label} /></Label>
 			<HStack className="gap-2">
 				<Input id={id} name={name} type="text" placeholder={placeholder} value={color} onChange={(e) => handleChange(e.target.value)} onBlur={onBlur} className="flex-1" />
 				<DropdownMenu open={isOpen} onOpenChange={onOpenChange} modal>

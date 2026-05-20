@@ -2,6 +2,7 @@ import { CaseSensitive, Eye, Grid3x3, Lock, RectangleHorizontal, RotateCcw, Scan
 
 import { ShowObjectNamesTypes, SnappingModeTypes, useDrawingViewOptions } from "@/ui/stores/drawing-view.store";
 import { useUIViewOptions } from "@/ui/stores/ui-view.store";
+import { useConsoleStore } from "@/ui/stores/console.store";
 
 const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -20,9 +21,8 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 				{
 					type: "check",
 					label: "menu.view.action.viewAndToolbars.console",
-					checked: () => useUIViewOptions().showConsole,
-					disabled: () => true,
-					toggle: () => useUIViewOptions.getState().toggleShowConsole(),
+					checked: () => useConsoleStore().isConsoleOpen,
+					toggle: () => useConsoleStore.getState().toggleConsole(),
 				},
 				{
 					type: "check",

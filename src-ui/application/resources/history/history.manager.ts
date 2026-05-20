@@ -1,12 +1,13 @@
 import { BatchCommand } from "@/application/commands/batch.command";
 import { EditorFacade } from "@/application/editor.facade";
 import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { Result } from "@/shared/types/result";
 
 export class HistoryManager {
     private undoStack: IBaseCommand[] = [];
     private redoStack: IBaseCommand[] = [];
     private readonly limit: number;
-    
+
     private isTransactionActive: boolean = false;
     private currentBatch: IBaseCommand[] = [];
 
@@ -16,15 +17,18 @@ export class HistoryManager {
         this.limit = limit;
     }
 
-    public execute(command: IBaseCommand, editorFacade: EditorFacade) {
-        command.execute(editorFacade);
+    public execute(command: IBaseCommand, editorFacade: EditorFacade): Result {
+        const result = command.execute(editorFacade);
+        if (result.status !== Result.Status.Success) return result;
+
         if (this.isTransactionActive) {
             this.currentBatch.push(command);
         } else {
             this.pushToUndoStack(command);
         }
-        
+
         this.notifyUI();
+        return result;
     }
 
     public startTransaction() {
@@ -39,24 +43,28 @@ export class HistoryManager {
     public commitTransaction() {
         if (!this.isTransactionActive) return;
 
-        if (this.currentBatch.length > 0) {
+        const hasCommands = this.currentBatch.length > 0;
+
+        if (hasCommands) {
             const batchCmd = new BatchCommand([...this.currentBatch]);
             this.pushToUndoStack(batchCmd);
         }
 
         this.isTransactionActive = false;
         this.currentBatch = [];
-        this.notifyUI();
+        if (hasCommands) this.notifyUI();
     }
 
     public cancelTransaction(editorFacade: EditorFacade) {
         if (!this.isTransactionActive) return;
 
+        const hasCommands = this.currentBatch.length > 0;
+
         [...this.currentBatch].reverse().forEach(cmd => cmd.undo(editorFacade));
 
         this.isTransactionActive = false;
         this.currentBatch = [];
-        this.notifyUI();
+        if (hasCommands) this.notifyUI();
     }
 
     public undo(editorFacade: EditorFacade) {
@@ -84,7 +92,7 @@ export class HistoryManager {
     public pushToUndoStack(cmd: IBaseCommand) {
         this.undoStack.push(cmd);
         this.redoStack = [];
-        
+
         if (this.undoStack.length > this.limit) {
             const cmd = this.undoStack.shift();
             if (cmd) cmd.delete();

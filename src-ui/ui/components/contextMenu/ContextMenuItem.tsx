@@ -28,7 +28,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 
 	if (item.type === "option") {
 		return (
-			<ShadContextMenuItem variant={item.variant} className="gap-2 h-6 text-xs" disabled={disabled} onClick={item.onClick}>
+			<ShadContextMenuItem variant={item.variant} className="gap-2 h-6 text-xs" disabled={disabled} onClick={disabled ? undefined : item.onClick}>
 				{wrapIcon(item.startIcon)}
 				<LocalizedText message={label} />
 				{wrapIcon(item.endIcon, false)}

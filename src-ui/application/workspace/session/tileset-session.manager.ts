@@ -37,7 +37,7 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
 
     @CatchError("message.system.unknownError.loadTilesetSession")
     public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<Result> {
-        await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
+        const loadResults = await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
             const tilesetResult = await tilesetManager.loadTileset(sessionData.tilesetId);
             if (tilesetResult.status !== Result.Status.Success) {
                 return Result.Error(tilesetResult.message);
@@ -48,7 +48,12 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
 
             this.tilesetSessionMap.set(tilesetSession.id, tilesetSession);
             this.tilesetMap.set(tileset.id, tilesetSession.id);
+            return Result.Success();
         }))
+
+        const failedLoadResult = loadResults.find(result => result.status !== Result.Status.Success);
+        if (failedLoadResult) return failedLoadResult;
+
         return Result.Success();
     }
 

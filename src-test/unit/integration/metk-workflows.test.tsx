@@ -151,6 +151,16 @@ vi.mock("react-router", () => ({
     useParams: () => ({ projectId: mockState.routeProjectId }),
 }));
 
+vi.mock("react-i18next", () => ({
+    initReactI18next: {
+        type: "3rdParty",
+        init: vi.fn(),
+    },
+    useTranslation: () => ({
+        t: (message: string) => message,
+    }),
+}));
+
 vi.mock("@/shared/services/tilemap-layer.service", () => ({
     TilemapLayerService: {
         selectLayer: vi.fn((id: string, multi: boolean) => {

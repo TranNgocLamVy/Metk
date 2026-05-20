@@ -1,0 +1,234 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const workspaceModelMocks = vi.hoisted(() => {
+    const instances = {
+        tilesetSessionManager: null as any,
+        tilemapSessionManager: null as any,
+        rulesetSessionManager: null as any,
+        toolSessionManager: null as any,
+        savedPathManager: null as any,
+    };
+
+    class MockTilesetSessionManager {
+        public loadTilesetSessions = vi.fn();
+        public destroy = vi.fn();
+        public serialize = vi.fn(() => ({ tilesetSessions: [{ id: "tileset-session" }], currentTilesetSessionId: "tileset-session" }));
+        constructor(public data: any, public editorFacade: any) {
+            instances.tilesetSessionManager = this;
+        }
+    }
+
+    class MockTilemapSessionManager {
+        public loadTilemapSessions = vi.fn();
+        public detroy = vi.fn();
+        public serialize = vi.fn(() => ({ tilemapSessions: [{ id: "tilemap-session" }], currentTilemapSessionId: "tilemap-session" }));
+        constructor(public data: any, public editorFacade: any) {
+            instances.tilemapSessionManager = this;
+        }
+    }
+
+    class MockRulesetSessionManager {
+        public serialize = vi.fn(() => ({ selectedRuleId: "ruleset-a" }));
+        constructor(public data: any, public editorFacade: any) {
+            instances.rulesetSessionManager = this;
+        }
+    }
+
+    class MockToolSessionManager {
+        public load = vi.fn();
+        public destroy = vi.fn();
+        public serialize = vi.fn(() => ({ currentTool: "tool.stamp" }));
+        constructor(public data: any, public editorFacade: any) {
+            instances.toolSessionManager = this;
+        }
+    }
+
+    class MockWorkspaceSavedPathManager {
+        public serialize = vi.fn(() => ({ exportPaths: ["C:/exports"], tilemapDir: "C:/tilemaps" }));
+        constructor(public data: any, public projectPathSystem: any) {
+            instances.savedPathManager = this;
+        }
+    }
+
+    return {
+        instances,
+        MockTilesetSessionManager,
+        MockTilemapSessionManager,
+        MockRulesetSessionManager,
+        MockToolSessionManager,
+        MockWorkspaceSavedPathManager,
+    };
+});
+
+vi.mock("@/application/workspace/session/tileset-session.manager", () => ({ TilesetSessionManager: workspaceModelMocks.MockTilesetSessionManager }));
+vi.mock("@/application/workspace/session/tilemap-session.manager", () => ({ TilemapSessionManager: workspaceModelMocks.MockTilemapSessionManager }));
+vi.mock("@/application/workspace/session/ruleset-session.manager", () => ({ RulesetSessionManager: workspaceModelMocks.MockRulesetSessionManager }));
+vi.mock("@/application/workspace/session/tool-session.manager", () => ({ ToolSessionManager: workspaceModelMocks.MockToolSessionManager }));
+vi.mock("@/application/workspace/workspace-saved-path.manager", () => ({ WorkspaceSavedPathManager: workspaceModelMocks.MockWorkspaceSavedPathManager }));
+
+import { BaseObject } from "@/editor/model/base-object";
+import { Tileset } from "@/editor/model/tileset/tileset";
+import { Workspace } from "@/editor/model/workspace/workspace";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { defaultWorkspaceData } from "@/shared/schema/workspaceSchema";
+import { Result } from "@/shared/types/result";
+
+class TestBaseObject extends BaseObject {
+    public static properties = new Map<string, any>([
+        ["name", { label: "Name" }],
+        ["opacity", { label: "Opacity" }],
+    ]);
+
+    public name = "Initial";
+    public opacity = 1;
+}
+
+const createTilesetPathSystem = (id = "tileset-a") => {
+    const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/model-project");
+    return new FilePathSystem(id, projectPathSystem, `tilesets/${id}.json`);
+};
+
+const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[0]> = {}) => new Tileset(
+    {
+        id: "tileset-a",
+        name: "Terrain",
+        columns: 2,
+        rows: 2,
+        tilewidth: 16,
+        tileheight: 16,
+        image: { source: "textures/terrain.png", width: 32, height: 32 },
+        tiles: [],
+        ...overrides,
+    },
+    createTilesetPathSystem(),
+);
+
+describe("BaseObject", () => {
+    it("copies static property metadata and exposes runtime properties", () => {
+        const model = new TestBaseObject();
+
+        expect(model.properties).toEqual(TestBaseObject.properties);
+        expect(model.properties).not.toBe(TestBaseObject.properties);
+        expect(model.getProperty("name")).toBe("Initial");
+    });
+
+    it("sets properties and emits update events with the changed key and value", async () => {
+        const model = new TestBaseObject();
+        const listener = vi.fn();
+        model.eventEmitter.on("updateProperty", listener as any);
+
+        await expect(model.setProperty("name", "Edited")).resolves.toEqual(Result.Success());
+
+        expect(model.name).toBe("Edited");
+        expect(listener).toHaveBeenCalledWith({ key: "name", value: "Edited" });
+    });
+});
+
+describe("Workspace model", () => {
+    beforeEach(() => {
+        workspaceModelMocks.instances.tilesetSessionManager = null;
+        workspaceModelMocks.instances.tilemapSessionManager = null;
+        workspaceModelMocks.instances.rulesetSessionManager = null;
+        workspaceModelMocks.instances.toolSessionManager = null;
+        workspaceModelMocks.instances.savedPathManager = null;
+    });
+
+    it("constructs session and saved-path managers from workspace data", () => {
+        const editorFacade = { id: "editor" };
+        const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/workspace-project");
+        const workspace = new Workspace(defaultWorkspaceData, {} as any, {} as any, projectPathSystem, editorFacade as any);
+
+        expect(workspace.tilesetSessionManager).toBe(workspaceModelMocks.instances.tilesetSessionManager);
+        expect(workspace.tilemapSessionManager).toBe(workspaceModelMocks.instances.tilemapSessionManager);
+        expect(workspace.rulesetSessionManager).toBe(workspaceModelMocks.instances.rulesetSessionManager);
+        expect(workspace.toolSessionManager).toBe(workspaceModelMocks.instances.toolSessionManager);
+        expect(workspace.savedPathManager).toBe(workspaceModelMocks.instances.savedPathManager);
+        expect(workspaceModelMocks.instances.savedPathManager.projectPathSystem).toBe(projectPathSystem);
+    });
+
+    it("loads, destroys, and serializes through its child managers", async () => {
+        const tilesetManager = { id: "tileset-manager" };
+        const tilemapManager = { id: "tilemap-manager" };
+        const workspace = new Workspace(defaultWorkspaceData, tilesetManager as any, tilemapManager as any, new ProjectPathSystem("C:/Project/Metk/workspace-project"), {} as any);
+
+        await expect(workspace.loadSession()).resolves.toEqual(Result.Success());
+
+        expect(workspaceModelMocks.instances.tilesetSessionManager.loadTilesetSessions).toHaveBeenCalledWith(tilesetManager);
+        expect(workspaceModelMocks.instances.tilemapSessionManager.loadTilemapSessions).toHaveBeenCalledWith(tilemapManager);
+        expect(workspaceModelMocks.instances.toolSessionManager.load).toHaveBeenCalledTimes(1);
+
+        expect(workspace.serialize()).toEqual({
+            tilesets: { tilesetSessions: [{ id: "tileset-session" }], currentTilesetSessionId: "tileset-session" },
+            tilemaps: { tilemapSessions: [{ id: "tilemap-session" }], currentTilemapSessionId: "tilemap-session" },
+            ruleset: { selectedRuleId: "ruleset-a" },
+            toolState: { currentTool: "tool.stamp" },
+            savedPath: { exportPaths: ["C:/exports"], tilemapDir: "C:/tilemaps" },
+        });
+
+        await workspace.destroy();
+
+        expect(workspaceModelMocks.instances.tilesetSessionManager.destroy).toHaveBeenCalledTimes(1);
+        expect(workspaceModelMocks.instances.tilemapSessionManager.detroy).toHaveBeenCalledTimes(1);
+        expect(workspaceModelMocks.instances.toolSessionManager.destroy).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("Tileset model", () => {
+    it("creates default tile objects and resolves ids to coordinates", () => {
+        const tileset = createTileset();
+
+        expect(tileset.tiles.map((tile) => tile.id)).toEqual([0, 1, 2, 3]);
+        expect(tileset.getTileFromId(2)?.serialize()).toEqual({ id: 2 });
+        expect(tileset.getCoordinatesFromTile(3)).toEqual({ row: 1, col: 1 });
+        expect(tileset.getCoordinatesFromTile(99)).toBeNull();
+        expect(tileset.getTileFromCoordinates(1, 0)?.id).toBe(2);
+        expect(tileset.getTileFromCoordinates(9, 9)).toBeNull();
+    });
+
+    it("preserves explicit tile ids during construction and serialization", () => {
+        const tileset = createTileset({
+            columns: 3,
+            rows: 1,
+            tiles: [{ id: 2 }, { id: 5 }],
+        });
+
+        expect(tileset.tiles.map((tile) => tile.id)).toEqual([2, 5]);
+        expect(tileset.serialize()).toMatchObject({
+            id: "tileset-a",
+            name: "Terrain",
+            columns: 3,
+            rows: 1,
+            tiles: [{ id: 2 }, { id: 5 }],
+        });
+    });
+
+    it("emits property updates when renamed or when the texture path changes", async () => {
+        const tileset = createTileset();
+        const listener = vi.fn();
+        tileset.eventEmitter.on("updateProperty", listener as any);
+
+        await expect(tileset.rename("Terrain Edited")).resolves.toEqual(Result.Success());
+        tileset.updateTexturePath("../textures/terrain-v2.png");
+
+        expect(tileset.name).toBe("Terrain Edited");
+        expect(tileset.image.source).toBe("../textures/terrain-v2.png");
+        expect(listener).toHaveBeenCalledWith("name", "Terrain Edited");
+        expect(listener).toHaveBeenCalledWith("image", tileset.image);
+    });
+
+    it("derives rows and columns from a new texture size without inventing new explicit tiles", () => {
+        const emptyTileset = createTileset({ columns: 0, rows: 0, image: { source: "empty.png", width: 0, height: 0 } });
+        emptyTileset.checkTextureSize(32, 48);
+
+        expect(emptyTileset.columns).toBe(2);
+        expect(emptyTileset.rows).toBe(3);
+        expect(emptyTileset.tiles.map((tile) => tile.id)).toEqual([0, 1, 2, 3, 4, 5]);
+
+        const explicitTileset = createTileset({ columns: 1, rows: 1, tiles: [{ id: 10 }] });
+        explicitTileset.checkTextureSize(64, 64);
+
+        expect(explicitTileset.columns).toBe(4);
+        expect(explicitTileset.rows).toBe(4);
+        expect(explicitTileset.tiles.map((tile) => tile.id)).toEqual([10]);
+    });
+});

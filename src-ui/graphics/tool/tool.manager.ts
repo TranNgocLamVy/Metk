@@ -116,6 +116,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
             if (this.activeTilemapView) {
                 this.currentTool.attachView(this.activeTilemapView);
+                this.activeTilemapView.session.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
+                this.activeTilemapView.session.on("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
                 this.onSelectedLayersChanged();
             }
             this.emit("onToolChanged", toolId);
@@ -124,6 +126,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
     private clearTool() {
         if (this.currentTool) {
+            if (this.activeTilemapView) this.activeTilemapView.session.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
             this.currentTool.detach();
             this.currentTool.onDisable();
             this.currentTool = null;

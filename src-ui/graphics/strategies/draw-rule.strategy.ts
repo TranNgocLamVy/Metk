@@ -6,6 +6,7 @@ import { SetRulesCommand } from "@/application/commands/tile/set-rules.command";
 import { ITool } from "@/editor/interface/tool.interface";
 import { BaseLayerRenderer } from "@/graphics/renderer/base-layer.renderer";
 import { RuleLayerRenderer } from "@/graphics/renderer/rule-layer.renderer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 
 
 export class DrawRuleStrategy implements IDrawStrategy {
@@ -13,7 +14,7 @@ export class DrawRuleStrategy implements IDrawStrategy {
     public static readonly spriteAlpha = 0.9;
 
     public canHandle(layerRenderer: BaseLayerRenderer<any>, tool: ITool): boolean {
-        return layerRenderer.layer instanceof RuleLayerRenderer;
+        return layerRenderer.layer instanceof RuleLayer;
     }
 
     public getRefAt(pos: Position, layerRenderer: RuleLayerRenderer): any {

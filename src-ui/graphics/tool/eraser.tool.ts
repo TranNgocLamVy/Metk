@@ -144,7 +144,7 @@ export class EraserTool implements ITool {
         if (e.button !== 0) return;
         if (!this.currentView || !this.targetLayerRenderer || !this.activeDrawStrategy) return;
         this.isDragging = true;
-        this.previousPreviewCoordinate = this.targetLayerRenderer.posToCoord(this.getLocalPos(e));
+        this.previousPreviewCoordinate = this.currentPreviewCoordinate = this.targetLayerRenderer.posToCoord(this.getLocalPos(e));
         this.eraseMove(e);
     }
 

@@ -25,8 +25,15 @@ export class MoveLayerCommand implements IBaseCommand {
         const targetLayer = root.findLayer(this.targetLayerId);
 
         if (!rawParentLayer || !targetLayer) return Result.Error("Target layer not found");
+        if (targetLayer.id === root.id) return Result.Error("Cannot move root layer");
 
         const newParentLayer = rawParentLayer instanceof GroupLayer ? rawParentLayer : (rawParentLayer?.parentLayer ? rawParentLayer.parentLayer : root);
+        if (this.newIndex < 0) return Result.Error("Invalid layer's index: " + this.newIndex);
+        let parentCursor = newParentLayer as typeof newParentLayer | null;
+        while (parentCursor) {
+            if (parentCursor.id === targetLayer.id) return Result.Error("Cannot move a layer into itself or its descendant");
+            parentCursor = parentCursor.parentLayer;
+        }
 
         this.oldParentLayerId = targetLayer.parentLayer ? targetLayer.parentLayer.id : root.id;
         this.oldIndex = targetLayer.parentLayer ? targetLayer.parentLayer.getLayerIndex(targetLayer.id) : root.layers.indexOf(targetLayer);
