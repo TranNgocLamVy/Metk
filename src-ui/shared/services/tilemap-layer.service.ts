@@ -18,6 +18,25 @@ import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 
+const getLayerVisualOrder = (root: RootLayer): Map<string, number> => {
+    const order = new Map<string, number>();
+    root.getAllLayers().forEach((layer, index) => order.set(layer.id, index));
+    return order;
+};
+
+const removeDraggedDescendants = (layers: BaseLayer[]): BaseLayer[] => {
+    return layers.filter(layer => !layers.some(candidate => candidate.id !== layer.id && candidate.isAncestorOf(layer)));
+};
+
+const getMoveCommandIndex = (parent: IGroupLayer, layer: BaseLayer, desiredIndex: number): number => {
+    if (layer.parentLayer !== parent) return desiredIndex;
+
+    const currentIndex = parent.getLayerIndex(layer.id);
+    if (currentIndex === -1) return desiredIndex;
+
+    return currentIndex < desiredIndex ? desiredIndex - 1 : desiredIndex;
+};
+
 export class TilemapLayerService {
     public static getSelectedParentLayer(tilemap: Tilemap): IGroupLayer | null {
         const selectedIds = Array.from(useLayerManagerStore.getState().selectedLayers).reverse();
@@ -276,37 +295,44 @@ export class TilemapLayerService {
 
         if (!targetLayer) return;
 
-        const layersToMove = draggedIds
-            .map(id => root.findLayer(id))
-            .filter((l): l is BaseLayer => {
-                if (!l) return false;
-                if (l.id === targetId) return false;
-                if (targetLayer === root) return true;
-                return !l.isAncestorOf(targetLayer as any);
-            });
+        const visualOrder = getLayerVisualOrder(root);
+        const requestedIds = new Set(draggedIds);
+        const layersToMove = removeDraggedDescendants(
+            Array.from(requestedIds)
+                .map(id => root.findLayer(id))
+                .filter((layer): layer is BaseLayer => {
+                    if (!layer) return false;
+                    if (layer.id === targetId) return false;
+                    if (targetLayer === root) return true;
+                    return !layer.isAncestorOf(targetLayer as BaseLayer);
+                })
+                .sort((a, b) => (visualOrder.get(a.id) ?? 0) - (visualOrder.get(b.id) ?? 0))
+        );
 
         if (layersToMove.length === 0) return;
 
         if (position === 'inside' && (targetLayer instanceof GroupLayer || targetLayer instanceof RootLayer)) {
             historyManager.startTransaction();
             layersToMove.forEach(l => {
-                const moveLayerCommand = new MoveLayerCommand(targetLayer.id, l.id, targetLayer.layers.length);
+                const insertIndex = getMoveCommandIndex(targetLayer, l, targetLayer.layers.length);
+                const moveLayerCommand = new MoveLayerCommand(targetLayer.id, l.id, insertIndex);
                 historyManager.execute(moveLayerCommand, editorFacade);
             });
             historyManager.commitTransaction();
         } else {
             const parent = targetLayer.parentLayer || root;
             if (parent) {
-                const targetIndex = parent.getLayerIndex(targetLayer.id);
-                if (targetIndex !== -1) {
-                    const insertIndex = position === 'top' ? targetIndex : targetIndex + 1;
-                    historyManager.startTransaction();
-                    layersToMove.forEach((l, i) => {
-                        const moveLayerCommand = new MoveLayerCommand(parent.id, l.id, insertIndex + i);
+                historyManager.startTransaction();
+                layersToMove.forEach((l, i) => {
+                    const targetIndex = parent.getLayerIndex(targetLayer.id);
+                    if (targetIndex !== -1) {
+                        const desiredIndex = position === 'top' ? targetIndex : targetIndex + 1 + i;
+                        const insertIndex = getMoveCommandIndex(parent, l, desiredIndex);
+                        const moveLayerCommand = new MoveLayerCommand(parent.id, l.id, insertIndex);
                         historyManager.execute(moveLayerCommand, editorFacade);
-                    });
-                    historyManager.commitTransaction();
-                }
+                    }
+                });
+                historyManager.commitTransaction();
             }
         }
     }

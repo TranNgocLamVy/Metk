@@ -375,6 +375,66 @@ describe("TilemapLayerService.moveLayers", () => {
         expect(layerIds(bottomHarness.root)).toEqual(["group-a", "group-b", "rule-root", "tile-root"]);
     });
 
+    it("moves a same-parent layer downward without overshooting the target", () => {
+        const { root, historyManager } = createServiceHarness();
+
+        TilemapLayerService.moveLayers(["group-a"], "group-b", "bottom");
+
+        expectSingleTransaction(historyManager, 1);
+        expect(layerIds(root)).toEqual(["group-b", "group-a", "tile-root", "rule-root"]);
+    });
+
+    it("moves a same-parent layer upward to the correct target position", () => {
+        const { root, historyManager } = createServiceHarness();
+
+        TilemapLayerService.moveLayers(["tile-root"], "group-a", "top");
+
+        expectSingleTransaction(historyManager, 1);
+        expect(layerIds(root)).toEqual(["tile-root", "group-a", "group-b", "rule-root"]);
+    });
+
+    it("moves multiple sibling layers below a target while preserving their visual order", () => {
+        const { root, historyManager } = createServiceHarness();
+
+        TilemapLayerService.moveLayers(["group-b", "group-a"], "tile-root", "bottom");
+
+        expectSingleTransaction(historyManager, 2);
+        expect(layerIds(root)).toEqual(["tile-root", "group-a", "group-b", "rule-root"]);
+    });
+
+    it("moves multiple sibling layers above a target while preserving their visual order", () => {
+        const { root, historyManager } = createServiceHarness();
+
+        TilemapLayerService.moveLayers(["rule-root", "tile-root"], "group-a", "top");
+
+        expectSingleTransaction(historyManager, 2);
+        expect(layerIds(root)).toEqual(["tile-root", "rule-root", "group-a", "group-b"]);
+    });
+
+    it("moves multiple layers inside a group while preserving their visual order", () => {
+        const { root, historyManager } = createServiceHarness();
+        const group = requireGroupLayer(root, "group-a");
+
+        TilemapLayerService.moveLayers(["rule-root", "tile-root"], "group-a", "inside");
+
+        expectSingleTransaction(historyManager, 2);
+        expect(layerIds(group)).toEqual(["group-child", "tile-a", "tile-root", "rule-root"]);
+        expect(root.findLayer("tile-root")?.parentLayer.id).toBe("group-a");
+        expect(root.findLayer("rule-root")?.parentLayer.id).toBe("group-a");
+    });
+
+    it("moves an ancestor once and leaves selected descendants attached to it", () => {
+        const { root, historyManager } = createServiceHarness();
+        const group = requireGroupLayer(root, "group-a");
+
+        TilemapLayerService.moveLayers(["group-a", "tile-a"], "group-b", "bottom");
+
+        expectSingleTransaction(historyManager, 1);
+        expect(layerIds(root)).toEqual(["group-b", "group-a", "tile-root", "rule-root"]);
+        expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
+        expect(root.findLayer("tile-a")?.parentLayer.id).toBe("group-a");
+    });
+
     it("rejects self moves before opening a history transaction", () => {
         const { root, historyManager } = createServiceHarness();
         const before = root.serialize();
@@ -395,6 +455,22 @@ describe("TilemapLayerService.moveLayers", () => {
         expect(root.serialize()).toEqual(before);
         expect(historyManager.startTransaction).not.toHaveBeenCalled();
         expect(historyManager.execute).not.toHaveBeenCalled();
+    });
+
+    it("ignores missing dragged layers and missing targets without opening invalid transactions", () => {
+        const missingDragHarness = createServiceHarness();
+
+        TilemapLayerService.moveLayers(["missing-layer"], "group-a", "inside");
+
+        expect(missingDragHarness.historyManager.startTransaction).not.toHaveBeenCalled();
+        expect(missingDragHarness.historyManager.execute).not.toHaveBeenCalled();
+
+        const missingTargetHarness = createServiceHarness();
+
+        TilemapLayerService.moveLayers(["tile-root"], "missing-target", "inside");
+
+        expect(missingTargetHarness.historyManager.startTransaction).not.toHaveBeenCalled();
+        expect(missingTargetHarness.historyManager.execute).not.toHaveBeenCalled();
     });
 });
 
