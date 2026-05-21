@@ -48,7 +48,7 @@ export default defineConfig(async () => ({
 		],
 		coverage: {
 			provider: "v8",
-			reporter: ["text", "html"],
+			reporter: ["json", "html"],
 			include: ["src-ui/**/*.{ts,tsx}"],
 			exclude: [
 				"src-ui/**/*.d.ts",

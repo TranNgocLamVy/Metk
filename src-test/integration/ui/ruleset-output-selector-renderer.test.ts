@@ -78,7 +78,7 @@ const rendererMocks = vi.hoisted(() => {
         tilesetManager,
         appKernel: {
             editorFacade: {
-                currentProject: { tilesetManager },
+                currentProject: { tilesetManager } as null | { tilesetManager: typeof tilesetManager },
                 textureManager,
             },
         },

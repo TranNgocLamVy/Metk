@@ -148,6 +148,10 @@ const flushAsync = async () => {
     await Promise.resolve();
 };
 
+type MockContainer = InstanceType<typeof rendererMocks.Container>;
+type MockGraphics = InstanceType<typeof rendererMocks.Graphics>;
+type MockSprite = InstanceType<typeof rendererMocks.Sprite>;
+
 const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[0]> = {}) => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/renderer-project");
     const filePathSystem = new FilePathSystem("tileset-a", projectPathSystem, "tilesets/tileset-a.json");
@@ -215,7 +219,9 @@ describe("BaseLayerRenderer and TilemapRenderer", () => {
         expect(renderer.findLayerRenderer("tile-a")).toBeTruthy();
         expect(renderer.findLayerRenderer("missing-layer")).toBeNull();
 
-        const borderGraphic = renderer.container.children.find((child: any) => child instanceof rendererMocks.Graphics);
+        const container = renderer.container as unknown as MockContainer;
+        const borderGraphic = container.children.find((child: any) => child instanceof rendererMocks.Graphics) as MockGraphics | undefined;
+        if (!borderGraphic) throw new Error("Expected tilemap border graphic to be rendered");
         expect(borderGraphic.moveTo).toHaveBeenCalledWith(0, 0);
         expect(borderGraphic.lineTo).toHaveBeenCalledWith(64, 0);
         expect(borderGraphic.lineTo).toHaveBeenCalledWith(64, 64);
@@ -238,11 +244,13 @@ describe("TilesetRenderer", () => {
 
         const renderer = new TilesetRenderer({ tileset, parent: new rendererMocks.Container() as any, gap: 1 });
         await flushAsync();
+        const container = renderer.container as unknown as MockContainer;
+        const children = container.children as MockSprite[];
 
-        expect(renderer.container.children).toHaveLength(4);
-        expect(renderer.container.children[0].position.set).toHaveBeenCalledWith(0, 0);
-        expect(renderer.container.children[1].position.set).toHaveBeenCalledWith(17, 0);
-        expect(renderer.container.children[2].texture).toEqual({ id: "error-texture", width: 16, height: 16 });
+        expect(children).toHaveLength(4);
+        expect(children[0].position.set).toHaveBeenCalledWith(0, 0);
+        expect(children[1].position.set).toHaveBeenCalledWith(17, 0);
+        expect(children[2].texture).toEqual({ id: "error-texture", width: 16, height: 16 });
         expect(rendererMocks.appKernel.editorFacade.textureManager.getErrorTexture).toHaveBeenCalledTimes(1);
         expect(rendererMocks.appKernel.textureManager.on).toHaveBeenCalledWith("onTextureReloaded", expect.any(Function));
     });
@@ -251,20 +259,22 @@ describe("TilesetRenderer", () => {
         const tileset = createTileset();
         const renderer = new TilesetRenderer({ tileset, parent: new rendererMocks.Container() as any, gap: 0 });
         await flushAsync();
+        const container = renderer.container as unknown as MockContainer;
+        const children = container.children as MockSprite[];
 
         renderer.setGap(2);
 
-        expect(renderer.container.children[1].position.set).toHaveBeenLastCalledWith(18, 0);
-        expect(renderer.container.children[2].position.set).toHaveBeenLastCalledWith(0, 18);
+        expect(children[1].position.set).toHaveBeenLastCalledWith(18, 0);
+        expect(children[2].position.set).toHaveBeenLastCalledWith(0, 18);
 
         const reloadHandler = rendererMocks.appKernel.textureManager.on.mock.calls.find(([eventName]) => eventName === "onTextureReloaded")![1];
-        renderer.container.removeChildren.mockClear();
+        container.removeChildren.mockClear();
         reloadHandler("other-tileset");
-        expect(renderer.container.removeChildren).not.toHaveBeenCalled();
+        expect(container.removeChildren).not.toHaveBeenCalled();
 
         reloadHandler("tileset-a");
         await flushAsync();
-        expect(renderer.container.removeChildren).toHaveBeenCalledTimes(1);
+        expect(container.removeChildren).toHaveBeenCalledTimes(1);
     });
 
     it("destroys sprites and unregisters texture reload listener", async () => {

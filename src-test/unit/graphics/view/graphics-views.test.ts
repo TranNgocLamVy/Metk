@@ -140,6 +140,8 @@ import { TilemapView } from "@/graphics/view/tilemap.view";
 import { TilesetView } from "@/graphics/view/tileset.view";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 
+type MockViewport = InstanceType<typeof viewMocks.MockViewport>;
+
 const createPixiApp = () => ({
     screen: { width: 640, height: 480 },
     renderer: {
@@ -229,9 +231,10 @@ describe("TilemapView", () => {
     it("persists view state from viewport movement and zoom events", () => {
         const view = new TilemapView(createTilemapSession() as any);
         view.activateView(createPixiApp() as any);
+        const viewport = view.viewport as unknown as MockViewport;
 
-        view.viewport.listeners["moved-end"]();
-        view.viewport.listeners["zoomed-end"]();
+        viewport.listeners["moved-end"]();
+        viewport.listeners["zoomed-end"]();
 
         expect(view.session.updateViewState).toHaveBeenCalledWith({ x: 80, y: 96 });
         expect(view.session.updateViewState).toHaveBeenCalledWith({ zoom: 1.75 });
@@ -310,9 +313,10 @@ describe("TilesetView", () => {
         const app = createPixiApp();
         const view = new TilesetView(createTilesetSession() as any);
         view.activateView(app as any);
+        const viewport = view.viewport as unknown as MockViewport;
 
-        view.viewport.listeners["moved-end"]();
-        view.viewport.listeners["zoomed-end"]();
+        viewport.listeners["moved-end"]();
+        viewport.listeners["zoomed-end"]();
 
         expect(view.session.updateViewState).toHaveBeenCalledWith({ x: 80, y: 96 });
         expect(view.session.updateViewState).toHaveBeenCalledWith({ zoom: 1.75 });
