@@ -10,7 +10,6 @@ import { RulesetManager } from "../ruleset/ruleset.manager";
 import { Console } from "@/shared/services/console.service";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TilemapData, TilemapMetadata } from "@/shared/schema/tilemap.schema";
-import { CatchError } from "@/shared/decorator/catch-result-error.decorator";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -61,7 +60,6 @@ export class TilemapManager {
         tilemapsMetadata.forEach((meta) => this.tilemapMetadata.set(meta.id, meta));
     }
 
-    @CatchError("message.system.unknownError.loadTilemap")
     public async loadTilemap(id: string): Promise<Result<Tilemap>> {
         if (this.loadedTilemaps.has(id)) return Result.Success(this.loadedTilemaps.get(id)!)
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;

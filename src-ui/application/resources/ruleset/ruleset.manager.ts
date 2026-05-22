@@ -9,7 +9,6 @@ import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
 import EventEmitter from "eventemitter3";
-import { CatchError } from "@/shared/decorator/catch-result-error.decorator";
 
 export interface RulesetManagerEvent {
     onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
@@ -71,7 +70,6 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         return await Promise.all(ids.map(id => this.loadRuleset(id)));
     }
 
-    @CatchError("message.system.unknownError.loadRuleset")
     public async loadRuleset(id: string): Promise<Result<Ruleset>> {
         if (this.loadedRulesets.has(id)) return Result.Success(this.loadedRulesets.get(id)!)
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;

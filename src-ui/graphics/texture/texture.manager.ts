@@ -6,7 +6,6 @@ import errorTexture from "@/assets/sprites/Missing_texture.png"
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { Console } from "@/shared/services/console.service";
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { CatchError } from "@/shared/decorator/catch-result-error.decorator";
 
 interface TextureManagerEvent {
     onTextureReloaded: (tilesetId: string) => void;
@@ -86,7 +85,6 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
         return Result.Success();
     }
 
-    @CatchError("message.system.unknownError.loadTexture")
     private async loadTexture(textureAbsPath: string): Promise<Result<Texture | null>> {
         const exist = await exists(textureAbsPath); // TODO: Move load texture logic into Infrastructure
         if (!exist) return Result.Error({ key: "message.system.fs.fileNotFoundAt", options: { path: textureAbsPath } });

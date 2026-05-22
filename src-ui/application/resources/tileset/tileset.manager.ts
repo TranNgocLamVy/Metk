@@ -6,7 +6,6 @@ import { TilesetStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
 import { TilesetData, TilesetMetadata } from "@/shared/schema/tileset.schema";
-import { CatchError } from "@/shared/decorator/catch-result-error.decorator";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -48,7 +47,6 @@ export class TilesetManager {
         return await Promise.all(ids.map(id => this.loadTileset(id)));
     }
     
-    @CatchError("message.system.unknownError.loadTileset")
     public async loadTileset(id: string): Promise<Result<Tileset>> {
         if (this.loadedTilesets.has(id)) return Result.Success(this.loadedTilesets.get(id)!);
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;

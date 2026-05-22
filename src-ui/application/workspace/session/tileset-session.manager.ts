@@ -6,7 +6,6 @@ import { TilesetSession } from "@/editor/session/tileset.session";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { Console } from "@/shared/services/console.service";
-import { CatchError } from "@/shared/decorator/catch-result-error.decorator";
 import { TilesetView } from "@/graphics/view/tileset.view";
 
 export type TilesetSessionManagerEvent = {
@@ -35,7 +34,6 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
         super();
     }
 
-    @CatchError("message.system.unknownError.loadTilesetSession")
     public async loadTilesetSessions(tilesetManager: TilesetManager): Promise<Result> {
         const loadResults = await Promise.all(this.tilesetSessionManagerData.tilesetSessions.map(async (sessionData) => {
             const tilesetResult = await tilesetManager.loadTileset(sessionData.tilesetId);

@@ -6,7 +6,6 @@ import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TilemapManager } from "@/application/resources/tilemap/tilemap.manager";
 import { Result } from "@/shared/types/result";
 import { Console } from "@/shared/services/console.service";
-import { CatchError } from "@/shared/decorator/catch-result-error.decorator";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 
 export type TilemapSessionManagerEvent = {
@@ -33,7 +32,6 @@ export class TilemapSessionManager extends EventEmitter<TilemapSessionManagerEve
         super();
     }
 
-    @CatchError("message.system.unknownError.loadTilemapSession")
     public async loadTilemapSessions(tilemapManager: TilemapManager): Promise<Result> {
         const loadResults = await Promise.all(this.tilemapSessionManagerData.tilemapSessions.map(async (sessionData) => {
             const tilemapResult = await tilemapManager.loadTilemap(sessionData.tilemapId);
