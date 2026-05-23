@@ -14,6 +14,7 @@ import TilemapEditor from "./tilemapEditor/TilemapEditor";
 import RulesetManager from "./rulesetManager/RulesetManager";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { LocalizedText } from "../custom/LocalizeText";
+import PropertyPanel from "./propertyPanel/PropertyPanel";
 
 export default function Workspace() {
 
@@ -34,6 +35,8 @@ export default function Workspace() {
 				return <TilemapEditor />
 			case "rulesetManager":
 				return <RulesetManager />
+			case "properties":
+				return <PropertyPanel />
 			default:
 				return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 		}

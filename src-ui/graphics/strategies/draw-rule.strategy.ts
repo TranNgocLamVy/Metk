@@ -34,6 +34,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
     }
 
     public drawHoverPreview(pos: Position, layerRenderer: RuleLayerRenderer, editorFacade: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[] {
+        if (layerRenderer.layer.locked || !layerRenderer.layer.visible) return [];
+
         const selectedRuleset = this.getSelectedRuleset(editorFacade);
         if (!selectedRuleset) return [];
 
@@ -55,6 +57,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
     }
 
     public getPayload(pos: Position, layerRenderer: RuleLayerRenderer, editorFacade: EditorFacade, session: TilemapSession): DrawPayload[] {
+        if (layerRenderer.layer.locked || !layerRenderer.layer.visible) return [];
+
         const selectedRuleset = this.getSelectedRuleset(editorFacade);
         if (!selectedRuleset) return [];
 
@@ -74,6 +78,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
     }
 
     public commit(layerRenderer: RuleLayerRenderer, previewData: DrawPayload[], editorFacade: EditorFacade): void {
+        if (layerRenderer.layer.locked || !layerRenderer.layer.visible) return;
+
         const historyManager = editorFacade.getCurrentHistoryManager();
         if (!historyManager) return;
 

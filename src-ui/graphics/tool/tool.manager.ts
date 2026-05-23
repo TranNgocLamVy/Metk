@@ -90,7 +90,6 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         for (const id of layerIds) {
             const layerRenderer = this.activeTilemapView.renderer.findLayerRenderer(id);
             if (!layerRenderer || layerRenderer instanceof GroupLayerRenderer) continue;
-            if (!layerRenderer.layer.visible || layerRenderer.layer.locked) continue;
             targetLayerRenderer = layerRenderer;
             break;
         }

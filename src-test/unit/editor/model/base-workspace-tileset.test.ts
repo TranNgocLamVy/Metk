@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { v4 as uuidv4 } from "uuid";
 
 const workspaceModelMocks = vi.hoisted(() => {
     const instances = {
@@ -105,7 +106,7 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[
 
 describe("BaseObject", () => {
     it("copies static property metadata and exposes runtime properties", () => {
-        const model = new TestBaseObject();
+        const model = new TestBaseObject(uuidv4());
 
         expect(model.properties).toEqual(TestBaseObject.properties);
         expect(model.properties).not.toBe(TestBaseObject.properties);
@@ -113,7 +114,7 @@ describe("BaseObject", () => {
     });
 
     it("sets properties and emits update events with the changed key and value", async () => {
-        const model = new TestBaseObject();
+        const model = new TestBaseObject(uuidv4());
         const listener = vi.fn();
         model.eventEmitter.on("updateProperty", listener as any);
 

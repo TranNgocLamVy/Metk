@@ -1,23 +1,69 @@
 
 import { BaseObject, BaseObjectEvents } from "@/editor/model/base-object";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { TilemapData, TilemapOrientation } from "@/shared/schema/tilemap.schema";
+import { TilemapData, type TilemapOrientation } from "@/shared/schema/tilemap.schema";
 import { RootLayer } from "./layer/root-layer";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { EnumProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 
 interface TilemapEvent extends BaseObjectEvents {
     onChange: () => void
 }
 
 export class Tilemap extends BaseObject<TilemapEvent> {
+    @StringProperty<Tilemap>({
+        label: "ID",
+        readonly: true,
+        get: (target) => target.id,
+    })
     public id: string;
+
+    @StringProperty<Tilemap>({
+        label: "Map name",
+        get: (target) => target.name,
+        set: (target, value) => { target.rename(value) },
+    })
     public name: string;
+
+    @EnumProperty<Tilemap>({
+        label: "Orientation",
+        group: "Map",
+        order: 0,
+        readonly: true,
+        get: (target) => target.orientation,
+        options: () => {
+            return [
+                { label: "Orthogonal", value: "orthogonal" },
+                { label: "Isometric", value: "isometric" },
+                { label: "Oblique", value: "oblique" },
+                { label: "Staggered", value: "staggered" },
+                { label: "Hexagonal", value: "hexagonal" },
+            ]
+        },
+    })
     public orientation: TilemapOrientation;
     public backgroundcolor: string;
 
+    @Point2DProperty<Tilemap>({
+        label: "Map size",
+        group: "Map",
+        order: 1,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        get: (target) => ({ x: target.width, y: target.height }),
+    })
     public width: number;
     public height: number;
+
+    @Point2DProperty<Tilemap>({
+        label: "Tile size",
+        group: "Map",
+        order: 1,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        get: (target) => ({ x: target.tilewidth, y: target.tileheight }),
+    })
     public tilewidth: number;
     public tileheight: number;
 
@@ -29,7 +75,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager
     ) {
-        super();
+        super(`tilemap:${tilemapData.id}`);
         this.tilemapPathSystem = tilesetRefManager.filePathSystem;
 
         this.id = tilemapData.id;
@@ -41,11 +87,16 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.height = tilemapData.height;
         this.tilewidth = tilemapData.tilewidth;
         this.tileheight = tilemapData.tileheight;
-        
+
         this.tilesetRefManager.loadData(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
         this.rulesetRefManager.loadData(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
 
         this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager);
+    }
+
+    public rename(newName: string) {
+        this.name = newName;
+        this.eventEmitter.emit("updateProperty", "name", newName);
     }
 
     public serialize(): TilemapData {

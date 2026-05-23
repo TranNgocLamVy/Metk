@@ -40,6 +40,8 @@ export class DrawTileStrategy implements IDrawStrategy {
     }
 
     public drawHoverPreview(pos: Position, layerRenderer: TileLayerRenderer, editorFacade: EditorFacade, session: TilemapSession, overlayContainer: Container): Sprite[] {
+        if (layerRenderer.layer.locked || !layerRenderer.layer.visible) return [];
+
         const selectedTiles = this.getSelectedTiles(editorFacade);
         if (!selectedTiles) return [];
 
@@ -71,6 +73,8 @@ export class DrawTileStrategy implements IDrawStrategy {
     }
 
     public getPayload(pos: Position, layerRenderer: TileLayerRenderer, editorFacade: EditorFacade, session: TilemapSession): DrawPayload[] {
+        if (layerRenderer.layer.locked || !layerRenderer.layer.visible) return [];
+
         const selectedTiles = this.getSelectedTiles(editorFacade);
         if (!selectedTiles) return [];
 
@@ -101,6 +105,8 @@ export class DrawTileStrategy implements IDrawStrategy {
     }
 
     public commit(layerRenderer: TileLayerRenderer, previewData: DrawPayload[], editorFacade: EditorFacade): void {
+        if (layerRenderer.layer.locked || !layerRenderer.layer.visible) return;
+
         const historyManager = editorFacade.getCurrentHistoryManager();
         if (!historyManager) return;
 

@@ -64,6 +64,20 @@ const workspaceRowNode: IJsonRowNode = {
                 },
             ],
         },
+        {
+            type: "tabset",
+            weight: 25,
+            children: [
+                {
+                    type: "tab",
+                    name: "Properties",
+                    minHeight: 200,
+                    minWidth: 280,
+                    component: "properties",
+                    enableClose: false,
+                },
+            ],
+        },
     ],
 };
 

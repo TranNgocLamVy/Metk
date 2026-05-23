@@ -77,6 +77,8 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     }
 
     public setRuleRefsAt(updates: { coordinate: Coordinate, rulesetId: string | null }[]): Result<{ coordinate: Coordinate, oldRulesetId: string | null }[]> {
+        if (this.locked || !this.visible) return Result.Cancel();
+        
         const results: { coordinate: Coordinate, oldRulesetId: string | null }[] = [];
         const affectedCoordinates = new Set<string>();
 

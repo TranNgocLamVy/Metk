@@ -24,7 +24,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
     };
 
     constructor(tilesetData: TilesetData, public readonly tilesetPathSystem: FilePathSystem) {
-        super();
+        super(`tileset:${tilesetData.id}`);
         this.id = tilesetData.id;
         this.name = tilesetData.name;
         this.columns = tilesetData.columns;
@@ -115,7 +115,7 @@ export class Tile extends BaseObject {
     public tileset: Tileset;
 
     constructor(tileData: TileData, tileset: Tileset) {
-        super();
+        super(`tile:${tileset.id}:${tileData.id}`);
         this.id = tileData.id;
         this.tileset = tileset;
     }

@@ -25,7 +25,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager
     ) {
-        super();
+        super(`ruleset:${rulesetData.id}`);
 
         this.id = rulesetData.id;
         this.name = rulesetData.name;

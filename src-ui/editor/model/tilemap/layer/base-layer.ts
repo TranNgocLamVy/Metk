@@ -3,18 +3,58 @@ import { Result } from "@/shared/types/result";
 
 import { BaseObject, BaseObjectEvents } from "../../base-object";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { BooleanProperty, NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
-
+    
 }
 
 export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends BaseObject<T> {
+    @StringProperty<BaseLayer>({
+        label: "ID",
+        readonly: true,
+        get: (target) => target.id,
+    })
     public readonly id: string;
+
+    @StringProperty<BaseLayer>({
+        label: "Layer name",
+        get: (target) => target.name,
+        set: (target, value) => { target.rename(value) },
+    })
     public name: string;
+
+    @NumberProperty<BaseLayer>({
+        label: "Opacity",
+        group: "Layer",
+        order: 1,
+        slider: {
+            range: [0, 1],
+            step: 0.01,
+        },
+        get: (target) => target.opacity,
+        set: (target, value) => { target.updateOpacity(value) },
+    })
     public opacity: number = 1;
+
+    @BooleanProperty<BaseLayer>({
+        label: "Visible",
+        group: "Layer",
+        order: 2,
+        get: (target) => target._visible,
+        set: (target, value) => { target.toggleVisibility(value) },
+    })
     protected _visible: boolean = true;
+
+    @BooleanProperty<BaseLayer>({
+        label: "Locked",
+        group: "Layer",
+        order: 3,
+        get: (target) => target._locked,
+        set: (target, value) => { target.toggleLock(value) },
+    })
     protected _locked: boolean = false;
-    
+
     public get visible() { return this._visible && this.parentLayer ? this.parentLayer.visible : this._visible }
     public set visible(value: boolean) {
         this._visible = value;
@@ -30,7 +70,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     public parentLayer: IGroupLayer;
 
     constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly rulesetRefManager: RulesetRefManager) {
-        super();
+        super(`layer:${id}`);
         this.id = id;
     }
 
@@ -55,13 +95,13 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     }
 
     public removeFromParent() {
-        if (this.parentLayer) this.parentLayer.removeLayer(this.id); 
+        if (this.parentLayer) this.parentLayer.removeLayer(this.id);
     }
 
     public duplicate(): BaseLayer<any> | null {
         if (!this.parentLayer) return null;
 
-        const index = this.parentLayer.getLayerIndex(this.id); 
+        const index = this.parentLayer.getLayerIndex(this.id);
         if (index == -1) return null
 
         const clone = this.clone();

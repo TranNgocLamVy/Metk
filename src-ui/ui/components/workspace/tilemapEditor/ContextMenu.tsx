@@ -1,7 +1,8 @@
-import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
+import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Info, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { TilemapService } from "@/shared/services/tilemap.service";
+import { usePropertyStore } from "@/ui/stores/property.store";
 
 const ActionGroup: MenuDropDownGroupType = [
     {
@@ -10,6 +11,16 @@ const ActionGroup: MenuDropDownGroupType = [
         startIcon: <Plus className="stroke-1" />,
         onClick() {
             TilemapService.createTilemap();
+        }
+    },
+    {
+        type: "option",
+        label: "workspace.tilemapEditor.contextMenu.property",
+        startIcon: <Info className="stroke-1" />,
+        onClick() {
+			const activeTilemapSession = appKernel.editorFacade.getActiveTilemapSession();
+			if (!activeTilemapSession) return;
+			usePropertyStore.getState().setBaseObject(activeTilemapSession.tilemap);
         }
     },
 ];

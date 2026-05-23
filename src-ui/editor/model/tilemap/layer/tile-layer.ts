@@ -79,6 +79,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
      * @returns previous tileRefsData
      */
     public setTilesAt(payload: SetTilesData[]): Result<SetTilesData[]> {
+        if (this.locked || !this.visible) return Result.Cancel();
         const result = payload.map((data) => {
             const coordinate = data.coordinate;
             const tileId = data.tileId;

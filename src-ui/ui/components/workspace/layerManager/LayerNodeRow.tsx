@@ -8,24 +8,41 @@ import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layer
 import { Button } from "../../shadcn/button";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { usePropertyStore } from "@/ui/stores/property.store";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 
 type LayerNodeRowProps = {
 	view: LayerView;
 	isSelected: boolean;
+	updatedLayerView: () => void;
 };
 
-export default function LayerNodeRow({ view, isSelected }: LayerNodeRowProps) {
+export default function LayerNodeRow({ view, isSelected, updatedLayerView }: LayerNodeRowProps) {
 	const { editingId, selectedLayers, setEditingId } = useLayerManagerStore();
+	const { setBaseObject } = usePropertyStore();
 
 	const layer = view.layer;
 	const isGroup = layer instanceof GroupLayer;
 	const isRenaming = editingId === layer.id;
+
+	useEffect(() => {
+		const onUpdate = () => {
+			updatedLayerView();
+			useTilemapSessionStore.getState().activeSession?.markLayerChange();
+		};
+
+		layer.eventEmitter.on("updateProperty", onUpdate);
+		return () => {
+			layer.eventEmitter.off("updateProperty", onUpdate);
+		};
+	}, [])
 
 	const isRenameByUI = useRef(false);
 	const [dragOverPos, setDragOverPos] = useState<DropPosition | null>(null);
 
 	const handleClick = (e: MouseEvent) => {
 		e.stopPropagation();
+		setBaseObject(layer);
 		TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
 	};
 

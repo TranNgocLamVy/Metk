@@ -1,4 +1,4 @@
-import { DragEvent, useCallback, useEffect } from "react";
+import { DragEvent, useCallback, useEffect, useState } from "react";
 
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
@@ -105,7 +105,7 @@ export default function LayerManager() {
 						<ScrollArea className="w-full h-full shadow-sm bg-surface-base">
 							<div className="flex flex-col w-full min-h-full pb-10">
 								{layerViews.map((view) => (
-									<LayerNodeRow key={view.id} view={view} isSelected={selectedLayers.includes(view.id)} />
+									<LayerNodeRow key={view.id} view={view} isSelected={selectedLayers.includes(view.id)} updatedLayerView={updateLayerView} />
 								))}
 							</div>
 							<div className="flex-1 min-h-[10px] h-full transition-colors" />
