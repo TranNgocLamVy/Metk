@@ -225,8 +225,11 @@ describe("layer renderers", () => {
 
     it("creates nested group child renderers, responds to removal, and destroys descendants", () => {
         const tilemap = createTilemap([
-            createGroupLayerData({ id: "group-a", name: "Group A" }),
-            createTileLayerData({ id: "tile-a", parentId: "group-a", name: "Nested Tile", layerData: "0,0\n0,0" }),
+            createGroupLayerData({
+                id: "group-a",
+                name: "Group A",
+                layers: [createTileLayerData({ id: "tile-a", name: "Nested Tile", layerData: "0,0\n0,0" })],
+            }),
             createTileLayerData({ id: "tile-root", name: "Root Tile", layerData: "0,0\n0,0" }),
         ]);
         const renderer = new GroupLayerRenderer({ layer: tilemap.rootLayer, tilemap });

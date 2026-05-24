@@ -64,13 +64,13 @@ const exportParsed = (tilemap: Tilemap, exportPath = "C:/Project/Metk/test-proje
     return parser.parse(exportXml(tilemap, exportPath));
 };
 
-const orderedChildIds = (xml: string, parentElement: "map" | "group" = "map", parentId?: string): string[] => {
+const orderedChildIds = (xml: string, parentElement: "map" | "group" = "map", targetId?: string): string[] => {
     const parsed = orderedParser.parse(xml);
     const findElement = (nodes: any[]): any[] | null => {
         for (const node of nodes) {
             const children = node[parentElement];
             if (children) {
-                if (!parentId || node[":@"]?.id === parentId) return children;
+                if (!targetId || node[":@"]?.id === targetId) return children;
                 const nested = findElement(children);
                 if (nested) return nested;
             }
@@ -92,7 +92,6 @@ const orderedChildIds = (xml: string, parentElement: "map" | "group" = "map", pa
 const createTilemap = (context: ReturnType<typeof createReferenceContext>, overrides: Partial<TilemapData> = {}) => {
     const defaultLayer: TilemapData["layers"][number] = {
         id: "ground",
-        parentId: "root",
         type: "tile",
         name: "Ground",
         x: 1,
@@ -216,7 +215,6 @@ describe("TmxTilemapExporter", () => {
             tilesets: { refs: [{ index: 0, id: "terrain", name: "Terrain" }], nextIndex: 1 },
             layers: [{
                 id: "first",
-                parentId: "root",
                 type: "tile",
                 name: "First",
                 x: 0,
@@ -236,7 +234,6 @@ describe("TmxTilemapExporter", () => {
             tilesets: { refs: [], nextIndex: 0 },
             layers: [{
                 id: "second",
-                parentId: "root",
                 type: "tile",
                 name: "Second",
                 x: 0,
@@ -277,7 +274,6 @@ describe("TmxTilemapExporter", () => {
             layers: [
                 {
                     id: "bottom-tile",
-                    parentId: "root",
                     type: "tile",
                     name: "Bottom Tile",
                     x: 0,
@@ -293,59 +289,58 @@ describe("TmxTilemapExporter", () => {
                 },
                 {
                     id: "parent-group",
-                    parentId: "root",
                     type: "group",
                     name: "Parent Group",
                     opacity: 1,
                     open: true,
                     visible: false,
                     locked: true,
-                },
-                {
-                    id: "child-tile",
-                    parentId: "parent-group",
-                    type: "tile",
-                    name: "Child Tile",
-                    x: 0,
-                    y: 0,
-                    width: 1,
-                    height: 1,
-                    opacity: 1,
-                    visible: true,
-                    locked: false,
-                    offsetx: 0,
-                    offsety: 0,
-                    layerData: "2:0",
-                },
-                {
-                    id: "nested-group",
-                    parentId: "parent-group",
-                    type: "group",
-                    name: "Nested Group",
-                    opacity: 1,
-                    open: false,
-                    visible: true,
-                    locked: false,
-                },
-                {
-                    id: "nested-tile",
-                    parentId: "nested-group",
-                    type: "tile",
-                    name: "Nested Tile",
-                    x: 0,
-                    y: 0,
-                    width: 1,
-                    height: 1,
-                    opacity: 1,
-                    visible: true,
-                    locked: false,
-                    offsetx: 0,
-                    offsety: 0,
-                    layerData: "0:0",
+                    layers: [
+                        {
+                            id: "child-tile",
+                            type: "tile",
+                            name: "Child Tile",
+                            x: 0,
+                            y: 0,
+                            width: 1,
+                            height: 1,
+                            opacity: 1,
+                            visible: true,
+                            locked: false,
+                            offsetx: 0,
+                            offsety: 0,
+                            layerData: "2:0",
+                        },
+                        {
+                            id: "nested-group",
+                            type: "group",
+                            name: "Nested Group",
+                            opacity: 1,
+                            open: false,
+                            visible: true,
+                            locked: false,
+                            layers: [
+                                {
+                                    id: "nested-tile",
+                                    type: "tile",
+                                    name: "Nested Tile",
+                                    x: 0,
+                                    y: 0,
+                                    width: 1,
+                                    height: 1,
+                                    opacity: 1,
+                                    visible: true,
+                                    locked: false,
+                                    offsetx: 0,
+                                    offsety: 0,
+                                    layerData: "0:0",
+                                },
+                            ],
+                        },
+                    ],
                 },
                 {
                     id: "top-tile",
-                    parentId: "root",
                     type: "tile",
                     name: "Top Tile",
                     x: 0,
@@ -423,7 +418,6 @@ describe("TmxTilemapExporter", () => {
             rulesets: { refs: [{ index: 0, id: "terrain-rule", name: "Terrain Rule" }], nextIndex: 1 },
             layers: [{
                 id: "rules",
-                parentId: "root",
                 type: "auto_rule",
                 name: "Rules",
                 x: 0,
@@ -481,7 +475,6 @@ describe("TmxTilemapExporter", () => {
             layers: [
                 {
                     id: "tiles",
-                    parentId: "root",
                     type: "tile",
                     name: "Tiles",
                     x: 0,
@@ -497,7 +490,6 @@ describe("TmxTilemapExporter", () => {
                 },
                 {
                     id: "rules",
-                    parentId: "root",
                     type: "auto_rule",
                     name: "Rules",
                     x: 0,
@@ -542,7 +534,6 @@ describe("TmxTilemapExporter", () => {
             },
             layers: [{
                 id: "mixed",
-                parentId: "root",
                 type: "tile",
                 name: "Mixed",
                 x: 0,

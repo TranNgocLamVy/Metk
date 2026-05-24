@@ -1,5 +1,5 @@
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { RootLayerData } from "@/shared/schema/layer.schema";
+import { LayerData, RootLayerData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layerUtils";
 
@@ -19,20 +19,36 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
     constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
         super("root", tilesetRefManager, rulesetRefManager);
 
-        const groupLayerMap: Map<string, IGroupLayer> = new Map([["root", this]]);
+        layersData.forEach(layerData => {
+            const layer = this.createLayerTree(layerData, this);
+            if (layer) this.pushLayer(layer);
+        });    
+    }
 
-        layersData.forEach((layerData) => {
-            const parentLayer = groupLayerMap.get(layerData.parentId) ?? this;
-            const layer = LayerUtils.createLayeFromData(layerData, parentLayer, this.tilesetRefManager, this.rulesetRefManager);
-            if (layer) {
-                parentLayer.pushLayer(layer)
-                if (layer instanceof GroupLayer) groupLayerMap.set(layer.id, layer);
-            }
-        });
+    private createLayerTree(layerData: LayerData, parentLayer: IGroupLayer): BaseLayer<any> | null {
+        const layer = LayerUtils.createLayerFromData(
+            layerData,
+            parentLayer,
+            this.tilesetRefManager,
+            this.rulesetRefManager
+        );
+    
+        if (!layer) return null;
+    
+        if (layer instanceof GroupLayer) {
+            const children = layerData.type === "group" ? layerData.layers : [];
+    
+            children.forEach(childData => {
+                const child = this.createLayerTree(childData, layer);
+                if (child) layer.pushLayer(child);
+            });
+        }
+    
+        return layer;
     }
 
     public override serialize(): RootLayerData {
-        return this.getAllLayers().map((layer) => layer.serialize());
+        return this.layers.map(layer => layer.serialize());
     }
 
     public getLayers(): BaseLayer<any>[] {

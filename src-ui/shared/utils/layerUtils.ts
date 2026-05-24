@@ -8,19 +8,19 @@ import { RulesetRefManager } from "@/application/resources/references/ruleset-re
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 
 export class LayerUtils {
-    public static createLayeFromData(layerData: LayerData, parent: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager): BaseLayer | null {
-        let layer: BaseLayer<any> | null = null;
+    public static createLayerFromData(layerData: LayerData,parent: IGroupLayer,tilesetRefManager: TilesetRefManager,rulesetRefManager: RulesetRefManager): BaseLayer<any> | null {
         switch (layerData.type) {
             case "tile":
-                layer = new TileLayer(layerData as TileLayerData, parent, tilesetRefManager, rulesetRefManager);
-                break;
+                return new TileLayer(layerData, parent, tilesetRefManager, rulesetRefManager);
+    
             case "auto_rule":
-                layer = new RuleLayer(layerData as RuleLayerData, parent, tilesetRefManager, rulesetRefManager);
-                break;
+                return new RuleLayer(layerData, parent, tilesetRefManager, rulesetRefManager);
+    
             case "group":
-                layer = new GroupLayer(layerData as GroupLayerData, parent, tilesetRefManager, rulesetRefManager);
-                break;
+                return new GroupLayer(layerData, parent, tilesetRefManager, rulesetRefManager);
+    
+            default:
+                return null;
         }
-        return layer;
     }
 }

@@ -99,14 +99,14 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override serialize(): GroupLayerData {
         return {
             id: this.id,
-            parentId: this.parentLayer.id,
             type: "group",
             name: this.name,
             opacity: this.opacity,
             visible: this._visible,
             locked: this._locked,
-            open: this.isOpen
-        }
+            open: this.isOpen,
+            layers: this.layers.map(layer => layer.serialize())
+        };
     }
 
     public override clone(): GroupLayer {

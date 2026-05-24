@@ -20,7 +20,6 @@ type TestTilemapSession = {
 
 const createTileLayerData = (overrides: Partial<TileLayerData> = {}): TileLayerData => ({
     id: "tile-layer",
-    parentId: "root",
     type: "tile",
     name: "Ground",
     x: 0,
@@ -38,7 +37,6 @@ const createTileLayerData = (overrides: Partial<TileLayerData> = {}): TileLayerD
 
 const createRuleLayerData = (overrides: Partial<RuleLayerData> = {}): RuleLayerData => ({
     id: "rule-layer",
-    parentId: "root",
     type: "auto_rule",
     name: "Auto Rules",
     x: 0,

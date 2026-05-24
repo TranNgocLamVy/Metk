@@ -61,7 +61,7 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload = defaultTileLayerData({ parentId: parent.id, width: currentSession.tilemap.width, height: currentSession.tilemap.height });
+        const payload = defaultTileLayerData({ width: currentSession.tilemap.width, height: currentSession.tilemap.height });
 
         const createTileLayerCommand = new CreateTileLayerCommand(payload, parent.id);
 
@@ -84,7 +84,7 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload = defaultRuleLayerData({ parentId: parent.id, width: currentSession.tilemap.width, height: currentSession.tilemap.height });
+        const payload = defaultRuleLayerData({ width: currentSession.tilemap.width, height: currentSession.tilemap.height });
 
         const createRuleLayerCommand = new CreateRuleLayerCommand(payload, parent.id);
 
@@ -107,7 +107,7 @@ export class TilemapLayerService {
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
-        const payload = defaultGroupLayerData({ parentId: parent.id });
+        const payload = defaultGroupLayerData();
 
         const createGroupLayerCommand = new CreateGroupLayerCommand(payload, parent.id);
 

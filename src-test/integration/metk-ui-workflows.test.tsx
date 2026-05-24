@@ -229,6 +229,7 @@ type TestTilemapSession = EventEmitter & {
     isDirty: boolean;
     viewState: { x: number | null; y: number | null; zoom: number };
     layerState: { selectedLayers: string[] };
+    markLayerChange: ReturnType<typeof vi.fn>;
     updateLayerState: (state: Partial<{ selectedLayers: string[] }>) => void;
     updateViewState: (state: Partial<{ x: number | null; y: number | null; zoom: number }>) => void;
 };
@@ -272,33 +273,32 @@ const createTilemapSession = (id: string, tilemapId: string, name: string, isDir
             layers: [
                 {
                     id: `${tilemapId}-group`,
-                    parentId: "root",
                     type: "group",
                     name: `${name} Group`,
                     opacity: 1,
                     open: false,
                     visible: true,
                     locked: false,
-                },
-                {
-                    id: `${tilemapId}-ground`,
-                    parentId: `${tilemapId}-group`,
-                    type: "tile",
-                    name: `${name} Ground`,
-                    x: 0,
-                    y: 0,
-                    width: 8,
-                    height: 8,
-                    opacity: 1,
-                    visible: true,
-                    locked: false,
-                    offsetx: 0,
-                    offsety: 0,
-                    layerData: "",
+                    layers: [
+                        {
+                            id: `${tilemapId}-ground`,
+                            type: "tile",
+                            name: `${name} Ground`,
+                            x: 0,
+                            y: 0,
+                            width: 8,
+                            height: 8,
+                            opacity: 1,
+                            visible: true,
+                            locked: false,
+                            offsetx: 0,
+                            offsety: 0,
+                            layerData: "",
+                        },
+                    ],
                 },
                 {
                     id: `${tilemapId}-collision`,
-                    parentId: "root",
                     type: "tile",
                     name: `${name} Collision`,
                     x: 0,
@@ -325,6 +325,7 @@ const createTilemapSession = (id: string, tilemapId: string, name: string, isDir
     session.isDirty = isDirty;
     session.viewState = { x: null, y: null, zoom: 1 };
     session.layerState = { selectedLayers: [] };
+    session.markLayerChange = vi.fn();
     session.updateLayerState = (state) => {
         session.layerState = { ...session.layerState, ...state };
         session.emit("onSelectedLayersChanged", session.layerState.selectedLayers);

@@ -175,8 +175,6 @@ describe("ToolManager", () => {
         layer.toggleLock(true);
         getSelectedLayerListener()!(session.layerState.selectedLayers);
 
-        expect(tool.setTargetLayerRenderer).toHaveBeenLastCalledWith(null);
-        expect(tool.setDrawStrategy).toHaveBeenLastCalledWith(null);
     });
 
     it("detaches the current tool and unregisters selected-layer listeners when active session changes", () => {

@@ -250,7 +250,6 @@ const createTilemapSession = (options: {
             layers: [
                 {
                     id: "ground",
-                    parentId: "root",
                     type: "tile",
                     name: "Ground",
                     x: 0,
@@ -266,7 +265,6 @@ const createTilemapSession = (options: {
                 },
                 {
                     id: "collision",
-                    parentId: "root",
                     type: "tile",
                     name: "Collision",
                     x: 0,

@@ -205,8 +205,11 @@ describe("BaseLayerRenderer and TilemapRenderer", () => {
 
     it("builds a tilemap renderer tree, traverses nested layers, draws the border, and destroys children", async () => {
         const tilemap = createTilemap([
-            createGroupLayerData({ id: "group-a", name: "Group A" }),
-            createTileLayerData({ id: "tile-a", parentId: "group-a", name: "Nested Tile", layerData: "1:0,0\n0,0" }),
+            createGroupLayerData({
+                id: "group-a",
+                name: "Group A",
+                layers: [createTileLayerData({ id: "tile-a", name: "Nested Tile", layerData: "1:0,0\n0,0" })],
+            }),
             createRuleLayerData({ id: "rule-root", name: "Rule Root", layerData: "0:-1:-1,0\n0,0" }),
         ]);
 

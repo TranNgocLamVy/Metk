@@ -70,17 +70,28 @@ vi.mock("@/application/workspace/workspace-saved-path.manager", () => ({ Workspa
 import { BaseObject } from "@/editor/model/base-object";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { Workspace } from "@/editor/model/workspace/workspace";
+import { NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { defaultWorkspaceData } from "@/shared/schema/workspaceSchema";
 import { Result } from "@/shared/types/result";
 
 class TestBaseObject extends BaseObject {
-    public static properties = new Map<string, any>([
-        ["name", { label: "Name" }],
-        ["opacity", { label: "Opacity" }],
-    ]);
-
+    @StringProperty<TestBaseObject>({
+        label: "Name",
+        get: target => target.name,
+        set: (target, value) => {
+            target.name = value;
+        },
+    })
     public name = "Initial";
+
+    @NumberProperty<TestBaseObject>({
+        label: "Opacity",
+        get: target => target.opacity,
+        set: (target, value) => {
+            target.opacity = value;
+        },
+    })
     public opacity = 1;
 }
 
@@ -105,11 +116,13 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[
 );
 
 describe("BaseObject", () => {
-    it("copies static property metadata and exposes runtime properties", () => {
+    it("initializes decorated property metadata and exposes runtime properties", () => {
         const model = new TestBaseObject(uuidv4());
 
-        expect(model.properties).toEqual(TestBaseObject.properties);
-        expect(model.properties).not.toBe(TestBaseObject.properties);
+        expect(model.properties.get("name")).toMatchObject({ label: "Name" });
+        expect(model.properties.get("opacity")).toMatchObject({ label: "Opacity" });
+        expect(model.properties.get("name")?.target).toBe(model);
+        expect(model.properties.get("opacity")?.target).toBe(model);
         expect(model.getProperty("name")).toBe("Initial");
     });
 

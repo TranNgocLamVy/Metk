@@ -24,7 +24,6 @@ const createTilemap = () => {
         layers: [
             {
                 id: "tile-layer",
-                parentId: "root",
                 type: "tile",
                 name: "Ground",
                 x: 0,

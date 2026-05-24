@@ -244,7 +244,6 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
         return {
             id: this.id,
-            parentId: this.parentLayer.id,
             type: "auto_rule",
             name: this.name,
             x: this.coordinate.col,

@@ -11,7 +11,6 @@ const createTileLayer = (overrides: Partial<TileLayerData> = {}) => {
     const parent = new RootLayer([], context.tilesetRefManager, context.rulesetRefManager);
     const data: TileLayerData = {
         id: "tile-layer",
-        parentId: "root",
         type: "tile",
         name: "Ground",
         x: 0,
@@ -91,7 +90,6 @@ describe("TileLayer", () => {
 
         expect(layer.serialize()).toEqual(expect.objectContaining({
             id: "tile-layer",
-            parentId: "root",
             type: "tile",
             layerData: "0,0\n0,2:1",
         }));

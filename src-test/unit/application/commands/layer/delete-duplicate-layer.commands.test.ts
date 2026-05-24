@@ -81,10 +81,10 @@ describe("DuplicateLayerCommand", () => {
         expect(duplicated.id).not.toBe("tile-a");
         expect(duplicated.name).toBe("Ground (copy)");
         expect(duplicated.serialize()).toMatchObject({
-            parentId: "group-a",
             type: "tile",
             layerData: "1:0,0\n0,0",
         });
+        expect(duplicated.parentLayer.id).toBe("group-a");
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
@@ -103,10 +103,10 @@ describe("DuplicateLayerCommand", () => {
         expect(duplicatedGroup.name).toBe("Group A (copy)");
         expect(root.findLayer("tile-a")?.parentLayer.id).toBe("group-a");
         expect(duplicatedGroup.serialize()).toMatchObject({
-            parentId: "root",
             type: "group",
             name: "Group A (copy)",
         });
+        expect(duplicatedGroup.parentLayer.id).toBe("root");
     });
 
     it("returns an error and leaves the tree unchanged when the target layer is missing", () => {

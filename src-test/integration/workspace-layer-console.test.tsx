@@ -60,6 +60,7 @@ import {
 type TestSession = EventEmitter & {
     tilemap: ReturnType<typeof createTilemap>;
     layerState: { selectedLayers: string[] };
+    markLayerChange: ReturnType<typeof vi.fn>;
     updateLayerState: (state: Partial<{ selectedLayers: string[] }>) => void;
 };
 
@@ -72,13 +73,18 @@ const resetStores = () => {
 
 const createLayerSession = () => {
     const tilemap = createTilemap([
-        createGroupLayerData({ id: "environment", name: "Environment", open: false }),
-        createTileLayerData({ id: "ground", parentId: "environment", name: "Ground", layerData: "0,0\n0,0" }),
+        createGroupLayerData({
+            id: "environment",
+            name: "Environment",
+            open: false,
+            layers: [createTileLayerData({ id: "ground", name: "Ground", layerData: "0,0\n0,0" })],
+        }),
         createTileLayerData({ id: "collision", name: "Collision", layerData: "0,0\n0,0" }),
     ]);
     const session = new EventEmitter() as TestSession;
     session.tilemap = tilemap;
     session.layerState = { selectedLayers: [] };
+    session.markLayerChange = vi.fn();
     session.updateLayerState = (state) => {
         session.layerState = { ...session.layerState, ...state };
         session.emit("onSelectedLayersChanged", session.layerState.selectedLayers);

@@ -10,33 +10,32 @@ const createRootLayer = () => {
         [
             {
                 id: "group-1",
-                parentId: "root",
                 type: "group",
                 name: "Group One",
                 opacity: 0.8,
                 open: true,
                 visible: true,
                 locked: false,
-            },
-            {
-                id: "tile-1",
-                parentId: "group-1",
-                type: "tile",
-                name: "Ground",
-                x: 0,
-                y: 0,
-                width: 2,
-                height: 2,
-                opacity: 1,
-                visible: true,
-                locked: false,
-                offsetx: 0,
-                offsety: 0,
-                layerData: "0,0\n0,0",
+                layers: [
+                    {
+                        id: "tile-1",
+                        type: "tile",
+                        name: "Ground",
+                        x: 0,
+                        y: 0,
+                        width: 2,
+                        height: 2,
+                        opacity: 1,
+                        visible: true,
+                        locked: false,
+                        offsetx: 0,
+                        offsety: 0,
+                        layerData: "0,0\n0,0",
+                    },
+                ],
             },
             {
                 id: "tile-2",
-                parentId: "root",
                 type: "tile",
                 name: "Overlay",
                 x: 0,
@@ -59,13 +58,17 @@ const createRootLayer = () => {
 };
 
 describe("RootLayer", () => {
-    it("builds a layer tree from flat data and traverses it in hierarchy order", () => {
+    it("builds a layer tree from nested data and traverses it in hierarchy order", () => {
         const { rootLayer } = createRootLayer();
 
         expect(Array.from(rootLayer.getAllIds())).toEqual(["group-1", "tile-1", "tile-2"]);
         expect(rootLayer.findLayer("tile-1")?.parentLayer.id).toBe("group-1");
         expect(rootLayer.findLayer("missing-layer")).toBeNull();
-        expect(rootLayer.serialize().map((layer) => layer.id)).toEqual(["group-1", "tile-1", "tile-2"]);
+        expect(rootLayer.serialize().map((layer) => layer.id)).toEqual(["group-1", "tile-2"]);
+        const serializedGroup = rootLayer.serialize()[0];
+        expect(serializedGroup).toMatchObject({ id: "group-1", type: "group" });
+        if (serializedGroup.type !== "group") throw new Error("Expected group-1 to serialize as a group");
+        expect(serializedGroup.layers.map((layer) => layer.id)).toEqual(["tile-1"]);
     });
 
     it("moves direct children within bounds and leaves order unchanged outside bounds", () => {
@@ -88,7 +91,6 @@ describe("RootLayer", () => {
         const insertedLayer = new TileLayer(
             {
                 id: "inserted-tile",
-                parentId: "root",
                 type: "tile",
                 name: "Inserted",
                 x: 0,

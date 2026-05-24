@@ -34,7 +34,6 @@ const createRuleLayer = (overrides: Partial<RuleLayerData> = {}) => {
     const parent = new RootLayer([], context.tilesetRefManager, context.rulesetRefManager);
     const data: RuleLayerData = {
         id: "rule-layer",
-        parentId: "root",
         type: "auto_rule",
         name: "Auto Rules",
         x: 0,
@@ -101,7 +100,6 @@ describe("RuleLayer", () => {
 
         expect(layer.serialize()).toEqual(expect.objectContaining({
             id: "rule-layer",
-            parentId: "root",
             type: "auto_rule",
             layerData: "0:12:0,0,0\n0,0:12:0,0\n0,0,0",
         }));

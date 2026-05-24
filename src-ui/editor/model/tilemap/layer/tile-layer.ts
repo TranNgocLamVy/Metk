@@ -138,7 +138,6 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
 
         return {
             id: this.id,
-            parentId: this.parentLayer.id,
             type: "tile",
             name: this.name,
             x: this.coordinate.col,

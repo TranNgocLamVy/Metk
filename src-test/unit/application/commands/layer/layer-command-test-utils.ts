@@ -13,7 +13,6 @@ import { createReferenceContext } from "../../../editor/editor-test-utils";
 
 export const createTileLayerData = (overrides: Partial<TileLayerData> = {}): TileLayerData => ({
     id: "new-tile",
-    parentId: "root",
     type: "tile",
     name: "New Tile",
     x: 0,
@@ -31,7 +30,6 @@ export const createTileLayerData = (overrides: Partial<TileLayerData> = {}): Til
 
 export const createRuleLayerData = (overrides: Partial<RuleLayerData> = {}): RuleLayerData => ({
     id: "new-rule",
-    parentId: "root",
     type: "auto_rule",
     name: "New Rule",
     x: 0,
@@ -49,20 +47,26 @@ export const createRuleLayerData = (overrides: Partial<RuleLayerData> = {}): Rul
 
 export const createGroupLayerData = (overrides: Partial<GroupLayerData> = {}): GroupLayerData => ({
     id: "new-group",
-    parentId: "root",
     type: "group",
     name: "New Group",
     opacity: 1,
     open: false,
     visible: true,
     locked: false,
+    layers: [],
     ...overrides,
 });
 
 export const createBaseLayers = (): RootLayerData => [
-    createGroupLayerData({ id: "group-a", name: "Group A", open: false }),
-    createGroupLayerData({ id: "group-child", parentId: "group-a", name: "Nested Group", open: false }),
-    createTileLayerData({ id: "tile-a", parentId: "group-a", name: "Ground", layerData: "1:0,0\n0,0" }),
+    createGroupLayerData({
+        id: "group-a",
+        name: "Group A",
+        open: false,
+        layers: [
+            createGroupLayerData({ id: "group-child", name: "Nested Group", open: false, layers: [] }),
+            createTileLayerData({ id: "tile-a", name: "Ground", layerData: "1:0,0\n0,0" }),
+        ],
+    }),
     createGroupLayerData({ id: "group-b", name: "Group B", open: false }),
     createTileLayerData({ id: "tile-root", name: "Root Tile", layerData: "0,2:0\n0,0" }),
     createRuleLayerData({ id: "rule-root", name: "Root Rules", layerData: "0:-1:-1,0\n0,0" }),
