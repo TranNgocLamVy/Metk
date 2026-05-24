@@ -21,12 +21,13 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
 
     constructor(
-        ruleLayerData: RuleLayerData, 
-        parentLayer: IGroupLayer, 
-        tilesetRefManager: TilesetRefManager, 
+        ruleLayerData: RuleLayerData,
+        parentLayer: IGroupLayer,
+        tilesetRefManager: TilesetRefManager,
         rulesetRefManager: RulesetRefManager,
+        objectIdScope: string,
     ) {
-        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager);
+        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
 
         this.parentLayer = parentLayer;
         this.name = ruleLayerData.name;
@@ -262,7 +263,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public override clone(): RuleLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
+        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

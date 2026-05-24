@@ -29,7 +29,7 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
     public async setAndLoadProject(projectId: string) {
         if (this.currentProject) {
             if (this.currentProject.id === projectId) return Result.Success(this.currentProject);
-            await this.currentProject.unload();
+            await this.currentProject.destroy();
             this.currentProject = null;
         }
 
@@ -53,7 +53,7 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
     public async unLoadProject() {
         if (!this.currentProject) return;
         const projectId = this.currentProject.id;
-        await this.currentProject.unload();
+        await this.currentProject.destroy();
         this.currentProject = null;
         this.emit("onProjectUnloaded", projectId);
     }

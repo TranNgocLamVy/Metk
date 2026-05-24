@@ -10,6 +10,7 @@ import { RulesetManager } from "../ruleset/ruleset.manager";
 import { Console } from "@/shared/services/console.service";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TilemapData, TilemapMetadata } from "@/shared/schema/tilemap.schema";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -21,6 +22,7 @@ export class TilemapManager {
         private readonly tilesetManager: TilesetManager,
         private readonly rulesetManager: RulesetManager,
         private readonly projectPathSystem: ProjectPathSystem,
+        private readonly objectRegistry: EditorObjectRegistry,
     ) { }
 
     public addTilemapMetadata(tilemapMetadata: TilemapMetadata): void {
@@ -41,7 +43,7 @@ export class TilemapManager {
         const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
         const newTilemap = new Tilemap(tilemap, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
 
-        await newTilemap.load();
+        this.objectRegistry.registerTree(newTilemap);
 
         this.loadedTilemaps.set(tilemap.id, newTilemap);
 
@@ -52,7 +54,7 @@ export class TilemapManager {
             this.tilesetManager.loadTilesets(tilesetDepIds),
             this.rulesetManager.loadRulesets(rulesetDepIds),
         ])
-        
+
         return Result.Success(newTilemap);
     }
 
@@ -81,11 +83,11 @@ export class TilemapManager {
             Console.error({
                 message: { key: "message.tilemap.loadFail", options: { name: "Unknow", id } },
                 stacks: [{ key: "message.tilemap.metadataNotFound", options: { id } }],
-                actions: [{ 
-                    label: "global.action.tilemap.import", variant: "outline", 
+                actions: [{
+                    label: "global.action.tilemap.import", variant: "outline",
                     onClick: async () => {
                         const { TilemapService } = await import("@/shared/services/tilemap.service");
-                        return await TilemapService.importTilemap(id) 
+                        return await TilemapService.importTilemap(id)
                     }
                 }]
             }, customId);
@@ -101,15 +103,15 @@ export class TilemapManager {
                 message: { key: "message.tilemap.loadFail", options: { name: tilemapMetadata.name, id } },
                 stacks: loadTilemapResult.message ? [loadTilemapResult.message] : [],
                 actions: [
-                    { 
-                        label: "global.action.tilemap.import", variant: "outline", 
+                    {
+                        label: "global.action.tilemap.import", variant: "outline",
                         onClick: async () => {
                             const { TilemapService } = await import("@/shared/services/tilemap.service");
                             return await TilemapService.importTilemap(id);
-                        } 
+                        }
                     },
-                    { 
-                        label: "global.action.tilemap.remove", variant: "destructive", 
+                    {
+                        label: "global.action.tilemap.remove", variant: "destructive",
                         onClick: async () => {
                             const { TilemapService } = await import("@/shared/services/tilemap.service");
                             return await TilemapService.removeTilemap(id);
@@ -130,7 +132,9 @@ export class TilemapManager {
         const tilemap = this.loadedTilemaps.get(tilemapId);
         if (!tilemap) return;
 
-        await tilemap.unload();
+        this.objectRegistry?.unregisterTree(tilemap);
+        tilemap.destroy();
+
         this.loadedTilemaps.delete(tilemapId);
     }
 
@@ -151,7 +155,7 @@ export class TilemapManager {
         }
 
         this.tilemapMetadata.delete(id);
-        Console.log({ message: { key: "message.tilemap.removeSuccess", options: { name: tilemapMetadata.name }}});
+        Console.log({ message: { key: "message.tilemap.removeSuccess", options: { name: tilemapMetadata.name } } });
         return Result.Success();
     }
 
@@ -177,7 +181,7 @@ export class TilemapManager {
         }
 
         this.tilemapMetadata.delete(id);
-        Console.log({ message: { key: "message.tilemap.deleteSuccess", options: { name: tilemapMetadata.name }}});
+        Console.log({ message: { key: "message.tilemap.deleteSuccess", options: { name: tilemapMetadata.name } } });
         return Result.Success();
     }
 
@@ -201,5 +205,15 @@ export class TilemapManager {
             if (!tilemap) return metaData;
             return { name: tilemap.name, id: tilemap.id, tilemapRelPath: tilemap.tilemapPathSystem.relPath };
         });
+    }
+
+    public async destroy(): Promise<void> {
+        for (const tilemap of this.loadedTilemaps.values()) {
+            this.objectRegistry?.unregisterTree(tilemap);
+            tilemap.destroy();
+        }
+    
+        this.loadedTilemaps.clear();
+        this.pendingLoads.clear();
     }
 }

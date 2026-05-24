@@ -1,11 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { GroupLayerData } from "@/shared/schema/layer.schema";
+import { GroupLayerData, LayerData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { LayerUtils } from "@/shared/utils/layer.utils";
+import { BaseObject } from "../../base-object";
 
 interface GroupLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -17,8 +19,14 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public layers: BaseLayer[] = [];
     public isOpen: boolean = false;
 
-    constructor(groupLayerData: GroupLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
-        super(groupLayerData.id, tilesetRefManager, rulesetRefManager);
+    constructor(
+        groupLayerData: GroupLayerData,
+        parentLayer: IGroupLayer,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager,
+        objectIdScope: string
+    ) {
+        super(groupLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
 
         this.parentLayer = parentLayer;
 
@@ -28,6 +36,22 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         this.visible = groupLayerData.visible;
         this.locked = groupLayerData.locked;
         this.isOpen = groupLayerData.open;
+
+        groupLayerData.layers.forEach(layerData => {
+            const layer = this.createLayerTree(layerData, this);
+            if (layer) this.pushLayer(layer);
+        });
+    }
+
+    private createLayerTree(layerData: LayerData, parentLayer: IGroupLayer): BaseLayer<any> | null {
+        const layer = LayerUtils.createLayerFromData(
+            layerData,
+            parentLayer,
+            this.tilesetRefManager,
+            this.rulesetRefManager,
+            this.objectId
+        );
+        return layer;
     }
 
     public getLayers(): BaseLayer<any>[] {
@@ -112,7 +136,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override clone(): GroupLayer {
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
-        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
+        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
     }
 
     public override removeRulesetRef(rulesetIndex: number): void {
@@ -121,5 +145,14 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
 
     public override removeTilesetRef(tilesetIndex: number): void {
         this.layers.forEach((layer) => layer.removeTilesetRef(tilesetIndex));
+    }
+
+    public override getObjectChildren(): BaseObject<any>[] {
+        return this.layers;
+    }
+
+    public override destroy(): void {
+        this.layers.forEach((layer) => layer.destroy());
+        super.destroy();
     }
 }

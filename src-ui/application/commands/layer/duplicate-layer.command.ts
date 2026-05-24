@@ -22,6 +22,9 @@ export class DuplicateLayerCommand implements IBaseCommand {
 
         const duplicateLayer = targetLayer.duplicate();
         if (!duplicateLayer) return Result.Error("Failed to duplicate layer");
+
+        editorFacade.objectRegistry?.registerTree(duplicateLayer);
+
         this.newLayerId = duplicateLayer.id;
         const cloneLayerName = `${targetLayer.name} (copy)`
         duplicateLayer.rename(cloneLayerName);
@@ -39,6 +42,9 @@ export class DuplicateLayerCommand implements IBaseCommand {
         const targetLayer = root.findLayer(this.newLayerId);
         if (!targetLayer) return Result.Error("Target layer not found");
         targetLayer.removeFromParent();
+
+        editorFacade.objectRegistry?.unregisterTree(targetLayer);
+        targetLayer.destroy();
 
         currentSession.markLayerChange();
 

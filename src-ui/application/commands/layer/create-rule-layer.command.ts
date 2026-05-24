@@ -26,9 +26,10 @@ export class CreateRuleLayerCommand implements IBaseCommand {
         const targetLayer = root.findLayer(this.parentLayerId);
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
 
-        const newRuleLayer = new RuleLayer(this.ruleLayerData, parent, parent.tilesetRefManager, tilemap.rulesetRefManager);
+        const newRuleLayer = new RuleLayer(this.ruleLayerData, parent, parent.tilesetRefManager, tilemap.rulesetRefManager, parent.objectIdScope);
         parent.addLayer(newRuleLayer);
-        
+        editorFacade.objectRegistry?.registerTree(newRuleLayer);
+
         if (parent instanceof GroupLayer) parent.toggleOpen(true);
 
         this.ruleLayerId = newRuleLayer.id;
@@ -46,8 +47,11 @@ export class CreateRuleLayerCommand implements IBaseCommand {
         ruleLayer.removeFromParent();
         this.ruleLayerData = ruleLayer.serialize();
 
+        editorFacade.objectRegistry?.unregisterTree(ruleLayer);
+        ruleLayer.destroy();
+
         currentSession.markLayerChange();
-        
+
         return Result.Success();
     }
 

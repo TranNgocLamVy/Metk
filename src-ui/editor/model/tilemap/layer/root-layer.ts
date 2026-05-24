@@ -1,11 +1,12 @@
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { LayerData, RootLayerData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
-import { LayerUtils } from "@/shared/utils/layerUtils";
+import { LayerUtils } from "@/shared/utils/layer.utils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { GroupLayer } from "./group-layer";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { BaseObject } from "../../base-object";
 
 interface RootLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -16,13 +17,18 @@ interface RootLayerEvents extends BaseLayerEvents {
 export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer {
     public layers: BaseLayer[] = [];
 
-    constructor(layersData: RootLayerData, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
-        super("root", tilesetRefManager, rulesetRefManager);
+    constructor(
+        layersData: RootLayerData, 
+        tilesetRefManager: TilesetRefManager, 
+        rulesetRefManager: RulesetRefManager,
+        objectIdScope: string
+    ) {
+        super("root", tilesetRefManager, rulesetRefManager, objectIdScope);
 
         layersData.forEach(layerData => {
             const layer = this.createLayerTree(layerData, this);
             if (layer) this.pushLayer(layer);
-        });    
+        });
     }
 
     private createLayerTree(layerData: LayerData, parentLayer: IGroupLayer): BaseLayer<any> | null {
@@ -30,25 +36,10 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
             layerData,
             parentLayer,
             this.tilesetRefManager,
-            this.rulesetRefManager
+            this.rulesetRefManager,
+            this.objectId
         );
-    
-        if (!layer) return null;
-    
-        if (layer instanceof GroupLayer) {
-            const children = layerData.type === "group" ? layerData.layers : [];
-    
-            children.forEach(childData => {
-                const child = this.createLayerTree(childData, layer);
-                if (child) layer.pushLayer(child);
-            });
-        }
-    
         return layer;
-    }
-
-    public override serialize(): RootLayerData {
-        return this.layers.map(layer => layer.serialize());
     }
 
     public getLayers(): BaseLayer<any>[] {
@@ -143,5 +134,18 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
 
     public override removeTilesetRef(tilesetIndex: number): void {
         this.layers.forEach((layer) => layer.removeTilesetRef(tilesetIndex));
+    }
+
+    public override serialize(): RootLayerData {
+        return this.layers.map(layer => layer.serialize());
+    }
+
+    public override getObjectChildren(): BaseObject<any>[] {
+        return this.layers;
+    }
+    
+    public override destroy(): void {
+        this.layers.forEach((layer) => layer.destroy());
+        super.destroy();
     }
 }

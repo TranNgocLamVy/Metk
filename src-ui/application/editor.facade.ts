@@ -1,6 +1,7 @@
 import { WorkspaceManager } from "@/application/workspace/workspace.manager";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 import { TilesetSession } from "@/editor/session/tileset.session";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 import { TilesetView } from "@/graphics/view/tileset.view";
@@ -24,6 +25,10 @@ export class EditorFacade {
 
     public get currentWorkspace(): Workspace | null {
         return this.workspaceManager.currentWorkspace;
+    }
+
+    public get objectRegistry(): EditorObjectRegistry | null {
+        return this.currentProject?.objectRegistry ?? null;
     }
 
     public getActiveTilemapSession(): TilemapSession | null {

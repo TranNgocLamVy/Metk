@@ -6,6 +6,7 @@ import { TilesetStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
 import { TilesetData, TilesetMetadata } from "@/shared/schema/tileset.schema";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -15,6 +16,7 @@ export class TilesetManager {
 
     public constructor(
         private readonly projectPathSystem: ProjectPathSystem,
+        private readonly objectRegistry: EditorObjectRegistry,
     ) { }
 
     public addTilesetMetadata(tilesetMetadata: TilesetMetadata): void {
@@ -30,9 +32,9 @@ export class TilesetManager {
         }
         this.tilesetMetadata.set(tileset.id, tilesetMetadata);
         const tilesetPathSystem = new FilePathSystem(tileset.id, this.projectPathSystem, tilesetRelPath);
-        const newTileset = new Tileset(tileset, tilesetPathSystem);
+        const newTileset = new Tileset(tileset, tilesetPathSystem, this.objectRegistry);
 
-        await newTileset.load();
+        this.objectRegistry.registerTree(newTileset);
 
         this.loadedTilesets.set(tileset.id, newTileset);
 
@@ -42,11 +44,11 @@ export class TilesetManager {
     public loadTilesetsMetadata(tilesetsMetadata: TilesetMetadata[]): void {
         tilesetsMetadata.forEach((meta) => this.tilesetMetadata.set(meta.id, meta));
     }
-    
+
     public async loadTilesets(ids: string[]): Promise<Result<Tileset>[]> {
         return await Promise.all(ids.map(id => this.loadTileset(id)));
     }
-    
+
     public async loadTileset(id: string): Promise<Result<Tileset>> {
         if (this.loadedTilesets.has(id)) return Result.Success(this.loadedTilesets.get(id)!);
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;
@@ -113,7 +115,8 @@ export class TilesetManager {
     public async unloadTileset(id: string): Promise<void> {
         const tileset = this.loadedTilesets.get(id);
         if (!tileset) return;
-        await tileset.unload();
+        this.objectRegistry?.unregisterTree(tileset);
+        tileset.destroy();
         this.loadedTilesets.delete(id);
     }
 
@@ -189,5 +192,15 @@ export class TilesetManager {
             if (!tileset) return tilesetMetadata;
             return { name: tileset.name, id: tileset.id, tilesetRelPath: tileset.tilesetPathSystem.relPath };
         });
+    }
+
+    public async destroy(): Promise<void> {
+        for (const tileset of this.loadedTilesets.values()) {
+            this.objectRegistry.unregisterTree(tileset);
+            tileset.destroy();
+        }
+
+        this.loadedTilesets.clear();
+        this.pendingLoads.clear();
     }
 }

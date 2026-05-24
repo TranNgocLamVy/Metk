@@ -69,8 +69,13 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     public parentLayer: IGroupLayer;
 
-    constructor(id: string, public readonly tilesetRefManager: TilesetRefManager, public readonly rulesetRefManager: RulesetRefManager) {
-        super(`layer:${id}`);
+    constructor(
+        id: string, 
+        public readonly tilesetRefManager: TilesetRefManager, 
+        public readonly rulesetRefManager: RulesetRefManager,
+        public readonly objectIdScope: string,
+    ) {
+        super(`${objectIdScope}:layer:${id}`);
         this.id = id;
     }
 
@@ -147,6 +152,8 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
 export interface IGroupLayer {
     id: string;
+    objectId: string;
+    objectIdScope: string;
     parentLayer: IGroupLayer | null;
     tilesetRefManager: TilesetRefManager;
     rulesetRefManager: RulesetRefManager;

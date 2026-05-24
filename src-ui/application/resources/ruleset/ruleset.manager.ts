@@ -9,6 +9,7 @@ import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
 import EventEmitter from "eventemitter3";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 export interface RulesetManagerEvent {
     onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
@@ -24,6 +25,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
     public constructor(
         private readonly tilesetManager: TilesetManager,
         private readonly projectPathSystem: ProjectPathSystem,
+        private readonly objectRegistry: EditorObjectRegistry,
     ) {
         super();
     }
@@ -46,7 +48,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
         const newRuleset = new Ruleset(ruleset, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
 
-        await newRuleset.load();
+        this.objectRegistry.registerTree(newRuleset);
 
         this.loadedRulesets.set(ruleset.id, newRuleset);
 
@@ -77,7 +79,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         const loadPromise = this.performRulesetLoad(id);
         this.pendingLoads.set(id, loadPromise);
 
-        try {   
+        try {
             return await loadPromise;
         } finally {
             this.pendingLoads.delete(id);
@@ -136,7 +138,8 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
     public async unloadRuleset(id: string): Promise<void> {
         const ruleset = this.loadedRulesets.get(id);
         if (!ruleset) return;
-        await ruleset.unload();
+        this.objectRegistry.unregisterTree(ruleset);
+        ruleset.destroy();
         this.loadedRulesets.delete(id);
     }
 
@@ -162,10 +165,32 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
     public updateRuleset(rulesetData: RulesetData): void {
         const ruleset = this.loadedRulesets.get(rulesetData.id);
         if (!ruleset) return;
+    
+        const previousObjectIds = new Set(
+            ruleset.getObjectChildren().map((object) => object.objectId)
+        );
+    
         ruleset.updateRuleset(rulesetData);
+    
+        const currentObjects = ruleset.getObjectChildren();
+        const currentObjectIds = new Set(
+            currentObjects.map((object) => object.objectId)
+        );
+    
+        previousObjectIds.forEach((objectId) => {
+            if (!currentObjectIds.has(objectId)) {
+                this.objectRegistry?.unregister(objectId);
+            }
+        });
+    
+        currentObjects.forEach((object) => {
+            this.objectRegistry?.registerTree(object);
+        });
+    
         this.emit("onRulesetManagerUpdated", this.serialize());
         this.emit("onRulesetUpdated", rulesetData.id);
-        Console.success({ message: { key: "message.ruleset.updatedSuccess", options: { name: rulesetData.name } } })
+    
+        Console.success({message: { key: "message.ruleset.updatedSuccess", options: { name: rulesetData.name }}});
     }
 
     public async removeRuleset(id: string): Promise<Result> {
@@ -212,7 +237,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         Console.log({ message: { key: "message.ruleset.deleteSuccess", options: { name: rulesetMetadata.name } } });
 
         this.emit("onRulesetManagerUpdated", this.serialize());
-        
+
         return Result.Success();
     }
 
@@ -246,5 +271,16 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
             if (!rulesets) return metaData;
             return { id: rulesets.id, name: rulesets.name, color: rulesets.color, rulesetRelPath: rulesets.rulesetPathSystem.relPath };
         });
+    }
+
+    public async destroy(): Promise<void> {
+        for (const ruleset of this.loadedRulesets.values()) {
+            this.objectRegistry?.unregisterTree(ruleset);
+            ruleset.destroy();
+        }
+    
+        this.loadedRulesets.clear();
+        this.pendingLoads.clear();
+        this.removeAllListeners();
     }
 }

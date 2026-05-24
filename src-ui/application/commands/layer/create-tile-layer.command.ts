@@ -24,8 +24,9 @@ export class CreateTileLayerCommand implements IBaseCommand {
         const targetLayer = root.findLayer(this.parentLayerId);
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
 
-        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager, parent.rulesetRefManager);
+        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, parent.objectIdScope);
         parent.addLayer(newTileLayer);
+        editorFacade.objectRegistry?.registerTree(newTileLayer);
         
         if (parent instanceof GroupLayer) parent.toggleOpen(true);
 
@@ -42,7 +43,11 @@ export class CreateTileLayerCommand implements IBaseCommand {
         const root = currentSession.tilemap.rootLayer;
         const tileLayer = root.findLayer(this.tileLayerId) as TileLayer;
         tileLayer.removeFromParent();
+
         this.tileLayerData = tileLayer.serialize();
+
+        editorFacade.objectRegistry?.unregisterTree(tileLayer);
+        tileLayer.destroy();
 
         currentSession.markLayerChange();
         

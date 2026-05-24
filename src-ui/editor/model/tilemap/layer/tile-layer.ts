@@ -25,9 +25,14 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public offset: Point = new Point(0, 0);
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
-
-    constructor(tileLayerData: TileLayerData, parentLayer: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager) {
-        super(tileLayerData.id, tilesetRefManager, rulesetRefManager);
+    constructor(
+        tileLayerData: TileLayerData,
+        parentLayer: IGroupLayer,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager,
+        objectIdScope: string
+    ) {
+        super(tileLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
 
         this.parentLayer = parentLayer;
 
@@ -156,7 +161,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override clone(): TileLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager);
+        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

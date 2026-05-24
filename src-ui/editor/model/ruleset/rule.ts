@@ -17,9 +17,10 @@ export class Rule extends BaseObject<RuleEvent> {
         data: RuleData,
         private readonly size: number,
         public readonly tilesetRefManager: TilesetRefManager,
-        public readonly rulesetRefManager: RulesetRefManager
+        public readonly rulesetRefManager: RulesetRefManager,
+        objectIdScope: string,
     ) {
-        super(`rule:${data.id}`);
+        super(`${objectIdScope}:rule:${data.id}`);
         this.id = data.id;
         this.constraints = this.processConstraints(data.constraints);
         this.outputs = this.processOutputs(data.outputs);

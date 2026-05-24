@@ -2,6 +2,7 @@ import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager"
 import { TilemapManager } from "@/application/resources/tilemap/tilemap.manager";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { ProjectData, ProjectMetadata } from "@/shared/schema/project.schema";
 
 
@@ -24,7 +25,8 @@ export class Project {
             directory: this.projectPathSystem.absDir,
         }
     }
-    
+
+    public objectRegistry: EditorObjectRegistry;
     public tilesetManager: TilesetManager;
     public tilemapManager: TilemapManager;
     public rulesetManager: RulesetManager;
@@ -37,9 +39,25 @@ export class Project {
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
 
-        this.tilesetManager = new TilesetManager(this.projectPathSystem);
-        this.rulesetManager = new RulesetManager(this.tilesetManager, this.projectPathSystem);
-        this.tilemapManager = new TilemapManager(this.tilesetManager, this.rulesetManager, this.projectPathSystem);
+        this.objectRegistry = new EditorObjectRegistry();
+
+        this.tilesetManager = new TilesetManager(
+            this.projectPathSystem,
+            this.objectRegistry
+        );
+
+        this.rulesetManager = new RulesetManager(
+            this.tilesetManager,
+            this.projectPathSystem,
+            this.objectRegistry
+        );
+
+        this.tilemapManager = new TilemapManager(
+            this.tilesetManager,
+            this.rulesetManager,
+            this.projectPathSystem,
+            this.objectRegistry
+        );
     }
 
     public async load() {
@@ -48,11 +66,7 @@ export class Project {
         this.rulesetManager.loadRulesetMetadata(this.data.rulesets);
 
         // Default to load all ruleset since ruleset is light and fast to load, and most of the time user will need them all. Can optimize later if needed.
-        await this.rulesetManager.loadRulesets(this.data.rulesets.map(ruleset => ruleset.id)); 
-    }
-
-    public async unload() {
-        
+        await this.rulesetManager.loadRulesets(this.data.rulesets.map(ruleset => ruleset.id));
     }
 
     public serialize(): ProjectData {
@@ -67,5 +81,13 @@ export class Project {
             tilesets: this.tilesetManager.serialize(),
             rulesets: this.rulesetManager.serialize(),
         };
+    }
+
+    public async destroy() {
+        await this.tilemapManager.destroy();
+        await this.rulesetManager.destroy();
+        await this.tilesetManager.destroy();
+        
+        this.objectRegistry.clear();
     }
 }

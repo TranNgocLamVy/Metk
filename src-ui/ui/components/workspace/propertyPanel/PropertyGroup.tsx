@@ -14,7 +14,7 @@ export function PropertyGroup({ group, groupIndex }: PropertyGroupProps) {
             </header>
             <div className="flex flex-col">
                 {group.properties.map((property, index) => (
-                    <div className={`${(groupIndex + index) % 2 == 0 ? "bg-surface-base" : "bg-surface-sunken/40"} border-b border-foreground/20`}>
+                    <div key={groupIndex + index} className={`${(groupIndex + index) % 2 == 0 ? "bg-surface-base" : "bg-surface-sunken/40"} border-b border-foreground/20`}>
                         <PropertyRow key={property[1].id} property={property[1]} />
                     </div>
                 ))}

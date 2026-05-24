@@ -2,6 +2,7 @@ import { BaseObject, BaseObjectEvents } from "@/editor/model/base-object";
 import { TileData, TilesetData } from "@/shared/schema/tileset.schema";
 import { Result } from "@/shared/types/result";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 
 interface TilesetEvent extends BaseObjectEvents {
@@ -23,7 +24,11 @@ export class Tileset extends BaseObject<TilesetEvent> {
         height: number;
     };
 
-    constructor(tilesetData: TilesetData, public readonly tilesetPathSystem: FilePathSystem) {
+    constructor(
+        tilesetData: TilesetData, 
+        public readonly tilesetPathSystem: FilePathSystem, 
+        private readonly objectRegistry: EditorObjectRegistry
+    ) {
         super(`tileset:${tilesetData.id}`);
         this.id = tilesetData.id;
         this.name = tilesetData.name;
@@ -36,30 +41,21 @@ export class Tileset extends BaseObject<TilesetEvent> {
         const numberOfTiles = this.columns * this.rows;
         if (tilesetData.tiles.length > 0) {
             this.tiles = tilesetData.tiles.map(tileData => {
-                return new Tile(tileData, this);
+                const tile = new Tile(tileData, this);
+                this.objectRegistry.register(tile);
+                return tile;
             });
         } else {
             this.tiles = Array.from({ length: numberOfTiles }, (_, index) => {
-                return new Tile({ id: index }, this);
+                const tile = new Tile({ id: index }, this);
+                this.objectRegistry.register(tile);
+                return tile;
             });
         }
     }
-    
-    public async load(): Promise<void> { }
 
-    public async unload(): Promise<void> { }
-
-    public serialize(): TilesetData {
-        return {
-            id: this.id,
-            name: this.name,
-            columns: this.columns,
-            rows: this.rows,
-            tilewidth: this.tilewidth,
-            tileheight: this.tileheight,
-            image: this.image,
-            tiles: this.tiles.map(tile => tile.serialize()),
-        }
+    public override getObjectChildren(): BaseObject<any>[] {
+        return this.tiles;
     }
 
     public getName(): string {
@@ -99,7 +95,9 @@ export class Tileset extends BaseObject<TilesetEvent> {
         const expectedTileCount = this.columns * this.rows;
         if (this.tiles.length === 0 && expectedTileCount > 0) {
             this.tiles = Array.from({ length: expectedTileCount }, (_, index) => {
-                return new Tile({ id: index }, this);
+                const tile = new Tile({ id: index }, this);
+                this.objectRegistry.register(tile);
+                return tile;
             });
         }
     }
@@ -108,6 +106,24 @@ export class Tileset extends BaseObject<TilesetEvent> {
         this.image.source = textureRelPath;
         this.eventEmitter.emit("updateProperty", "image", this.image);
     }
+
+    public serialize(): TilesetData {
+        return {
+            id: this.id,
+            name: this.name,
+            columns: this.columns,
+            rows: this.rows,
+            tilewidth: this.tilewidth,
+            tileheight: this.tileheight,
+            image: this.image,
+            tiles: this.tiles.map(tile => tile.serialize()),
+        }
+    }
+
+    public override destroy(): void {
+        this.tiles.forEach((tile) => tile.destroy());
+        super.destroy();
+    }
 }
 
 export class Tile extends BaseObject {
@@ -115,7 +131,7 @@ export class Tile extends BaseObject {
     public tileset: Tileset;
 
     constructor(tileData: TileData, tileset: Tileset) {
-        super(`tile:${tileset.id}:${tileData.id}`);
+        super(`${tileset.objectId}:tile:${tileData.id}`);
         this.id = tileData.id;
         this.tileset = tileset;
     }

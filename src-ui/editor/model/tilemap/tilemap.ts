@@ -91,7 +91,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilesetRefManager.loadData(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
         this.rulesetRefManager.loadData(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
 
-        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager);
+        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager, this.objectId);
     }
 
     public rename(newName: string) {
@@ -115,14 +115,6 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         }
     }
 
-    public async load(): Promise<void> {
-
-    }
-
-    public async unload(): Promise<void> {
-        this.eventEmitter.removeAllListeners();
-    }
-
     public removeRulesetRef(ruleset: string | number): boolean {
         const rulesetIndex = this.rulesetRefManager.removeRulesetRef(ruleset);
         if (rulesetIndex === -1) return false;
@@ -141,5 +133,14 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         if (coordinate.col < 0 || coordinate.col >= this.width) return false;
         if (coordinate.row < 0 || coordinate.row >= this.height) return false;
         return true;
+    }
+
+    public override getObjectChildren(): BaseObject<any>[] {
+        return [this.rootLayer];
+    }
+    
+    public override destroy(): void {
+        this.rootLayer.destroy();
+        super.destroy();
     }
 }
