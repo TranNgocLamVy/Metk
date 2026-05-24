@@ -107,12 +107,12 @@ describe("ProjectManager", () => {
         });
         await manager.setAndLoadProject("project-a");
         const firstProject = manager.currentProject!;
-        const unload = vi.spyOn(firstProject, "unload");
+        const destroy = vi.spyOn(firstProject, "destroy");
 
         const result = await manager.setAndLoadProject("project-b");
 
         expect(result.status).toBe(Result.Status.Success);
-        expect(unload).toHaveBeenCalledTimes(1);
+        expect(destroy).toHaveBeenCalledTimes(1);
         expect(manager.currentProject?.id).toBe("project-b");
     });
 
@@ -149,11 +149,11 @@ describe("ProjectManager", () => {
         manager.load([createProjectMetadata("project-a")]);
         await manager.setAndLoadProject("project-a");
         const project = manager.currentProject!;
-        const unload = vi.spyOn(project, "unload");
+        const destroy = vi.spyOn(project, "destroy");
 
         await manager.unLoadProject();
 
-        expect(unload).toHaveBeenCalledTimes(1);
+        expect(destroy).toHaveBeenCalledTimes(1);
         expect(manager.currentProject).toBeNull();
         expect(unloaded).toHaveBeenCalledWith("project-a");
     });

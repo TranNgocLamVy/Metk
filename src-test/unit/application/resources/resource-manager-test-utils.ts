@@ -1,3 +1,4 @@
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { ProjectData, ProjectMetadata } from "@/shared/schema/project.schema";
 import { RulesetData, RulesetMetadata } from "@/shared/schema/ruleset.schema";
@@ -5,6 +6,8 @@ import { TilemapData, TilemapMetadata } from "@/shared/schema/tilemap.schema";
 import { TilesetData, TilesetMetadata } from "@/shared/schema/tileset.schema";
 
 export const createProjectPathSystem = () => new ProjectPathSystem("C:/Project/Metk/test-project");
+
+export const createObjectRegistry = () => new EditorObjectRegistry();
 
 export const createTilesetData = (id = "tileset-a", overrides: Partial<TilesetData> = {}): TilesetData => ({
     id,

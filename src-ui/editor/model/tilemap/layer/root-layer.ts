@@ -21,7 +21,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         layersData: RootLayerData, 
         tilesetRefManager: TilesetRefManager, 
         rulesetRefManager: RulesetRefManager,
-        objectIdScope: string
+        objectIdScope: string = "tilemap:unknown"
     ) {
         super("root", tilesetRefManager, rulesetRefManager, objectIdScope);
 
@@ -37,7 +37,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
             parentLayer,
             this.tilesetRefManager,
             this.rulesetRefManager,
-            this.objectId
+            this.objectIdScope
         );
         return layer;
     }

@@ -10,6 +10,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { RulesetSessionManager } from "@/application/workspace/session/ruleset-session.manager";
 import { ToolSessionManager } from "@/application/workspace/session/tool-session.manager";
+import { WorkspacePropertyPanelManager } from "@/application/workspace/workspace-property-panel.manager";
 
 export class Workspace {
     public tilesetSessionManager: TilesetSessionManager;
@@ -17,7 +18,7 @@ export class Workspace {
     public rulesetSessionManager: RulesetSessionManager;
     public toolSessionManager: ToolSessionManager;
     public savedPathManager: WorkspaceSavedPathManager;
-
+    public propertyPanelManager: WorkspacePropertyPanelManager;
     constructor (
         workspaceData: WorkpsaceData, 
         private readonly tilesetManager: TilesetManager, 
@@ -30,6 +31,7 @@ export class Workspace {
         this.rulesetSessionManager = new RulesetSessionManager(workspaceData.ruleset, this.editorFacade);
         this.toolSessionManager = new ToolSessionManager(workspaceData.toolState, this.editorFacade);
         this.savedPathManager = new WorkspaceSavedPathManager(workspaceData.savedPath, this.projectPathSystem);
+        this.propertyPanelManager = new WorkspacePropertyPanelManager(workspaceData.propertyPanel, this.editorFacade);
     }
 
     public async loadSession(): Promise<Result> {
@@ -52,6 +54,7 @@ export class Workspace {
             ruleset: this.rulesetSessionManager.serialize(),
             toolState: this.toolSessionManager.serialize(),
             savedPath: this.savedPathManager.serialize(),
+            propertyPanel: this.propertyPanelManager.serialize(),
         }
     }
 }

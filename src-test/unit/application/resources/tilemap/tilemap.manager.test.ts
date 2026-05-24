@@ -19,11 +19,13 @@ vi.mock("@/shared/services/console.service", () => ({
 }));
 
 import { TilemapManager } from "@/application/resources/tilemap/tilemap.manager";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilemapStorageService } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 
 import {
     createDeferred,
+    createObjectRegistry,
     createProjectPathSystem,
     createTilemapData,
     createTilemapMetadata,
@@ -48,7 +50,7 @@ describe("TilemapManager", () => {
 
     it("adds a tilemap, stores metadata, caches the loaded model, and loads dependencies", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         const tilemapData = createTilemapData("tilemap-a", {
             name: "Overworld",
             tilesets: { refs: [{ id: "tileset-a", index: 0, name: "Tileset A" }], nextIndex: 1 },
@@ -67,9 +69,66 @@ describe("TilemapManager", () => {
         }]);
     });
 
+    it("registers loaded tilemaps with their root and child layers, then unregisters them on unload", async () => {
+        const deps = createDependencyManagers();
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), objectRegistry);
+        const tilemapData = createTilemapData("tilemap-a", {
+            layers: [
+                {
+                    id: "group-a",
+                    type: "group",
+                    name: "Group A",
+                    opacity: 1,
+                    open: true,
+                    visible: true,
+                    locked: false,
+                    layers: [
+                        {
+                            id: "tile-a",
+                            type: "tile",
+                            name: "Tile A",
+                            x: 0,
+                            y: 0,
+                            width: 1,
+                            height: 1,
+                            opacity: 1,
+                            visible: true,
+                            locked: false,
+                            offsetx: 0,
+                            offsety: 0,
+                            layerData: "0",
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const result = await manager.addTilemap(tilemapData, "C:/Project/Metk/test-project/maps/overworld.json");
+        const tilemap = result.data!;
+        const group = tilemap.rootLayer.findLayer("group-a")!;
+        const child = tilemap.rootLayer.findLayer("tile-a")!;
+
+        expect(objectRegistry.has(tilemap.objectId)).toBe(true);
+        expect(objectRegistry.has("tilemap:tilemap-a:layer:root")).toBe(true);
+        expect(group.objectId).toBe("tilemap:tilemap-a:layer:group-a");
+        expect(child.objectId).toBe("tilemap:tilemap-a:layer:tile-a");
+        expect(objectRegistry.has(group.objectId)).toBe(true);
+        expect(objectRegistry.has(child.objectId)).toBe(true);
+
+        await manager.unloadTilemap("tilemap-a");
+
+        expect(objectRegistry.has(tilemap.objectId)).toBe(false);
+        expect(objectRegistry.has(group.objectId)).toBe(false);
+        expect(objectRegistry.has(child.objectId)).toBe(false);
+        expect(tilemap.destroyed).toBe(true);
+        expect(group.destroyed).toBe(true);
+        expect(child.destroyed).toBe(true);
+    });
+
     it("loads a tilemap from storage and then serves cache hits without reading storage again", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addTilemapMetadata(createTilemapMetadata("tilemap-a"));
         (TilemapStorageService.load as any).mockResolvedValue(Result.Success(createTilemapData("tilemap-a")));
 
@@ -85,7 +144,7 @@ describe("TilemapManager", () => {
 
     it("deduplicates concurrent pending loads for the same tilemap", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         const deferred = createDeferred<any>();
         manager.addTilemapMetadata(createTilemapMetadata("tilemap-a"));
         (TilemapStorageService.load as any).mockReturnValue(deferred.promise);
@@ -103,7 +162,7 @@ describe("TilemapManager", () => {
 
     it("returns metadata-not-found when loading an unknown tilemap", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
 
         const result = await manager.loadTilemap("missing-tilemap");
 
@@ -116,7 +175,7 @@ describe("TilemapManager", () => {
 
     it("returns the storage error when storage loading fails", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addTilemapMetadata(createTilemapMetadata("tilemap-a"));
         (TilemapStorageService.load as any).mockResolvedValue(Result.Error("storage failed"));
 
@@ -130,7 +189,7 @@ describe("TilemapManager", () => {
 
     it("saves a loaded tilemap and errors when the tilemap is not loaded", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         const addResult = await manager.addTilemap(createTilemapData("tilemap-a"), "C:/Project/Metk/test-project/tilemaps/tilemap-a.json");
         addResult.data!.name = "Saved Map";
 
@@ -148,21 +207,21 @@ describe("TilemapManager", () => {
 
     it("removes metadata and unloads a cached tilemap without deleting storage", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         const addResult = await manager.addTilemap(createTilemapData("tilemap-a"), "C:/Project/Metk/test-project/tilemaps/tilemap-a.json");
-        const unload = vi.spyOn(addResult.data!, "unload");
+        const destroy = vi.spyOn(addResult.data!, "destroy");
 
         const result = await manager.removeTilemapMetadata("tilemap-a");
 
         expect(result.status).toBe(Result.Status.Success);
-        expect(unload).toHaveBeenCalledTimes(1);
+        expect(destroy).toHaveBeenCalledTimes(1);
         expect(manager.serialize()).toEqual([]);
         expect(TilemapStorageService.remove).not.toHaveBeenCalled();
     });
 
     it("deletes metadata and storage for an unloaded tilemap", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addTilemapMetadata(createTilemapMetadata("tilemap-a"));
 
         const result = await manager.deleteTilemap("tilemap-a");
@@ -174,7 +233,7 @@ describe("TilemapManager", () => {
 
     it("keeps metadata when storage deletion fails", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addTilemapMetadata(createTilemapMetadata("tilemap-a"));
         (TilemapStorageService.remove as any).mockResolvedValue(Result.Error("delete failed"));
 
@@ -189,7 +248,7 @@ describe("TilemapManager", () => {
 
     it("serializes loaded tilemaps with current model names and unloaded tilemaps from metadata", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addTilemapMetadata(createTilemapMetadata("tilemap-b", { name: "Metadata B" }));
         const addResult = await manager.addTilemap(createTilemapData("tilemap-a"), "C:/Project/Metk/test-project/tilemaps/tilemap-a.json");
         addResult.data!.name = "Loaded Name";
@@ -202,7 +261,7 @@ describe("TilemapManager", () => {
 
     it("saves only loaded tilemaps affected by removed tileset references", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         await manager.addTilemap(createTilemapData("affected-map", {
             tilesets: { refs: [{ id: "tileset-a", index: 0, name: "Tileset A" }], nextIndex: 1 },
         }), "C:/Project/Metk/test-project/tilemaps/affected-map.json");
@@ -222,7 +281,7 @@ describe("TilemapManager", () => {
 
     it("saves only loaded tilemaps affected by removed ruleset references", async () => {
         const deps = createDependencyManagers();
-        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem());
+        const manager = new TilemapManager(deps.tilesetManager as any, deps.rulesetManager as any, createProjectPathSystem(), createObjectRegistry());
         await manager.addTilemap(createTilemapData("affected-map", {
             rulesets: { refs: [{ id: "ruleset-a", index: 0, name: "Ruleset A" }], nextIndex: 1 },
         }), "C:/Project/Metk/test-project/tilemaps/affected-map.json");

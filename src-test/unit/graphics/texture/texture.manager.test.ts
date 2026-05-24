@@ -56,6 +56,7 @@ vi.mock("@/shared/services/console.service", () => ({ Console: textureMocks.cons
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TextureManager } from "@/graphics/texture/texture.manager";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Result } from "@/shared/types/result";
 
 const createTileset = (id = "terrain") => {
@@ -73,6 +74,7 @@ const createTileset = (id = "terrain") => {
             tiles: [],
         },
         tilesetPathSystem,
+        new EditorObjectRegistry(),
     );
 };
 

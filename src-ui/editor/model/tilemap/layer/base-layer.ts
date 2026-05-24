@@ -73,7 +73,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         id: string, 
         public readonly tilesetRefManager: TilesetRefManager, 
         public readonly rulesetRefManager: RulesetRefManager,
-        public readonly objectIdScope: string,
+        public readonly objectIdScope: string = "object",
     ) {
         super(`${objectIdScope}:layer:${id}`);
         this.id = id;

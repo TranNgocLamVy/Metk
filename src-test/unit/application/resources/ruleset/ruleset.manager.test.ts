@@ -19,11 +19,13 @@ vi.mock("@/shared/services/console.service", () => ({
 }));
 
 import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 
 import {
     createDeferred,
+    createObjectRegistry,
     createProjectPathSystem,
     createRulesetData,
     createRulesetMetadata,
@@ -44,7 +46,7 @@ describe("RulesetManager", () => {
 
     it("adds a ruleset, stores metadata, caches the loaded model, loads dependencies, and emits manager updates", async () => {
         const tilesetManager = createTilesetManager();
-        const manager = new RulesetManager(tilesetManager as any, createProjectPathSystem());
+        const manager = new RulesetManager(tilesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         const loadRulesets = vi.spyOn(manager, "loadRulesets").mockResolvedValue([]);
         const updated = vi.fn();
@@ -77,9 +79,45 @@ describe("RulesetManager", () => {
         }]);
     });
 
+    it("registers loaded rulesets with rules and unregisters removed rules before destroying them", async () => {
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), objectRegistry);
+        manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
+        await manager.addRuleset(createRulesetData("ruleset-a", {
+            rules: [
+                { id: "rule-a", constraints: "", outputs: "" },
+                { id: "rule-b", constraints: "", outputs: "" },
+            ],
+        }), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
+        const ruleset = manager.getRulesetById("ruleset-a")!;
+        const ruleA = ruleset.getRule("rule-a")!;
+        const ruleB = ruleset.getRule("rule-b")!;
+        const ruleBDestroy = vi.spyOn(ruleB, "destroy");
+
+        expect(objectRegistry.has(ruleset.objectId)).toBe(true);
+        expect(ruleA.objectId).toBe("ruleset:ruleset-a:rule:rule-a");
+        expect(objectRegistry.has(ruleA.objectId)).toBe(true);
+        expect(objectRegistry.has(ruleB.objectId)).toBe(true);
+
+        manager.updateRuleset(createRulesetData("ruleset-a", {
+            rules: [
+                { id: "rule-a", constraints: "", outputs: "" },
+                { id: "rule-c", constraints: "", outputs: "" },
+            ],
+        }));
+
+        const ruleC = ruleset.getRule("rule-c")!;
+        expect(objectRegistry.has(ruleA.objectId)).toBe(true);
+        expect(objectRegistry.has(ruleB.objectId)).toBe(false);
+        expect(ruleBDestroy).toHaveBeenCalledTimes(1);
+        expect(ruleB.destroyed).toBe(true);
+        expect(ruleC.objectId).toBe("ruleset:ruleset-a:rule:rule-c");
+        expect(objectRegistry.has(ruleC.objectId)).toBe(true);
+    });
+
     it("loads a ruleset from storage and then serves cache hits without reading storage again", async () => {
         const tilesetManager = createTilesetManager();
-        const manager = new RulesetManager(tilesetManager as any, createProjectPathSystem());
+        const manager = new RulesetManager(tilesetManager as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         (RulesetStorageService.load as any).mockResolvedValue(Result.Success(createRulesetData("ruleset-a")));
 
@@ -95,7 +133,7 @@ describe("RulesetManager", () => {
 
     it("deduplicates concurrent pending loads for the same ruleset", async () => {
         const tilesetManager = createTilesetManager();
-        const manager = new RulesetManager(tilesetManager as any, createProjectPathSystem());
+        const manager = new RulesetManager(tilesetManager as any, createProjectPathSystem(), createObjectRegistry());
         const deferred = createDeferred<any>();
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         (RulesetStorageService.load as any).mockReturnValue(deferred.promise);
@@ -112,7 +150,7 @@ describe("RulesetManager", () => {
     });
 
     it("returns metadata-not-found when loading an unknown ruleset", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
 
         const result = await manager.loadRuleset("missing-ruleset");
 
@@ -124,7 +162,7 @@ describe("RulesetManager", () => {
     });
 
     it("returns the storage error when storage loading fails", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         (RulesetStorageService.load as any).mockResolvedValue(Result.Error("storage failed"));
 
@@ -138,7 +176,7 @@ describe("RulesetManager", () => {
     });
 
     it("saves a loaded ruleset and errors when the ruleset is not loaded", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         const addResult = await manager.addRuleset(createRulesetData("ruleset-a"), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
         addResult.data!.updateRuleset(createRulesetData("ruleset-a", { name: "Saved Ruleset" }));
@@ -156,7 +194,7 @@ describe("RulesetManager", () => {
     });
 
     it("updates a loaded ruleset, emits update events, and ignores mismatched or missing updates", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         await manager.addRuleset(createRulesetData("ruleset-a"), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
         const managerUpdated = vi.fn();
@@ -179,17 +217,17 @@ describe("RulesetManager", () => {
     });
 
     it("removes loaded metadata without deleting storage and emits manager updates", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         const addResult = await manager.addRuleset(createRulesetData("ruleset-a"), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
-        const unload = vi.spyOn(addResult.data!, "unload");
+        const destroy = vi.spyOn(addResult.data!, "destroy");
         const updated = vi.fn();
         manager.on("onRulesetManagerUpdated", updated);
 
         const result = await manager.removeRuleset("ruleset-a");
 
         expect(result.status).toBe(Result.Status.Success);
-        expect(unload).toHaveBeenCalledTimes(1);
+        expect(destroy).toHaveBeenCalledTimes(1);
         expect(manager.getRulesetById("ruleset-a")).toBeNull();
         expect(manager.getRulesetMetadataById("ruleset-a")).toBeNull();
         expect(RulesetStorageService.remove).not.toHaveBeenCalled();
@@ -197,7 +235,7 @@ describe("RulesetManager", () => {
     });
 
     it("deletes metadata and storage for an unloaded ruleset", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
 
         const result = await manager.deleteRuleset("ruleset-a");
@@ -208,7 +246,7 @@ describe("RulesetManager", () => {
     });
 
     it("keeps metadata when storage deletion fails", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
         (RulesetStorageService.remove as any).mockResolvedValue(Result.Error("delete failed"));
 
@@ -221,21 +259,27 @@ describe("RulesetManager", () => {
         expect(manager.serialize()).toEqual([createRulesetMetadata("ruleset-a")]);
     });
 
-    it("clones a loaded ruleset and returns null when cloning an unloaded ruleset", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+    it("clones a loaded ruleset without registering the temporary clone and returns null when cloning an unloaded ruleset", async () => {
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), objectRegistry);
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
-        await manager.addRuleset(createRulesetData("ruleset-a"), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
+        await manager.addRuleset(createRulesetData("ruleset-a", {
+            rules: [{ id: "rule-a", constraints: "", outputs: "" }],
+        }), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
+        const loadedRuleset = manager.getRulesetById("ruleset-a")!;
 
         const clone = manager.cloneRuleset("ruleset-a");
 
         expect(clone).not.toBeNull();
-        expect(clone).not.toBe(manager.getRulesetById("ruleset-a"));
-        expect(clone?.serialize()).toEqual(manager.getRulesetById("ruleset-a")?.serialize());
+        expect(clone).not.toBe(loadedRuleset);
+        expect(clone?.serialize()).toEqual(loadedRuleset.serialize());
+        expect(objectRegistry.get(clone!.objectId)).toBe(loadedRuleset);
+        expect(objectRegistry.get(clone!.getRule("rule-a")!.objectId)).toBe(loadedRuleset.getRule("rule-a"));
         expect(manager.cloneRuleset("missing-ruleset")).toBeNull();
     });
 
     it("saves only loaded rulesets affected by removed tileset references", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("affected-ruleset"));
         manager.addRulesetMetadata(createRulesetMetadata("untouched-ruleset"));
         await manager.addRuleset(createRulesetData("affected-ruleset", {
@@ -256,7 +300,7 @@ describe("RulesetManager", () => {
     });
 
     it("saves only loaded rulesets affected by removed ruleset references", async () => {
-        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem());
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), createObjectRegistry());
         manager.addRulesetMetadata(createRulesetMetadata("affected-ruleset"));
         manager.addRulesetMetadata(createRulesetMetadata("untouched-ruleset"));
         await manager.addRuleset(createRulesetData("affected-ruleset", {

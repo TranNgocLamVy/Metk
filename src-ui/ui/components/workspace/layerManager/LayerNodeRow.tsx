@@ -19,7 +19,7 @@ type LayerNodeRowProps = {
 
 export default function LayerNodeRow({ view, isSelected, updatedLayerView }: LayerNodeRowProps) {
 	const { editingId, selectedLayers, setEditingId } = useLayerManagerStore();
-	const { setBaseObject } = usePropertyStore();
+	const { setObjectId } = usePropertyStore();
 
 	const layer = view.layer;
 	const isGroup = layer instanceof GroupLayer;
@@ -42,7 +42,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 
 	const handleClick = (e: MouseEvent) => {
 		e.stopPropagation();
-		setBaseObject(layer);
+		setObjectId(layer.objectId);
 		TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
 	};
 

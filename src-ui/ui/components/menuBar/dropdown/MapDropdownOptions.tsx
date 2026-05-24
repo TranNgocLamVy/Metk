@@ -5,6 +5,7 @@ import { Label } from '@/ui/components/shadcn/label';
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
+import { usePropertyStore } from "@/ui/stores/property.store";
 
 const activeTilemapSession = () => appKernel.editorFacade.getActiveTilemapSession();
 
@@ -66,37 +67,7 @@ const MapDropdownOptionGroup5: MenuDropDownGroupType = [
 			const session = activeTilemapSession();
 			if (!session) return;
 			const tilemap = session.tilemap;
-			useDialogStore.getState().openDialog("FORM_DIALOG", { zLevel: DialogZLevel.Modal }, {
-				resolve: () => {},
-				formDialog: {
-					title: "menu.map.action.mapProperties",
-					okText: "global.action.ok",
-					cancelText: "global.action.cancel",
-					inputs: [
-						{
-							id: "map-name",
-							name: "name",
-							type: "text",
-							label: "Name",
-							defaultValue: tilemap.name,
-						},
-						{
-							id: "map-width",
-							name: "width",
-							type: "number",
-							label: "Width",
-							defaultValue: tilemap.width,
-						},
-						{
-							id: "map-height",
-							name: "height",
-							type: "number",
-							label: "Height",
-							defaultValue: tilemap.height,
-						},
-					],
-				},
-			});
+			usePropertyStore.getState().setObjectId(tilemap.objectId);
 		},
 	},
 ];

@@ -20,7 +20,7 @@ const ActionGroup: MenuDropDownGroupType = [
         onClick() {
 			const activeTilemapSession = appKernel.editorFacade.getActiveTilemapSession();
 			if (!activeTilemapSession) return;
-			usePropertyStore.getState().setBaseObject(activeTilemapSession.tilemap);
+			usePropertyStore.getState().setObjectId(activeTilemapSession.tilemap.objectId);
         }
     },
 ];

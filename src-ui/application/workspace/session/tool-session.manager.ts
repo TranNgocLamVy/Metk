@@ -1,5 +1,5 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { ToolStateData } from "@/shared/schema/tool-session.schema";
+import { ToolStateData } from "@/shared/schema/workspaceSchema";
 
 
 export class ToolSessionManager {

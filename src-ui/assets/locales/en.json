@@ -286,6 +286,7 @@
             "create": "New Tilemap",
             "contextMenu": {
                 "new": "New Tilemap",
+                "property": "Tilemap Property",
                 "currentTool": "Current Tool",
                 "undo": "Undo",
                 "redo": "Redo",

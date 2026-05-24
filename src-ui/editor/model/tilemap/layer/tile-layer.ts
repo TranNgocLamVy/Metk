@@ -30,7 +30,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         parentLayer: IGroupLayer,
         tilesetRefManager: TilesetRefManager,
         rulesetRefManager: RulesetRefManager,
-        objectIdScope: string
+        objectIdScope: string = parentLayer.objectIdScope
     ) {
         super(tileLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
 

@@ -5,6 +5,7 @@ import { TilesetRefManager } from "@/application/resources/references/tileset-re
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { RulesetData } from "@/shared/schema/ruleset.schema";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 type ReferenceContextOptions = {
     tilesets?: string[];
@@ -15,12 +16,13 @@ type ReferenceContextOptions = {
 
 export const createReferenceContext = (options: ReferenceContextOptions = {}) => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/test-project");
+    const objectRegistry = new EditorObjectRegistry();
     const filePathSystem = new FilePathSystem(
         options.fileId ?? "resource",
         projectPathSystem,
         options.relPath ?? "resources/resource.json",
     );
-    const tilesetManager = new TilesetManager(projectPathSystem);
+    const tilesetManager = new TilesetManager(projectPathSystem, objectRegistry);
 
     for (const id of options.tilesets ?? []) {
         tilesetManager.addTilesetMetadata({
@@ -30,7 +32,7 @@ export const createReferenceContext = (options: ReferenceContextOptions = {}) =>
         });
     }
 
-    const rulesetManager = new RulesetManager(tilesetManager, projectPathSystem);
+    const rulesetManager = new RulesetManager(tilesetManager, projectPathSystem, objectRegistry);
 
     for (const id of options.rulesets ?? []) {
         rulesetManager.addRulesetMetadata({
@@ -47,6 +49,7 @@ export const createReferenceContext = (options: ReferenceContextOptions = {}) =>
     return {
         projectPathSystem,
         filePathSystem,
+        objectRegistry,
         tilesetManager,
         rulesetManager,
         tilesetRefManager,

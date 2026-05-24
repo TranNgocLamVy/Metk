@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ProjectPathSystem, FilePathSystem } from "@/infrastructure/project-path-system";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
@@ -225,13 +226,14 @@ const createTilemapSession = (options: {
     isDirty?: boolean;
 }) => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/integration-fixture");
+    const objectRegistry = new EditorObjectRegistry();
     const filePathSystem = new FilePathSystem(
         options.tilemapId,
         projectPathSystem,
         `tilemaps/${options.tilemapId}.json`,
     );
-    const tilesetManager = new TilesetManager(projectPathSystem);
-    const rulesetManager = new RulesetManager(tilesetManager, projectPathSystem);
+    const tilesetManager = new TilesetManager(projectPathSystem, objectRegistry);
+    const rulesetManager = new RulesetManager(tilesetManager, projectPathSystem, objectRegistry);
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
 

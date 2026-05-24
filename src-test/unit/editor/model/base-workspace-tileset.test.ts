@@ -68,6 +68,7 @@ vi.mock("@/application/workspace/session/tool-session.manager", () => ({ ToolSes
 vi.mock("@/application/workspace/workspace-saved-path.manager", () => ({ WorkspaceSavedPathManager: workspaceModelMocks.MockWorkspaceSavedPathManager }));
 
 import { BaseObject } from "@/editor/model/base-object";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
@@ -113,6 +114,7 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[
         ...overrides,
     },
     createTilesetPathSystem(),
+    new EditorObjectRegistry(),
 );
 
 describe("BaseObject", () => {

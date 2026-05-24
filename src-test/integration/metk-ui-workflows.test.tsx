@@ -208,6 +208,7 @@ import TilemapEditor from "@/ui/components/workspace/tilemapEditor/TilemapEditor
 import TilesetViewSelector from "@/ui/components/workspace/tilesetView/TilesetViewSelector";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { RulesetManager as ResourceRulesetManager } from "@/application/resources/ruleset/ruleset.manager";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
@@ -248,12 +249,13 @@ const resetStore = <T,>(store: { getInitialState: () => T; setState: (state: T, 
 const createProjectContext = () => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/integration-project");
     const filePathSystem = new FilePathSystem("tilemap", projectPathSystem, "tilemaps/tilemap.json");
-    const tilesetManager = new TilesetManager(projectPathSystem);
-    const rulesetManager = new ResourceRulesetManager(tilesetManager, projectPathSystem);
+    const objectRegistry = new EditorObjectRegistry();
+    const tilesetManager = new TilesetManager(projectPathSystem, objectRegistry);
+    const rulesetManager = new ResourceRulesetManager(tilesetManager, projectPathSystem, objectRegistry);
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
 
-    return { projectPathSystem, filePathSystem, tilesetManager, rulesetManager, tilesetRefManager, rulesetRefManager };
+    return { projectPathSystem, filePathSystem, objectRegistry, tilesetManager, rulesetManager, tilesetRefManager, rulesetRefManager };
 };
 
 const createTilemapSession = (id: string, tilemapId: string, name: string, isDirty = false): TestTilemapSession => {
@@ -338,6 +340,7 @@ const createTilemapSession = (id: string, tilemapId: string, name: string, isDir
 
 const createTilesetSession = (id: string, tilesetId: string, name: string): TestTilesetSession => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/integration-project");
+    const objectRegistry = new EditorObjectRegistry();
     const tilesetPathSystem = new FilePathSystem(tilesetId, projectPathSystem, `tilesets/${tilesetId}.json`);
     const tileset = new Tileset(
         {
@@ -351,6 +354,7 @@ const createTilesetSession = (id: string, tilesetId: string, name: string): Test
             tiles: [],
         },
         tilesetPathSystem,
+        objectRegistry,
     );
     return {
         id,

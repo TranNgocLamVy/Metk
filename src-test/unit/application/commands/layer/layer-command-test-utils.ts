@@ -5,6 +5,7 @@ import { IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { GroupLayerData, RootLayerData, RuleLayerData, TileLayerData } from "@/shared/schema/layer.schema";
 import { TilemapData } from "@/shared/schema/tilemap.schema";
@@ -95,6 +96,8 @@ export const createTilemap = (layers = createBaseLayers()): Tilemap => {
 
 export const createLayerCommandHarness = (layers = createBaseLayers()) => {
     const tilemap = createTilemap(layers);
+    const objectRegistry = new EditorObjectRegistry();
+    objectRegistry.registerTree(tilemap);
     const markLayerChange = vi.fn();
     const emit = vi.fn();
     const session = {
@@ -106,9 +109,10 @@ export const createLayerCommandHarness = (layers = createBaseLayers()) => {
     };
     const editorFacade = {
         getActiveTilemapSession: vi.fn(() => session),
+        objectRegistry,
     } as unknown as EditorFacade;
 
-    return { tilemap, root: tilemap.rootLayer, session, markLayerChange, emit, editorFacade };
+    return { tilemap, root: tilemap.rootLayer, session, markLayerChange, emit, editorFacade, objectRegistry };
 };
 
 export const createNoSessionFacade = () => ({

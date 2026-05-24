@@ -56,7 +56,7 @@ const registerLoadedTileset = (
     relPath: string,
 ) => {
     const pathSystem = new FilePathSystem(data.id, context.projectPathSystem, relPath);
-    const tileset = new Tileset(data, pathSystem);
+    const tileset = new Tileset(data, pathSystem, context.objectRegistry);
     (context.tilesetManager as any).loadedTilesets.set(data.id, tileset);
 };
 

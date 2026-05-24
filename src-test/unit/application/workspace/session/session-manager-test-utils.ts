@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 
 import { EditorFacade } from "@/application/editor.facade";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilesetData } from "@/shared/schema/tileset.schema";
@@ -26,7 +27,7 @@ export const createTileset = (id = "tileset-a"): Tileset => {
         tiles: [],
     };
 
-    return new Tileset(data, filePathSystem);
+    return new Tileset(data, filePathSystem, new EditorObjectRegistry());
 };
 
 export const createEditorFacadeHarness = () => {

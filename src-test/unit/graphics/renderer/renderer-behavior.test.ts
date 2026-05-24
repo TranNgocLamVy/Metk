@@ -123,6 +123,7 @@ import { TilesetGridRenderer } from "@/graphics/renderer/tileset-grid.renderer";
 import { TilemapGridRenderer } from "@/graphics/renderer/tilemap-grid.renderer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 
@@ -168,6 +169,7 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[
             ...overrides,
         },
         filePathSystem,
+        new EditorObjectRegistry(),
     );
 };
 

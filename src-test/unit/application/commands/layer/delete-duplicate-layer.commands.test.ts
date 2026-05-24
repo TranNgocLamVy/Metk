@@ -13,37 +13,54 @@ import {
 
 describe("DeleteLayerCommand", () => {
     it("removes a nested layer and restores it to the same parent and index on undo", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
+        const originalLayer = root.findLayer("tile-a")!;
+        const originalObjectId = originalLayer.objectId;
         const command = new DeleteLayerCommand("tile-a");
 
+        expect(objectRegistry.has(originalObjectId)).toBe(true);
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
         expect(root.findLayer("tile-a")).toBeNull();
+        expect(objectRegistry.has(originalObjectId)).toBe(false);
+        expect(originalLayer.destroyed).toBe(true);
         expect(layerIds(group)).toEqual(["group-child"]);
         expect(markLayerChange).toHaveBeenCalledTimes(1);
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
 
-        expect(root.findLayer("tile-a")?.parentLayer.id).toBe("group-a");
+        const restoredLayer = root.findLayer("tile-a");
+        expect(restoredLayer?.parentLayer.id).toBe("group-a");
+        expect(restoredLayer).not.toBe(originalLayer);
+        expect(restoredLayer?.destroyed).toBe(false);
+        expect(objectRegistry.has(originalObjectId)).toBe(true);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
         expect(markLayerChange).toHaveBeenCalledTimes(2);
     });
 
     it("removes a group with its children and restores the complete subtree on undo", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, root, objectRegistry } = createLayerCommandHarness();
+        const group = root.findLayer("group-a")!;
+        const child = root.findLayer("tile-a")!;
         const command = new DeleteLayerCommand("group-a");
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
         expect(root.findLayer("group-a")).toBeNull();
         expect(root.findLayer("tile-a")).toBeNull();
+        expect(objectRegistry.has(group.objectId)).toBe(false);
+        expect(objectRegistry.has(child.objectId)).toBe(false);
+        expect(group.destroyed).toBe(true);
+        expect(child.destroyed).toBe(true);
         expect(layerIds(root)).toEqual(["group-b", "tile-root", "rule-root"]);
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
 
         expect(root.findLayer("group-a")).not.toBeNull();
         expect(root.findLayer("tile-a")?.parentLayer.id).toBe("group-a");
+        expect(objectRegistry.has(group.objectId)).toBe(true);
+        expect(objectRegistry.has(child.objectId)).toBe(true);
         expect(layerIds(root)).toEqual(["group-a", "group-b", "tile-root", "rule-root"]);
     });
 
@@ -70,7 +87,7 @@ describe("DeleteLayerCommand", () => {
 
 describe("DuplicateLayerCommand", () => {
     it("duplicates a tile layer after the original, renames the copy, and removes the copy on undo", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
         const command = new DuplicateLayerCommand("tile-a");
 
@@ -85,23 +102,29 @@ describe("DuplicateLayerCommand", () => {
             layerData: "1:0,0\n0,0",
         });
         expect(duplicated.parentLayer.id).toBe("group-a");
+        expect(objectRegistry.has(duplicated.objectId)).toBe(true);
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
         expect(root.findLayer(duplicated.id)).toBeNull();
+        expect(objectRegistry.has(duplicated.objectId)).toBe(false);
+        expect(duplicated.destroyed).toBe(true);
         expect(markLayerChange).toHaveBeenCalledTimes(2);
     });
 
     it("duplicates a group without flattening or moving its existing children", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, root, objectRegistry } = createLayerCommandHarness();
         const command = new DuplicateLayerCommand("group-a");
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
         const duplicatedGroup = root.layers[1];
+        const duplicatedChildren = (duplicatedGroup as any).layers;
         expect(layerIds(root).slice(0, 2)).toEqual(["group-a", duplicatedGroup.id]);
         expect(duplicatedGroup.name).toBe("Group A (copy)");
         expect(root.findLayer("tile-a")?.parentLayer.id).toBe("group-a");
+        expect(duplicatedChildren.map((layer: any) => layer.id)).not.toContain("tile-a");
+        expect(duplicatedChildren.every((layer: any) => objectRegistry.has(layer.objectId))).toBe(true);
         expect(duplicatedGroup.serialize()).toMatchObject({
             type: "group",
             name: "Group A (copy)",

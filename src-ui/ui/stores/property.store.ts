@@ -1,18 +1,15 @@
-import { BaseObject } from "@/editor/model/base-object"
 import { create } from "zustand";
 
 
-
-
 type PropertyStoreState = {
-    object: BaseObject<any> | null;
+    objectId: string | null;
 
-    setBaseObject: (object: BaseObject<any> | null) => void;
+    setObjectId: (objectId: string | null) => void;
 }
 
 export const usePropertyStore = create<PropertyStoreState>((set, get) => {
     return {
-        object: null,
-        setBaseObject: (object: BaseObject | null) => set({ object }),
+        objectId: null,
+        setObjectId: (objectId: string | null) => set({ objectId }),
     }
 })

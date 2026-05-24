@@ -84,6 +84,7 @@ import { RuleLayerData, TileLayerData } from "@/shared/schema/layer.schema";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 
@@ -307,7 +308,7 @@ describe("grid renderers", () => {
             tileheight: 16,
             image: { source: "terrain.png", width: 32, height: 32 },
             tiles: [],
-        }, tilesetPathSystem);
+        }, tilesetPathSystem, new EditorObjectRegistry());
         const viewport = {};
 
         const renderer = new TilesetGridRenderer({ viewport: viewport as any, tileset });

@@ -20,15 +20,17 @@ import {
 
 describe("CreateTileLayerCommand", () => {
     it("creates a tile layer in a group parent, opens the group, and removes it on undo", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
         const command = new CreateTileLayerCommand(createTileLayerData({ id: "created-tile", name: "Decoration" }), "group-a");
 
         const executeResult = command.execute(editorFacade);
 
         expect(executeResult.status).toBe(Result.Status.Success);
-        expect(root.findLayer("created-tile")).toBeInstanceOf(TileLayer);
-        expect(root.findLayer("created-tile")?.parentLayer.id).toBe("group-a");
+        const createdLayer = root.findLayer("created-tile");
+        expect(createdLayer).toBeInstanceOf(TileLayer);
+        expect(createdLayer?.parentLayer.id).toBe("group-a");
+        expect(objectRegistry.has(createdLayer!.objectId)).toBe(true);
         expect(layerIds(group)[0]).toBe("created-tile");
         expect(group.isOpen).toBe(true);
         expect(markLayerChange).toHaveBeenCalledTimes(1);
@@ -37,6 +39,8 @@ describe("CreateTileLayerCommand", () => {
 
         expect(undoResult.status).toBe(Result.Status.Success);
         expect(root.findLayer("created-tile")).toBeNull();
+        expect(objectRegistry.has(createdLayer!.objectId)).toBe(false);
+        expect(createdLayer!.destroyed).toBe(true);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
         expect(markLayerChange).toHaveBeenCalledTimes(2);
     });

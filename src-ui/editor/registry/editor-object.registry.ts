@@ -1,6 +1,12 @@
 import { BaseObject } from "@/editor/model/base-object";
+import EventEmitter from "eventemitter3";
 
-export class EditorObjectRegistry {
+interface EditorObjectRegistryEvent {
+    onObjectAdded: (objectId: string) => void;
+    onObjectDeleted: (object: string) => void;
+}
+
+export class EditorObjectRegistry extends EventEmitter<EditorObjectRegistryEvent> {
     private readonly objects: Map<string, BaseObject<any>> = new Map();
 
     public get size(): number {
@@ -15,6 +21,7 @@ export class EditorObjectRegistry {
         }
 
         this.objects.set(object.objectId, object);
+        this.emit("onObjectAdded", object.objectId);
         return object;
     }
 
@@ -30,6 +37,7 @@ export class EditorObjectRegistry {
                 : objectOrId.objectId;
 
         this.objects.delete(objectId);
+        this.emit("onObjectDeleted", objectId);
     }
 
     public unregisterTree(rootObject: BaseObject<any>): void {

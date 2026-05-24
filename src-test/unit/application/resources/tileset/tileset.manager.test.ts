@@ -19,11 +19,13 @@ vi.mock("@/shared/services/console.service", () => ({
 }));
 
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilesetStorageService } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 
 import {
     createDeferred,
+    createObjectRegistry,
     createProjectPathSystem,
     createTilesetData,
     createTilesetMetadata,
@@ -38,7 +40,7 @@ describe("TilesetManager", () => {
     });
 
     it("adds a tileset, stores metadata, caches the loaded model, and emits loaded metadata on serialize", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         const tilesetData = createTilesetData("tileset-a", { name: "Grass" });
 
         const result = await manager.addTileset(tilesetData, "C:/Project/Metk/test-project/assets/grass.tileset.json");
@@ -59,8 +61,28 @@ describe("TilesetManager", () => {
         }]);
     });
 
+    it("registers loaded tilesets with generated tiles, then unregisters them on unload", async () => {
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new TilesetManager(createProjectPathSystem(), objectRegistry);
+
+        const result = await manager.addTileset(createTilesetData("tileset-a"), "C:/Project/Metk/test-project/assets/grass.tileset.json");
+        const tileset = result.data!;
+        const tile = tileset.getTileFromId(0)!;
+
+        expect(objectRegistry.has(tileset.objectId)).toBe(true);
+        expect(tile.objectId).toBe("tileset:tileset-a:tile:0");
+        expect(objectRegistry.has(tile.objectId)).toBe(true);
+
+        await manager.unloadTileset("tileset-a");
+
+        expect(objectRegistry.has(tileset.objectId)).toBe(false);
+        expect(objectRegistry.has(tile.objectId)).toBe(false);
+        expect(tileset.destroyed).toBe(true);
+        expect(tile.destroyed).toBe(true);
+    });
+
     it("loads a tileset from storage and then serves cache hits without reading storage again", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         manager.addTilesetMetadata(createTilesetMetadata("tileset-a"));
         (TilesetStorageService.load as any).mockResolvedValue(Result.Success(createTilesetData("tileset-a")));
 
@@ -75,7 +97,7 @@ describe("TilesetManager", () => {
     });
 
     it("deduplicates concurrent pending loads for the same tileset", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         const deferred = createDeferred<ReturnType<typeof Result.Success>>();
         manager.addTilesetMetadata(createTilesetMetadata("tileset-a"));
         (TilesetStorageService.load as any).mockReturnValue(deferred.promise);
@@ -92,7 +114,7 @@ describe("TilesetManager", () => {
     });
 
     it("returns metadata-not-found when loading an unknown tileset", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
 
         const result = await manager.loadTileset("missing-tileset");
 
@@ -104,7 +126,7 @@ describe("TilesetManager", () => {
     });
 
     it("returns the storage error when storage loading fails", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         manager.addTilesetMetadata(createTilesetMetadata("tileset-a"));
         (TilesetStorageService.load as any).mockResolvedValue(Result.Error("storage failed"));
 
@@ -118,7 +140,7 @@ describe("TilesetManager", () => {
     });
 
     it("saves a loaded tileset and errors when the tileset is not loaded", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         const loadResult = await manager.addTileset(createTilesetData("tileset-a"), "C:/Project/Metk/test-project/tilesets/tileset-a.json");
         loadResult.data!.rename("Saved Tileset");
 
@@ -135,21 +157,21 @@ describe("TilesetManager", () => {
     });
 
     it("removes loaded metadata without deleting storage and unloads the cached tileset", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         const addResult = await manager.addTileset(createTilesetData("tileset-a"), "C:/Project/Metk/test-project/tilesets/tileset-a.json");
-        const unload = vi.spyOn(addResult.data!, "unload");
+        const destroy = vi.spyOn(addResult.data!, "destroy");
 
         const result = await manager.removeTileset("tileset-a");
 
         expect(result.status).toBe(Result.Status.Success);
-        expect(unload).toHaveBeenCalledTimes(1);
+        expect(destroy).toHaveBeenCalledTimes(1);
         expect(manager.getTilesetById("tileset-a")).toBeNull();
         expect(manager.getTilesetMetadataById("tileset-a")).toBeNull();
         expect(TilesetStorageService.remove).not.toHaveBeenCalled();
     });
 
     it("deletes metadata and storage for an unloaded tileset", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         manager.addTilesetMetadata(createTilesetMetadata("tileset-a"));
 
         const result = await manager.deleteTileset("tileset-a");
@@ -160,7 +182,7 @@ describe("TilesetManager", () => {
     });
 
     it("keeps metadata when storage deletion fails", async () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         manager.addTilesetMetadata(createTilesetMetadata("tileset-a"));
         (TilesetStorageService.remove as any).mockResolvedValue(Result.Error("delete failed"));
 
@@ -174,7 +196,7 @@ describe("TilesetManager", () => {
     });
 
     it("serializes unloaded metadata without requiring storage reads", () => {
-        const manager = new TilesetManager(createProjectPathSystem());
+        const manager = new TilesetManager(createProjectPathSystem(), createObjectRegistry());
         manager.loadTilesetsMetadata([
             createTilesetMetadata("tileset-a"),
             createTilesetMetadata("tileset-b", { name: "Tileset B" }),

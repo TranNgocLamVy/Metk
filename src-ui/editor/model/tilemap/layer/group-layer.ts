@@ -24,7 +24,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         parentLayer: IGroupLayer,
         tilesetRefManager: TilesetRefManager,
         rulesetRefManager: RulesetRefManager,
-        objectIdScope: string
+        objectIdScope: string = parentLayer.objectIdScope
     ) {
         super(groupLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
 
@@ -49,7 +49,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
             parentLayer,
             this.tilesetRefManager,
             this.rulesetRefManager,
-            this.objectId
+            this.objectIdScope
         );
         return layer;
     }
@@ -136,7 +136,23 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override clone(): GroupLayer {
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
+        groupLayerData.layers = groupLayerData.layers.map((layerData) => GroupLayer.cloneLayerDataWithNewIds(layerData));
         return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
+    }
+
+    private static cloneLayerDataWithNewIds(layerData: LayerData): LayerData {
+        if (layerData.type === "group") {
+            return {
+                ...layerData,
+                id: uuidv4(),
+                layers: layerData.layers.map((childLayerData) => GroupLayer.cloneLayerDataWithNewIds(childLayerData)),
+            };
+        }
+
+        return {
+            ...layerData,
+            id: uuidv4(),
+        };
     }
 
     public override removeRulesetRef(rulesetIndex: number): void {

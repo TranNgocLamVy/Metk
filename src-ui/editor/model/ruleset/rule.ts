@@ -18,7 +18,7 @@ export class Rule extends BaseObject<RuleEvent> {
         private readonly size: number,
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager,
-        objectIdScope: string,
+        objectIdScope: string = "ruleset:unknown",
     ) {
         super(`${objectIdScope}:rule:${data.id}`);
         this.id = data.id;
