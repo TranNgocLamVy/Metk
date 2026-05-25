@@ -1,4 +1,4 @@
-import "@/application/commands/register-commands";
+import "@/application/command-system/register-commands";
 import "@/graphics/tool/register-tool";
 
 import { EditorFacade } from "@/application/editor.facade";
