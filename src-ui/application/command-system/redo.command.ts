@@ -1,5 +1,5 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { SystemCommand } from "../command.decorator";
+import { SystemCommand } from "../commands/command.decorator";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 

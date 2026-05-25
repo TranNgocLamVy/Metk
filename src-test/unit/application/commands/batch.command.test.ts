@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { BatchCommand } from "@/application/commands/batch.command";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 
-const createCommand = (overrides: Partial<IBaseCommand> = {}): IBaseCommand => ({
+const createCommand = (overrides: Partial<IUndoableCommand> = {}): IUndoableCommand => ({
     id: crypto.randomUUID(),
     execute: vi.fn(() => Result.Success()),
     undo: vi.fn(() => Result.Success()),

@@ -1,64 +1,68 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
-import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { LayerData } from "@/shared/schema/layer.schema";
 import { LayerUtils } from "@/shared/utils/layer.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, isLayerContainer, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
 
-export class DeleteLayerCommand implements IBaseCommand {
+export class DeleteLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
 
-    private parentId: string;
+    private parentLayerObjectId: string;
     private index: number;
     private layerData: LayerData;
     constructor(
-        private readonly layerId: string,
+        private readonly tilemapObjectId: string,
+        private readonly layerObjectId: string,
     ) { }
 
     public execute(editorFacade: EditorFacade): Result {
-        const currentSession = editorFacade.getActiveTilemapSession()
-        if (!currentSession) return Result.Error("Current session not found");
-        const root = currentSession.tilemap.rootLayer;
+        const objectRegistry = editorFacade.objectRegistry;
+        if (!objectRegistry) return Result.Error("Object registry not found");
 
-        const targetLayer = root.findLayer(this.layerId);
-        if (!targetLayer) return Result.Error("Target layer not found");
+        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        if (!tilemap) return Result.Error("Tilemap not found");
+
+        const targetLayer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Target layer not found");
+        if (targetLayer === tilemap.rootLayer) return Result.Error("Cannot delete root layer");
 
         this.layerData = targetLayer.serialize();
 
-        const parent = targetLayer.parentLayer || root;
-        this.parentId = parent.id;
+        const parent = targetLayer.parentLayer || tilemap.rootLayer;
+        this.parentLayerObjectId = parent.objectId;
         this.index = parent.getLayerIndex(targetLayer.id);
         targetLayer.removeFromParent();
     
-        editorFacade.objectRegistry?.unregisterTree(targetLayer);
+        objectRegistry.unregisterTree(targetLayer);
         targetLayer.destroy();
 
-        currentSession.markLayerChange();
+        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }
 
     public undo(editorFacade: EditorFacade): Result {
-        const currentSession = editorFacade.getActiveTilemapSession()
-        if (!currentSession) return Result.Error("Current session not found");
-        const root = currentSession.tilemap.rootLayer;
+        const objectRegistry = editorFacade.objectRegistry;
+        if (!objectRegistry) return Result.Error("Object registry not found");
 
-        const targetLayer = root.findLayer(this.parentId);
-        if (!targetLayer) return Result.Error("Target layer not found");
-        const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
+        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        if (!tilemap) return Result.Error("Tilemap not found");
 
-        const restoredLayer = LayerUtils.createLayerFromData(this.layerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, parent.objectIdScope);
+        const parent = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
+        if (!parent || !isLayerInTilemap(tilemap, parent) || !isLayerContainer(parent)) return Result.Error("Parent layer not found");
+
+        const restoredLayer = LayerUtils.createLayerFromData(this.layerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, tilemap.objectId);
         if (!restoredLayer) {
             return Result.Error("Failed to restore deleted layer");
         }
         parent.insertLayer(restoredLayer, this.index);
 
-        editorFacade.objectRegistry?.registerTree(restoredLayer);
+        objectRegistry.registerTree(restoredLayer);
 
-        currentSession.markLayerChange();
+        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

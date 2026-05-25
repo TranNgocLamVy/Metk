@@ -72,7 +72,7 @@ class SecondFakeTool extends FakeTool {
 const createToolManagerHarness = () => {
     const editor = createEditorHarness();
     const layer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
-    const layerRenderer = createTileLayerRenderer(layer);
+    const layerRenderer = createTileLayerRenderer(layer, editor.tilemap);
     let selectedLayerListener: ((layerIds: string[]) => void) | null = null;
     const session = {
         ...editor.session,

@@ -6,14 +6,15 @@ import { Result } from "@/shared/types/result";
 import {
     createLayerCommandHarness,
     createNoSessionFacade,
+    layerObjectId,
     layerIds,
     requireGroupLayer,
 } from "./layer-command-test-utils";
 
 describe("MoveLayerCommand", () => {
     it("moves a layer within the same parent and restores the original order on undo", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
-        const command = new MoveLayerCommand("root", "rule-root", 1);
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
+        const command = new MoveLayerCommand(tilemap.objectId, root.objectId, layerObjectId(root, "rule-root"), 1);
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -28,9 +29,9 @@ describe("MoveLayerCommand", () => {
     });
 
     it("moves a layer between parents, opens the destination group, and restores it on undo", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new MoveLayerCommand("group-a", "tile-root", 1);
+        const command = new MoveLayerCommand(tilemap.objectId, group.objectId, layerObjectId(root, "tile-root"), 1);
 
         expect(group.isOpen).toBe(false);
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
@@ -48,9 +49,9 @@ describe("MoveLayerCommand", () => {
     });
 
     it("uses a non-group parent target as a request to move beside that target", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new MoveLayerCommand("tile-a", "group-child", 1);
+        const command = new MoveLayerCommand(tilemap.objectId, layerObjectId(root, "tile-a"), layerObjectId(root, "group-child"), 1);
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -59,14 +60,14 @@ describe("MoveLayerCommand", () => {
     });
 
     it("returns an error without mutating when either requested layer is missing", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new MoveLayerCommand("group-a", "missing-layer", 0).execute(editorFacade)).toMatchObject({
+        expect(new MoveLayerCommand(tilemap.objectId, layerObjectId(root, "group-a"), `${tilemap.objectId}:layer:missing-layer`, 0).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer not found" },
         });
-        expect(new MoveLayerCommand("missing-parent", "tile-root", 0).execute(editorFacade)).toMatchObject({
+        expect(new MoveLayerCommand(tilemap.objectId, `${tilemap.objectId}:layer:missing-parent`, layerObjectId(root, "tile-root"), 0).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer not found" },
         });
@@ -76,10 +77,10 @@ describe("MoveLayerCommand", () => {
     });
 
     it("rejects negative destination indexes before removing the layer", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new MoveLayerCommand("group-a", "tile-root", -1).execute(editorFacade)).toMatchObject({
+        expect(new MoveLayerCommand(tilemap.objectId, layerObjectId(root, "group-a"), layerObjectId(root, "tile-root"), -1).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Invalid layer's index: -1" },
         });
@@ -90,14 +91,14 @@ describe("MoveLayerCommand", () => {
     });
 
     it("rejects moving a group into itself or one of its descendants", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new MoveLayerCommand("group-a", "group-a", 0).execute(editorFacade)).toMatchObject({
+        expect(new MoveLayerCommand(tilemap.objectId, layerObjectId(root, "group-a"), layerObjectId(root, "group-a"), 0).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Cannot move a layer into itself or its descendant" },
         });
-        expect(new MoveLayerCommand("group-child", "group-a", 0).execute(editorFacade)).toMatchObject({
+        expect(new MoveLayerCommand(tilemap.objectId, layerObjectId(root, "group-child"), layerObjectId(root, "group-a"), 0).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Cannot move a layer into itself or its descendant" },
         });
@@ -108,10 +109,10 @@ describe("MoveLayerCommand", () => {
     });
 
     it("rejects moving the root layer", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new MoveLayerCommand("group-a", "root", 0).execute(editorFacade)).toMatchObject({
+        expect(new MoveLayerCommand(tilemap.objectId, layerObjectId(root, "group-a"), root.objectId, 0).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Cannot move root layer" },
         });
@@ -121,9 +122,9 @@ describe("MoveLayerCommand", () => {
     });
 
     it("returns an error when there is no active tilemap session", () => {
-        expect(new MoveLayerCommand("root", "tile-root", 0).execute(createNoSessionFacade())).toMatchObject({
+        expect(new MoveLayerCommand("tilemap:missing", "tilemap:missing:layer:root", "tilemap:missing:layer:tile-root", 0).execute(createNoSessionFacade())).toMatchObject({
             status: Result.Status.Error,
-            message: { key: "Current session not found" },
+            message: { key: "Tilemap not found" },
         });
     });
 });

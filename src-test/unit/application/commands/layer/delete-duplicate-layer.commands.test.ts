@@ -7,17 +7,18 @@ import { Result } from "@/shared/types/result";
 import {
     createLayerCommandHarness,
     createNoSessionFacade,
+    layerObjectId,
     layerIds,
     requireGroupLayer,
 } from "./layer-command-test-utils";
 
 describe("DeleteLayerCommand", () => {
     it("removes a nested layer and restores it to the same parent and index on undo", () => {
-        const { editorFacade, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
         const originalLayer = root.findLayer("tile-a")!;
         const originalObjectId = originalLayer.objectId;
-        const command = new DeleteLayerCommand("tile-a");
+        const command = new DeleteLayerCommand(tilemap.objectId, originalLayer.objectId);
 
         expect(objectRegistry.has(originalObjectId)).toBe(true);
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
@@ -40,10 +41,10 @@ describe("DeleteLayerCommand", () => {
     });
 
     it("removes a group with its children and restores the complete subtree on undo", () => {
-        const { editorFacade, root, objectRegistry } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, objectRegistry } = createLayerCommandHarness();
         const group = root.findLayer("group-a")!;
         const child = root.findLayer("tile-a")!;
-        const command = new DeleteLayerCommand("group-a");
+        const command = new DeleteLayerCommand(tilemap.objectId, group.objectId);
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -65,10 +66,10 @@ describe("DeleteLayerCommand", () => {
     });
 
     it("returns an error and leaves the tree unchanged when the target layer is missing", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new DeleteLayerCommand("missing-layer").execute(editorFacade)).toMatchObject({
+        expect(new DeleteLayerCommand(tilemap.objectId, `${tilemap.objectId}:layer:missing-layer`).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer not found" },
         });
@@ -78,18 +79,18 @@ describe("DeleteLayerCommand", () => {
     });
 
     it("returns an error when there is no active tilemap session", () => {
-        expect(new DeleteLayerCommand("tile-a").execute(createNoSessionFacade())).toMatchObject({
+        expect(new DeleteLayerCommand("tilemap:missing", "tilemap:missing:layer:tile-a").execute(createNoSessionFacade())).toMatchObject({
             status: Result.Status.Error,
-            message: { key: "Current session not found" },
+            message: { key: "Tilemap not found" },
         });
     });
 });
 
 describe("DuplicateLayerCommand", () => {
     it("duplicates a tile layer after the original, renames the copy, and removes the copy on undo", () => {
-        const { editorFacade, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new DuplicateLayerCommand("tile-a");
+        const command = new DuplicateLayerCommand(tilemap.objectId, layerObjectId(root, "tile-a"));
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -113,8 +114,8 @@ describe("DuplicateLayerCommand", () => {
     });
 
     it("duplicates a group without flattening or moving its existing children", () => {
-        const { editorFacade, root, objectRegistry } = createLayerCommandHarness();
-        const command = new DuplicateLayerCommand("group-a");
+        const { editorFacade, tilemap, root, objectRegistry } = createLayerCommandHarness();
+        const command = new DuplicateLayerCommand(tilemap.objectId, layerObjectId(root, "group-a"));
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -133,10 +134,10 @@ describe("DuplicateLayerCommand", () => {
     });
 
     it("returns an error and leaves the tree unchanged when the target layer is missing", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new DuplicateLayerCommand("missing-layer").execute(editorFacade)).toMatchObject({
+        expect(new DuplicateLayerCommand(tilemap.objectId, `${tilemap.objectId}:layer:missing-layer`).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer not found" },
         });

@@ -63,7 +63,7 @@ export class TilemapLayerService {
 
         const payload = defaultTileLayerData({ width: currentSession.tilemap.width, height: currentSession.tilemap.height });
 
-        const createTileLayerCommand = new CreateTileLayerCommand(payload, parent.id);
+        const createTileLayerCommand = new CreateTileLayerCommand(currentSession.tilemap.objectId, parent.objectId, payload);
 
         historyManager.startTransaction();
         historyManager.execute(createTileLayerCommand, editorFacade)
@@ -86,7 +86,7 @@ export class TilemapLayerService {
 
         const payload = defaultRuleLayerData({ width: currentSession.tilemap.width, height: currentSession.tilemap.height });
 
-        const createRuleLayerCommand = new CreateRuleLayerCommand(payload, parent.id);
+        const createRuleLayerCommand = new CreateRuleLayerCommand(currentSession.tilemap.objectId, parent.objectId, payload);
 
         historyManager.startTransaction();
         historyManager.execute(createRuleLayerCommand, editorFacade)
@@ -109,7 +109,7 @@ export class TilemapLayerService {
 
         const payload = defaultGroupLayerData();
 
-        const createGroupLayerCommand = new CreateGroupLayerCommand(payload, parent.id);
+        const createGroupLayerCommand = new CreateGroupLayerCommand(currentSession.tilemap.objectId, parent.objectId, payload);
 
         historyManager.startTransaction();
         historyManager.execute(createGroupLayerCommand, editorFacade)
@@ -129,7 +129,9 @@ export class TilemapLayerService {
 
         historyManager.startTransaction();
         selectedIds.forEach(id => {
-            const duplicateLayerCommand = new DuplicateLayerCommand(id);
+            const layer = currentSession.tilemap.rootLayer.findLayer(id);
+            if (!layer) return;
+            const duplicateLayerCommand = new DuplicateLayerCommand(currentSession.tilemap.objectId, layer.objectId);
             historyManager.execute(duplicateLayerCommand, editorFacade);
         });
         historyManager.commitTransaction();
@@ -146,7 +148,9 @@ export class TilemapLayerService {
 
         historyManager.startTransaction();
         selectedIds.forEach((id) => {
-            const deleteLayerCommand = new DeleteLayerCommand(id);
+            const layer = currentSession.tilemap.rootLayer.findLayer(id);
+            if (!layer) return;
+            const deleteLayerCommand = new DeleteLayerCommand(currentSession.tilemap.objectId, layer.objectId);
             historyManager.execute(deleteLayerCommand, editorFacade);
         })
         historyManager.commitTransaction();
@@ -223,7 +227,7 @@ export class TilemapLayerService {
         ids.forEach(id => {
             const layer = root.findLayer(id);
             if (!layer) return;
-            const toggleVisibilityCommand = new ToggleLayerVisibilityCommand(id, force === undefined ? !layer.visible : force);
+            const toggleVisibilityCommand = new ToggleLayerVisibilityCommand(currentSession.tilemap.objectId, layer.objectId, force === undefined ? !layer.visible : force);
             historyManager.execute(toggleVisibilityCommand, editorFacade);
         });
         historyManager.commitTransaction();
@@ -241,7 +245,7 @@ export class TilemapLayerService {
         if (!targetLayer) return;
         if (!(targetLayer instanceof GroupLayer)) return;
 
-        const toggleOpenGroupLayerCommand = new ToggleOpenGroupLayerCommand(id, force);
+        const toggleOpenGroupLayerCommand = new ToggleOpenGroupLayerCommand(currentSession.tilemap.objectId, targetLayer.objectId, force);
         toggleOpenGroupLayerCommand.execute(editorFacade);
     }
 
@@ -276,7 +280,7 @@ export class TilemapLayerService {
         ids.forEach(id => {
             const layer = root.findLayer(id);
             if (!layer) return;
-            const toggleLockCommand = new ToggleLayerLockCommand(id, force === undefined ? !layer.locked : force);
+            const toggleLockCommand = new ToggleLayerLockCommand(currentSession.tilemap.objectId, layer.objectId, force === undefined ? !layer.locked : force);
             historyManager.execute(toggleLockCommand, editorFacade);
         });
         historyManager.commitTransaction();
@@ -315,7 +319,7 @@ export class TilemapLayerService {
             historyManager.startTransaction();
             layersToMove.forEach(l => {
                 const insertIndex = getMoveCommandIndex(targetLayer, l, targetLayer.layers.length);
-                const moveLayerCommand = new MoveLayerCommand(targetLayer.id, l.id, insertIndex);
+                const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, targetLayer.objectId, l.objectId, insertIndex);
                 historyManager.execute(moveLayerCommand, editorFacade);
             });
             historyManager.commitTransaction();
@@ -328,7 +332,7 @@ export class TilemapLayerService {
                     if (targetIndex !== -1) {
                         const desiredIndex = position === 'top' ? targetIndex : targetIndex + 1 + i;
                         const insertIndex = getMoveCommandIndex(parent, l, desiredIndex);
-                        const moveLayerCommand = new MoveLayerCommand(parent.id, l.id, insertIndex);
+                        const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, parent.objectId, l.objectId, insertIndex);
                         historyManager.execute(moveLayerCommand, editorFacade);
                     }
                 });
@@ -370,14 +374,14 @@ export class TilemapLayerService {
                 if (parent.parentLayer) {
                     const grandParent = parent.parentLayer;
                     const parentIndex = grandParent.layers.indexOf(parent as any);
-                    const moveLayerCommand = new MoveLayerCommand(grandParent.id, layer.id, parentIndex);
+                    const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, grandParent.objectId, layer.objectId, parentIndex);
                     historyManager.execute(moveLayerCommand, editorFacade);
                 }
             } else if (prevSibling instanceof GroupLayer) {
-                const moveLayerCommand = new MoveLayerCommand(prevSibling.id, layer.id, prevSibling.layers.length);
+                const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, prevSibling.objectId, layer.objectId, prevSibling.layers.length);
                 historyManager.execute(moveLayerCommand, editorFacade);
             } else {
-                const moveLayerCommand = new MoveLayerCommand(parent.id, layer.id, index - 1);
+                const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, parent.objectId, layer.objectId, index - 1);
                 historyManager.execute(moveLayerCommand, editorFacade);
             }
         });
@@ -417,14 +421,14 @@ export class TilemapLayerService {
                 if (parent.parentLayer) {
                     const grandParent = parent.parentLayer;
                     const parentIndex = grandParent.layers.indexOf(parent as any);
-                    const moveLayerCommand = new MoveLayerCommand(grandParent.id, layer.id, parentIndex + 1);
+                    const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, grandParent.objectId, layer.objectId, parentIndex + 1);
                     historyManager.execute(moveLayerCommand, editorFacade);
                 }
             } else if (nextSibling instanceof GroupLayer) {
-                const moveLayerCommand = new MoveLayerCommand(nextSibling.id, layer.id, 0);
+                const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, nextSibling.objectId, layer.objectId, 0);
                 historyManager.execute(moveLayerCommand, editorFacade);
             } else {
-                const moveLayerCommand = new MoveLayerCommand(parent.id, layer.id, index + 1);
+                const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, parent.objectId, layer.objectId, index + 1);
                 historyManager.execute(moveLayerCommand, editorFacade);
             }
         });
@@ -438,13 +442,14 @@ export class TilemapLayerService {
         const historyManager = editorFacade.getCurrentHistoryManager();
         if (!currentSession || !historyManager) return;
 
+        const root = currentSession.tilemap.rootLayer;
+        const layer = root.findLayer(id);
+        if (!layer) return;
+
         if (recordUndo) {
-            const renameLayerCommand = new RenameLayerCommand(id, name);
+            const renameLayerCommand = new RenameLayerCommand(currentSession.tilemap.objectId, layer.objectId, name);
             historyManager.execute(renameLayerCommand, editorFacade);
         } else {
-            const root = currentSession.tilemap.rootLayer;
-            const layer = root.findLayer(id);
-            if (!layer) return;
             layer.rename(name);
         }
     }

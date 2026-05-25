@@ -14,15 +14,16 @@ import {
     createNoSessionFacade,
     createRuleLayerData,
     createTileLayerData,
+    layerObjectId,
     layerIds,
     requireGroupLayer,
 } from "./layer-command-test-utils";
 
 describe("CreateTileLayerCommand", () => {
     it("creates a tile layer in a group parent, opens the group, and removes it on undo", () => {
-        const { editorFacade, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange, objectRegistry } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new CreateTileLayerCommand(createTileLayerData({ id: "created-tile", name: "Decoration" }), "group-a");
+        const command = new CreateTileLayerCommand(tilemap.objectId, group.objectId, createTileLayerData({ id: "created-tile", name: "Decoration" }));
 
         const executeResult = command.execute(editorFacade);
 
@@ -46,9 +47,9 @@ describe("CreateTileLayerCommand", () => {
     });
 
     it("creates a tile layer beside a non-group target by using that target's parent", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new CreateTileLayerCommand(createTileLayerData({ id: "sibling-tile" }), "tile-a");
+        const command = new CreateTileLayerCommand(tilemap.objectId, layerObjectId(root, "tile-a"), createTileLayerData({ id: "sibling-tile" }));
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -57,19 +58,19 @@ describe("CreateTileLayerCommand", () => {
     });
 
     it("returns an error when there is no active tilemap session", () => {
-        const command = new CreateTileLayerCommand(createTileLayerData(), "root");
+        const command = new CreateTileLayerCommand("tilemap:missing", "tilemap:missing:layer:root", createTileLayerData());
 
         expect(command.execute(createNoSessionFacade())).toMatchObject({
             status: Result.Status.Error,
-            message: { key: "Current session not found" },
+            message: { key: "Tilemap not found" },
         });
     });
 });
 
 describe("CreateRuleLayerCommand", () => {
     it("creates a rule layer at the root and removes it on undo", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
-        const command = new CreateRuleLayerCommand(createRuleLayerData({ id: "created-rule", name: "Auto Terrain" }), "root");
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
+        const command = new CreateRuleLayerCommand(tilemap.objectId, root.objectId, createRuleLayerData({ id: "created-rule", name: "Auto Terrain" }));
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -84,20 +85,20 @@ describe("CreateRuleLayerCommand", () => {
     });
 
     it("returns an error when undo runs without an active tilemap session", () => {
-        const command = new CreateRuleLayerCommand(createRuleLayerData(), "root");
+        const command = new CreateRuleLayerCommand("tilemap:missing", "tilemap:missing:layer:root", createRuleLayerData());
 
         expect(command.undo(createNoSessionFacade())).toMatchObject({
             status: Result.Status.Error,
-            message: { key: "Current session not found" },
+            message: { key: "Tilemap not found" },
         });
     });
 });
 
 describe("CreateGroupLayerCommand", () => {
     it("creates a group layer in the target group and removes it on undo", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new CreateGroupLayerCommand(createGroupLayerData({ id: "created-group", name: "Props" }), "group-a");
+        const command = new CreateGroupLayerCommand(tilemap.objectId, group.objectId, createGroupLayerData({ id: "created-group", name: "Props" }));
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 
@@ -112,9 +113,9 @@ describe("CreateGroupLayerCommand", () => {
     });
 
     it("creates a group beside a non-group target by using that target's parent", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new CreateGroupLayerCommand(createGroupLayerData({ id: "sibling-group" }), "tile-a");
+        const command = new CreateGroupLayerCommand(tilemap.objectId, layerObjectId(root, "tile-a"), createGroupLayerData({ id: "sibling-group" }));
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
 

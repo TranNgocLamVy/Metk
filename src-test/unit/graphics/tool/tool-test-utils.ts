@@ -3,6 +3,7 @@ import { vi } from "vitest";
 import { IDrawStrategy, DrawPayload } from "@/graphics/strategies/draw-strategy.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 import { createTilemap } from "../../application/commands/layer/layer-command-test-utils";
 
@@ -75,6 +76,8 @@ export const createOverlayContainer = () => ({
 
 export const createEditorHarness = () => {
     const tilemap = createTilemap();
+    const objectRegistry = new EditorObjectRegistry();
+    objectRegistry.registerTree(tilemap);
     const historyManager = {
         startTransaction: vi.fn(),
         execute: vi.fn((command: any, editorFacade: EditorFacade) => command.execute(editorFacade)),
@@ -90,9 +93,14 @@ export const createEditorHarness = () => {
         on: vi.fn(),
         off: vi.fn(),
     };
+    const tilemapSessionManager = {
+        getSessionByTilemapId: vi.fn((tilemapId: string) => tilemapId === tilemap.id ? session : null),
+    };
     const editorFacade = {
         getActiveTilemapSession: vi.fn(() => session),
         getCurrentHistoryManager: vi.fn(() => historyManager),
+        objectRegistry,
+        currentWorkspace: { tilemapSessionManager },
     } as unknown as EditorFacade;
 
     return { tilemap, session, historyManager, editorFacade };
@@ -110,8 +118,9 @@ export const createViewHarness = (session: any) => {
     return { view, viewport, overlayerContainer };
 };
 
-export const createTileLayerRenderer = (layer: TileLayer) => ({
+export const createTileLayerRenderer = (layer: TileLayer, tilemap: ReturnType<typeof createTilemap>) => ({
     layer,
+    tilemap,
     width: 4,
     height: 4,
     posToCoord: vi.fn((pos: Position) => ({

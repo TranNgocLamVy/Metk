@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { HistoryManager } from "@/application/resources/history/history.manager";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 
-const createCommand = (id: string, calls: string[] = []): IBaseCommand => ({
+const createCommand = (id: string, calls: string[] = []): IUndoableCommand => ({
     id,
     execute: vi.fn(() => { calls.push(`execute:${id}`); return Result.Success(); }),
     undo: vi.fn(() => { calls.push(`undo:${id}`); return Result.Success(); }),

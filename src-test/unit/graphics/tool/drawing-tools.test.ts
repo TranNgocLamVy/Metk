@@ -77,7 +77,7 @@ const createDrawingHarness = () => {
     const editor = createEditorHarness();
     const view = createViewHarness(editor.session);
     const layer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
-    const renderer = createTileLayerRenderer(layer);
+    const renderer = createTileLayerRenderer(layer, editor.tilemap);
 
     return { ...editor, ...view, layer, renderer };
 };

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { HistoryManager } from "@/application/resources/history/history.manager";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 
 type CommandDoubleOptions = {
@@ -10,7 +10,7 @@ type CommandDoubleOptions = {
     calls?: string[];
 };
 
-const createCommandDouble = (id: string, options: CommandDoubleOptions = {}): IBaseCommand => {
+const createCommandDouble = (id: string, options: CommandDoubleOptions = {}): IUndoableCommand => {
     const calls = options.calls ?? [];
     return {
         id,

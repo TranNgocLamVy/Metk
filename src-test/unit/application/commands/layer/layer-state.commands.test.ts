@@ -9,13 +9,14 @@ import { Result } from "@/shared/types/result";
 import {
     createLayerCommandHarness,
     createNoSessionFacade,
+    layerObjectId,
     requireGroupLayer,
 } from "./layer-command-test-utils";
 
 describe("RenameLayerCommand", () => {
     it("renames a layer and restores its previous name on undo", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
-        const command = new RenameLayerCommand("tile-root", "Collision");
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
+        const command = new RenameLayerCommand(tilemap.objectId, layerObjectId(root, "tile-root"), "Collision");
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
         expect(root.findLayer("tile-root")?.name).toBe("Collision");
@@ -27,10 +28,10 @@ describe("RenameLayerCommand", () => {
     });
 
     it("returns an error and leaves names unchanged when the target layer is missing", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new RenameLayerCommand("missing-layer", "Collision").execute(editorFacade)).toMatchObject({
+        expect(new RenameLayerCommand(tilemap.objectId, `${tilemap.objectId}:layer:missing-layer`, "Collision").execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer not found" },
         });
@@ -42,8 +43,8 @@ describe("RenameLayerCommand", () => {
 
 describe("ToggleLayerLockCommand", () => {
     it("updates lock state, emits selected-layer changes, and restores lock state on undo", () => {
-        const { editorFacade, root, markLayerChange, emit, session } = createLayerCommandHarness();
-        const command = new ToggleLayerLockCommand("tile-root", true);
+        const { editorFacade, tilemap, root, markLayerChange, emit, session } = createLayerCommandHarness();
+        const command = new ToggleLayerLockCommand(tilemap.objectId, layerObjectId(root, "tile-root"), true);
 
         expect(root.findLayer("tile-root")?.locked).toBe(false);
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
@@ -60,10 +61,10 @@ describe("ToggleLayerLockCommand", () => {
     });
 
     it("returns an error without emitting when the target layer is missing", () => {
-        const { editorFacade, root, emit, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, emit, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new ToggleLayerLockCommand("missing-layer", true).execute(editorFacade)).toMatchObject({
+        expect(new ToggleLayerLockCommand(tilemap.objectId, `${tilemap.objectId}:layer:missing-layer`, true).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer not found" },
         });
@@ -76,8 +77,8 @@ describe("ToggleLayerLockCommand", () => {
 
 describe("ToggleLayerVisibilityCommand", () => {
     it("updates visibility, emits selected-layer changes, and restores visibility on undo", () => {
-        const { editorFacade, root, markLayerChange, emit, session } = createLayerCommandHarness();
-        const command = new ToggleLayerVisibilityCommand("tile-root", false);
+        const { editorFacade, tilemap, root, markLayerChange, emit, session } = createLayerCommandHarness();
+        const command = new ToggleLayerVisibilityCommand(tilemap.objectId, layerObjectId(root, "tile-root"), false);
 
         expect(root.findLayer("tile-root")?.visible).toBe(true);
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
@@ -94,18 +95,18 @@ describe("ToggleLayerVisibilityCommand", () => {
     });
 
     it("returns an error when there is no active tilemap session", () => {
-        expect(new ToggleLayerVisibilityCommand("tile-root", false).execute(createNoSessionFacade())).toMatchObject({
+        expect(new ToggleLayerVisibilityCommand("tilemap:missing", "tilemap:missing:layer:tile-root", false).execute(createNoSessionFacade())).toMatchObject({
             status: Result.Status.Error,
-            message: { key: "Current session not found" },
+            message: { key: "Tilemap not found" },
         });
     });
 });
 
 describe("ToggleOpenGroupLayerCommand", () => {
     it("toggles a group layer open state and marks the layer tree changed", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new ToggleOpenGroupLayerCommand("group-a");
+        const command = new ToggleOpenGroupLayerCommand(tilemap.objectId, group.objectId);
 
         expect(group.isOpen).toBe(false);
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
@@ -115,9 +116,9 @@ describe("ToggleOpenGroupLayerCommand", () => {
     });
 
     it("honors a forced open state and reports that undo is unsupported", () => {
-        const { editorFacade, root } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root } = createLayerCommandHarness();
         const group = requireGroupLayer(root, "group-a");
-        const command = new ToggleOpenGroupLayerCommand("group-a", false);
+        const command = new ToggleOpenGroupLayerCommand(tilemap.objectId, group.objectId, false);
 
         group.toggleOpen(true);
 
@@ -130,10 +131,10 @@ describe("ToggleOpenGroupLayerCommand", () => {
     });
 
     it("returns an error without mutating when the target is not a group layer", () => {
-        const { editorFacade, root, markLayerChange } = createLayerCommandHarness();
+        const { editorFacade, tilemap, root, markLayerChange } = createLayerCommandHarness();
         const before = root.serialize();
 
-        expect(new ToggleOpenGroupLayerCommand("tile-root").execute(editorFacade)).toMatchObject({
+        expect(new ToggleOpenGroupLayerCommand(tilemap.objectId, layerObjectId(root, "tile-root")).execute(editorFacade)).toMatchObject({
             status: Result.Status.Error,
             message: { key: "Target layer is not a group layer" },
         });

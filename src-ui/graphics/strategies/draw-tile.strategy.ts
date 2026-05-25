@@ -118,7 +118,7 @@ export class DrawTileStrategy implements IDrawStrategy {
         if (updates.length == 0) return;
 
         historyManager.startTransaction();
-        historyManager.execute(new SetTilesCommand(layerRenderer.layer.id, updates), editorFacade);
+        historyManager.execute(new SetTilesCommand(layerRenderer.tilemap.objectId, layerRenderer.layer.objectId, updates), editorFacade);
         historyManager.commitTransaction();
     }
 

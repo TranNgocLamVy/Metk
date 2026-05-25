@@ -2,7 +2,7 @@ import { Result } from "@/shared/types/result";
 
 import { EditorFacade } from "@/application/editor.facade";
 
-export interface IBaseCommand {
+export interface IUndoableCommand {
     readonly id: string;
     execute(editorFacade: EditorFacade): Result;
     undo(editorFacade: EditorFacade): Result;

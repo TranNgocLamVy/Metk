@@ -3,53 +3,63 @@ import { v4 as uuidv4 } from "uuid";
 import { TileLayerData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
-import { IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
 
-export class CreateTileLayerCommand implements IBaseCommand {
+export class CreateTileLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
-    private tileLayerId: string;
+    private tileLayerObjectId: string;
     constructor(
+        private readonly tilemapObjectId: string,
+        private readonly parentLayerObjectId: string,
         private tileLayerData: TileLayerData,
-        private readonly parentLayerId: string,
     ) { }
 
     public execute(editorFacade: EditorFacade): Result {
-        const currentSession = editorFacade.getActiveTilemapSession()
-        if (!currentSession) return Result.Error("Current session not found");
-        const root = currentSession.tilemap.rootLayer;
+        const objectRegistry = editorFacade.objectRegistry;
+        if (!objectRegistry) return Result.Error("Object registry not found");
 
-        const targetLayer = root.findLayer(this.parentLayerId);
-        const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root) as IGroupLayer;
+        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        if (!tilemap) return Result.Error("Tilemap not found");
 
-        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, parent.objectIdScope);
+        const targetLayer = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
+        if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Parent layer not found");
+
+        const parent = resolveLayerInsertionParent(targetLayer, tilemap.rootLayer);
+
+        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, tilemap.objectId);
         parent.addLayer(newTileLayer);
-        editorFacade.objectRegistry?.registerTree(newTileLayer);
+        objectRegistry.registerTree(newTileLayer);
         
         if (parent instanceof GroupLayer) parent.toggleOpen(true);
 
-        this.tileLayerId = newTileLayer.id;
+        this.tileLayerObjectId = newTileLayer.objectId;
 
-        currentSession.markLayerChange();
+        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }
 
     public undo(editorFacade: EditorFacade): Result {
-        const currentSession = editorFacade.getActiveTilemapSession()
-        if (!currentSession) return Result.Error("Current session not found");
-        const root = currentSession.tilemap.rootLayer;
-        const tileLayer = root.findLayer(this.tileLayerId) as TileLayer;
+        const objectRegistry = editorFacade.objectRegistry;
+        if (!objectRegistry) return Result.Error("Object registry not found");
+
+        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        if (!tilemap) return Result.Error("Tilemap not found");
+
+        const tileLayer = getLayerByObjectId<TileLayer>(editorFacade, this.tileLayerObjectId);
+        if (!(tileLayer instanceof TileLayer) || !isLayerInTilemap(tilemap, tileLayer)) return Result.Error("Tile layer not found");
+
         tileLayer.removeFromParent();
 
         this.tileLayerData = tileLayer.serialize();
 
-        editorFacade.objectRegistry?.unregisterTree(tileLayer);
+        objectRegistry.unregisterTree(tileLayer);
         tileLayer.destroy();
 
-        currentSession.markLayerChange();
+        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
         
         return Result.Success();
     }

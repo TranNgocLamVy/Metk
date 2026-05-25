@@ -2,45 +2,45 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { emitSelectedLayersChanged, getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
 
-export class ToggleLayerLockCommand implements IBaseCommand {
+export class ToggleLayerLockCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
     private oldIsLocked: boolean
     constructor(
-        private readonly targetLayerId: string,
+        private readonly tilemapObjectId: string,
+        private readonly targetLayerObjectId: string,
         private readonly newIsLocked: boolean
     ) { }
 
     public execute(editorFacade: EditorFacade): Result {
-        const currentSession = editorFacade.getActiveTilemapSession()
-        if (!currentSession) return Result.Error("Current session not found");
-        const root = currentSession.tilemap.rootLayer;
+        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        if (!tilemap) return Result.Error("Tilemap not found");
 
-        const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return Result.Error("Target layer not found");
+        const targetLayer = getLayerByObjectId(editorFacade, this.targetLayerObjectId);
+        if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Target layer not found");
 
         this.oldIsLocked = targetLayer.locked;
         targetLayer.toggleLock(this.newIsLocked);
 
-        currentSession.markLayerChange();
-        currentSession.emit("onSelectedLayersChanged", currentSession.layerState.selectedLayers);
+        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
+        emitSelectedLayersChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }
 
     public undo(editorFacade: EditorFacade): Result {
-        const currentSession = editorFacade.getActiveTilemapSession()
-        if (!currentSession) return Result.Error("Current session not found");
-        const root = currentSession.tilemap.rootLayer;
+        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        if (!tilemap) return Result.Error("Tilemap not found");
         
-        const targetLayer = root.findLayer(this.targetLayerId);
-        if (!targetLayer) return Result.Error("Target layer not found");
+        const targetLayer = getLayerByObjectId(editorFacade, this.targetLayerObjectId);
+        if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Target layer not found");
 
         targetLayer.toggleLock(this.oldIsLocked);
 
-        currentSession.markLayerChange();
-        currentSession.emit("onSelectedLayersChanged", currentSession.layerState.selectedLayers);
+        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
+        emitSelectedLayersChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

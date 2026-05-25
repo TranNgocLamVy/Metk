@@ -79,11 +79,13 @@ const createStrategyHarness = () => {
     const ruleLayer = tilemap.rootLayer.findLayer("rule-root") as RuleLayer;
     const tileRenderer = {
         layer: tileLayer,
+        tilemap,
         posToCoord: vi.fn((pos: Position) => ({ col: Math.floor(pos.x / 16), row: Math.floor(pos.y / 16) })),
         coordToPos: vi.fn((coord: Coordinate) => ({ x: coord.col * 16, y: coord.row * 16 })),
     };
     const ruleRenderer = {
         layer: ruleLayer,
+        tilemap,
         posToCoord: vi.fn((pos: Position) => ({ col: Math.floor(pos.x / 16), row: Math.floor(pos.y / 16) })),
         coordToPos: vi.fn((coord: Coordinate) => ({ x: coord.col * 16, y: coord.row * 16 })),
     };

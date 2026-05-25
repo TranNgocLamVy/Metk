@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ExportTilemapTMXCommand } from "@/application/commands/system/export-tilemap.command";
-import { OpenFileCommand } from "@/application/commands/system/open-file.command";
-import { RedoCommand } from "@/application/commands/system/redo.command";
-import { SaveAllTilemapCommand } from "@/application/commands/system/save-all-tilemap.command";
-import { SaveTilemapCommand } from "@/application/commands/system/save-tilemap.command";
-import { ToggleConsoleCommand } from "@/application/commands/system/toggle-terminal.command";
-import { UndoCommand } from "@/application/commands/system/undo.command";
+import { ExportTilemapTMXCommand } from "@/application/command-system/export-tilemap.command";
+import { OpenFileCommand } from "@/application/command-system/open-file.command";
+import { RedoCommand } from "@/application/command-system/redo.command";
+import { SaveAllTilemapCommand } from "@/application/command-system/save-all-tilemap.command";
+import { SaveTilemapCommand } from "@/application/command-system/save-tilemap.command";
+import { ToggleConsoleCommand } from "@/application/command-system/toggle-terminal.command";
+import { UndoCommand } from "@/application/command-system/undo.command";
 import { EditorFacade } from "@/application/editor.facade";
 import { ExportStorageService } from "@/infrastructure/export-storage.service";
 import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter";

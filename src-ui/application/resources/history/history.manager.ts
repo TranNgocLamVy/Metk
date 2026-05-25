@@ -1,15 +1,15 @@
 import { BatchCommand } from "@/application/commands/batch.command";
 import { EditorFacade } from "@/application/editor.facade";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 
 export class HistoryManager {
-    private undoStack: IBaseCommand[] = [];
-    private redoStack: IBaseCommand[] = [];
+    private undoStack: IUndoableCommand[] = [];
+    private redoStack: IUndoableCommand[] = [];
     private readonly limit: number;
 
     private isTransactionActive: boolean = false;
-    private currentBatch: IBaseCommand[] = [];
+    private currentBatch: IUndoableCommand[] = [];
 
     public onStateChange?: () => void;
 
@@ -17,7 +17,7 @@ export class HistoryManager {
         this.limit = limit;
     }
 
-    public execute(command: IBaseCommand, editorFacade: EditorFacade): Result {
+    public execute(command: IUndoableCommand, editorFacade: EditorFacade): Result {
         const result = command.execute(editorFacade);
         if (result.status !== Result.Status.Success) return result;
 
@@ -89,7 +89,7 @@ export class HistoryManager {
         }
     }
 
-    public pushToUndoStack(cmd: IBaseCommand) {
+    public pushToUndoStack(cmd: IUndoableCommand) {
         this.undoStack.push(cmd);
         this.redoStack = [];
 

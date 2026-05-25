@@ -2,14 +2,14 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
 
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "../editor.facade";
 
-export class BatchCommand implements IBaseCommand {
+export class BatchCommand implements IUndoableCommand {
     public readonly id: string;
-    private commands: IBaseCommand[];
+    private commands: IUndoableCommand[];
 
-    constructor(commands: IBaseCommand[]) {
+    constructor(commands: IUndoableCommand[]) {
         this.id = uuidv4();
         this.commands = commands;
     }

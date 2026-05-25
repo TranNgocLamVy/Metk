@@ -107,19 +107,28 @@ export const createLayerCommandHarness = (layers = createBaseLayers()) => {
         markLayerChange,
         emit,
     };
+    const tilemapSessionManager = {
+        getSessionByTilemapId: vi.fn(() => session),
+    };
     const editorFacade = {
-        getActiveTilemapSession: vi.fn(() => session),
         objectRegistry,
+        currentWorkspace: { tilemapSessionManager },
     } as unknown as EditorFacade;
 
     return { tilemap, root: tilemap.rootLayer, session, markLayerChange, emit, editorFacade, objectRegistry };
 };
 
 export const createNoSessionFacade = () => ({
-    getActiveTilemapSession: vi.fn(() => null),
+    objectRegistry: new EditorObjectRegistry(),
 }) as unknown as EditorFacade;
 
 export const layerIds = (parent: IGroupLayer): string[] => parent.layers.map((layer) => layer.id);
+
+export const layerObjectId = (root: RootLayer, id: string): string => {
+    const layer = root.findLayer(id);
+    if (!layer) throw new Error(`Expected ${id} to exist`);
+    return layer.objectId;
+};
 
 export const requireGroupLayer = (root: RootLayer, id: string): GroupLayer => {
     const layer = root.findLayer(id);

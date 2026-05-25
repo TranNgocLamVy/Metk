@@ -91,7 +91,7 @@ export class DrawRuleStrategy implements IDrawStrategy {
         if (updates.length == 0) return;
 
         historyManager.startTransaction();
-        historyManager.execute(new SetRulesCommand(layerRenderer.layer.id, updates), editorFacade);
+        historyManager.execute(new SetRulesCommand(layerRenderer.tilemap.objectId, layerRenderer.layer.objectId, updates), editorFacade);
         historyManager.commitTransaction();
     }
 

@@ -6,7 +6,7 @@ import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { SetRulesCommand } from "@/application/commands/tile/set-rules.command";
 import { SetTilesCommand } from "@/application/commands/tile/set-tiles.command";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { ITool } from "@/editor/interface/tool.interface";
 import { GeometryUtils } from "@/shared/utils/geometry-utils";
 import { IDrawStrategy } from "../strategies/draw-strategy.interface";
@@ -51,7 +51,7 @@ export class EraserTool implements ITool {
     private bindPointerOutside: (event: FederatedPointerEvent) => void;
     private originalWheelEvent: (e: FederatedWheelEvent) => boolean;
 
-    private eraseCommandStack: IBaseCommand[] = [];
+    private eraseCommandStack: IUndoableCommand[] = [];
 
     constructor(private readonly editorFacade: EditorFacade) {
         this.bindPointerOnDown = this.onPointerDown.bind(this);
@@ -230,13 +230,13 @@ export class EraserTool implements ITool {
         })
 
         if (eraseCoordinates.length != 0) {
-            let eraseCommand: IBaseCommand;
+            let eraseCommand: IUndoableCommand;
 
             // TODO: Move this into strategy
             if (this.targetLayerRenderer.layer instanceof TileLayer) {
-                eraseCommand = new SetTilesCommand(this.targetLayerRenderer.layer.id, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+                eraseCommand = new SetTilesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
             } else if (this.targetLayerRenderer.layer instanceof RuleLayer) {
-                eraseCommand = new SetRulesCommand(this.targetLayerRenderer.layer.id, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
+                eraseCommand = new SetRulesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
             } else {
                 return;
             }

@@ -23,8 +23,9 @@ import { RenameLayerCommand } from "@/application/commands/layer/rename-layer.co
 import { ToggleLayerLockCommand } from "@/application/commands/layer/toggle-layer-lock.command";
 import { ToggleLayerVisibilityCommand } from "@/application/commands/layer/toggle-layer-visibility.command";
 import { ToggleOpenGroupLayerCommand } from "@/application/commands/layer/toggle-open-group-layer.command";
-import { IBaseCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { WorkspaceService } from "@/shared/services/workspace.service";
@@ -41,6 +42,8 @@ const resetLayerManagerStore = () => {
 
 const createServiceHarness = (selectedLayers: string[] = []) => {
     const tilemap = createTilemap();
+    const objectRegistry = new EditorObjectRegistry();
+    objectRegistry.registerTree(tilemap);
     const session = {
         tilemap,
         isDirty: false,
@@ -53,16 +56,22 @@ const createServiceHarness = (selectedLayers: string[] = []) => {
             session.layerState = { ...session.layerState, ...state };
         }),
     };
+    const tilemapSessionManager = {
+        activeSession: session,
+        getSessionByTilemapId: vi.fn((tilemapId: string) => tilemapId === tilemap.id ? session : null),
+    };
 
     const editorFacade = {
         getActiveTilemapSession: vi.fn(() => session),
         getCurrentHistoryManager: vi.fn(),
+        objectRegistry,
+        currentWorkspace: { tilemapSessionManager },
     } as unknown as EditorFacade;
 
-    const executedCommands: IBaseCommand[] = [];
+    const executedCommands: IUndoableCommand[] = [];
     const historyManager = {
         startTransaction: vi.fn(),
-        execute: vi.fn((command: IBaseCommand, facade: EditorFacade) => {
+        execute: vi.fn((command: IUndoableCommand, facade: EditorFacade) => {
             executedCommands.push(command);
             return command.execute(facade);
         }),
@@ -72,9 +81,7 @@ const createServiceHarness = (selectedLayers: string[] = []) => {
     (editorFacade.getCurrentHistoryManager as any).mockReturnValue(historyManager);
     kernelState.appKernel.editorFacade = editorFacade;
     kernelState.appKernel.workspaceManager.currentWorkspace = {
-        tilemapSessionManager: {
-            activeSession: session,
-        },
+        tilemapSessionManager,
     };
 
     return {
@@ -201,7 +208,7 @@ describe("TilemapLayerService duplicate and delete workflows", () => {
 
         await TilemapLayerService.deleteLayer();
 
-        expectSingleTransaction(historyManager, 2);
+        expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(DeleteLayerCommand);
         expect(root.findLayer("tile-a")).toBeNull();
         expect(layerIds(group)).toEqual(["group-child"]);
