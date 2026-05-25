@@ -14,6 +14,7 @@ import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
 import { TilemapView } from "../view/tilemap.view";
 import { Tool } from "./tool.decorator";
 import { BatchCommand } from "@/application/commands/batch.command";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 
 @Tool({
     id: "tool.eraser",
@@ -42,6 +43,8 @@ export class EraserTool implements ITool {
     private static eraserSize: number = 1;
 
     private targetLayerRenderer: BaseLayerRenderer | null = null;
+    private tilemapObjectId: string | null = null;
+    private targetLayerObjectId: string | null = null;
 
     private isEnabled: boolean = false;
 
@@ -74,6 +77,8 @@ export class EraserTool implements ITool {
         this.previousPreviewCoordinate = null!;
         this.currentPreviewCoordinate = null!;
         this.targetLayerRenderer = null;
+        this.tilemapObjectId = null;
+        this.targetLayerObjectId = null;
         this.eraseCoordinateSet.clear();
 
         this.reverseErase();
@@ -127,6 +132,8 @@ export class EraserTool implements ITool {
         this.previousPreviewCoordinate = null!;
         this.currentPreviewCoordinate = null!;
         this.targetLayerRenderer = null;
+        this.tilemapObjectId = null;
+        this.targetLayerObjectId = null;
         this.eraseCoordinateSet.clear();
 
         this.reverseErase();
@@ -138,6 +145,8 @@ export class EraserTool implements ITool {
 
     public setTargetLayerRenderer(layerRenderer: BaseLayerRenderer | null): void {
         this.targetLayerRenderer = layerRenderer;
+        this.tilemapObjectId = layerRenderer?.tilemap.objectId ?? null;
+        this.targetLayerObjectId = layerRenderer?.layer.objectId ?? null;
     }
 
     private onPointerDown(e: FederatedPointerEvent) {
@@ -202,7 +211,13 @@ export class EraserTool implements ITool {
     private eraseMove(e: FederatedPointerEvent) {
         if (!this.isDragging) return;
 
-        if (!this.targetLayerRenderer) return;
+        if (!this.targetLayerRenderer || !this.tilemapObjectId || !this.targetLayerObjectId) return;
+
+        const tilemap = getTilemapByObjectId(this.editorFacade, this.tilemapObjectId);
+        if (!tilemap) return;
+
+        const targetLayer = getLayerByObjectId(this.editorFacade, this.targetLayerObjectId);
+        if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return;
 
         const drawCoordinates = GeometryUtils.calculateLine(this.previousPreviewCoordinate, this.currentPreviewCoordinate);
         if (drawCoordinates.length == 0) drawCoordinates.push(this.currentPreviewCoordinate);
@@ -233,10 +248,10 @@ export class EraserTool implements ITool {
             let eraseCommand: IUndoableCommand;
 
             // TODO: Move this into strategy
-            if (this.targetLayerRenderer.layer instanceof TileLayer) {
-                eraseCommand = new SetTilesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
-            } else if (this.targetLayerRenderer.layer instanceof RuleLayer) {
-                eraseCommand = new SetRulesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
+            if (targetLayer instanceof TileLayer) {
+                eraseCommand = new SetTilesCommand(this.tilemapObjectId, this.targetLayerObjectId, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
+            } else if (targetLayer instanceof RuleLayer) {
+                eraseCommand = new SetRulesCommand(this.tilemapObjectId, this.targetLayerObjectId, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
             } else {
                 return;
             }

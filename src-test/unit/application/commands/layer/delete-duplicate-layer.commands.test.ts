@@ -38,6 +38,11 @@ describe("DeleteLayerCommand", () => {
         expect(objectRegistry.has(originalObjectId)).toBe(true);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
         expect(markLayerChange).toHaveBeenCalledTimes(2);
+
+        expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
+        expect(root.findLayer("tile-a")).toBeNull();
+        expect(objectRegistry.has(originalObjectId)).toBe(false);
+        expect(markLayerChange).toHaveBeenCalledTimes(3);
     });
 
     it("removes a group with its children and restores the complete subtree on undo", () => {
@@ -111,6 +116,13 @@ describe("DuplicateLayerCommand", () => {
         expect(objectRegistry.has(duplicated.objectId)).toBe(false);
         expect(duplicated.destroyed).toBe(true);
         expect(markLayerChange).toHaveBeenCalledTimes(2);
+
+        expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
+        const restoredDuplicate = root.findLayer(duplicated.id);
+        expect(restoredDuplicate?.objectId).toBe(duplicated.objectId);
+        expect(restoredDuplicate?.serialize()).toEqual(duplicated.serialize());
+        expect(objectRegistry.has(duplicated.objectId)).toBe(true);
+        expect(markLayerChange).toHaveBeenCalledTimes(3);
     });
 
     it("duplicates a group without flattening or moving its existing children", () => {

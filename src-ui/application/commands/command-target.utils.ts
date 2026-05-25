@@ -6,7 +6,7 @@ import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 
-export type RegisteredGroupLayer = (GroupLayer | RootLayer) & IGroupLayer;
+export type LayerContainer = (GroupLayer | RootLayer) & IGroupLayer;
 
 export function getTilemapByObjectId(editorFacade: EditorFacade, tilemapObjectId: string): Tilemap | null {
     const tilemap = editorFacade.objectRegistry?.get<BaseObject<any>>(tilemapObjectId) ?? null;
@@ -18,13 +18,13 @@ export function getLayerByObjectId<TLayer extends BaseLayer<any> = BaseLayer<any
     return layer instanceof BaseLayer ? layer as TLayer : null;
 }
 
-export function isLayerContainer(layer: BaseLayer<any>): layer is RegisteredGroupLayer {
+export function isLayerContainer(layer: BaseLayer<any>): layer is LayerContainer {
     return layer instanceof GroupLayer || layer instanceof RootLayer;
 }
 
-export function resolveLayerInsertionParent(layer: BaseLayer<any>, root: RootLayer): RegisteredGroupLayer {
+export function resolveLayerInsertionParent(layer: BaseLayer<any>, root: RootLayer): LayerContainer {
     if (isLayerContainer(layer)) return layer;
-    return (layer.parentLayer ?? root) as RegisteredGroupLayer;
+    return (layer.parentLayer ?? root) as LayerContainer;
 }
 
 export function isLayerInTilemap(tilemap: Tilemap, layer: BaseLayer<any>): boolean {

@@ -11,8 +11,6 @@ export type RulesetRefData = {
     output?: TileRefData;
 }
 
-export const LayerType = type("'tile' | 'group' | 'auto_rule'");
-
 const layerModule = scope({
     TileLayer: {
         id: "string",

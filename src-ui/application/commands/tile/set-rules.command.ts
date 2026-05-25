@@ -4,7 +4,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapDirty } from "@/application/commands/command-object.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapDirty } from "@/application/commands/command-target.utils";
 
 export class SetRulesCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -14,7 +14,7 @@ export class SetRulesCommand implements IUndoableCommand {
     constructor(
         private readonly tilemapObjectId: string,
         private readonly layerObjectId: string,
-        private readonly updates: { coordinate: Coordinate, rulesetId: string | null }[]
+        private updates: { coordinate: Coordinate, rulesetId: string | null }[]
     ) {}
 
     public execute(editorFacade: EditorFacade): Result {
@@ -57,6 +57,7 @@ export class SetRulesCommand implements IUndoableCommand {
     }
 
     public delete(): void {
+        this.updates = [];
         this.oldRules = [];
     }
 }

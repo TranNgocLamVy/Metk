@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
 
 export class RenameLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()

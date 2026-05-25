@@ -55,6 +55,13 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     })
     protected _locked: boolean = false;
 
+    @StringProperty<BaseLayer>({
+        label: "Layer Type",
+        readonly: true,
+        get: (target) => target.layerType,
+    })
+    public readonly layerType: string = "Unknow";
+
     public get visible() { return this._visible && this.parentLayer ? this.parentLayer.visible : this._visible }
     public set visible(value: boolean) {
         this._visible = value;
@@ -74,9 +81,11 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         public readonly tilesetRefManager: TilesetRefManager, 
         public readonly rulesetRefManager: RulesetRefManager,
         public readonly objectIdScope: string = "object",
+        layerType: string = "Unknow"
     ) {
         super(`${objectIdScope}:layer:${id}`);
         this.id = id;
+        this.layerType = layerType;
     }
 
     public rename(newName: string): void {

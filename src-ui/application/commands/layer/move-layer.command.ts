@@ -5,7 +5,7 @@ import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
+import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
 import { IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 
 export class MoveLayerCommand implements IUndoableCommand {

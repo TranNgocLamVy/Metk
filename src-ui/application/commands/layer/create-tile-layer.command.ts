@@ -6,7 +6,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
+import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
 
 export class CreateTileLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()

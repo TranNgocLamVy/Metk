@@ -23,7 +23,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         rulesetRefManager: RulesetRefManager,
         objectIdScope: string = "tilemap:unknown"
     ) {
-        super("root", tilesetRefManager, rulesetRefManager, objectIdScope);
+        super("root", tilesetRefManager, rulesetRefManager, objectIdScope, "Root Layer");
 
         layersData.forEach(layerData => {
             const layer = this.createLayerTree(layerData, this);

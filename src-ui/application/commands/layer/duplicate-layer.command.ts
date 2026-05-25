@@ -4,7 +4,7 @@ import { Result } from "@/shared/types/result";
 
 import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-object.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
 
 export class DuplicateLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -58,6 +58,6 @@ export class DuplicateLayerCommand implements IUndoableCommand {
     }
 
     public delete(): void {
-
+        
     }
 }

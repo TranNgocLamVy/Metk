@@ -27,7 +27,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         rulesetRefManager: RulesetRefManager,
         objectIdScope: string = parentLayer.objectIdScope,
     ) {
-        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
+        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope, "Rule Layer");
 
         this.parentLayer = parentLayer;
         this.name = ruleLayerData.name;

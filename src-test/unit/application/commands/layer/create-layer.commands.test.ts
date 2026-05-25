@@ -44,6 +44,12 @@ describe("CreateTileLayerCommand", () => {
         expect(createdLayer!.destroyed).toBe(true);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
         expect(markLayerChange).toHaveBeenCalledTimes(2);
+
+        expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
+        const recreatedLayer = root.findLayer("created-tile");
+        expect(recreatedLayer?.objectId).toBe(createdLayer!.objectId);
+        expect(objectRegistry.has(createdLayer!.objectId)).toBe(true);
+        expect(markLayerChange).toHaveBeenCalledTimes(3);
     });
 
     it("creates a tile layer beside a non-group target by using that target's parent", () => {

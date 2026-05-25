@@ -26,7 +26,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         rulesetRefManager: RulesetRefManager,
         objectIdScope: string = parentLayer.objectIdScope
     ) {
-        super(groupLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope);
+        super(groupLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope, "Group Layer");
 
         this.parentLayer = parentLayer;
 
