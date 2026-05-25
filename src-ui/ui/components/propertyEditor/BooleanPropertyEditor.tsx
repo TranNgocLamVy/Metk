@@ -15,11 +15,11 @@ export function BooleanPropertyEditor({ property }: BooleanEditorProps) {
     }
 
     return (
-        <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] px-2 py-1.5 items-center gap-2">
-            <label className="min-w-0 truncate text-xs" title={property.label}>
+        <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] px-2 h-8 items-center gap-2">
+            <label className="min-w-0 truncate text-2xs" title={property.label}>
                 {property.label}
             </label>
-            <div className="flex h-8 items-center">
+            <div className="flex items-center">
                 <Checkbox
                     checked={draft}
                     disabled={property.disabled() || property.readonly()}

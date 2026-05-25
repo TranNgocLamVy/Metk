@@ -19,9 +19,9 @@ import PropertyPanel from "./propertyPanel/PropertyPanel";
 export default function Workspace() {
 
 	const { model } = useLayoutStore();
-	
+
 	const layoutRef = useRef<Layout | null>(null);
-	
+
 	useRelativeFlexLayout(layoutRef);
 
 	const factory = (node: TabNode) => {
@@ -71,10 +71,10 @@ export default function Workspace() {
 	};
 
 	return (
-		<HStack className="w-full h-full">
+		<HStack className="w-full h-full select-none">
 			<VStack className="w-full h-full bg-surface">
 				<VStack className="workspace w-full h-full px-1 relative">
-					{model && <Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange}  />}
+					<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
 					<div className="top-0 left-0 w-full h-full absolute pointer-events-none" />
 				</VStack>
 				<ContextBar />

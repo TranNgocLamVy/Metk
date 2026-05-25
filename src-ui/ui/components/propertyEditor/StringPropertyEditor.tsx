@@ -51,9 +51,9 @@ export function StringPropertyEditor({ property }: StringEditorProps) {
     }, [])
 
     return (
-        <div className="px-2 py-1.5">
-            <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center gap-2">
-                <label className="min-w-0 truncate text-xs text-shadow-foreground" title={property.label}>
+        <div className="px-2 h-8">
+            <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center h-full gap-2">
+                <label className="min-w-0 truncate text-2xs text-shadow-foreground" title={property.label}>
                     {property.label}
                 </label>
                 <Input
@@ -64,9 +64,10 @@ export function StringPropertyEditor({ property }: StringEditorProps) {
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     onBlur={() => handleConfirmChange(draft)}
+                    className="h-6 text-2xs"
                 />
             </div>
-            {error && <span className="mt-1 pl-[calc(40%+0.5rem)] text-[10px] text-destructive"><LocalizedText message={error} /></span>}
+            {error && <span className="mt-1 pl-[calc(40%+0.5rem)] text-[10px] text-2xs text-destructive"><LocalizedText message={error} /></span>}
         </div>
 
     );

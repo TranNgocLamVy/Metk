@@ -19,8 +19,8 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
     }, [])
 
     return (
-        <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center px-2 py-1.5 gap-2">
-            <label className="min-w-0 truncate text-xs text-shadow-foreground" title={property.label}>
+        <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center px-2 h-8 gap-2">
+            <label className="min-w-0 truncate text-2xs text-shadow-foreground" title={property.label}>
                 {property.label}
             </label>
             <Select
@@ -28,7 +28,7 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
                 value={draft}
                 onValueChange={onValueChange}
             >
-                <SelectTrigger className="w-full bg-surface-sunken">
+                <SelectTrigger size="sm" className="w-full bg-surface-sunken text-2xs">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-surface-overlay-raised">

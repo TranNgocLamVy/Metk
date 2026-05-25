@@ -101,17 +101,15 @@ export function Point3DPropertyEditor({ property }: Point3DEditorProps) {
     }, [draft, handleConfirmChange]);
 
     return (
-        <VStack className="px-2 py-1.5 gap-2">
-            <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center gap-2">
-                <label className="min-w-0 truncate text-xs text-shadow-foreground" title={property.label}>
+        <VStack className="px-2">
+            <div className="flex h-8 items-center gap-2" onClick={toggleOpen}>
+                <ChevronUp size={14} className={`${isOpen ? "rotate-180" : "rotate-90"} duration-100`} />
+                <label className="w-fit truncate text-2xs text-shadow-foreground" title={property.label}>
                     {property.label}
                 </label>
-                <HStack className="w-full" onClick={toggleOpen} >
-                    <ChevronUp size={20} className={`ml-auto ${isOpen && "rotate-180"}`} />
-                </HStack>
             </div>
             {isOpen && (
-                <HStack className="gap-4" onBlur={handleBlur}>
+                <HStack className="gap-2 pb-2" onBlur={handleBlur}>
                     <PointAxisInput
                         label={property.pointLabel.x}
                         value={draft.x}
@@ -138,7 +136,7 @@ export function Point3DPropertyEditor({ property }: Point3DEditorProps) {
                     />
                 </HStack>
             )}
-            {error && <span className="mt-1 pl-[calc(40%+0.5rem)] text-[10px] text-destructive"><LocalizedText message={error} /></span>}
+            {error && <span className="mt-1 pl-[calc(40%+0.5rem)] text-2xs text-destructive"><LocalizedText message={error} /></span>}
         </VStack>
     )
 }
@@ -164,7 +162,7 @@ function PointAxisInput({
                 {label}
             </span>
             <Input
-                className="h-7 px-1.5"
+                className="h-6 text-2xs px-1.5"
                 type="text"
                 inputMode="decimal"
                 value={value}
