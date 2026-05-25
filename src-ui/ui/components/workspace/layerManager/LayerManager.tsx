@@ -1,4 +1,4 @@
-import { DragEvent, useCallback, useEffect, useState } from "react";
+import { DragEvent, FocusEvent, useCallback, useEffect, useRef } from "react";
 
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
@@ -17,11 +17,63 @@ import { useDialogStore } from "@/ui/stores/dialog.store";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { BaseLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+
+const LAYER_MANAGER_CONTEXT_INSTIGATOR_ID = "layer-manager";
 
 export default function LayerManager() {
 	const { layerViews, selectedLayers, setLayerViews, setSelectedLayer } = useLayerManagerStore();
 
 	const { activeSession } = useTilemapSessionStore();
+
+	const layerManagerRef = useRef<HTMLDivElement>(null);
+
+	const setFocusLayerManager = useCallback((isFocused: boolean) => {
+		appKernel.activationContext.setFlag(
+			"focusLayerManager",
+			isFocused,
+			LAYER_MANAGER_CONTEXT_INSTIGATOR_ID,
+		);
+	}, []);
+
+	const handleLayerManagerPointerDownCapture = useCallback(() => {
+		setFocusLayerManager(true);
+	}, [setFocusLayerManager]);
+
+	const handleLayerManagerBlurCapture = useCallback((e: FocusEvent<HTMLDivElement>) => {
+		const nextFocusedElement = e.relatedTarget as Node | null;
+
+		if (
+			nextFocusedElement &&
+			layerManagerRef.current?.contains(nextFocusedElement)
+		) {
+			return;
+		}
+
+		setFocusLayerManager(false);
+	}, [setFocusLayerManager]);
+
+	useEffect(() => {
+		const handleDocumentPointerDown = (e: PointerEvent) => {
+			const target = e.target as Node | null;
+
+			if (!target) {
+				setFocusLayerManager(false);
+				return;
+			}
+
+			if (!layerManagerRef.current?.contains(target)) {
+				setFocusLayerManager(false);
+			}
+		};
+
+		document.addEventListener("pointerdown", handleDocumentPointerDown, true);
+
+		return () => {
+			document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+			setFocusLayerManager(false);
+		};
+	}, [setFocusLayerManager]);
 
 	const updateLayerView = useCallback(() => {
 		if (!activeSession) {
@@ -31,19 +83,19 @@ export default function LayerManager() {
 		}
 		const root = activeSession.tilemap.rootLayer;
 		const result: LayerView[] = [];
-        const processLayer = (layer: BaseLayer, depth: number) => {
+		const processLayer = (layer: BaseLayer, depth: number) => {
 			result.push({ id: layer.id, layer, depth });
-            if (layer instanceof GroupLayer && layer.isOpen) {
-                layer.layers.forEach(c => processLayer(c, depth + 1));
-            }
-        };
-        root.layers.forEach(c => processLayer(c, 0));
+			if (layer instanceof GroupLayer && layer.isOpen) {
+				layer.layers.forEach(c => processLayer(c, depth + 1));
+			}
+		};
+		root.layers.forEach(c => processLayer(c, 0));
 		setLayerViews(result);
 	}, [activeSession, setLayerViews])
 
 	useEffect(() => {
 		if (!activeSession) return;
-	
+
 		updateLayerView();
 		setSelectedLayer(activeSession.layerState.selectedLayers);
 		activeSession.on("onSelectedLayersChanged", setSelectedLayer);
@@ -99,7 +151,14 @@ export default function LayerManager() {
 
 	return (
 		<VStack className="w-full h-full relative overflow-hidden bg-surface">
-			<VStack onDrop={handleContainerDrop} onDragOver={handleDragOver} className="absolute inset w-full h-full px-1 py-2 bg-surface">
+			<VStack
+				className="absolute inset w-full h-full px-1 py-2 bg-surface"
+				onDrop={handleContainerDrop}
+				onDragOver={handleDragOver}
+				ref={layerManagerRef}
+				onPointerDownCapture={handleLayerManagerPointerDownCapture}
+				onBlurCapture={handleLayerManagerBlurCapture}
+			>
 				<ContextMenu onOpenChange={onOpenChange}>
 					<ContextMenuTrigger asChild>
 						<ScrollArea className="w-full h-full shadow-sm bg-surface-base">

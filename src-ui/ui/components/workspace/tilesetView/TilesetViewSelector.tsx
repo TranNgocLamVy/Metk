@@ -77,6 +77,8 @@ export default function TilesetViewSelector() {
 			activeViewRef.current = null;
 
 			tilesetSessionManager.unregisterActiveView();
+
+			useTilesetSessionStore.getState().setActiveSession(null);
 		}
 	}, [activeWorkspace, pixiApp])
 

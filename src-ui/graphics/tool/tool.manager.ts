@@ -68,7 +68,7 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         this.toolMap.set(toolId, brushConstructor);
     }
 
-    public setActiveSession(view: TilemapView | null) {
+    public setActiveView(view: TilemapView | null) {
         if (this.activeTilemapView) this.activeTilemapView.session.off("onSelectedLayersChanged", this.bindOnSelectedLayersChanged);
 
         this.activeTilemapView = view;

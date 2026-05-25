@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, LegacyRef, ReactNode } from "react";
 
 interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: ReactNode;
@@ -6,6 +6,7 @@ interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
 	justify?: CSSProperties["justifyContent"];
 	style?: CSSProperties;
 	className?: string;
+	ref?: LegacyRef<HTMLDivElement> | undefined
 }
 
 export function VStack({ children, align = "stretch", justify = "flex-start", style, className, ...props }: StackProps) {

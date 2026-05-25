@@ -156,7 +156,7 @@ describe("ToolManager", () => {
     it("attaches the current tool to the active view and propagates the selected editable layer", () => {
         const { manager, view, layerRenderer } = createToolManagerHarness();
 
-        manager.setActiveSession(view as any);
+        manager.setActiveView(view as any);
         manager.startTool("fake.tool");
 
         const tool = FakeTool.instances[0];
@@ -168,7 +168,7 @@ describe("ToolManager", () => {
 
     it("updates the current tool when selected layers change and no editable renderer is available", () => {
         const { manager, view, session, layer, getSelectedLayerListener } = createToolManagerHarness();
-        manager.setActiveSession(view as any);
+        manager.setActiveView(view as any);
         manager.startTool("fake.tool");
         const tool = FakeTool.instances[0];
 
@@ -179,11 +179,11 @@ describe("ToolManager", () => {
 
     it("detaches the current tool and unregisters selected-layer listeners when active session changes", () => {
         const { manager, view } = createToolManagerHarness();
-        manager.setActiveSession(view as any);
+        manager.setActiveView(view as any);
         manager.startTool("fake.tool");
         const tool = FakeTool.instances[0];
 
-        manager.setActiveSession(null);
+        manager.setActiveView(null);
 
         expect(view.session.off).toHaveBeenCalledWith("onSelectedLayersChanged", expect.any(Function));
         expect(tool.detach).toHaveBeenCalledTimes(1);
@@ -191,7 +191,7 @@ describe("ToolManager", () => {
 
     it("stops and resumes the current tool without changing the tracked tool id", () => {
         const { manager, view } = createToolManagerHarness();
-        manager.setActiveSession(view as any);
+        manager.setActiveView(view as any);
         manager.startTool("fake.tool");
         const tool = FakeTool.instances[0];
 

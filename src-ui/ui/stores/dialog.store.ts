@@ -19,13 +19,13 @@ export const useDialogStore = create<DialogState>((set, get) => ({
     openDialog: (type, config, params) => {
         const id = uuidv4();
         set((state) => ({ dialogs: [...state.dialogs, { id, type, params, config }], }));
-        appKernel.contextManager.setFlag("isModalOpen", true, id);
+        appKernel.activationContext.setFlag("isModalOpen", true, id);
         return id;
     },
 
     closeDialog: (id) => {
         set((state) => ({ dialogs: state.dialogs.filter((dialog) => dialog.id !== id), }));
-        appKernel.contextManager.setFlag("isModalOpen", false, id);
+        appKernel.activationContext.setFlag("isModalOpen", false, id);
     },
 
     closeTopDialog: () => {

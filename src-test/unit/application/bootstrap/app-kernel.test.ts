@@ -142,7 +142,7 @@ describe("AppKernel", () => {
 
         expect(state.toolManager.setEditorContext).toHaveBeenCalledWith(appKernel.editorFacade);
         expect(state.workspaceManager.setEditorContext).toHaveBeenCalledWith(appKernel.editorFacade);
-        expect(state.constructors.SystemCommandManager).toHaveBeenCalledWith(appKernel.contextManager, appKernel.editorFacade);
+        expect(state.constructors.SystemCommandManager).toHaveBeenCalledWith(appKernel.activationContext, appKernel.editorFacade);
         expect(state.constructors.KeybindingManager).toHaveBeenCalledWith(appKernel.systemCommandManager, appKernel.toolManager);
     });
 

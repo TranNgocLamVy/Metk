@@ -39,7 +39,7 @@ export default function TilemapEditor() {
         activeViewRef.current = { id: view.session.id, view: view };
 
         tilemapSessionManager.registerActiveView(view);
-        toolManager.setActiveSession(view);
+        toolManager.setActiveView(view);
 
         view.session.on("onMarkChange", updateTilemapSessionList);
 
@@ -56,7 +56,7 @@ export default function TilemapEditor() {
         activeViewRef.current = null;
 
         const toolManager = appKernel.toolManager;
-        toolManager.setActiveSession(null);
+        toolManager.setActiveView(null);
 
         const tilemapSessionManager = activeWorkspace!.tilemapSessionManager;
         tilemapSessionManager.unregisterActiveView();
@@ -68,9 +68,9 @@ export default function TilemapEditor() {
 
     useEffect(() => {
         if (!activeSession) return;
-        appKernel.contextManager.setFlag("tilmapSessionOpened", true, activeSession.id);
+        appKernel.activationContext.setFlag("tilmapSessionOpened", true, activeSession.id);
         return () => {
-            appKernel.contextManager.setFlag("tilmapSessionOpened", false, activeSession.id);
+            appKernel.activationContext.setFlag("tilmapSessionOpened", false, activeSession.id);
         }
     }, [activeSession])
 
@@ -99,7 +99,8 @@ export default function TilemapEditor() {
             activeViewRef.current = null;
 
             tilemapSessionManager.unregisterActiveView();
-            toolManager.setActiveSession(null);
+            toolManager.setActiveView(null);
+            useTilemapSessionStore.getState().setActiveSession(null);
         }
     }, [activeWorkspace, pixiApp])
 

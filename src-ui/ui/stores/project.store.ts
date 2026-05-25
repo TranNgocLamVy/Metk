@@ -12,7 +12,7 @@ interface ProjectState {
 
 export const useProjectStore = create<ProjectState>((set) => {
     const project = appKernel.projectManager.currentProject;
-    if (project) appKernel.contextManager.setFlag("projectOpened", true, project.id);
+    if (project) appKernel.activationContext.setFlag("projectOpened", true, project.id);
 
     const projectMetadatas = appKernel.projectManager.serialize();
     return {
@@ -24,12 +24,12 @@ export const useProjectStore = create<ProjectState>((set) => {
 });
 
 appKernel.projectManager.on("onProjectLoaded", (project) => {
-    appKernel.contextManager.setFlag("projectOpened", true, project.id);
+    appKernel.activationContext.setFlag("projectOpened", true, project.id);
     useProjectStore.getState().setActiveProject(project);
 });
 
 appKernel.projectManager.on("onProjectUnloaded", (projectId) => {
-    appKernel.contextManager.setFlag("projectOpened", false, projectId);
+    appKernel.activationContext.setFlag("projectOpened", false, projectId);
     useProjectStore.getState().setActiveProject(null);
 });
 

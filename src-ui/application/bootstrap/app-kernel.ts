@@ -22,7 +22,7 @@ export class AppKernel {
     public readonly layoutManager: LayoutManager;
     public readonly systemCommandManager: SystemCommandManager;
     public readonly toolManager: ToolManager;
-    public readonly contextManager: ActivationContext;
+    public readonly activationContext: ActivationContext;
     public readonly keybindingManager: KeybindingManager;
     public readonly textureManager: TextureManager;
 
@@ -36,10 +36,11 @@ export class AppKernel {
         this.layoutManager = new LayoutManager();
         this.toolManager = new ToolManager();
         this.textureManager = new TextureManager();
-        this.editorFacade = new EditorFacade(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager);
+        this.activationContext = new ActivationContext();
 
-        this.contextManager = new ActivationContext();
-        this.systemCommandManager = new SystemCommandManager(this.contextManager, this.editorFacade);
+        this.editorFacade = new EditorFacade(this.projectManager, this.workspaceManager, this.toolManager, this.textureManager, this.activationContext);
+
+        this.systemCommandManager = new SystemCommandManager(this.activationContext, this.editorFacade);
         this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
         
         // Set Context

@@ -10,13 +10,15 @@ import { Project } from "@/editor/model/project/project";
 import { ToolManager } from "@/graphics/tool/tool.manager";
 import { TextureManager } from "@/graphics/texture/texture.manager";
 import { HistoryManager } from "./resources/history/history.manager";
+import { ActivationContext } from "./runtime/activation-context";
 
 export class EditorFacade {
     constructor(
         public readonly projectManager: ProjectManager,
         public readonly workspaceManager: WorkspaceManager,
         public readonly toolManager: ToolManager,
-        public readonly textureManager: TextureManager
+        public readonly textureManager: TextureManager,
+        public readonly activationContext: ActivationContext
     ) { }
 
     public get currentProject(): Project | null {

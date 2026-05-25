@@ -6,10 +6,10 @@ export function useContextScope(flag: string, isActive: boolean = true) {
 
     useEffect(() => {
         if (!flag) return;
-        appKernel.contextManager.setFlag(flag, isActive, instigatorId);
+        appKernel.activationContext.setFlag(flag, isActive, instigatorId);
 
         return () => {
-            appKernel.contextManager.setFlag(flag, false, instigatorId);
+            appKernel.activationContext.setFlag(flag, false, instigatorId);
         };
     }, [flag, isActive, instigatorId]);
 }
