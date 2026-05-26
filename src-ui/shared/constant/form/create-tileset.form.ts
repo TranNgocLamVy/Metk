@@ -20,14 +20,33 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                         label: "form.tileset.name.label",
                         placeholder: "form.tileset.name.placeholder",
                         required: true,
-                    }
-                ]
+                    },
+                    {
+                        id: "type",
+                        name: "type",
+                        type: "select",
+                        label: "form.tileset.type.label",
+                        defaultValue: "single-image",
+                        required: true,
+                        options: [
+                            {
+                                label: "form.tileset.type.singleImage",
+                                value: "single-image",
+                            },
+                            {
+                                label: "form.tileset.type.imageCollection",
+                                value: "image-collection",
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: "image",
                 name: "image",
                 type: "group",
                 label: "form.tileset.image.label",
+                visible: (value) => value.tileset?.type === "single-image",
                 inputs: [
                     {
                         id: "source",
@@ -37,36 +56,32 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                         multiple: false,
                         label: "form.tileset.image.source",
                         required: true,
-                        filter: { name: "Image", extensions: ["png", "jpg", "jpeg"]} 
-                    },
-                    {
-                        id: "useTransparentColor",
-                        name: "useTransparentColor",
-                        type: "checkbox",
-                        label: "form.tileset.image.useTransparentColor",
-                        required: false,
+                        filter: {
+                            name: "Image",
+                            extensions: ["png", "jpg", "jpeg"],
+                        },
                     },
                     {
                         id: "setting",
                         name: "setting",
                         type: "group",
                         label: "Setting",
-                        visible: false,
+                        showFrame: false,
                         orientation: "horizontal",
                         inputs: [
                             {
                                 id: "tile",
                                 name: "tile",
                                 type: "group",
-                                label: "form.tilemap.size.label",
-                                visible: false,
+                                label: "form.tileset.size.label",
+                                showFrame: false,
                                 orientation: "vertical",
                                 inputs: [
                                     {
                                         id: "tilewidth",
                                         name: "tilewidth",
                                         type: "number",
-                                        label: "form.tilemap.size.width",
+                                        label: "form.tileset.size.width",
                                         defaultValue: 16,
                                         required: true,
                                     },
@@ -74,18 +89,18 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                                         id: "tileheight",
                                         name: "tileheight",
                                         type: "number",
-                                        label: "form.tilemap.size.height",
+                                        label: "form.tileset.size.height",
                                         defaultValue: 16,
                                         required: true,
                                     },
-                                ]
+                                ],
                             },
                             {
                                 id: "marginSpacing",
                                 name: "marginAndSpacing",
                                 type: "group",
                                 label: "MarginAndSpacing",
-                                visible: false,
+                                showFrame: false,
                                 orientation: "vertical",
                                 inputs: [
                                     {
@@ -97,19 +112,19 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                                         required: true,
                                     },
                                     {
-                                        id: "spaceing",
-                                        name: "spaceing",
+                                        id: "spacing",
+                                        name: "spacing",
                                         type: "number",
                                         label: "form.tileset.spacing",
                                         defaultValue: 0,
                                         required: true,
                                     },
-                                ]
-                            }
-                        ]
+                                ],
+                            },
+                        ],
                     },
-                ]
+                ],
             },
-        ]
-    })
-}
+        ],
+    });
+};

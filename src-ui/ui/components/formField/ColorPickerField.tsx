@@ -14,11 +14,12 @@ interface ColorPickerProps {
 	placeholder?: string;
 	value: string;
 	defaultValue?: string;
+	disabled?: boolean;
 	onChange: (fieldName: string, color: string) => void;
 }
 
 export function ColorPickerField(props: ColorPickerProps) {
-	const { id, name, label, defaultValue, placeholder, value, onChange } = props;
+	const { id, name, label, defaultValue, placeholder, value, disabled, onChange } = props;
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [color, setColor] = useState(value ?? defaultValue ?? "#ffffff");
@@ -29,6 +30,7 @@ export function ColorPickerField(props: ColorPickerProps) {
 	}
 
 	const handleSubmit = () => {
+		if (disabled) return;
 		onChange(name, color);
 		setIsOpen(false);
 	}
@@ -36,19 +38,6 @@ export function ColorPickerField(props: ColorPickerProps) {
 	const handleClose = () => {
 		setIsOpen(false);
 		setColor(value ?? defaultValue ?? "#ffffff");
-	}
-
-	const onOpenChange = (open: boolean) => {
-		setIsOpen(open);
-		setColor(value ?? defaultValue ?? "#ffffff");
-	}
-
-	const onBlur = () => {
-		if (isHexColor(color)) {
-			onChange(name, color);
-		} else {
-			setColor(value ?? defaultValue ?? "#ffffff");
-		}
 	}
 
 	const customStyles = {
@@ -63,13 +52,13 @@ export function ColorPickerField(props: ColorPickerProps) {
 	};
 
 	return (
-		<VStack className="gap-2">
-			<Label htmlFor={id}><LocalizedText message={label} /></Label>
+		<div className="grid grid-cols-[max-content_minmax(0,1fr)] h-full items-center gap-2">
+			<Label htmlFor={id} className="text-2xs"><LocalizedText message={label} /></Label>
 			<HStack className="gap-2">
-				<Input id={id} name={name} type="text" placeholder={placeholder} value={color} onChange={(e) => handleChange(e.target.value)} onBlur={onBlur} className="flex-1" />
-				<DropdownMenu open={isOpen} onOpenChange={onOpenChange} modal>
-					<DropdownMenuTrigger asChild>
-						<div className="w-8 h-8" style={{ backgroundColor: color ? color : "#ffffff" }} />
+				<Input id={id} name={name} type="text" placeholder={placeholder} value={color} disabled={disabled} onChange={(e) => handleChange(e.target.value)} className="flex-1 text-2xs h-6" />
+				<DropdownMenu open={isOpen} modal>
+					<DropdownMenuTrigger asChild disabled={disabled} onClick={() => setIsOpen(true)}>
+						<div className="w-6 h-6" style={{ backgroundColor: color ? color : "#ffffff" }} />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-surface-overlay p-4">
 						<VStack className="custom-sketch-picker w-fit">
@@ -83,7 +72,7 @@ export function ColorPickerField(props: ColorPickerProps) {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</HStack>
-		</VStack>
+		</div>
 	);
 }
 

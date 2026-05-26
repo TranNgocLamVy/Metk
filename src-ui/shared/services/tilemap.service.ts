@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilemapData } from "../schema/tilemap.schema";
+import { TilemapData, TilemapOrientation } from "../schema/tilemap.schema";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspace.service";
@@ -32,8 +32,8 @@ export class TilemapService {
 
         const tilemapData: TilemapData = {
             id: uuidv4(),
-            name: form.name,
-            orientation: "orthogonal", // TODO: Implement other orientations
+            name: form.tilemap.name,
+            orientation: form.tilemap.type as TilemapOrientation,
             height: form.options.map.mapheight,
             width: form.options.map.mapwidth,
             tilewidth: form.options.tile.tilewidth,

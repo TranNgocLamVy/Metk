@@ -7,7 +7,8 @@ const createFacade = (workspace: any = null, project: any = null) => {
     const workspaceManager = { currentWorkspace: workspace };
     const toolManager = {};
     const textureManager = {};
-    return new EditorFacade(projectManager as any, workspaceManager as any, toolManager as any, textureManager as any);
+    const activationContext = {}
+    return new EditorFacade(projectManager as any, workspaceManager as any, toolManager as any, textureManager as any, activationContext as any);
 };
 
 describe("EditorFacade", () => {

@@ -9,20 +9,21 @@ interface CheckBoxProps {
 	defaultChecked?: boolean;
     value?: boolean;
 	required?: boolean;
+	disabled?: boolean;
 	handleChange?: (checked: boolean) => void;
 }
 
 export function CheckBoxField(props: CheckBoxProps) {
-	const { id, name, label, defaultChecked, required, value, handleChange } = props;
+	const { id, name, label, required, disabled, value, handleChange } = props;
 
     const onChange = (checked: boolean | "indeterminate") => {
         handleChange?.(checked === true);
     }
 
 	return (
-		<div className="flex gap-3">
-			<Checkbox id={id} name={name} checked={value} onCheckedChange={onChange} required={required} />
-			<Label htmlFor={id}><LocalizedText message={label} /></Label>
+		<div className="grid grid-cols-[max-content_minmax(0,1fr)] h-full items-center gap-2">
+			<Checkbox id={id} name={name} checked={value} onCheckedChange={onChange} required={required} disabled={disabled} />
+			<Label htmlFor={id} className="text-2xs"><LocalizedText message={label} /></Label>
 		</div>
 	);
 }

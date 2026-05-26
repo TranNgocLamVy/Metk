@@ -9,6 +9,7 @@ interface TextInputProps {
 	label: string;
 	placeholder?: string;
 	required?: boolean;
+	disabled?: boolean;
 	minLength?: number;
 	maxLength?: number;
 	value?: string;
@@ -17,17 +18,16 @@ interface TextInputProps {
 
 export function TextInputField(props: TextInputProps) {
 	const { t: translate } = useTranslation([]);
-	const { id, name, label, placeholder, required, minLength, maxLength, value, handleChange } = props;
+	const { id, name, label, placeholder, required, disabled, minLength, maxLength, value, handleChange } = props;
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const raw = e.target.value;
-        handleChange?.(name, raw);
+        handleChange?.(name, e.target.value);
     }
 
 	return (
-		<div className="grid gap-2">
-			<Label htmlFor={id}><LocalizedText message={label} /></Label>
-			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} minLength={minLength} maxLength={maxLength} value={value ?? ""} onChange={onChange} className="w-full" />
+		<div className="grid grid-cols-[max-content_minmax(0,1fr)] h-full items-center gap-2">
+			<Label htmlFor={id} className="text-2xs"><LocalizedText message={label} /></Label>
+			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} disabled={disabled} minLength={minLength} maxLength={maxLength} value={value ?? ""} onChange={onChange} className="w-full text-2xs h-6" />
 		</div>
 	);
 }

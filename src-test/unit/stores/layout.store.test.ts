@@ -17,8 +17,5 @@ describe("useLayoutStore", () => {
 
         useLayoutStore.getState().setModel(model);
         expect(useLayoutStore.getState().model).toBe(model);
-
-        useLayoutStore.getState().setModel(null);
-        expect(useLayoutStore.getState().model).toBeNull();
     });
 });

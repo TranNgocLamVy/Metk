@@ -5,16 +5,21 @@ export interface FieldTypeMap {
     filePath: string[];
     folderPath: string;
     color: string;
+    select: string;
     group: Record<string, any>;
 }
 
 export type FieldType = keyof FieldTypeMap;
 
+export type FieldStateResolver =
+    | boolean
+    | ((value: Record<string, any>) => boolean);
+
 export type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 export type ShapeFromInputs<I extends readonly Field[]> = {
     [K in I[number] as K["name"]]: K extends GroupFieldInput
-        ? Simplify<ShapeFromInputs<K["inputs"]>> // <--- RECURSIVE MAGIC
+        ? Simplify<ShapeFromInputs<K["inputs"]>>
         : FieldTypeMap[K["type"]];
 };
 
@@ -25,18 +30,21 @@ export type FormDialogOptions<I extends readonly Field[] = readonly Field[]> = {
     cancelText?: string;
     size?: "sm" | "md" | "lg" | "xl" | "2xl";
     inputs: I;
-    validateBeforeSubmit?: (values: Simplify<ShapeFromInputs<I>>) => Promise<ValidateResult>;
+    validateBeforeSubmit?: (
+        values: Simplify<ShapeFromInputs<I>>,
+    ) => Promise<ValidateResult>;
 };
 
-export type FormDialogItem<I extends readonly Field[] = readonly Field[]> = FormDialogOptions<I> & {
-    id: string;
-    resolve: (result: Simplify<ShapeFromInputs<I>> | null) => void;
-};
+export type FormDialogItem<I extends readonly Field[] = readonly Field[]> =
+    FormDialogOptions<I> & {
+        id: string;
+        resolve: (result: Simplify<ShapeFromInputs<I>> | null) => void;
+    };
 
 export type ValidateResult = {
     valid: boolean;
     message?: string;
-}
+};
 
 export type BaseField = {
     id: string;
@@ -46,7 +54,10 @@ export type BaseField = {
     placeholder?: string;
     defaultValue?: any;
     required?: boolean;
-    validate?: (value: any) => Promise<ValidateResult>;
+    visible?: FieldStateResolver;
+    disabled?: FieldStateResolver;
+
+    validate?: (value: any) => ValidateResult | Promise<ValidateResult>;
 };
 
 export type TextFieldInput = BaseField & {
@@ -54,7 +65,7 @@ export type TextFieldInput = BaseField & {
     minLength?: number;
     maxLength?: number;
     defaultValue?: string;
-    validate?: (value: string) => ValidateResult;
+    validate?: (value: string) => ValidateResult | Promise<ValidateResult>;
 };
 
 export type NumberFieldInput = BaseField & {
@@ -62,7 +73,7 @@ export type NumberFieldInput = BaseField & {
     min?: number;
     max?: number;
     defaultValue?: number;
-    validate?: (value: number) => Promise<ValidateResult>;
+    validate?: (value: number) => ValidateResult | Promise<ValidateResult>;
 };
 
 export type SelectFieldInput = BaseField & {
@@ -71,6 +82,7 @@ export type SelectFieldInput = BaseField & {
     options: {
         label: string;
         value: string;
+        disabled?: boolean;
     }[];
 };
 
@@ -90,7 +102,7 @@ export type FilePathFieldInput = BaseField & {
 export type FileFilter = {
     name: string;
     extensions: string[];
-}
+};
 
 export type FolderPathFieldInput = BaseField & {
     type: "folderPath";
@@ -102,33 +114,22 @@ export type GroupFieldInput = BaseField & {
     type: "group";
     inputs: readonly Field[];
     orientation?: "vertical" | "horizontal";
-    visible?: boolean;
-    validate?: (value: Record<string, any>) => Promise<ValidateResult>;
+    showFrame?: boolean;
+    validate?: (value: Record<string, any>) => ValidateResult | Promise<ValidateResult>;
 };
 
 export type ColorSelectFieldInput = BaseField & {
     type: "color";
     defaultValue?: string;
-    validate?: (value: string) => Promise<ValidateResult>;
+    validate?: (value: string) => ValidateResult | Promise<ValidateResult>;
 };
 
-export interface FieldTypeMap {
-    text: string;
-    number: number;
-    checkbox: boolean;
-    filePath: string[];
-    folderPath: string;
-    color: string;
-    select: string;
-    group: Record<string, any>;
-}
-
-export type Field = 
-    | TextFieldInput 
-    | NumberFieldInput 
-    | CheckboxFieldInput 
-    | SelectFieldInput 
-    | FilePathFieldInput 
-    | FolderPathFieldInput 
+export type Field =
+    | TextFieldInput
+    | NumberFieldInput
+    | CheckboxFieldInput
+    | SelectFieldInput
+    | FilePathFieldInput
+    | FolderPathFieldInput
     | ColorSelectFieldInput
     | GroupFieldInput;

@@ -12,7 +12,8 @@ interface TextureManagerEvent {
 }
 
 export class TextureManager extends EventEmitter<TextureManagerEvent> {
-    private tileTexturesCache: Map<string, Map<number, Texture>> = new Map(); // tilesetId -> Map<tileId, Texture>
+    private tileTexturesCache: Map<string, Map<number, Texture>> = new Map();
+    private sourceTexturesCache: Map<string, Texture[]> = new Map();
     private baseTexturesCache: Map<string, Texture> = new Map(); // tilesetId -> Base Texture
 
     private refCounts: Map<string, number> = new Map();
@@ -33,55 +34,90 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
     public async retainTilesetGraphics(tileset: Tileset): Promise<Result> {
         const currentCount = this.refCounts.get(tileset.id) || 0;
         this.refCounts.set(tileset.id, currentCount + 1);
-
-        if (this.baseTexturesCache.has(tileset.id)) return Result.Success();
-
-        if (this.pendingLoads.has(tileset.id)) return await this.pendingLoads.get(tileset.id)!;
-
+    
+        if (this.tileTexturesCache.has(tileset.id)) return Result.Success();
+    
+        if (this.pendingLoads.has(tileset.id)) {
+            return await this.pendingLoads.get(tileset.id)!;
+        }
+    
         const loadPromise = this.performLoad(tileset);
         this.pendingLoads.set(tileset.id, loadPromise);
-
+    
         const result = await loadPromise;
         this.pendingLoads.delete(tileset.id);
-
+    
         return result;
     }
 
     private async performLoad(tileset: Tileset): Promise<Result> {
+        if (tileset.isImageCollection()) {
+            return this.performLoadImageCollection(tileset);
+        }
+    
+        return this.performLoadSingleImage(tileset);
+    }
+
+    private async performLoadSingleImage(tileset: Tileset): Promise<Result> {
         const tilesetAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(tileset.image.source);
         const loadResult = await this.loadTexture(tilesetAbsPath);
+    
         if (loadResult.status === Result.Status.Error) {
-            const customId = "loadTextureFail:" + tileset.id;
-            Console.error({
-                message: { key: "message.texture.missing", options: { name: tileset.name } },
-                stacks: loadResult.message ? [loadResult.message] : [],
-                actions: [{
-                    label: "global.action.texture.import", variant: "outline",
-                    onClick: async () => {
-                        const { TextureService } = await import("@/shared/services/texture.service");
-                        return await TextureService.importTexture(tileset.id);
-                    }
-
-                }]
-            }, customId)
             return loadResult;
         }
-
+    
         const baseTexture = loadResult.data!;
-        this.baseTexturesCache.set(tileset.id, baseTexture);
-
+        this.sourceTexturesCache.set(tileset.id, [baseTexture]);
+    
         tileset.checkTextureSize(baseTexture.width, baseTexture.height);
-
+    
         const slicedTextures = this.sliceTexture(baseTexture, tileset.tilewidth, tileset.tileheight);
-
         const tiletextureMap = new Map<number, Texture>();
-
+    
         const sortedTiles = Array.from(tileset.tiles).sort((a, b) => a.id - b.id);
-        sortedTiles.forEach((tile, index) => { if (slicedTextures[index]) tiletextureMap.set(tile.id, slicedTextures[index]) });
-
+    
+        sortedTiles.forEach((tile, index) => {
+            if (slicedTextures[index]) {
+                tiletextureMap.set(tile.id, slicedTextures[index]);
+            }
+        });
+    
         this.tileTexturesCache.set(tileset.id, tiletextureMap);
-
         this.emit("onTextureReloaded", tileset.id);
+    
+        return Result.Success();
+    }
+
+    private async performLoadImageCollection(tileset: Tileset): Promise<Result> {
+        const tiletextureMap = new Map<number, Texture>();
+        const sourceTextures: Texture[] = [];
+    
+        const sortedTiles = Array.from(tileset.tiles).sort((a, b) => a.id - b.id);
+    
+        for (const tile of sortedTiles) {
+            if (!tile.image?.source) continue;
+    
+            const tileAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(tile.image.source);
+            const loadResult = await this.loadTexture(tileAbsPath);
+    
+            if (loadResult.status === Result.Status.Error) {
+                Console.error({
+                    message: { key: "message.texture.missing", options: { name: tileset.name } },
+                    stacks: loadResult.message ? [loadResult.message] : [],
+                });
+    
+                continue;
+            }
+    
+            const texture = loadResult.data!;
+            sourceTextures.push(texture);
+            tiletextureMap.set(tile.id, texture);
+        }
+    
+        this.sourceTexturesCache.set(tileset.id, sourceTextures);
+        this.tileTexturesCache.set(tileset.id, tiletextureMap);
+        this.emit("onTextureReloaded", tileset.id);
+    
         return Result.Success();
     }
 
@@ -132,17 +168,21 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
     }
 
     private destroyTextures(tilesetId: string): void {
+        const ownedTextures = new Set(this.sourceTexturesCache.get(tilesetId) ?? []);
         const tiletexturesMap = this.tileTexturesCache.get(tilesetId);
+    
         if (tiletexturesMap) {
-            tiletexturesMap.forEach(texture => texture.destroy());
+            tiletexturesMap.forEach((texture) => {
+                if (!ownedTextures.has(texture)) {
+                    texture.destroy();
+                }
+            });
+    
             this.tileTexturesCache.delete(tilesetId);
         }
-
-        const base = this.baseTexturesCache.get(tilesetId);
-        if (base) {
-            base.destroy(true);
-            this.baseTexturesCache.delete(tilesetId);
-        }
+    
+        ownedTextures.forEach((texture) => texture.destroy(true));
+        this.sourceTexturesCache.delete(tilesetId);
     }
 
     public getTileTexture(tilesetId: string, tileId: number): Texture | null {

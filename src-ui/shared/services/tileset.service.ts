@@ -35,33 +35,27 @@ export class TilesetService {
         const textureAbsPath = form.image.source[0];
         if (!textureAbsPath) return;
 
+
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
         currentWorkspace.savedPathManager.setTilesetDir(tilesetAbsDir);
 
         const textureAbsDir = PathUtils.dirname(textureAbsPath);
         currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
 
-        const imageRelPath = PathUtils.relative(tilesetAbsDir, textureAbsPath);
-
-        const fileBuffer = await readFile(textureAbsPath); // TODO: move readFile to infrastructure;
-        const image = await TextureUtils.processImage(fileBuffer);
-        const columns = Math.ceil(image.width / form.image.setting.tile.tilewidth);
-        const rows = Math.ceil(image.height / form.image.setting.tile.tileheight);
-
-        const tilesetData: TilesetData = {
-            id: uuidv4(),
-            name: form.tileset.name,
-            columns: columns,
-            rows: rows,
-            image: {
-                source: imageRelPath,
-                width: image.width,
-                height: image.height,
-            },
-            tiles: [],
-            tilewidth: form.image.setting.tile.tilewidth,
-            tileheight: form.image.setting.tile.tileheight,
-        }
+        const tilesetType = form.tileset.type ?? "single-image";
+        const tilesetData =
+            tilesetType === "image-collection"
+                ? await TilesetService.createImageCollectionTilesetData({
+                    name: form.tileset.name,
+                    tilesetAbsDir,
+                })
+                : await TilesetService.createSingleImageTilesetData({
+                    name: form.tileset.name,
+                    tilesetAbsDir,
+                    textureAbsPath: textureAbsPath[0],
+                    tilewidth: form.image.setting.tile.tilewidth,
+                    tileheight: form.image.setting.tile.tileheight,
+                });
 
         const saveResult = await TilesetStorageService.save(tilesetAbsPath, tilesetData);
         if (saveResult.status !== Result.Status.Success) {
@@ -79,6 +73,43 @@ export class TilesetService {
         await WorkspaceService.createTilesetSession(tilesetData.id);
 
         Console.success({ message: "message.tileset.createSuccess" });
+    }
+
+    private static async createSingleImageTilesetData(args: { name: string; tilesetAbsDir: string; textureAbsPath: string; tilewidth: number; tileheight: number }): Promise<TilesetData> {
+        const fileBuffer = await readFile(args.textureAbsPath);
+        const image = await TextureUtils.processImage(fileBuffer);
+
+        const columns = Math.ceil(image.width / args.tilewidth);
+        const rows = Math.ceil(image.height / args.tileheight);
+
+        return {
+            id: uuidv4(),
+            name: args.name,
+            type: "single-image",
+            columns,
+            rows,
+            image: {
+                source: PathUtils.relative(args.tilesetAbsDir, args.textureAbsPath),
+                width: image.width,
+                height: image.height,
+            },
+            tiles: [],
+            tilewidth: args.tilewidth,
+            tileheight: args.tileheight,
+        };
+    }
+
+    private static async createImageCollectionTilesetData(args: { name: string; tilesetAbsDir: string}): Promise<TilesetData> {
+        return {
+            id: uuidv4(),
+            name: args.name,
+            type: "image-collection",
+            columns: 0,
+            rows: 0,
+            tilewidth: 1,
+            tileheight: 1,
+            tiles: [],
+        };
     }
 
     public static async importTileset(refTilesetId?: string): Promise<Result> {
@@ -120,7 +151,7 @@ export class TilesetService {
 
         WorkspaceService.createTilesetSession(tilesetData.id);
 
-        Console.success({ message: { key: "message.tileset.importSuccess", options: { name: tilesetData.name }}});
+        Console.success({ message: { key: "message.tileset.importSuccess", options: { name: tilesetData.name } } });
 
         return Result.Success();
     }

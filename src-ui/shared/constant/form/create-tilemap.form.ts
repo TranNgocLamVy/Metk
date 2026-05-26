@@ -1,3 +1,4 @@
+import { TilemapOrientation } from "@/shared/schema/tilemap.schema";
 import { FormUtils } from "@/shared/utils/form.utils";
 
 export const createTilemapForm = () => {
@@ -8,20 +9,62 @@ export const createTilemapForm = () => {
         size: "md",
         inputs: [
             {
-                id: "name",
-                name: "name",
-                type: "text",
-                label: "form.tilemap.name.label",
-                placeholder: "form.tilemap.name.placeholder",
-                required: true,
+                id: "tilemap",
+                name: "tilemap",
+                type: "group",
+                label: "form.tilemap.tilemap",
+                orientation: "vertical",
+                inputs: [
+                    {
+                        id: "name",
+                        name: "name",
+                        type: "text",
+                        label: "form.tilemap.name.label",
+                        placeholder: "form.tilemap.name.placeholder",
+                        required: true,
+                    },
+                    {
+                        id: "type",
+                        name: "type",
+                        type: "select",
+                        label: "form.tilemap.type.label",
+                        defaultValue: "orthogonal",
+                        required: true,
+                        options: [
+                            {
+                                label: "form.tilemap.type.orthogonal",
+                                value: TilemapOrientation.Orthogonal,
+                            },
+                            {
+                                label: "form.tilemap.type.isometric",
+                                value: TilemapOrientation.Isometric,
+                                disabled: true,
+                            },
+                            {
+                                label: "form.tilemap.type.oblique",
+                                value: TilemapOrientation.Oblique,
+                                disabled: true,
+                            },
+                            {
+                                label: "form.tilemap.type.staggered",
+                                value: TilemapOrientation.Staggered,
+                                disabled: true,
+                            },
+                            {
+                                label: "form.tilemap.type.hexagonal",
+                                value: TilemapOrientation.Hexagonal,
+                                disabled: true,
+                            },
+                        ],
+                    },
+                ]
             },
             {
                 id: "options",
                 name: "options",
                 type: "group",
-                label: "Map Options",
+                label: "form.tilemap.options",
                 orientation: "horizontal",
-                visible: false,
                 inputs: [
                     {
                         id: "map",

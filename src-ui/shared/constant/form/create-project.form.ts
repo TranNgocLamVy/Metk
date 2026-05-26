@@ -7,6 +7,7 @@ export const createProjectForm = () => {
         title: "form.project.title",
         okText: "form.project.action.create",
         cancelText: "form.project.action.cancel",
+        size: "sm",
         inputs: [
             {
                 id: "name",

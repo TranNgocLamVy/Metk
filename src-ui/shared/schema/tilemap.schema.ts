@@ -13,6 +13,13 @@ export type TilemapMetadata = typeof TilemapMetadataSchema.infer
 
 export const tilemapOrientationSchema = type("'orthogonal' | 'isometric' | 'oblique' | 'staggered' | 'hexagonal'")
 export type TilemapOrientation = typeof tilemapOrientationSchema.infer
+export const TilemapOrientation: Record<string, TilemapOrientation> = {
+    Orthogonal: "orthogonal",
+    Isometric: "isometric",
+    Oblique: "oblique",
+    Staggered: "staggered",
+    Hexagonal: "hexagonal",
+}
 
 export const TilemapDataSchema = type("string.json.parse").to(type({
     id: type("string"),

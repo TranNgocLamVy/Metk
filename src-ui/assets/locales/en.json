@@ -60,10 +60,10 @@
             "action": {
                 "new": {
                     "label": "New",
-                    "project": "New project",
+                    "project": "New Project",
                     "tilemap": "New Tilemap",
-                    "tileset": "New tileset",
-                    "ruleset": "New ruleset"
+                    "tileset": "New Tileset",
+                    "ruleset": "New Ruleset"
                 },
                 "open": {
                     "file": "Open File",
@@ -382,12 +382,22 @@
                 "create": "Create",
                 "cancel": "Cancel"
             },
+            "tilemap": "Tilemap",
+            "options": "Options",
             "name": {
-                "label": "Tilemap Name",
+                "label": "Name",
                 "placeholder": "e.g., Level 1"
             },
+            "type": {
+                "label": "Type",
+                "orthogonal": "Orthogonal",
+                "isometric": "Isometric",
+                "oblique": "Oblique", 
+                "staggered": "Staggered", 
+                "hexagonal": "Hexagonal" 
+            },
             "size": {
-                "label": "Tilemap Size",
+                "label": "Map Size",
                 "width": "Width",
                 "height": "Height"
             },
@@ -405,18 +415,24 @@
             },
             "tileset": "Tileset",
             "name": {
-                "label": "Tileset Name",
+                "label": "Name",
                 "placeholder": "e.g., Forest Props"
+            },
+            "type": {
+                "label": "Type",
+                "singleImage": "Based on Tileset Image",
+                "imageCollection": "Collection of Images"
             },
             "image": {
                 "label": "Image",
                 "source": "Source",
+                "browse": "Browse...",
                 "useTransparentColor": "Use Transparent Color"
             },
             "size": {
                 "label": "Size",
-                "width": "Width",
-                "height": "Height"
+                "width": "Tile Width",
+                "height": "Tile Height"
             },
             "margin": "Margin",
             "spacing": "Spacing"

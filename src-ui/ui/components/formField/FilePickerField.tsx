@@ -6,6 +6,10 @@ import { Tooltip, TooltipContent } from "@/ui/components/shadcn/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useTranslation } from "react-i18next";
 import { LocalizedText } from "../custom/LocalizeText";
+import { ScrollArea } from "../shadcn/scroll-area";
+import { HStack, VStack } from "../custom/stack/Stack";
+import { Button } from "../shadcn/button";
+import { DotSquare, Ellipsis } from "lucide-react";
 
 type FilePickerProps = {
 	id: string;
@@ -14,61 +18,65 @@ type FilePickerProps = {
 	placeholder?: string;
 	defaultDir?: string;
 	required?: boolean;
+	disabled?: boolean;
 	multiple?: boolean;
-    filter?: FileFilter;
+	filter?: FileFilter;
 	value: string[];
 	handleChange?: (fieldName: string, raw: unknown) => void;
 };
 
 export default function FilePickerField(props: FilePickerProps) {
 	const { t: translate } = useTranslation([]);
-	const { id, name, label, placeholder, defaultDir, required, multiple, filter, value, handleChange } = props;
+	const { id, name, label, placeholder, defaultDir, required, disabled, multiple, filter, value, handleChange } = props;
 
 	const selectFile = async () => {
 		const path = await FileDialogUtils.open({
-            directory: false, // Only allow selecting files
+			directory: false, // Only allow selecting files
 			defaultPath: defaultDir,
-            multiple: multiple ?? false, // Prevent multiple selection
-            filters: filter ? [
-                {
-                    name: filter.name,
-                    extensions: filter.extensions,
-                },
-            ] : undefined,
-        });
-        if (!path) return;
-        if (Array.isArray(path)) {
-            handleChange?.(name, path);
-        } else {
-            handleChange?.(name, [path]);
-        }
-	};
-
-	const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		e.preventDefault();
-		if (value) return;
-		switch (e.key) {
-			case "Enter":
-				selectFile();
-				break;
+			multiple: multiple ?? false, // Prevent multiple selection
+			filters: filter ? [
+				{
+					name: filter.name,
+					extensions: filter.extensions,
+				},
+			] : undefined,
+		});
+		if (!path) return;
+		if (Array.isArray(path)) {
+			handleChange?.(name, path);
+		} else {
+			handleChange?.(name, [path]);
 		}
 	};
 
-    const inputValue = value ? (value.length > 0 ? value[0] : "") : "";
+	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const paths = e.target.value.split("\n");
+			handleChange?.(name, paths);
+    }
+
+	const inputValue = value ? (value.length > 0 ? value[0] : "") : "";
+	const title = value ? value.join("\n") : "";
 
 	return (
-		<div className="grid gap-2">
-			<Label htmlFor={id}><LocalizedText message={label} /></Label>
-			<Tooltip delayDuration={500}>
-				<TooltipTrigger asChild>
-					<Input id={id} name={name} type="text" placeholder={translate(placeholder)} defaultValue={inputValue} required={required} className="w-full cursor-pointer caret-transparent" onClick={selectFile} onKeyDown={onKeyDown} />
-				</TooltipTrigger>
-				{value && (
-					<TooltipContent side="bottom">
-						{value.map((v, i) => <p key={i}>{v}</p>)}
-					</TooltipContent>
-				)}
-			</Tooltip>
+		<div className="grid grid-cols-[max-content_minmax(0,1fr)] h-full items-center gap-2">
+			<Label htmlFor={id} className="text-2xs"><LocalizedText message={label} /></Label>
+			<HStack className="gap-3">
+				<Input
+					id={id}
+					name={name}
+					type="text"
+					placeholder={translate(placeholder)}
+					value={inputValue}
+					onChange={onChange}
+					required={required}
+					disabled={disabled}
+					className="w-full text-2xs h-6"
+					title={title}
+				/>
+				<Button variant="outline" size="xs" className="text-2xs border-foreground/40" onClick={selectFile}>
+					<LocalizedText message={"form.tileset.image.browse"} />
+				</Button>
+			</HStack>
 		</div>
 	);
 }

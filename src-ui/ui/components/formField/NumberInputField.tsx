@@ -9,6 +9,7 @@ interface NumberInputProps {
 	label: string;
 	placeholder?: string;
 	required?: boolean;
+    disabled?: boolean;
     min?: number;
     max?: number;
 	value?: string;
@@ -17,7 +18,7 @@ interface NumberInputProps {
 
 export function NumberInputField(props: NumberInputProps) {
     const { t: translate } = useTranslation([]);
-	const { id, name, label, placeholder, required, min, max, value, handleChange } = props;
+	const { id, name, label, placeholder, required, disabled, min, max, value, handleChange } = props;
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value;
@@ -43,9 +44,22 @@ export function NumberInputField(props: NumberInputProps) {
     }
 
 	return (
-		<div className="grid gap-2">
-			<Label htmlFor={id}><LocalizedText message={label} /></Label>
-			<Input id={id} name={name} type="text" placeholder={translate(placeholder)} required={required} value={value ?? ""} onChange={onChange} onBlur={onBlur} className="w-full" />
+		<div className="grid grid-cols-[max-content_minmax(0,1fr)] h-full items-center gap-2">
+			<Label htmlFor={id} className="text-2xs"><LocalizedText message={label} /></Label>
+			<Input 
+                id={id} 
+                name={name} 
+                type="text"
+                inputMode="decimal" 
+                required={required} 
+                disabled={disabled} 
+                min={min} 
+                max={max} 
+                placeholder={translate(placeholder)} 
+                value={value ?? ""} 
+                onChange={onChange} 
+                onBlur={onBlur} 
+                className="w-full text-2xs h-6" />
 		</div>
 	);
 }
