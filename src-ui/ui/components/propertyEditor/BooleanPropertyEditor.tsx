@@ -1,6 +1,8 @@
 import { BooleanPropertyClass } from "@/editor/properties/properties";
 import { Checkbox } from "@/ui/components/shadcn/checkbox";
 import { useState } from "react";
+import { Label } from "../shadcn/label";
+import { LocalizedText } from "../custom/LocalizeText";
 
 export interface BooleanEditorProps {
     property: BooleanPropertyClass<any>;
@@ -16,9 +18,9 @@ export function BooleanPropertyEditor({ property }: BooleanEditorProps) {
 
     return (
         <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] px-2 h-8 items-center gap-2">
-            <label className="min-w-0 truncate text-2xs" title={property.label}>
-                {property.label}
-            </label>
+            <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <LocalizedText message={property.label} />
+            </Label>
             <div className="flex items-center">
                 <Checkbox
                     checked={draft}

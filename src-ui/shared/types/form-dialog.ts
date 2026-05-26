@@ -65,6 +65,15 @@ export type NumberFieldInput = BaseField & {
     validate?: (value: number) => Promise<ValidateResult>;
 };
 
+export type SelectFieldInput = BaseField & {
+    type: "select";
+    defaultValue?: string;
+    options: {
+        label: string;
+        value: string;
+    }[];
+};
+
 export type CheckboxFieldInput = BaseField & {
     type: "checkbox";
     defaultValue?: boolean;
@@ -103,11 +112,22 @@ export type ColorSelectFieldInput = BaseField & {
     validate?: (value: string) => Promise<ValidateResult>;
 };
 
-// Update the main Union Type
+export interface FieldTypeMap {
+    text: string;
+    number: number;
+    checkbox: boolean;
+    filePath: string[];
+    folderPath: string;
+    color: string;
+    select: string;
+    group: Record<string, any>;
+}
+
 export type Field = 
     | TextFieldInput 
     | NumberFieldInput 
     | CheckboxFieldInput 
+    | SelectFieldInput 
     | FilePathFieldInput 
     | FolderPathFieldInput 
     | ColorSelectFieldInput

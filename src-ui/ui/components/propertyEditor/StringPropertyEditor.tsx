@@ -3,6 +3,7 @@ import { Input } from "@/ui/components/shadcn/input";
 import { StringPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { LocalizedText } from "../custom/LocalizeText";
+import { Label } from "../shadcn/label";
 
 export interface StringEditorProps {
     property: StringPropertyClass<any>;
@@ -53,9 +54,9 @@ export function StringPropertyEditor({ property }: StringEditorProps) {
     return (
         <div className="px-2 h-8">
             <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center h-full gap-2">
-                <label className="min-w-0 truncate text-2xs text-shadow-foreground" title={property.label}>
-                    {property.label}
-                </label>
+                <Label title={property.label} className="text-2xs min-w-0 truncate">
+                    <LocalizedText message={property.label} />
+                </Label>
                 <Input
                     value={draft}
                     maxLength={property.maxLength}

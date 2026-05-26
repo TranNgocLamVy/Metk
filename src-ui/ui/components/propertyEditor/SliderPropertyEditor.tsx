@@ -4,6 +4,8 @@ import { NumberPropertyClass } from "@/editor/properties/properties";
 import { Slider } from "../shadcn/slider";
 import { HStack } from "../custom/stack/Stack";
 import { Result } from "@/shared/types/result";
+import { Label } from "../shadcn/label";
+import { LocalizedText } from "../custom/LocalizeText";
 
 export interface SliderEditorProps {
     property: NumberPropertyClass<any>;
@@ -36,9 +38,9 @@ export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
 
     return (
         <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] px-2 h-8 items-center gap-2">
-            <label className="min-w-0 truncate text-2xs text-shadow-foreground" title={property.label}>
-                {property.label}
-            </label>
+            <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <LocalizedText message={property.label} />
+            </Label>
             <HStack className="gap-2">
                 <span className="text-2xs text-foreground">
                     {draft.toFixed(precision)}

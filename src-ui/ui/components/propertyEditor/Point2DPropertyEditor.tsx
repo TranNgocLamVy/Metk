@@ -6,6 +6,7 @@ import { Input } from "@/ui/components/shadcn/input";
 import { HStack, VStack } from "../custom/stack/Stack";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { LocalizedText } from "../custom/LocalizeText";
+import { Label } from "../shadcn/label";
 
 type Point2DDraft = Record<keyof Point2D, string>;
 
@@ -104,9 +105,9 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
         <VStack className="px-2">
             <div className="flex h-8 items-center gap-2" onClick={toggleOpen}>
                 <ChevronUp size={14} className={`${isOpen ? "rotate-180" : "rotate-90"} duration-50`} />
-                <label className="w-fit truncate text-2xs text-shadow-foreground" title={property.label}>
-                    {property.label}
-                </label>
+                <Label title={property.label} className="text-2xs min-w-0 truncate">
+                    <LocalizedText message={property.label} />
+                </Label>
             </div>
             {isOpen && (
                 <HStack className="gap-2 pb-2" onBlur={handleBlur}>

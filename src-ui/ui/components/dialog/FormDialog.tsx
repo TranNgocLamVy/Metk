@@ -14,6 +14,7 @@ import { useDialogStore } from "@/ui/stores/dialog.store";
 import { ColorPickerField } from "../formField/ColorPickerField";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Console } from "@/shared/services/console.service";
+import { SelectField } from "../formField/SelectField";
 
 interface FormDialogProps extends BaseDialogProps {
     formDialog: FormDialogOptions;
@@ -187,6 +188,8 @@ const FieldRenderer = ({ input, value, onChange }: { input: Field; value: any; o
             return <TextInputField {...input} value={value} handleChange={onChange} />;
         case "number":
             return <NumberInputField {...input} value={value} handleChange={onChange} />;
+        case "select":
+            return <SelectField {...input} value={value} handleChange={onChange} />;
         case "folderPath":
             return <FolderPickerField {...input} value={value} handleChange={onChange} />;
         case "filePath":

@@ -1,6 +1,8 @@
 import { EnumPropertyClass } from "@/editor/properties/properties";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/shadcn/select";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Label } from "../shadcn/label";
+import { LocalizedText } from "../custom/LocalizeText";
 
 export interface EnumEditorProps {
     property: EnumPropertyClass<any>;
@@ -20,9 +22,9 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
 
     return (
         <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center px-2 h-8 gap-2">
-            <label className="min-w-0 truncate text-2xs text-shadow-foreground" title={property.label}>
-                {property.label}
-            </label>
+            <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <LocalizedText message={property.label} />
+            </Label>
             <Select
                 disabled={property.readonly() || property.disabled() || options.length === 0}
                 value={draft}
