@@ -6,21 +6,18 @@ import { appKernel } from "@/application/bootstrap/app-kernel";
 export type CreateTilesetRendererContext = {
     tileset: Tileset;
     parent: Container;
-    gap: number;
 }
 
 export class TilesetRenderer {
     public readonly container: Container;
     private tileset: Tileset;
-    private gap: number = 0;
 
     private sprites: Sprite[] = [];
 
     private bindOnTextureReloaded: (tilesetId: string) => void;
 
-    constructor(editorFacade: CreateTilesetRendererContext) {
-        this.tileset = editorFacade.tileset as Tileset;
-        this.gap = editorFacade.gap;
+    constructor(context: CreateTilesetRendererContext) {
+        this.tileset = context.tileset as Tileset;
 
         this.container = new Container();
         this.container.position.set(0, 0);
@@ -49,11 +46,6 @@ export class TilesetRenderer {
         }
     }
 
-    public setGap(gap: number): void {
-        this.gap = gap;
-        this.rerenderTiles();
-    }
-
     public rerenderTiles(): void {
         this.sprites.forEach((sprite, index) => {
             const { x, y } = this.indexToPos(index);
@@ -73,8 +65,8 @@ export class TilesetRenderer {
         const tilewidth = this.tileset.tilewidth;
         const tileheight = this.tileset.tileheight;
         const columns = this.tileset.columns;
-        const x = (index % columns) * (tilewidth + this.gap);
-        const y = Math.floor(index / columns) * (tileheight + this.gap);
+        const x = (index % columns) * (tilewidth);
+        const y = Math.floor(index / columns) * (tileheight);
         return { x, y };
     }
 

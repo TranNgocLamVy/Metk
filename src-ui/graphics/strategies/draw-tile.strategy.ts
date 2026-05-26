@@ -4,10 +4,9 @@ import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { EditorFacade } from "@/application/editor.facade";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 import { SetTilesCommand } from "@/application/commands/tile/set-tiles.command";
-import { BaseLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { ITool } from "@/editor/interface/tool.interface";
-import { BaseLayerRenderer } from "@/graphics/renderer/base-layer.renderer";
-import { TileLayerRenderer } from "@/graphics/renderer/tile-layer.renderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
+import { TileLayerRenderer } from "@/graphics/renderer/tilemap/tile-layer.renderer";
 import { Tile } from "@/editor/model/tileset/tileset";
 
 

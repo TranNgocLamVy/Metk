@@ -4,7 +4,7 @@ import { Container, FederatedPointerEvent, Point } from "pixi.js";
 import { DrawPayload, IDrawStrategy } from "../strategies/draw-strategy.interface";
 
 import icon from "@/assets/icons/bucket.svg?raw";
-import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "../renderer/tilemap/base-layer.renderer";
 import { TilemapView } from "../view/tilemap.view";
 import { Tool } from "./tool.decorator";
 

@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 
-import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
-import { GroupLayerRenderer } from "../renderer/group-layer.renderer";
+import { BaseLayerRenderer } from "../renderer/tilemap/base-layer.renderer";
+import { GroupLayerRenderer } from "../renderer/tilemap/group-layer.renderer";
 import { IDrawStrategy } from "@/graphics/strategies/draw-strategy.interface";
 import { DrawTileStrategy } from "@/graphics/strategies/draw-tile.strategy";
 import { DrawRuleStrategy } from "@/graphics/strategies/draw-rule.strategy";

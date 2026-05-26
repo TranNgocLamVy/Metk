@@ -13,7 +13,7 @@ describe("TilesetSessionManager", () => {
                 id: "session-a",
                 tilesetId: tileset.id,
                 viewState: { x: 4, y: 8, zoom: 3 },
-                selectionState: { selectedTilesSet: [1, 2], pivot: { col: 1, row: 0 } },
+                selectionState: { selectedTilesSet: [1, 2] },
             }],
             currentTilesetSessionId: "session-a",
         }, editorFacade);
@@ -29,7 +29,7 @@ describe("TilesetSessionManager", () => {
                 id: "session-a",
                 tilesetId: tileset.id,
                 viewState: { x: 4, y: 8, zoom: 3 },
-                selectionState: { selectedTilesSet: [1, 2], pivot: { col: 1, row: 0 } },
+                selectionState: { selectedTilesSet: [1, 2] },
             }],
             currentTilesetSessionId: null,
         });
@@ -42,7 +42,7 @@ describe("TilesetSessionManager", () => {
                 id: "missing-session",
                 tilesetId: "missing-tileset",
                 viewState: { x: null, y: null, zoom: 1 },
-                selectionState: { selectedTilesSet: [], pivot: null },
+                selectionState: { selectedTilesSet: [] },
             }],
             currentTilesetSessionId: "missing-session",
         }, editorFacade);

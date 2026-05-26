@@ -137,7 +137,7 @@ vi.mock("@/graphics/renderer/tileset-selector.renderer", () => ({ TilesetSelecto
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: viewMocks.workspaceService }));
 
 import { TilemapView } from "@/graphics/view/tilemap.view";
-import { TilesetView } from "@/graphics/view/tileset.view";
+import { SingleImageTilesetView } from "@/graphics/view/single-image-tileset.view";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 
 type MockViewport = InstanceType<typeof viewMocks.MockViewport>;
@@ -288,7 +288,7 @@ describe("TilesetView", () => {
     it("initializes renderer, grid, and selector using the tileset session", () => {
         const app = createPixiApp();
         const session = createTilesetSession();
-        const view = new TilesetView(session as any);
+        const view = new SingleImageTilesetView(session as any);
 
         view.activateView(app as any);
 
@@ -311,7 +311,7 @@ describe("TilesetView", () => {
 
     it("persists tileset viewport state and responds to renderer resize", () => {
         const app = createPixiApp();
-        const view = new TilesetView(createTilesetSession() as any);
+        const view = new SingleImageTilesetView(createTilesetSession() as any);
         view.activateView(app as any);
         const viewport = view.viewport as unknown as MockViewport;
 
@@ -329,7 +329,7 @@ describe("TilesetView", () => {
     });
 
     it("keeps renderer and selector gaps in sync with grid visibility", () => {
-        const view = new TilesetView(createTilesetSession() as any);
+        const view = new SingleImageTilesetView(createTilesetSession() as any);
         view.activateView(createPixiApp() as any);
         const renderer = viewMocks.tilesetRendererInstances[0];
         const selector = viewMocks.tilesetSelectorInstances[0];
@@ -347,7 +347,7 @@ describe("TilesetView", () => {
 
     it("unactivates and destroys the viewport plus renderer collaborators", () => {
         const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
-        const view = new TilesetView(createTilesetSession() as any);
+        const view = new SingleImageTilesetView(createTilesetSession() as any);
         view.activateView(createPixiApp() as any);
         const renderer = viewMocks.tilesetRendererInstances[0];
         const selector = viewMocks.tilesetSelectorInstances[0];
@@ -366,7 +366,7 @@ describe("TilesetView", () => {
     });
 
     it("allows unactivate and destroy to be called safely before initialization", () => {
-        const view = new TilesetView(createTilesetSession() as any);
+        const view = new SingleImageTilesetView(createTilesetSession() as any);
 
         expect(() => view.unActivateView()).not.toThrow();
         expect(() => view.destroy()).not.toThrow();

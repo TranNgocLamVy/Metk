@@ -17,8 +17,6 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
     public readonly tileset: Tileset;
     public viewState: ViewState;
     public selectionState: SelectionState;
-    private pivot: Coordinate | null = null;
-
     public historyManager: HistoryManager;
 
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorFacade: EditorFacade) {
@@ -26,7 +24,7 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
         this.viewState = tilesetSessionData.viewState ?? { x: null, y: null, zoom: 1 };
-        this.selectionState = tilesetSessionData.selectionState ?? { selectedTilesSet: [], pivot: null };
+        this.selectionState = { selectedTilesSet: this.normalizeSelectedTileIds(tilesetSessionData.selectionState) } 
 
         this.historyManager = new HistoryManager();
     }
@@ -44,18 +42,25 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
         this.selectionState = { ...this.selectionState, ...state };
     }
 
-    public updatePivot(pivot: Coordinate | null) {
-        this.pivot = pivot;
+    private normalizeSelectedTileIds(selectionState: SelectionState | null): number[] {
+        if (!selectionState) return [];
+        const { selectedTilesSet } = selectionState;
+        if (!Array.isArray(selectedTilesSet)) return [];
+
+        const sanitized: number[] = [];
+
+        selectedTilesSet.forEach((tileId) => {
+            if (!this.tileset.getCoordinatesFromTile(tileId)) return;
+            sanitized.push(tileId);
+        });
+
+        return sanitized;
     }
 
-    public getPivot(): Coordinate | null {
-        return this.pivot ? this.pivot : null;
-    }
 
     public serialize(): TilesetSessionData {
         const selectionState: SelectionState = {
             selectedTilesSet: this.selectionState.selectedTilesSet,
-            pivot: this.selectionState.pivot,
         }
         return {
             id: this.id,

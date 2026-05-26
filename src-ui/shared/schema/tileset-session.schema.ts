@@ -26,6 +26,6 @@ export const defaultTilesetSessionData = (tilesetId: string): TilesetSessionData
         id: uuidv4(),
         tilesetId: tilesetId,
         viewState: { x: null, y: null, zoom: 1 },
-        selectionState: { selectedTilesSet: [], pivot: null },
+        selectionState: { selectedTilesSet: [] },
     }
 }

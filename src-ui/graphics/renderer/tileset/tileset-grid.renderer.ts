@@ -13,7 +13,6 @@ export class TilesetGridRenderer {
     public readonly graphics: Graphics;
     private viewport: Viewport;
     private tileset: Tileset;
-    public gridGap: number = 0;
     public gridEnabled: boolean = true;
 
     private bindOnTilesetUpdate: () => void;
@@ -41,11 +40,11 @@ export class TilesetGridRenderer {
         const drawLineOptions: DrawLineOption = { color: 0xc9c9c9, alpha: 0.5, pixelLine: true }
 
         for (let col = 0; col <= columns; col++) {
-            GraphicUtils.drawVerticelLine(this.graphics, col * (tileWidth + this.gridGap), 0, rows * (tileHeight + this.gridGap), drawLineOptions);
+            GraphicUtils.drawVerticelLine(this.graphics, col * (tileWidth), 0, rows * (tileHeight), drawLineOptions);
         }
 
         for (let row = 0; row <= rows; row++) {
-            GraphicUtils.drawHorizontalLine(this.graphics, row * (tileHeight + this.gridGap), 0, columns * (tileWidth + this.gridGap), drawLineOptions);
+            GraphicUtils.drawHorizontalLine(this.graphics, row * (tileHeight), 0, columns * (tileWidth), drawLineOptions);
         }
     }
 

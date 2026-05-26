@@ -115,12 +115,12 @@ vi.mock("pixi.js", () => ({
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: rendererMocks.appKernel }));
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: rendererMocks.workspaceService }));
 
-import { BaseLayerRenderer } from "@/graphics/renderer/base-layer.renderer";
-import { TilemapRenderer } from "@/graphics/renderer/tilemap.renderer";
-import { TilesetRenderer } from "@/graphics/renderer/tileset.renderer";
-import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset-selector.renderer";
-import { TilesetGridRenderer } from "@/graphics/renderer/tileset-grid.renderer";
-import { TilemapGridRenderer } from "@/graphics/renderer/tilemap-grid.renderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
+import { TilemapRenderer } from "@/graphics/renderer/tilemap/tilemap.renderer";
+import { TilesetRenderer } from "@/graphics/renderer/tileset/tileset.renderer";
+import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/tileset-selector.renderer";
+import { TilesetGridRenderer } from "@/graphics/renderer/tileset/tileset-grid.renderer";
+import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
@@ -247,7 +247,7 @@ describe("TilesetRenderer", () => {
             return { id: `${tilesetId}:${tileId}`, width: 16, height: 16 };
         });
 
-        const renderer = new TilesetRenderer({ tileset, parent: new rendererMocks.Container() as any, gap: 1 });
+        const renderer = new TilesetRenderer({ tileset, parent: new rendererMocks.Container() as any });
         await flushAsync();
         const container = renderer.container as unknown as MockContainer;
         const children = container.children as MockSprite[];
@@ -262,12 +262,10 @@ describe("TilesetRenderer", () => {
 
     it("updates tile positions when the grid gap changes and rerenders on matching texture reload", async () => {
         const tileset = createTileset();
-        const renderer = new TilesetRenderer({ tileset, parent: new rendererMocks.Container() as any, gap: 0 });
+        const renderer = new TilesetRenderer({ tileset, parent: new rendererMocks.Container() as any });
         await flushAsync();
         const container = renderer.container as unknown as MockContainer;
         const children = container.children as MockSprite[];
-
-        renderer.setGap(2);
 
         expect(children[1].position.set).toHaveBeenLastCalledWith(18, 0);
         expect(children[2].position.set).toHaveBeenLastCalledWith(0, 18);
@@ -283,7 +281,7 @@ describe("TilesetRenderer", () => {
     });
 
     it("destroys sprites and unregisters texture reload listener", async () => {
-        const renderer = new TilesetRenderer({ tileset: createTileset(), parent: new rendererMocks.Container() as any, gap: 0 });
+        const renderer = new TilesetRenderer({ tileset: createTileset(), parent: new rendererMocks.Container() as any });
         await flushAsync();
         const firstSprite = renderer.container.children[0];
 
@@ -306,7 +304,7 @@ describe("TilesetSelectorRenderer", () => {
             }),
             updatePivot: vi.fn(),
         };
-        const selector = new TilesetSelectorRenderer({ tileset, tilesetSession: session as any, parent: parent as any, gap: 0 });
+        const selector = new TilesetSelectorRenderer({ tileset, tilesetSession: session as any, parent: parent as any });
         return { tileset, parent, session, selector };
     };
 

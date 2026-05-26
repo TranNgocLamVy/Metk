@@ -76,17 +76,6 @@ export default function LayerMenuBar() {
                     <Lock />
                 </Button>
             </QuickToolTip>
-            <VStack className="ml-auto" />
-            <QuickToolTip toolTip={"workspace.layerManager.menu.showHideOther"}>
-                <Button variant={"ghost"} size={"icon-sm"} onClick={() => TilemapLayerService.toggleVisibility(nonSelectedLayers)}>
-                    <Eye />
-                </Button>
-            </QuickToolTip>
-            <QuickToolTip toolTip={"workspace.layerManager.menu.lockUnlockOther"}>
-                <Button variant={"ghost"} size={"icon-sm"} onClick={() => TilemapLayerService.toggleLock(nonSelectedLayers)}>
-                    <Lock />
-                </Button>
-            </QuickToolTip>
         </HStack>
     )
 }

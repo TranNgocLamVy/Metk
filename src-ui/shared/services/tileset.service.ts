@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilesetData } from "@/shared/schema/tileset.schema";
+import { TilesetData, TilesetType } from "@/shared/schema/tileset.schema";
 
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { PathUtils } from "../utils/path.utils";
@@ -32,30 +32,30 @@ export class TilesetService {
         const tilesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
 
-        const textureAbsPath = form.image.source[0];
-        if (!textureAbsPath) return;
-
-
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
         currentWorkspace.savedPathManager.setTilesetDir(tilesetAbsDir);
 
-        const textureAbsDir = PathUtils.dirname(textureAbsPath);
-        currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
+        let tilesetData: TilesetData;
 
-        const tilesetType = form.tileset.type ?? "single-image";
-        const tilesetData =
-            tilesetType === "image-collection"
-                ? await TilesetService.createImageCollectionTilesetData({
-                    name: form.tileset.name,
-                    tilesetAbsDir,
-                })
-                : await TilesetService.createSingleImageTilesetData({
-                    name: form.tileset.name,
-                    tilesetAbsDir,
-                    textureAbsPath: textureAbsPath[0],
-                    tilewidth: form.image.setting.tile.tilewidth,
-                    tileheight: form.image.setting.tile.tileheight,
-                });
+        if (form.tileset.type == TilesetType.SingleImage) {
+            const textureAbsPath = form.image.source[0];
+            if (!textureAbsPath) return;
+
+            const textureAbsDir = PathUtils.dirname(textureAbsPath);
+            currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
+            tilesetData = await TilesetService.createSingleImageTilesetData({
+                name: form.tileset.name,
+                tilesetAbsDir,
+                textureAbsPath: textureAbsPath[0],
+                tilewidth: form.image.setting.tile.tilewidth,
+                tileheight: form.image.setting.tile.tileheight,
+            })
+        } else {
+            tilesetData = await TilesetService.createImageCollectionTilesetData({
+                name: form.tileset.name,
+                tilesetAbsDir,
+            })
+        }
 
         const saveResult = await TilesetStorageService.save(tilesetAbsPath, tilesetData);
         if (saveResult.status !== Result.Status.Success) {
@@ -99,7 +99,7 @@ export class TilesetService {
         };
     }
 
-    private static async createImageCollectionTilesetData(args: { name: string; tilesetAbsDir: string}): Promise<TilesetData> {
+    private static async createImageCollectionTilesetData(args: { name: string; tilesetAbsDir: string }): Promise<TilesetData> {
         return {
             id: uuidv4(),
             name: args.name,

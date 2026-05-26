@@ -1,6 +1,6 @@
 import { IDrawStrategy } from "@/graphics/strategies/draw-strategy.interface";
 import { EditorFacade } from "@/application/editor.facade";
-import { BaseLayerRenderer } from "@/graphics/renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 
 export interface ITool {

@@ -8,7 +8,7 @@ import { GeometryUtils } from "@/shared/utils/geometry-utils";
 import icon from "@/assets/icons/stamp.svg?raw";
 import { Tool } from "./tool.decorator";
 import { TilemapView } from "../view/tilemap.view";
-import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "../renderer/tilemap/base-layer.renderer";
 
 @Tool({
     id: "tool.stamp",

@@ -6,7 +6,7 @@ import { TilesetSession } from "@/editor/session/tileset.session";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { Console } from "@/shared/services/console.service";
-import { TilesetView } from "@/graphics/view/tileset.view";
+import { SingleImageTilesetView } from "@/graphics/view/single-image-tileset.view";
 
 export type TilesetSessionManagerEvent = {
     onCreateTilesetSession: (session: TilesetSession) => void;
@@ -19,7 +19,7 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
     private tilesetMap: Map<string, string> = new Map<string, string>();
 
     public activeSession: TilesetSession | null = null;
-    private activeView: TilesetView | null = null;
+    private activeView: SingleImageTilesetView | null = null;
 
     private tilesetSessionIdStack: string[] = [];
 
@@ -123,11 +123,11 @@ export class TilesetSessionManager extends EventEmitter<TilesetSessionManagerEve
         return this.tilesetSessionIdStack[this.tilesetSessionIdStack.length - 1] || null;
     }
 
-    public getActiveView(): TilesetView | null {
+    public getActiveView(): SingleImageTilesetView | null {
         return this.activeView;
     }
 
-    public registerActiveView(view: TilesetView | null) {
+    public registerActiveView(view: SingleImageTilesetView | null) {
         this.activeView = view
     }
 

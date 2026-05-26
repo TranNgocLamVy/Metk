@@ -4,8 +4,8 @@ import { TilemapSession } from "@/editor/session/tilemap.session";
 import { Color, Container, Sprite, Texture } from "pixi.js";
 import { SetRulesCommand } from "@/application/commands/tile/set-rules.command";
 import { ITool } from "@/editor/interface/tool.interface";
-import { BaseLayerRenderer } from "@/graphics/renderer/base-layer.renderer";
-import { RuleLayerRenderer } from "@/graphics/renderer/rule-layer.renderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
+import { RuleLayerRenderer } from "@/graphics/renderer/tilemap/rule-layer.renderer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 
 

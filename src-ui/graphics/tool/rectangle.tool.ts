@@ -6,7 +6,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import icon from "@/assets/icons/rect.svg?raw";
 import { Tool } from "./tool.decorator";
 import { TilemapView } from "../view/tilemap.view";
-import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "../renderer/tilemap/base-layer.renderer";
 
 @Tool({
     id: "tool.rectangle",

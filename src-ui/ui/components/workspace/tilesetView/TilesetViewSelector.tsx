@@ -6,14 +6,14 @@ import TilesetViewTabs from "./TilesetViewTabs";
 import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 import { useCallback, useEffect, useRef } from "react";
 import { useTilesetSessionEvent } from "@/ui/hooks/useTilesetSessionEvent.hook";
-import { TilesetView } from "@/graphics/view/tileset.view";
+import { SingleImageTilesetView } from "@/graphics/view/single-image-tileset.view";
 
 export default function TilesetViewSelector() {
 	const { activeWorkspace } = useWorkspaceStore();
 	const { pixiApp, setTilesetSessions } = useTilesetSessionStore();
 
-	const activeViewRef = useRef<{ id: string, view: TilesetView } | null>(null);
-	const viewRefMap = useRef<Map<string, TilesetView>>(new Map());
+	const activeViewRef = useRef<{ id: string, view: SingleImageTilesetView } | null>(null);
+	const viewRefMap = useRef<Map<string, SingleImageTilesetView>>(new Map());
 
 	const updateTilesetSessionList = useCallback(() => {
 		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
@@ -24,7 +24,7 @@ export default function TilesetViewSelector() {
 		setTilesetSessions(sessionList);
 	}, [])
 
-	const activateView = useCallback((view: TilesetView) => {
+	const activateView = useCallback((view: SingleImageTilesetView) => {
 		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
 		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
@@ -61,7 +61,7 @@ export default function TilesetViewSelector() {
 		const currentSession = tilesetSessionManager.activeSession;
 
 		if (currentSession) {
-			const newView = new TilesetView(currentSession);
+			const newView = new SingleImageTilesetView(currentSession);
 			viewRefMap.current.set(currentSession.id, newView);
 			activateView(newView);
 		}
@@ -93,7 +93,7 @@ export default function TilesetViewSelector() {
 
 		let newCurrentView = viewRefMap.current.get(session.id);
 		if (!newCurrentView) {
-			newCurrentView = new TilesetView(session);
+			newCurrentView = new SingleImageTilesetView(session);
 			viewRefMap.current.set(session.id, newCurrentView);
 		}
 
@@ -107,7 +107,7 @@ export default function TilesetViewSelector() {
 		if (!activeWorkspace || !pixiApp) return;
 
 		if (viewRefMap.current.has(session.id)) return;
-		const newView = new TilesetView(session);
+		const newView = new SingleImageTilesetView(session);
 		viewRefMap.current.set(session.id, newView);
 
 		updateTilesetSessionList();

@@ -1,5 +1,5 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { BaseLayerRenderer } from "@/graphics/renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 import { ITool } from "@/editor/interface/tool.interface";
 import { Container, Sprite } from "pixi.js";

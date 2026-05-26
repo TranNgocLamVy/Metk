@@ -75,11 +75,11 @@ const appMock = vi.hoisted(() => ({
 vi.mock("pixi.js", () => graphicsMock);
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: appMock }));
 
-import { TileLayerRenderer } from "@/graphics/renderer/tile-layer.renderer";
-import { RuleLayerRenderer } from "@/graphics/renderer/rule-layer.renderer";
-import { GroupLayerRenderer } from "@/graphics/renderer/group-layer.renderer";
-import { TilemapGridRenderer } from "@/graphics/renderer/tilemap-grid.renderer";
-import { TilesetGridRenderer } from "@/graphics/renderer/tileset-grid.renderer";
+import { TileLayerRenderer } from "@/graphics/renderer/tilemap/tile-layer.renderer";
+import { RuleLayerRenderer } from "@/graphics/renderer/tilemap/rule-layer.renderer";
+import { GroupLayerRenderer } from "@/graphics/renderer/tilemap/group-layer.renderer";
+import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
+import { TilesetGridRenderer } from "@/graphics/renderer/tileset/tileset-grid.renderer";
 import { RuleLayerData, TileLayerData } from "@/shared/schema/layer.schema";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";

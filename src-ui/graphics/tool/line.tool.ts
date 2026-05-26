@@ -7,7 +7,7 @@ import icon from "@/assets/icons/ruler.svg?raw";
 import { GeometryUtils } from "@/shared/utils/geometry-utils";
 import { Tool } from "./tool.decorator";
 import { TilemapView } from "../view/tilemap.view";
-import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "../renderer/tilemap/base-layer.renderer";
 
 @Tool({
     id: "tool.line",

@@ -10,7 +10,7 @@ import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { ITool } from "@/editor/interface/tool.interface";
 import { GeometryUtils } from "@/shared/utils/geometry-utils";
 import { IDrawStrategy } from "../strategies/draw-strategy.interface";
-import { BaseLayerRenderer } from "../renderer/base-layer.renderer";
+import { BaseLayerRenderer } from "../renderer/tilemap/base-layer.renderer";
 import { TilemapView } from "../view/tilemap.view";
 import { Tool } from "./tool.decorator";
 import { BatchCommand } from "@/application/commands/batch.command";
