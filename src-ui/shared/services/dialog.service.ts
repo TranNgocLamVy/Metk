@@ -3,6 +3,7 @@ import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/ty
 import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "../types/confirmation-dialog";
 import { DialogZLevel } from "../types/dialog";
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { Result } from "../types/result";
 
 
 export class DialogService {
@@ -34,5 +35,23 @@ export class DialogService {
         if (!ruleset) return;
         
         useDialogStore.getState().openDialog("EDIT_RULESET_MODAL", { zLevel: DialogZLevel.Modal }, { rulesetId: id })
+    }
+
+    public static async openEditTilesetDialog(id: string): Promise<void> {
+        const currentProject = appKernel.editorFacade.currentProject;
+        if (!currentProject) return;
+    
+        const tilesetManager = currentProject.tilesetManager;
+        const loadResult = await tilesetManager.loadTileset(id);
+    
+        if (loadResult.status !== Result.Status.Success) return;
+    
+        useDialogStore
+            .getState()
+            .openDialog(
+                "EDIT_TILESET_MODAL",
+                { zLevel: DialogZLevel.Modal },
+                { tilesetId: id },
+            );
     }
 }

@@ -2,9 +2,9 @@ import { createContext, useContext } from "react";
 import { useState, useCallback, useMemo } from 'react';
 import { Ruleset } from '@/editor/model/ruleset/ruleset';
 import { RuleRequirement } from '@/shared/schema/ruleset.schema';
-import { RulesetOutputSelector } from './renderer/RulesetOutputSelector';
 import { useRulesetStore } from '@/ui/stores/ruleset.store';
 import { appKernel } from '@/application/bootstrap/app-kernel';
+import { RulesetOutputSelector } from "./graphics/ruleset-ouput-selector.renderer";
 
 export function useRulesetController(initialRuleset: Ruleset) {
     const [version, setVersion] = useState<number>(0);

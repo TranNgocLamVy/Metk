@@ -45,7 +45,7 @@ const editRulesetMocks = vi.hoisted(() => {
 
 vi.mock("uuid", () => ({ v4: editRulesetMocks.uuid }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: editRulesetMocks.appKernel }));
-vi.mock("@/ui/components/dialog/editRuleset/renderer/RulesetOutputSelector", () => ({
+vi.mock("@/ui/dialogs/editRuleset/renderer/RulesetOutputSelector", () => ({
     RulesetOutputSelector: editRulesetMocks.MockRulesetOutputSelector,
 }));
 vi.mock("@pixi/react", () => ({
@@ -77,7 +77,7 @@ vi.mock("react-i18next", () => ({
 }));
 
 import { RuleRequirement } from "@/shared/schema/ruleset.schema";
-import { EditRulesetDialog } from "@/ui/components/dialog/editRuleset/EditRulesetDialog";
+import { EditRulesetDialog } from "@/ui/dialogs/edit-ruleset/EditRulesetDialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { useRulesetStore } from "@/ui/stores/ruleset.store";
 

@@ -2,8 +2,8 @@ import { OpenFileDialog } from "./OpenFileDialog";
 import { FormDialog } from "./FormDialog";
 import { PermissionDialog } from "./PermissionDialog";
 import { SaveDialog } from "./SaveDialog";
-import { EditTilesetDialog } from "./EditTilesetDialog";
-import { EditRulesetDialog } from "./editRuleset/EditRulesetDialog";
+import { EditTilesetDialog } from "../../dialogs/edit-tileset/EditTilesetDialog";
+import { EditRulesetDialog } from "../../dialogs/edit-ruleset/EditRulesetDialog";
 
 export const DIALOG_TYPES = {
     FORM: 'FORM_DIALOG',

@@ -1,12 +1,12 @@
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { BaseDialogProps } from "../dialogRegistry";
-import { DialogContent, Dialog, DialogTitle } from "../../shadcn/dialog";
+import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
+import { DialogContent, Dialog, DialogTitle } from "@/ui/components/shadcn/dialog";
 import { useMemo } from "react";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { HStack, VStack } from "../../custom/stack/Stack";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import OutputSelector from "./OutputSelector";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { LocalizedText } from "../../custom/LocalizeText";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import EditRulesetSidebar from "./Sidebar";
 import RuleEditor from "./RuleEditor";
 import { EditRulesetContext, useRulesetController } from "./ContextProvider";

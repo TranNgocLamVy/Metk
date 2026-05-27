@@ -1,11 +1,11 @@
 import { RuleRequirement } from "@/shared/schema/ruleset.schema";
 import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
-import PixiImage from "../../custom/PixiImage";
+import PixiImage from "@/ui/components/custom/PixiImage";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { VStack } from "../../custom/stack/Stack";
+import { VStack } from "@/ui/components/custom/stack/Stack";
 import { useCallback, WheelEvent } from "react";
-import { ScrollArea } from "../../shadcn/scroll-area";
-import { LocalizedText } from "../../custom/LocalizeText";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { useEditRuleset } from "./ContextProvider";
 
 

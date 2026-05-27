@@ -3,6 +3,7 @@ import { ImageData, TileData, TilesetData, TilesetType } from "@/shared/schema/t
 import { Result } from "@/shared/types/result";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 
 interface TilesetEvent extends BaseObjectEvents {
     update(): void;
@@ -116,6 +117,65 @@ export class Tileset extends BaseObject<TilesetEvent> {
         return this.rows * this.tileheight + Math.max(0, this.rows - 1) * gap;
     }
 
+    public updateTileset(tilesetData: TilesetData): void {
+        this.name = tilesetData.name;
+        this.type = tilesetData.type ?? TilesetType.SingleImage;
+    
+        this.columns = tilesetData.columns;
+        this.rows = tilesetData.rows;
+        this.tilewidth = tilesetData.tilewidth;
+        this.tileheight = tilesetData.tileheight;
+    
+        this.image = tilesetData.image ?? {
+            source: "",
+            width: this.columns * this.tilewidth,
+            height: this.rows * this.tileheight,
+        };
+    
+        const nextTileData =
+            this.type === TilesetType.ImageCollection
+                ? tilesetData.tiles
+                : tilesetData.tiles.length > 0
+                    ? tilesetData.tiles
+                    : Array.from(
+                        { length: Math.max(0, this.columns * this.rows) },
+                        (_, index) => ({ id: index }),
+                    );
+    
+        const currentTilesById = new Map(
+            this.tiles.map((tile) => [tile.id, tile]),
+        );
+    
+        const nextTileIds = new Set(nextTileData.map((tile) => tile.id));
+    
+        for (const tile of this.tiles) {
+            if (!nextTileIds.has(tile.id)) {
+                this.objectRegistry.unregister(tile);
+                tile.destroy();
+            }
+        }
+    
+        this.tiles = nextTileData.map((tileData) => {
+            const existingTile = currentTilesById.get(tileData.id);
+    
+            if (existingTile) {
+                existingTile.updateTile(tileData);
+                return existingTile;
+            }
+    
+            const tile = new Tile(tileData, this);
+            this.objectRegistry.register(tile);
+            return tile;
+        });
+    
+        if (this.type === TilesetType.ImageCollection) {
+            this.recalculateCollectionMetrics();
+        }
+    
+        this.eventEmitter.emit("update");
+        this.eventEmitter.emit("updateProperty", "name", this.name);
+    }
+
     public checkTextureSize(width: number, height: number): void {
         if (this.isImageCollection()) return;
 
@@ -199,9 +259,40 @@ export class Tileset extends BaseObject<TilesetEvent> {
 }
 
 export class Tile extends BaseObject {
+    @NumberProperty<Tile>({
+        label: "ID",
+        readonly: true,
+        get: (target) => target.id,
+    })
     public id: number;
+
     public tileset: Tileset;
     public image?: ImageData;
+
+    @StringProperty<Tile>({
+        label: "Image source",
+        group: "Image",
+        readonly: true,
+        visible: (target) => !!target.image?.source,
+        get: (target) => target.image?.source ?? "",
+    })
+    public readonly imageSource: string = "";
+
+    @NumberProperty<Tile>({
+        label: "Width",
+        group: "Image",
+        readonly: true,
+        get: (target) => target.image?.width ?? target.tileset.tilewidth,
+    })
+    public readonly imageWidth: number = 0;
+
+    @NumberProperty<Tile>({
+        label: "Height",
+        group: "Image",
+        readonly: true,
+        get: (target) => target.image?.height ?? target.tileset.tileheight,
+    })
+    public readonly imageHeight: number = 0;
 
     constructor(tileData: TileData, tileset: Tileset) {
         super(`${tileset.objectId}:tile:${tileData.id}`);
@@ -209,6 +300,12 @@ export class Tile extends BaseObject {
         this.id = tileData.id;
         this.tileset = tileset;
         this.image = tileData.image;
+    }
+
+    public updateTile(tileData: TileData): void {
+        this.image = tileData.image;
+
+        this.eventEmitter.emit("updateProperty", "image", this.image);
     }
 
     public serialize(): TileData {

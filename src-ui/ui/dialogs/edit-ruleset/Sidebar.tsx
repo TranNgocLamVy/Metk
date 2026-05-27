@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HStack, VStack } from "../../custom/stack/Stack";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { SketchPicker } from "react-color";
-import { Button } from "../../shadcn/button";
+import { Button } from "@/ui/components/shadcn/button";
 import { Copy, EllipsisVertical, GripHorizontal, Plus, Trash2 } from "lucide-react";
-import { DialogClose } from "../../shadcn/dialog";
+import { DialogClose } from "@/ui/components/shadcn/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { LocalizedText } from "../../custom/LocalizeText";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { ScrollArea } from "../../shadcn/scroll-area";
-import PixiImage from "../../custom/PixiImage";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import PixiImage from "@/ui/components/custom/PixiImage";
 import { useEditRuleset } from "./ContextProvider";
 
 type EditRulesetSidebarProps = {

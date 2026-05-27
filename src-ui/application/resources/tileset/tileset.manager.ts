@@ -140,7 +140,22 @@ export class TilesetManager {
     }
 
     public updateTileset(tilesetData: TilesetData): void {
-        // TODO: Implement
+        const tileset = this.loadedTilesets.get(tilesetData.id);
+        if (!tileset) return;
+    
+        tileset.updateTileset(tilesetData);
+    
+        const metadata = this.tilesetMetadata.get(tilesetData.id);
+        if (metadata) {
+            metadata.name = tilesetData.name;
+        }
+    
+        Console.success({
+            message: {
+                key: "message.tileset.updatedSuccess",
+                options: { name: tilesetData.name },
+            },
+        });
     }
 
     public async removeTileset(id: string): Promise<Result> {
@@ -182,8 +197,23 @@ export class TilesetManager {
     }
 
     public cloneTileset(id: string): Tileset | null {
-        // TODO: Implement
-        return null;
+        const tileset = this.loadedTilesets.get(id);
+        if (!tileset) return null;
+    
+        const tilesetData = tileset.serialize();
+        const tilesetPathSystem = new FilePathSystem(
+            tilesetData.id,
+            this.projectPathSystem,
+            tileset.tilesetPathSystem.relPath,
+        );
+    
+        const cloneRegistry = new EditorObjectRegistry();
+    
+        return new Tileset(
+            tilesetData,
+            tilesetPathSystem,
+            cloneRegistry,
+        );
     }
 
     public serialize(): TilesetMetadata[] {

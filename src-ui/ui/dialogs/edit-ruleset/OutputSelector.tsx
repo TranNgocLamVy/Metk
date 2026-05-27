@@ -6,8 +6,8 @@ import { Button } from '@/ui/components/shadcn/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/components/shadcn/dropdown-menu';
 import { ScrollArea, ScrollBar } from '@/ui/components/shadcn/scroll-area';
 import { Plus } from 'lucide-react';
-import { HStack, VStack } from '../../custom/stack/Stack';
-import { LocalizedText } from '../../custom/LocalizeText';
+import { HStack, VStack } from '@/ui/components/custom/stack/Stack';
+import { LocalizedText } from '@/ui/components/custom/LocalizeText';
 import { useEditRuleset } from './ContextProvider';
 
 export default function OutputSelector() {
