@@ -4,13 +4,13 @@ import { TilesetSession } from "@/editor/session/tileset.session";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { TilemapView } from "@/graphics/view/tilemap.view";
-import { SingleImageTilesetView } from "@/graphics/view/single-image-tileset.view";
 import { ProjectManager } from "./resources/project/project.manager";
 import { Project } from "@/editor/model/project/project";
 import { ToolManager } from "@/graphics/tool/tool.manager";
 import { TextureManager } from "@/graphics/texture/texture.manager";
 import { HistoryManager } from "./resources/history/history.manager";
 import { ActivationContext } from "./runtime/activation-context";
+import { TilesetView } from "@/graphics/view/tileset.view";
 
 export class EditorFacade {
     constructor(
@@ -55,7 +55,7 @@ export class EditorFacade {
         return currentTilesetSession;
     }
 
-    public getActiveTilesetView(): SingleImageTilesetView | null {
+    public getActiveTilesetView(): TilesetView | null {
         const currentWorkspace = this.workspaceManager.currentWorkspace;
         if (!currentWorkspace) return null;
         return currentWorkspace.tilesetSessionManager.getActiveView();

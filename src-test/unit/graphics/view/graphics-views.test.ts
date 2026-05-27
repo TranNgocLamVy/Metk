@@ -137,7 +137,7 @@ vi.mock("@/graphics/renderer/tileset-selector.renderer", () => ({ TilesetSelecto
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: viewMocks.workspaceService }));
 
 import { TilemapView } from "@/graphics/view/tilemap.view";
-import { SingleImageTilesetView } from "@/graphics/view/single-image-tileset.view";
+import { SingleImageTilesetView } from "@/graphics/view/single-tileset.view";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 
 type MockViewport = InstanceType<typeof viewMocks.MockViewport>;

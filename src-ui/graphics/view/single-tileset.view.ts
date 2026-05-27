@@ -2,20 +2,19 @@ import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { IBaseView } from "@/editor/interface/base-session.interface";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 
-import { TilesetGridRenderer } from "../renderer/tileset/tileset-grid.renderer";
-import { TilesetRenderer } from "../renderer/tileset/tileset.renderer";
-import { TilesetSelectorRenderer } from "../renderer/tileset/tileset-selector.renderer";
+import { TilesetGridRenderer } from "../renderer/tileset/single-tileset-grid.renderer";
+import { TilesetRenderer } from "../renderer/tileset/single-tileset.renderer";
+import { TilesetSelectorRenderer } from "../renderer/tileset/single-tileset-selector.renderer";
+import { ITilesetView } from "./tileset.view";
 
-export class SingleImageTilesetView implements IBaseView {
+export class SingleImageTilesetView implements ITilesetView {
     public session: TilesetSession;
     public viewport: Viewport;
     private pixiApp: Application;
     private renderer: TilesetRenderer;
     public grid: TilesetGridRenderer;
-    public gridEnabled: boolean = true;
     public selector: TilesetSelectorRenderer;
     private isInit: boolean = false;
 
@@ -130,6 +129,10 @@ export class SingleImageTilesetView implements IBaseView {
             this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);
         }
         this.viewport.setZoom(this.session.viewState.zoom); 
+    }
+
+    public get gridEnabled(): boolean {
+        return this.grid.gridEnabled;
     }
 
     public toggleGrid(): void {

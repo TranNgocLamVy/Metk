@@ -117,9 +117,9 @@ vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: render
 
 import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { TilemapRenderer } from "@/graphics/renderer/tilemap/tilemap.renderer";
-import { TilesetRenderer } from "@/graphics/renderer/tileset/tileset.renderer";
-import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/tileset-selector.renderer";
-import { TilesetGridRenderer } from "@/graphics/renderer/tileset/tileset-grid.renderer";
+import { TilesetRenderer } from "@/graphics/renderer/tileset/single-tileset.renderer";
+import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/single-tileset-selector.renderer";
+import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
 import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tileset } from "@/editor/model/tileset/tileset";
