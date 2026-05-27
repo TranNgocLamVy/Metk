@@ -58,7 +58,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
             const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
             const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
 
-            const imageRelPath = tileset.image.source;
+            const imageRelPath = tileset.imageSource.source;
             const imageAbsPath = PathUtils.join(tilesetAbsDir, imageRelPath);
 
             const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
@@ -81,8 +81,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
                     '@columns': columns,
                     image: {
                         '@source': source,
-                        '@width': tileset.image.width,
-                        '@height': tileset.image.height
+                        '@width': tileset.imageSource.width,
+                        '@height': tileset.imageSource.height
                     }
                 }
             })

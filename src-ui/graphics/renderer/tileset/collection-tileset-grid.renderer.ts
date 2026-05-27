@@ -188,11 +188,11 @@ export class CollectionTilesetGridRenderer {
         return {
             width: Math.max(
                 1,
-                tile.image?.width ?? this.tileset.tilewidth ?? 1,
+                tile.imageSource?.width ?? this.tileset.tilewidth ?? 1,
             ),
             height: Math.max(
                 1,
-                tile.image?.height ?? this.tileset.tileheight ?? 1,
+                tile.imageSource?.height ?? this.tileset.tileheight ?? 1,
             ),
         };
     }

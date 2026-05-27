@@ -38,7 +38,7 @@ export class TextureService {
         const tileset = tilesetManager.getTilesetById(tilesetId);
         if (!tileset) return Result.Cancel();
 
-        if (texture.width != tileset.image.width || texture.height != tileset.image.height) {
+        if (texture.width != tileset.imageSource.width || texture.height != tileset.imageSource.height) {
             const confirmTexture = await DialogService.openPermissionDialog({
                 title: "dialog.import.textureMismatchSize.title",
                 description: "dialog.import.textureMismatchSize.description",
@@ -48,7 +48,7 @@ export class TextureService {
 
         const tilesetAbsDir = tileset.tilesetPathSystem.getFileAbsDir();
         const textureRelPath = PathUtils.relative(tilesetAbsDir, textureAbsPath);
-        tileset.updateTexturePath(textureRelPath);
+        tileset.updateImageSource({ source: textureRelPath, width: texture.width, height: texture.height });
         tilesetManager.saveTileset(tilesetId);
 
         appKernel.textureManager.updateTilesetTexture(tileset, texture);

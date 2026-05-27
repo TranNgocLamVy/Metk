@@ -224,27 +224,11 @@ describe("Tileset model", () => {
         tileset.eventEmitter.on("updateProperty", listener as any);
 
         await expect(tileset.rename("Terrain Edited")).resolves.toEqual(Result.Success());
-        tileset.updateTexturePath("../textures/terrain-v2.png");
+        tileset.updateImageSource({ source: "../textures/terrain-v2.png", width: 32, height: 32});
 
         expect(tileset.name).toBe("Terrain Edited");
-        expect(tileset.image.source).toBe("../textures/terrain-v2.png");
+        expect(tileset.imageSource.source).toBe("../textures/terrain-v2.png");
         expect(listener).toHaveBeenCalledWith("name", "Terrain Edited");
-        expect(listener).toHaveBeenCalledWith("image", tileset.image);
-    });
-
-    it("derives rows and columns from a new texture size without inventing new explicit tiles", () => {
-        const emptyTileset = createTileset({ columns: 0, rows: 0, image: { source: "empty.png", width: 0, height: 0 } });
-        emptyTileset.checkTextureSize(32, 48);
-
-        expect(emptyTileset.columns).toBe(2);
-        expect(emptyTileset.rows).toBe(3);
-        expect(emptyTileset.tiles.map((tile) => tile.id)).toEqual([0, 1, 2, 3, 4, 5]);
-
-        const explicitTileset = createTileset({ columns: 1, rows: 1, tiles: [{ id: 10 }] });
-        explicitTileset.checkTextureSize(64, 64);
-
-        expect(explicitTileset.columns).toBe(4);
-        expect(explicitTileset.rows).toBe(4);
-        expect(explicitTileset.tiles.map((tile) => tile.id)).toEqual([10]);
+        expect(listener).toHaveBeenCalledWith("image", tileset.imageSource);
     });
 });

@@ -107,8 +107,8 @@ vi.mock("pixi.js", () => ({
 vi.mock("pixi-viewport", () => ({ Viewport: rendererMocks.viewport.MockViewport }));
 vi.mock("@/shared/utils/graphic-utils", () => ({ GraphicUtils: rendererMocks.graphicUtils }));
 
-import { RulesetOutputSelector } from "@/ui/dialogs/edit-ruleset/renderer/RulesetOutputSelector";
 import { Result } from "@/shared/types/result";
+import { RulesetOutputSelector } from "@/ui/dialogs/edit-ruleset/graphics/ruleset-ouput-selector.renderer";
 
 const createPixiApp = () => ({
     screen: { width: 320, height: 240 },

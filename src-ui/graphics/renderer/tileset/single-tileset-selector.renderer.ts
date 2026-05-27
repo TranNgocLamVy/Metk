@@ -72,7 +72,7 @@ export class TilesetSelectorRenderer {
         const world = new Point(event.globalX, event.globalY);
         const local = this.parent.toLocal(world);
 
-        if (local.x < 0 || local.y < 0 || local.x > this.tileset.image.width || local.y > this.tileset.image.height) return;
+        if (local.x < 0 || local.y < 0 || local.x > this.tileset.imageSource.width || local.y > this.tileset.imageSource.height) return;
         const id = this.posToId(local.x, local.y);
         const coords = this.posToCoordinates(local.x, local.y);
         if (id < 0 || !coords) {

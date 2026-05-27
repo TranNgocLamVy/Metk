@@ -1,5 +1,6 @@
 import { type } from "arktype";
 import { safeArray } from "./utils";
+import { imageSourceSchema } from "./image-source.schema";
 
 export const TilesetType = {
     SingleImage: "single-image",
@@ -8,20 +9,13 @@ export const TilesetType = {
 
 export type TilesetType = typeof TilesetType[keyof typeof TilesetType];
 
-const imageData = type({
-    source: type("string"),
-    width: type("number"),
-    height: type("number"),
-});
-export type ImageData = typeof imageData.infer;
-
 const tileData = type({
     id: type("number"),
     x: type("number").optional(),
     y: type("number").optional(),
     width: type("number").optional(),
     height: type("number").optional(),
-    image: imageData.optional(),
+    image: imageSourceSchema.optional(),
 });
 export type TileData = typeof tileData.infer;
 
@@ -33,7 +27,7 @@ export const TilesetDataSchema = type("string.json.parse").to({
     rows: type("number").default(16),
     tilewidth: type("number").default(16),
     tileheight: type("number").default(16),
-    image: imageData.optional(),
+    image: imageSourceSchema.optional(),
     tiles: safeArray(tileData).default(() => []),
 })
 export type TilesetData = typeof TilesetDataSchema.infer;

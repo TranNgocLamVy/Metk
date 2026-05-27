@@ -8,7 +8,7 @@ import { RulesetRefManager } from "@/application/resources/references/ruleset-re
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 
 export class LayerUtils {
-    public static createLayerFromData(layerData: LayerData, parent: IGroupLayer,tilesetRefManager: TilesetRefManager,rulesetRefManager: RulesetRefManager, objectIdScope: string): BaseLayer<any> | null {
+    public static createLayerFromData(layerData: LayerData, parent: IGroupLayer, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager, objectIdScope: string): BaseLayer<any> | null {
         switch (layerData.type) {
             case "tile":
                 return new TileLayer(layerData, parent, tilesetRefManager, rulesetRefManager, objectIdScope);

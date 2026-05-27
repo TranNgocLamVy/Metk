@@ -59,7 +59,7 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
 
     private async performLoadSingleImage(tileset: Tileset): Promise<Result> {
         const tilesetAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(
-            tileset.image.source,
+            tileset.imageSource.source,
         );
 
         const loadResult = await this.loadTexture(tilesetAbsPath);
@@ -71,8 +71,6 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
 
         const baseTexture = loadResult.data!;
         this.baseTexturesCache.set(tileset.id, baseTexture);
-
-        tileset.checkTextureSize(baseTexture.width, baseTexture.height);
 
         const slicedTextures = this.sliceTexture(
             baseTexture,
@@ -107,10 +105,10 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
         );
 
         for (const tile of sortedTiles) {
-            if (!tile.image?.source) continue;
+            if (!tile.imageSource?.source) continue;
 
             const tileAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(
-                tile.image.source,
+                tile.imageSource.source,
             );
 
             const loadResult = await this.loadTexture(tileAbsPath);
@@ -202,8 +200,6 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
         this.destroyTextures(tileset.id);
 
         this.baseTexturesCache.set(tileset.id, texture);
-
-        tileset.checkTextureSize(texture.width, texture.height);
 
         const slicedTextures = this.sliceTexture(texture, tileset.tilewidth, tileset.tileheight);
         const tileTextureMap = new Map<number, Texture>();

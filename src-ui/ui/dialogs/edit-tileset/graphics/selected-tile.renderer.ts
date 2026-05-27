@@ -105,7 +105,7 @@ function getTileNaturalSize(
     height: number;
 } {
     return {
-        width: Math.max(1, tile.image?.width ?? tileset.tilewidth ?? 1),
-        height: Math.max(1, tile.image?.height ?? tileset.tileheight ?? 1),
+        width: Math.max(1, tile.imageSource?.width ?? tileset.tilewidth ?? 1),
+        height: Math.max(1, tile.imageSource?.height ?? tileset.tileheight ?? 1),
     };
 }
