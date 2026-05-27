@@ -1,9 +1,10 @@
-import { Grid3x3, Pen, Plus, Trash2 } from "lucide-react";
+import { Grid3x3, Info, Pen, Plus, Trash2 } from "lucide-react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { TilesetService } from "@/shared/services/tileset.service";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { DialogZLevel } from "@/shared/types/dialog";
+import { usePropertyStore } from "@/ui/stores/property.store";
 
 const Group1: MenuDropDownGroupType = [
     {
@@ -23,6 +24,16 @@ const Group1: MenuDropDownGroupType = [
         },
         onClick() {
             useDialogStore.getState().openDialog("EDIT_TILESET_MODAL", { zLevel: DialogZLevel.Modal });
+        }
+    },
+    {
+        type: "option",
+        label: "workspace.tilesetSelector.contextMenu.property",
+        startIcon: <Info className="stroke-1" />,
+        onClick() {
+			const activeTilesetSession = appKernel.editorFacade.getActiveTilesetSession();
+			if (!activeTilesetSession) return;
+			usePropertyStore.getState().setObjectId(activeTilesetSession.tileset.objectId);
         }
     },
 ];

@@ -9,14 +9,17 @@ import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 
 type XMLBuilder = ReturnType<typeof create>;
 
 export class TmxTilemapExporter implements ITilemapExporter {
     private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // id -> firstGid
+    private exportPath: string;
 
     public export(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): Uint8Array {
         this.tilesetFirstGidMap.clear();
+        this.exportPath = exportPath;
 
         const builder: XMLBuilder = create({ version: '1.0', encoding: 'UTF-8' })
 
@@ -103,6 +106,9 @@ export class TmxTilemapExporter implements ITilemapExporter {
             } else if (childLayer instanceof RuleLayer) {
                 layer = this.getRuleLayer(childLayer, index, tilemap);
                 index++;
+            } else if (childLayer instanceof ImageLayer) {
+                layer = this.getImageLayer(childLayer, index, tilemap);
+                index++;
             }
             return layer;
         }).filter((layer) => layer != null).reverse();
@@ -179,5 +185,32 @@ export class TmxTilemapExporter implements ITilemapExporter {
         });
         
         return layer;
+    }
+
+    private getImageLayer(imageLayer: ImageLayer, index: number, tilemap: Tilemap): XMLBuilder {
+        const imageAbsPath = tilemap.tilemapPathSystem.getAbsPathFromRelPath(imageLayer.imageSource.source);
+        const source = PathUtils.relative(PathUtils.dirname(this.exportPath), imageAbsPath);
+    
+        return create({
+            imagelayer: {
+                "@id": imageLayer.id,
+                "@name": imageLayer.name,
+                "@offsetx": imageLayer.offset.x,
+                "@offsety": imageLayer.offset.y,
+                "@parallaxx": imageLayer.parallax.x,
+                "@parallaxy": imageLayer.parallax.y,
+                "@opacity": imageLayer.opacity,
+                "@visible": imageLayer.visible ? 1 : 0,
+                "@locked": imageLayer.locked ? 1 : 0,
+                ...(imageLayer.tintcolor ? {"@tintcolor": imageLayer.tintcolor} : {}),
+                "@repeatx": imageLayer.repeatX ? 1 : 0,
+                "@repeaty": imageLayer.repeatY ? 1 : 0,
+                image: {
+                    "@source": source,
+                    "@width": imageLayer.imageSource.width,
+                    "@height": imageLayer.imageSource.height,
+                },
+            },
+        });
     }
 }

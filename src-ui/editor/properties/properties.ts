@@ -141,7 +141,6 @@ export class ColorPropertyClass<TTarget> extends BaseProperty<TTarget> {
 }
 
 
-export type Point2D = { x: number, y: number };
 export interface Point2DPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
     pointLabel?: { x: string, y: string };
     set?: (target: TTarget, value: Point2D) => void;
@@ -157,7 +156,6 @@ export class Point2DPropertyClass<TTarget> extends BaseProperty<TTarget> {
     }
 }
 
-export type Point3D = { x: number, y: number, z: number };
 export interface Point3DPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
     pointLabel?: { x: string, y: string, z: string };
     set?: (target: TTarget, value: Point3D) => void;
@@ -170,5 +168,17 @@ export class Point3DPropertyClass<TTarget> extends BaseProperty<TTarget> {
     constructor(target: TTarget, options: Point3DPropertyOptions<TTarget>) {
         super(target, options);
         this.pointLabel = options.pointLabel ?? { x: "X", y: "Y", z: "Z" };
+    }
+}
+
+export interface ImageSourcePropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
+    set?: (target: TTarget, value: { source: string, width: number, height: number }) => void;
+    get: (target: TTarget) => String;
+    validate?: (target: TTarget, value: { source: string, width: number, height: number }) => Result;
+}
+
+export class ImageSourcePropertyClass<TTarget> extends BaseProperty<TTarget> {
+    constructor(target: TTarget, options: ImageSourcePropertyOptions<TTarget>) {
+        super(target, options);
     }
 }

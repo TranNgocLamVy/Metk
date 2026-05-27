@@ -68,7 +68,7 @@ describe("RootLayer", () => {
         const serializedGroup = rootLayer.serialize()[0];
         expect(serializedGroup).toMatchObject({ id: "group-1", type: "group" });
         if (serializedGroup.type !== "group") throw new Error("Expected group-1 to serialize as a group");
-        expect(serializedGroup.layers.map((layer) => layer.id)).toEqual(["tile-1"]);
+        expect(serializedGroup.layers?.map((layer) => layer.id)).toEqual(["tile-1"]);
     });
 
     it("moves direct children within bounds and leaves order unchanged outside bounds", () => {

@@ -10,13 +10,14 @@ import { DropPosition, useLayerManagerStore } from "@/ui/stores/layer-manager.st
 
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
 import { WorkspaceService } from "./workspace.service";
-import { defaultGroupLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layer.schema";
+import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layer.schema";
 import { CreateRuleLayerCommand } from "@/application/commands/layer/create-rule-layer.command";
 import { ToggleOpenGroupLayerCommand } from "@/application/commands/layer/toggle-open-group-layer.command";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
+import { CreateImageLayerCommand } from "@/application/commands/layer/create-image-layer.command";
 
 const getLayerVisualOrder = (root: RootLayer): Map<string, number> => {
     const order = new Map<string, number>();
@@ -92,6 +93,31 @@ export class TilemapLayerService {
         historyManager.execute(createRuleLayerCommand, editorFacade)
         historyManager.commitTransaction();
 
+        useLayerManagerStore.getState().setEditingId(payload.id);
+    }
+
+    public static async createNewImageLayer() {
+        const editorFacade = appKernel.editorFacade;
+    
+        const currentSession = editorFacade.getActiveTilemapSession();
+        const historyManager = editorFacade.getCurrentHistoryManager();
+    
+        if (!currentSession || !historyManager) return;
+
+        const tilemap = currentSession.tilemap;
+        const root = tilemap.rootLayer;
+        const targetLayer = this.getSelectedParentLayer(tilemap);
+    
+        const parent = targetLayer instanceof GroupLayer ? targetLayer : targetLayer?.parentLayer ? targetLayer.parentLayer : root;
+    
+        const payload = defaultImageLayerData();
+    
+        const createImageLayerCommand = new CreateImageLayerCommand(tilemap.objectId, parent.objectId, payload);
+    
+        historyManager.startTransaction();
+        historyManager.execute(createImageLayerCommand, editorFacade);
+        historyManager.commitTransaction();
+    
         useLayerManagerStore.getState().setEditingId(payload.id);
     }
 

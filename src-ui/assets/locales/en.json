@@ -274,6 +274,7 @@
             },
             "contextMenu": {
                 "new": "New Tileset",
+                "property": "Tileset Property",
                 "edit": "Edit Tileset",
                 "showGrid": "Show Grid",
                 "delete": "Delete Tileset"

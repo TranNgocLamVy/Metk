@@ -8,6 +8,7 @@ import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { Point2DProperty } from "@/editor/properties/properties.decorator";
 
 interface RuleLayerEvents extends BaseLayerEvents {
     rulesetRefsOutputChanged: (coordinates: Coordinate[]) => void
@@ -15,9 +16,36 @@ interface RuleLayerEvents extends BaseLayerEvents {
 
 export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public rulesetsRef: (RulesetRef | null)[][] = [];
-    public coordinate: Coordinate = { col: 0, row: 0 };
-    public offset: Point = new Point(0, 0);
+
+    @Point2DProperty<RuleLayer>({
+        label: "Size",
+        group: "Properties",
+        order: 4,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        get: (target) => ({ x: target.size.width, y: target.size.height }),
+    })
     public size: { width: number, height: number } = { width: 0, height: 0 }
+
+    @Point2DProperty<RuleLayer>({
+        label: "Coordinate",
+        group: "Properties",
+        order: 5,
+        readonly: true,
+        pointLabel: { x: "Col", y: "Row" },
+        get: (target) => ({ x: target.offset.x, y: target.offset.y }),
+    })
+    public coordinate: Coordinate = { col: 0, row: 0 };
+
+    @Point2DProperty<RuleLayer>({
+        label: "Offset",
+        group: "Properties",
+        order: 6,
+        readonly: true,
+        set: (target, value) => target.updateOffset(value.x, value.y),
+        get: (target) => ({ x: target.offset.x, y: target.offset.y }),
+    })
+    public offset: Point2D = { x: 0, y: 0 };
 
 
     constructor(
@@ -30,21 +58,22 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope, "Rule Layer");
 
         this.parentLayer = parentLayer;
-        this.name = ruleLayerData.name;
+        this.name = ruleLayerData.name ?? "Unknow Rule Layer";
 
-        this.coordinate.col = ruleLayerData.x;
-        this.coordinate.row = ruleLayerData.y;
-        this.offset.x = ruleLayerData.offsetx;
-        this.offset.y = ruleLayerData.offsety;
+        this.coordinate.col = ruleLayerData.x ?? 0;
+        this.coordinate.row = ruleLayerData.y ?? 0;
+        this.offset.x = ruleLayerData.offsetx ?? 0;
+        this.offset.y = ruleLayerData.offsety ?? 0;
 
-        this.size.width = ruleLayerData.width;
-        this.size.height = ruleLayerData.height;
+        this.size.width = ruleLayerData.width ?? 1;
+        this.size.height = ruleLayerData.height ?? 1;
 
-        this.opacity = ruleLayerData.opacity;
-        this.visible = ruleLayerData.visible;
-        this.locked = ruleLayerData.locked;
+        this.opacity = ruleLayerData.opacity ?? 1;
+        this.visible = ruleLayerData.visible ?? true;
+        this.locked = ruleLayerData.locked ?? false;
 
-        const rulesetRefs = ruleLayerData.layerData.split("\n").map((tileRow) => {
+        const layerData = ruleLayerData.layerData ?? ""
+        const rulesetRefs = layerData.split("\n").map((tileRow) => {
             return tileRow.split(",").map((tileRef) => {
                 if (tileRef === "0") return null;
                 const parts = tileRef.split(":");
@@ -79,7 +108,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
     public setRuleRefsAt(updates: { coordinate: Coordinate, rulesetId: string | null }[]): Result<{ coordinate: Coordinate, oldRulesetId: string | null }[]> {
         if (this.locked || !this.visible) return Result.Cancel();
-        
+
         const results: { coordinate: Coordinate, oldRulesetId: string | null }[] = [];
         const affectedCoordinates = new Set<string>();
 
@@ -120,7 +149,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         });
 
         this.eventEmitter.emit("rulesetRefsOutputChanged", updatedCoords);
-        
+
         return Result.Success(results);
     }
 
@@ -184,7 +213,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         if (!rulesetRef) return;
 
         const calculateResult = this.calculateOutputAt(coordinate);
-        
+
         if (calculateResult) {
             const tilesetIndex = this.tilesetRefManager.getTilesetRefIndex(calculateResult.tilesetId);
             rulesetRef.setOutput(calculateResult.tileId, tilesetIndex);
@@ -235,6 +264,12 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         }
 
         return rulesetRefs;
+    }
+
+    public updateOffset(x: number, y: number): void {
+        this.offset.x = x;
+        this.offset.y = y;
+        this.eventEmitter.emit("updateProperty", "offset", this.offset);
     }
 
     public override serialize(): RuleLayerData {
@@ -318,14 +353,14 @@ export class RulesetRef {
         if (this.tileId === -1 || this.tilesetIndex === -1) return `${this.rulesetIndex}:-1:-1`;
         return `${this.rulesetIndex}:${this.tileId}:${this.tilesetIndex}`;
     }
-    
+
     public setRulesetRef(rulesetIndex: number): number {
         const preRulesetRefData = this.rulesetIndex;
         this.rulesetIndex = rulesetIndex;
         return preRulesetRefData;
     }
 
-    public setOutput(tileId: number, tilesetIndex: number): { tileId: number, tilesetIndex: number} {
+    public setOutput(tileId: number, tilesetIndex: number): { tileId: number, tilesetIndex: number } {
         const preTileRefData = { tileId: this.tileId, tilesetIndex: this.tilesetIndex };
         this.tileId = tileId;
         this.tilesetIndex = tilesetIndex;

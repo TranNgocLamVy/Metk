@@ -48,7 +48,7 @@ export class ExportTilemapTMXCommand implements ISystemCommand {
         if (result.status === Result.Status.Success) {
             exportPathManager.setExportPath(tilemap.id, exportPath);
             await editorFacade.workspaceManager.saveCurrentWorkspace();
-            Console.success({ message: "message.tilemap.exportSuccess"});
+            Console.success({ message: { key: "message.tilemap.exportSuccess", options: { name: tilemap.name } } });
         }
 
         return result

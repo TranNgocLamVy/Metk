@@ -1,6 +1,6 @@
 import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useState } from "react";
 
-import { Point3D, Point3DPropertyClass } from "@/editor/properties/properties";
+import { Point3DPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { Input } from "@/ui/components/shadcn/input";
 import { HStack, VStack } from "../custom/stack/Stack";

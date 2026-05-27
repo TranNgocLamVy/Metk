@@ -13,6 +13,7 @@ import {
     CollectionTileLayout,
     CollectionTilesetGridRenderer,
 } from "./collection-tileset-grid.renderer";
+import { usePropertyStore } from "@/ui/stores/property.store";
 
 export type CreateCollectionTilesetSelectorContext = {
     tilesetSession: TilesetSession;
@@ -76,6 +77,9 @@ export class CollectionTilesetSelectorRenderer {
             this.clearSelection();
             return;
         }
+
+        const tile = layout.tile;
+        if (tile) usePropertyStore.getState().setObjectId(tile.objectId); // TODO: Refactor using a Service or somthing;
 
         const isCtrl = !!(original.ctrlKey || original.metaKey);
 

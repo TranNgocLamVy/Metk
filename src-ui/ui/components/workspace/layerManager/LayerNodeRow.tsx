@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Eye, EyeOff, Folder, FolderOpen, Grid, LockKeyhole, LockOpen } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, EyeOff, Folder, FolderOpen, Grid, Image, LockKeyhole, LockOpen } from "lucide-react";
 import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
@@ -10,6 +10,7 @@ import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { usePropertyStore } from "@/ui/stores/property.store";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 
 type LayerNodeRowProps = {
 	view: LayerView;
@@ -139,6 +140,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 		if (layer instanceof TileLayer) return <Grid size={16} className="text-emerald-500" />;
 		if (layer instanceof RuleLayer) return <Grid size={16} className="text-yellow-300" />;
 		if (layer instanceof GroupLayer) return layer.isOpen ? <FolderOpen size={16} className="text-blue-500" /> : <Folder size={16} className="text-blue-500" />;
+		if (layer instanceof ImageLayer) return <Image size={16} className="text-fuchsia-500" />;
 		return null
 	}
 

@@ -1,5 +1,7 @@
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { RulesetService } from "@/shared/services/ruleset.service";
-import { Plus } from "lucide-react";
+import { usePropertyStore } from "@/ui/stores/property.store";
+import { Info, Plus } from "lucide-react";
 
 const CreateActionGroup: MenuDropDownGroupType = [
 	{
@@ -8,12 +10,21 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		startIcon: <Plus />,
 		onClick() {
 			RulesetService.createRuleset();
-		},
-	}
+		}
+	},
+	{
+		type: "option",
+		label: "workspace.tilemapEditor.contextMenu.property",
+		startIcon: <Info className="stroke-1" />,
+		disabled: () => true,
+		onClick() {
+			
+		}
+	},
 ];
 
 export const RulesetManagerContextMenu: MenuItemType = {
-	label: "LayerManager",
+	label: "RulesetManager",
 	className: "w-60",
 	groups: [CreateActionGroup],
 };

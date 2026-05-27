@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { scope, type } from "arktype";
+import { scope } from "arktype";
+import { imageSourceSchema } from "./image-source.schema";
 
 export type TileRefData = {
     tilesetId: string;
@@ -13,49 +14,66 @@ export type RulesetRefData = {
 
 const layerModule = scope({
     TileLayer: {
-        id: "string",
-        type: "'tile'",
-        name: "string",
-        x: "number",
-        y: "number",
-        width: "number",
-        height: "number",
-        opacity: "number",
-        visible: "boolean",
-        locked: "boolean",
-        offsetx: "number",
-        offsety: "number",
-        layerData: "string"
+        "id": "string",
+        "type": "'tile'",
+        "name?": "string",
+        "x?": "number",
+        "y?": "number",
+        "width?": "number",
+        "height?": "number",
+        "opacity?": "number",
+        "visible?": "boolean",
+        "locked?": "boolean",
+        "offsetx?": "number",
+        "offsety?": "number",
+        "layerData?": "string"
     },
 
     RuleLayer: {
-        id: "string",
-        type: "'auto_rule'",
-        name: "string",
-        x: "number",
-        y: "number",
-        width: "number",
-        height: "number",
-        opacity: "number",
-        visible: "boolean",
-        locked: "boolean",
-        offsetx: "number",
-        offsety: "number",
-        layerData: "string"
+        "id": "string",
+        "type": "'auto_rule'",
+        "name?": "string",
+        "x?": "number",
+        "y?": "number",
+        "width?": "number",
+        "height?": "number",
+        "opacity?": "number",
+        "visible?": "boolean",
+        "locked?": "boolean",
+        "offsetx?": "number",
+        "offsety?": "number",
+        "layerData?": "string"
     },
 
     GroupLayer: {
-        id: "string",
-        type: "'group'",
-        name: "string",
-        opacity: "number",
-        open: "boolean",
-        visible: "boolean",
-        locked: "boolean",
-        layers: "Layer[]"
+        "id": "string",
+        "type": "'group'",
+        "name?": "string",
+        "opacity?": "number",
+        "open?": "boolean",
+        "visible?": "boolean",
+        "locked?": "boolean",
+        "layers?": "Layer[]"
     },
 
-    Layer: "TileLayer | RuleLayer | GroupLayer",
+    ImageLayer: {
+        "id": "string",
+        "type": "'image'",
+        "name?": "string",
+        "opacity?": "number",
+        "visible?": "boolean",
+        "locked?": "boolean",
+        "offsetx?": "number",
+        "offsety?": "number",
+        "parallaxx?": "number",
+        "parallaxy?": "number",
+        "tintcolor?": "string",
+        "repeatx?": "boolean",
+        "repeaty?": "boolean",
+        "image?": imageSourceSchema,
+    },
+
+    Layer: "TileLayer | RuleLayer | ImageLayer | GroupLayer",
     RootLayer: "Layer[]"
 }).export();
 
@@ -64,6 +82,9 @@ export type TileLayerData = typeof TileLayerSchema.infer;
 
 export const RuleLayerSchema = layerModule.RuleLayer;
 export type RuleLayerData = typeof RuleLayerSchema.infer;
+
+export const ImageLayerSchema = layerModule.ImageLayer;
+export type ImageLayerData = typeof ImageLayerSchema.infer;
 
 export const GroupLayerSchema = layerModule.GroupLayer;
 export type GroupLayerData = typeof GroupLayerSchema.infer;
@@ -81,14 +102,6 @@ export const defaultTileLayerData = (data: Pick<TileLayerData, | "width" | "heig
         type: "tile",
         width: data.width,
         height: data.height,
-        x: 0,
-        y: 0,
-        offsetx: 0,
-        offsety: 0,
-        opacity: 1,
-        visible: true,
-        locked: false,
-        layerData: ""
     };
 };
 
@@ -99,14 +112,14 @@ export const defaultRuleLayerData = (data: Pick<RuleLayerData, "width" | "height
         type: "auto_rule",
         width: data.width,
         height: data.height,
-        x: 0,
-        y: 0,
-        offsetx: 0,
-        offsety: 0,
-        opacity: 1,
-        visible: true,
-        locked: false,
-        layerData: ""
+    };
+};
+
+export const defaultImageLayerData = (): ImageLayerData => {
+    return {
+        id: uuidv4(),
+        name: "New Image Layer",
+        type: "image",
     };
 };
 
@@ -115,10 +128,5 @@ export const defaultGroupLayerData = (): GroupLayerData => {
         id: uuidv4(),
         name: "New Group Layer",
         type: "group",
-        opacity: 1,
-        open: true,
-        visible: true,
-        locked: false,
-        layers: []
     };
 };

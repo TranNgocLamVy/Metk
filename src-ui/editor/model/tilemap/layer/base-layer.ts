@@ -26,7 +26,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     @NumberProperty<BaseLayer>({
         label: "Opacity",
-        group: "Layer",
+        group: "Properties",
         order: 1,
         slider: {
             range: [0, 1],
@@ -39,7 +39,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     @BooleanProperty<BaseLayer>({
         label: "Visible",
-        group: "Layer",
+        group: "Properties",
         order: 2,
         get: (target) => target._visible,
         set: (target, value) => { target.toggleVisibility(value) },
@@ -48,7 +48,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     @BooleanProperty<BaseLayer>({
         label: "Locked",
-        group: "Layer",
+        group: "Properties",
         order: 3,
         get: (target) => target._locked,
         set: (target, value) => { target.toggleLock(value) },

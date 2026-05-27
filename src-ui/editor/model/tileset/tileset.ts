@@ -3,7 +3,7 @@ import { TileData, TilesetData, TilesetType } from "@/shared/schema/tileset.sche
 import { Result } from "@/shared/types/result";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { NumberProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import { EnumProperty, NumberProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { ImageSource } from "../image-source";
 
@@ -12,16 +12,72 @@ interface TilesetEvent extends BaseObjectEvents {
 }
 
 export class Tileset extends BaseObject<TilesetEvent> {
+    @StringProperty<Tileset>({
+        label: "ID",
+        readonly: true,
+        get: (target) => target.id,
+    })
     public id: string;
+
+    @StringProperty<Tileset>({
+        label: "Name",
+        get: (target) => target.name,
+        set: (target, value) => { target.rename(value) },
+    })
     public name: string;
+
+    @EnumProperty<Tileset>({
+        label: "Type",
+        order: 3,
+        readonly: true,
+        get: (target) => target.type,
+        options: () => {
+            return [
+                { label: "Single image", value: "single-image" },
+                { label: "Image Collection", value: "image-collection" },
+            ]
+        },
+    })
     public type: TilesetType;
+
+    @Point2DProperty<Tileset>({
+        label: "Tile Size",
+        group: "Properties",
+        order: 1,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        visible: (target) => target.type == "single-image",
+        get: (target) => ({ x: target.tilewidth, y: target.tileheight }),
+    })
+    public tilewidth: number;
+    public tileheight: number;
 
     public columns: number;
     public rows: number;
-    public tilewidth: number;
-    public tileheight: number;
-    public tiles: Tile[] = [];
+
+    @StringProperty<Tileset>({
+        label: "Source",
+        group: "Image",
+        order: 1,
+        readonly: true,
+        visible: (target) => target.type == "single-image",
+        get: (target) => target.imageSource?.source ?? "",
+    })
     public imageSource: ImageSource;
+
+    @Point2DProperty<Tileset>({
+        label: "Size",
+        group: "Image",
+        order: 2,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        visible: (target) => target.type == "single-image",
+        get: (target) => ({ x: target.imageSource.width, y: target.imageSource.height }),
+    })
+    private imageSize: any;
+
+    public tiles: Tile[] = [];
+
 
     constructor(
         tilesetData: TilesetData,
@@ -262,7 +318,18 @@ export class Tile extends BaseObject {
         visible: (target) => !!target.imageSource?.source,
         get: (target) => ({ x: target.imageSource?.width ?? target.tileset.tilewidth, y: target.imageSource?.height ?? target.tileset.tileheight }),
     })
-    private size: any;
+    private imageSize: any;
+
+    @Point2DProperty<Tile>({
+        label: "Tile Size",
+        group: "Properties",
+        order: 1,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        visible: (target) => { return target.imageSource == null },
+        get: (target) => ({ x: target.tileset.tilewidth, y: target.tileset.tileheight }),
+    })
+    private tileSize: any;
 
     constructor(
         tileData: TileData,
@@ -272,12 +339,7 @@ export class Tile extends BaseObject {
 
         this.id = tileData.id;
 
-        const sourceData = tileData.image ?? {
-            source: "",
-            width: tileset.tilewidth,
-            height: tileset.tileheight,
-        };
-        this.imageSource = new ImageSource(sourceData);
+        this.imageSource = tileData.image ? new ImageSource(tileData.image) : null;
     }
 
     public updateTile(tileData: TileData): void {

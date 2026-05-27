@@ -1,10 +1,10 @@
-import { ChangeEvent, FocusEvent, Fragment, KeyboardEvent, useCallback, useState } from "react";
+import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useState } from "react";
 
-import { Point2D, Point2DPropertyClass } from "@/editor/properties/properties";
+import { Point2DPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { Input } from "@/ui/components/shadcn/input";
 import { HStack, VStack } from "../custom/stack/Stack";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Label } from "../shadcn/label";
 
@@ -143,7 +143,7 @@ function PointAxisInput({ label, value, disabled, readOnly, onChange, onKeyDown 
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
 }) {
     return (
-        <label className="flex min-w-0 items-center gap-1">
+        <div className="flex w-full items-center gap-1">
             <span className="max-w-10 shrink-0 truncate text-[10px] text-shadow-foreground" title={label}>
                 {label}
             </span>
@@ -157,7 +157,7 @@ function PointAxisInput({ label, value, disabled, readOnly, onChange, onKeyDown 
                 onChange={onChange}
                 onKeyDown={onKeyDown}
             />
-        </label>
+        </div>
     );
 }
 

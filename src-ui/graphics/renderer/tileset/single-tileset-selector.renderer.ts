@@ -3,6 +3,7 @@ import { Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 import { TilesetSession } from "@/editor/session/tileset.session";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 import { WorkspaceService } from "@/shared/services/workspace.service";
+import { usePropertyStore } from "@/ui/stores/property.store";
 
 export type CreateTilesetViewSelectorContext = {
     tileset: Tileset;
@@ -87,6 +88,9 @@ export class TilesetSelectorRenderer {
         this.dragging = true;
         this.selectionType = this.selectedTilesSet.has(id) ? "deselect" : "select";
 
+        const tile = this.tileset.getTileFromId(id)
+        if (tile) usePropertyStore.getState().setObjectId(tile.objectId); // TODO: Refactor using a Service or somthing;
+
         const isCtrl = !!(original.ctrlKey || original.metaKey);
         if (!isCtrl) this.selectedTilesSet.clear();
 
@@ -121,7 +125,6 @@ export class TilesetSelectorRenderer {
         const endRow = Math.max(this.previewStartCoords!.row, this.previewEndCoords.row);
         const startCol = Math.min(this.previewStartCoords!.col, this.previewEndCoords.col);
         const endCol = Math.max(this.previewStartCoords!.col, this.previewEndCoords.col);
-
 
         this.previewTilesSet = new Set<number>();
         for (let r = startRow; r <= endRow; r++) {
@@ -287,7 +290,6 @@ export class TilesetSelectorRenderer {
 
         this.selectedTilesShape = rows;
 
-        // TODO: Custom pivot selection
         this.pivot = { row: Math.floor((minRow + maxRow) / 2), col: Math.floor((minCol + maxCol) / 2) };
 
         const mappedSelectedTiles = Array.from(this.selectedTilesSet);
@@ -424,7 +426,7 @@ export class TilesetSelectorRenderer {
         return id;
     }
 
-    public getSelectedTiles(): (Tile | null)[][] | null  {
+    public getSelectedTiles(): (Tile | null)[][] | null {
         return this.selectedTilesShape;
     }
 

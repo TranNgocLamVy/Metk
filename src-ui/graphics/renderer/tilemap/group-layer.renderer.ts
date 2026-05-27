@@ -8,6 +8,8 @@ import { BaseLayerRenderer } from "./base-layer.renderer";
 import { TileLayerRenderer } from "./tile-layer.renderer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { RuleLayerRenderer } from "./rule-layer.renderer";
+import { ImageLayerRenderer } from "./image-layer.renderer";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 
 type GroupLike = GroupLayer | RootLayer;
 
@@ -66,6 +68,8 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
             renderer = new TileLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
         } else if (childLayer instanceof RuleLayer) {
             renderer = new RuleLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
+        } else if (childLayer instanceof ImageLayer) {
+            renderer = new ImageLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
         } else if (childLayer instanceof GroupLayer) {
             renderer = new GroupLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
         }

@@ -30,14 +30,15 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
 
         this.parentLayer = parentLayer;
 
-        this.name = groupLayerData.name;
+        this.name = groupLayerData.name ?? "Unknow Group Layer";
 
-        this.opacity = groupLayerData.opacity;
-        this.visible = groupLayerData.visible;
-        this.locked = groupLayerData.locked;
-        this.isOpen = groupLayerData.open;
+        this.opacity = groupLayerData.opacity ?? 1;
+        this.visible = groupLayerData.visible ?? true;
+        this.locked = groupLayerData.locked ?? false;
+        this.isOpen = groupLayerData.open ?? true;
 
-        groupLayerData.layers.forEach(layerData => {
+        const layers = groupLayerData.layers ?? [];
+        layers.forEach(layerData => {
             const layer = this.createLayerTree(layerData, this);
             if (layer) this.pushLayer(layer);
         });
@@ -136,7 +137,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public override clone(): GroupLayer {
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
-        groupLayerData.layers = groupLayerData.layers.map((layerData) => GroupLayer.cloneLayerDataWithNewIds(layerData));
+        groupLayerData.layers = groupLayerData.layers!.map((layerData) => GroupLayer.cloneLayerDataWithNewIds(layerData));
         return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
     }
 
@@ -145,7 +146,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
             return {
                 ...layerData,
                 id: uuidv4(),
-                layers: layerData.layers.map((childLayerData) => GroupLayer.cloneLayerDataWithNewIds(childLayerData)),
+                layers: layerData.layers!.map((childLayerData) => GroupLayer.cloneLayerDataWithNewIds(childLayerData)),
             };
         }
 

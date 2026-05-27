@@ -1,4 +1,3 @@
-import { Point } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
 
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
@@ -8,6 +7,7 @@ import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { Point2DProperty } from "@/editor/properties/properties.decorator";
 
 interface TileLayerEvents extends BaseLayerEvents {
     tilesChanged: (coords: Coordinate[]) => void
@@ -21,9 +21,36 @@ export type SetTilesData = {
 
 export class TileLayer extends BaseLayer<TileLayerEvents> {
     public tilesRef: (TileRef | null)[][] = [];
-    public coordinate: Coordinate = { col: 0, row: 0 };
-    public offset: Point = new Point(0, 0);
+
+    @Point2DProperty<TileLayer>({
+        label: "Size",
+        group: "Properties",
+        order: 4,
+        readonly: true,
+        pointLabel: { x: "Width", y: "Height" },
+        get: (target) => ({ x: target.size.width, y: target.size.height }),
+    })
     public size: { width: number, height: number } = { width: 0, height: 0 }
+
+    @Point2DProperty<TileLayer>({
+        label: "Coordinate",
+        group: "Properties",
+        order: 5,
+        readonly: true,
+        pointLabel: { x: "Col", y: "Row" },
+        get: (target) => ({ x: target.offset.x, y: target.offset.y }),
+    })
+    public coordinate: Coordinate = { col: 0, row: 0 };
+
+    @Point2DProperty<TileLayer>({
+        label: "Offset",
+        group: "Properties",
+        order: 6,
+        readonly: true,
+        set: (target, value) => target.updateOffset(value.x, value.y),
+        get: (target) => ({ x: target.offset.x, y: target.offset.y }),
+    })
+    public offset: Point2D = { x: 0, y: 0 };
 
     constructor(
         tileLayerData: TileLayerData,
@@ -36,21 +63,22 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
 
         this.parentLayer = parentLayer;
 
-        this.name = tileLayerData.name;
+        this.name = tileLayerData.name ?? "Unknow Tile Layer";
 
-        this.coordinate.col = tileLayerData.x;
-        this.coordinate.row = tileLayerData.y;
-        this.offset.x = tileLayerData.offsetx;
-        this.offset.y = tileLayerData.offsety;
+        this.coordinate.col = tileLayerData.x ?? 0;
+        this.coordinate.row = tileLayerData.y ?? 0;
+        this.offset.x = tileLayerData.offsetx ?? 0;
+        this.offset.y = tileLayerData.offsety ?? 0;
 
-        this.size.width = tileLayerData.width;
-        this.size.height = tileLayerData.height;
+        this.size.width = tileLayerData.width ?? 1;
+        this.size.height = tileLayerData.height ?? 1;
 
-        this.opacity = tileLayerData.opacity;
-        this.visible = tileLayerData.visible;
-        this.locked = tileLayerData.locked;
+        this.opacity = tileLayerData.opacity ?? 1;
+        this.visible = tileLayerData.visible ?? true;
+        this.locked = tileLayerData.locked ?? false;
 
-        const tilesRef = tileLayerData.layerData.split("\n").map((tileRow) => {
+        const layerData = tileLayerData.layerData ?? ""
+        const tilesRef = layerData.split("\n").map((tileRow) => {
             return tileRow.split(",").map((tileRef) => {
                 if (tileRef === "0") return null;
                 const tileId = parseInt(tileRef.split(":")[0]);
@@ -133,6 +161,12 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
 
         this.eventEmitter.emit("tilesChanged", result.map(r => r.coordinate));
         return Result.Success(result);
+    }
+
+    public updateOffset(x: number, y: number): void {
+        this.offset.x = x;
+        this.offset.y = y;
+        this.eventEmitter.emit("updateProperty", "offset", this.offset);
     }
 
     public override serialize(): TileLayerData {
