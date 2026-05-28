@@ -38,7 +38,7 @@ const kernelMockState = vi.hoisted(() => {
     return {
         appKernel: {
             load: vi.fn(() => new Promise(() => {})),
-            contextManager: {
+            activationContext: {
                 setFlag: vi.fn(),
             },
             layoutManager,
@@ -82,7 +82,7 @@ beforeEach(() => {
     uuidMocks.reset();
     uuidMocks.v4.mockClear();
     kernelMocks.appKernel.load.mockClear();
-    kernelMocks.appKernel.contextManager.setFlag.mockClear();
+    kernelMocks.appKernel.activationContext.setFlag.mockClear();
     kernelMocks.appKernel.projectManager.serialize.mockClear();
 });
 

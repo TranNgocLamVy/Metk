@@ -30,7 +30,7 @@ const editRulesetMocks = vi.hoisted(() => {
         rulesetSessionInstances,
         MockRulesetOutputSelector,
         appKernel: {
-            contextManager: {
+            activationContext: {
                 setFlag: vi.fn(),
             },
             editorFacade: {
@@ -45,7 +45,7 @@ const editRulesetMocks = vi.hoisted(() => {
 
 vi.mock("uuid", () => ({ v4: editRulesetMocks.uuid }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: editRulesetMocks.appKernel }));
-vi.mock("@/ui/dialogs/editRuleset/renderer/RulesetOutputSelector", () => ({
+vi.mock("@/ui/dialogs/edit-ruleset/graphics/ruleset-ouput-selector.renderer", () => ({
     RulesetOutputSelector: editRulesetMocks.MockRulesetOutputSelector,
 }));
 vi.mock("@pixi/react", () => ({
@@ -189,7 +189,7 @@ beforeEach(() => {
     ]);
     editRulesetMocks.resetUuid();
     editRulesetMocks.rulesetSessionInstances.length = 0;
-    editRulesetMocks.appKernel.contextManager.setFlag.mockClear();
+    editRulesetMocks.appKernel.activationContext.setFlag.mockClear();
     Element.prototype.scrollIntoView = vi.fn();
     vi.clearAllMocks();
 });

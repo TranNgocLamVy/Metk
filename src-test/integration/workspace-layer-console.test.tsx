@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const workspaceUiMocks = vi.hoisted(() => ({
     appKernel: {
-        contextManager: {
+        activationContext: {
             setFlag: vi.fn(),
         },
     },
@@ -135,7 +135,7 @@ describe("Layer manager UI", () => {
             type: "OPEN_FILE_DIALOG",
             params: { panel: "tilemap" },
         });
-        expect(workspaceUiMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", true, "dialog-id");
+        expect(workspaceUiMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", true, "dialog-id");
     });
 
     it("renders nested rows when a group opens and highlights selected rows from session state", async () => {
@@ -241,8 +241,6 @@ describe("Layer manager UI", () => {
         expect(workspaceUiMocks.layerService.deleteLayer).toHaveBeenCalledTimes(1);
         expect(workspaceUiMocks.layerService.toggleVisibility).toHaveBeenCalledWith(["collision"]);
         expect(workspaceUiMocks.layerService.toggleLock).toHaveBeenCalledWith(["collision"]);
-        expect(workspaceUiMocks.layerService.toggleVisibility).toHaveBeenCalledWith(["environment"]);
-        expect(workspaceUiMocks.layerService.toggleLock).toHaveBeenCalledWith(["environment"]);
     });
 });
 

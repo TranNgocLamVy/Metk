@@ -175,7 +175,7 @@ describe("Metk form fields", () => {
             />,
         );
 
-        await user.click(screen.getByLabelText("Texture"));
+        await user.click(screen.getByRole("button", { name: "form.tileset.image.browse" }));
 
         await waitFor(() => {
             expect(formFieldMocks.fileDialogs.open).toHaveBeenCalledWith({
@@ -204,10 +204,10 @@ describe("Metk form fields", () => {
             />,
         );
 
-        await user.click(screen.getByLabelText("Textures"));
+        await user.click(screen.getByRole("button", { name: "form.tileset.image.browse" }));
         expect(onChange).toHaveBeenCalledWith("textures", ["C:/a.png", "C:/b.png"]);
 
-        await user.click(screen.getByLabelText("Textures"));
+        await user.click(screen.getByRole("button", { name: "form.tileset.image.browse" }));
         expect(onChange).toHaveBeenCalledTimes(1);
     });
 
@@ -228,7 +228,7 @@ describe("Metk form fields", () => {
         );
 
         const input = screen.getByLabelText("Destination");
-        await user.click(input);
+        await user.click(screen.getByRole("button", { name: "form.tileset.image.browse" }));
 
         await waitFor(() => {
             expect(formFieldMocks.fileDialogs.open).toHaveBeenCalledWith({
@@ -240,7 +240,7 @@ describe("Metk form fields", () => {
         });
     });
 
-    it("commits valid color text on blur and color picker selection from the dropdown", async () => {
+    it("edits color text locally and commits color picker selection from the dropdown", async () => {
         const user = userEvent.setup();
         const onChange = vi.fn();
         render(<ControlledColorField onChange={onChange} />);
@@ -250,9 +250,9 @@ describe("Metk form fields", () => {
 
         await user.clear(input);
         await user.type(input, "#abcdef");
-        await user.tab();
 
-        expect(onChange).toHaveBeenCalledWith("color", "#abcdef");
+        expect(input).toHaveValue("#abcdef");
+        expect(onChange).not.toHaveBeenCalled();
 
         const colorSwatch = input.parentElement!.querySelector("div[style]") as HTMLElement;
         await user.click(colorSwatch);

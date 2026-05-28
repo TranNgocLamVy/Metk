@@ -8,8 +8,10 @@ describe("useLayoutStore", () => {
         resetStore(useLayoutStore);
     });
 
-    it("initializes without a layout model", () => {
-        expect(useLayoutStore.getState().model).toBeNull();
+    it("initializes with the default workspace layout model", () => {
+        expect(useLayoutStore.getState().model).toEqual(expect.objectContaining({
+            layout: expect.any(Object),
+        }));
     });
 
     it("sets the layout model", () => {

@@ -165,6 +165,7 @@ describe("Workspace model", () => {
             tilesets: { tilesetSessions: [{ id: "tileset-session" }], currentTilesetSessionId: "tileset-session" },
             tilemaps: { tilemapSessions: [{ id: "tilemap-session" }], currentTilemapSessionId: "tilemap-session" },
             ruleset: { selectedRuleId: "ruleset-a" },
+            propertyPanel: { selectedObjectId: null },
             toolState: { currentTool: "tool.stamp" },
             savedPath: { exportPaths: ["C:/exports"], tilemapDir: "C:/tilemaps" },
         });
@@ -220,7 +221,7 @@ describe("Tileset model", () => {
             origin: "external",
             source: "Tileset.rename",
         });
-        expect(listener).toHaveBeenCalledWith("image", tileset.imageSource, {
+        expect(listener).toHaveBeenCalledWith("imageSource", tileset.imageSource, {
             origin: "external",
             source: "Tileset.updateImageSource",
         });

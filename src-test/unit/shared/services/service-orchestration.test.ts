@@ -327,7 +327,7 @@ describe("TilemapService orchestration", () => {
     it("creates a tilemap, updates saved paths, persists metadata, and opens a session", async () => {
         const { project, workspace } = attachProjectAndWorkspace();
         vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({
-            name: "Overworld",
+            tilemap: { name: "Overworld", type: "orthogonal" },
             options: {
                 map: { mapwidth: 20, mapheight: 10 },
                 tile: { tilewidth: 16, tileheight: 16 },
@@ -380,7 +380,7 @@ describe("TilesetService orchestration", () => {
     it("creates a tileset from an image without re-testing graphics processing", async () => {
         const { project, workspace } = attachProjectAndWorkspace();
         vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({
-            tileset: { name: "Terrain" },
+            tileset: { name: "Terrain", type: "single-image" },
             image: {
                 source: ["C:/project/textures/terrain.png"],
                 setting: { tile: { tilewidth: 16, tileheight: 16 } },
@@ -474,9 +474,9 @@ describe("TextureService orchestration", () => {
         const { project, workspace } = attachProjectAndWorkspace();
         const tileset = {
             id: "tileset-a",
-            image: { width: 32, height: 32 },
+            imageSource: { width: 32, height: 32 },
             tilesetPathSystem: { getFileAbsDir: vi.fn(() => "C:/project/tilesets") },
-            updateTexturePath: vi.fn(),
+            updateImageSource: vi.fn(),
         };
         project.tilesetManager.getTilesetById.mockReturnValue(tileset);
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/replacement.png");
@@ -487,7 +487,11 @@ describe("TextureService orchestration", () => {
 
         expect(result.status).toBe(Result.Status.Success);
         expect(workspace.savedPathManager.setTextureDir).toHaveBeenCalledWith("C:/project/textures");
-        expect(tileset.updateTexturePath).toHaveBeenCalledWith("../textures/replacement.png");
+        expect(tileset.updateImageSource).toHaveBeenCalledWith({
+            source: "../textures/replacement.png",
+            width: 32,
+            height: 32,
+        });
         expect(project.tilesetManager.saveTileset).toHaveBeenCalledWith("tileset-a");
         expect(serviceMocks.appKernel.textureManager.updateTilesetTexture).toHaveBeenCalledWith(tileset, { width: 32, height: 32 });
         expect(DialogService.openPermissionDialog).not.toHaveBeenCalled();
@@ -497,9 +501,9 @@ describe("TextureService orchestration", () => {
         const { project } = attachProjectAndWorkspace();
         const tileset = {
             id: "tileset-a",
-            image: { width: 32, height: 32 },
+            imageSource: { width: 32, height: 32 },
             tilesetPathSystem: { getFileAbsDir: vi.fn(() => "C:/project/tilesets") },
-            updateTexturePath: vi.fn(),
+            updateImageSource: vi.fn(),
         };
         project.tilesetManager.getTilesetById.mockReturnValue(tileset);
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/large.png");
@@ -513,7 +517,7 @@ describe("TextureService orchestration", () => {
             title: "dialog.import.textureMismatchSize.title",
             description: "dialog.import.textureMismatchSize.description",
         });
-        expect(tileset.updateTexturePath).not.toHaveBeenCalled();
+        expect(tileset.updateImageSource).not.toHaveBeenCalled();
         expect(project.tilesetManager.saveTileset).not.toHaveBeenCalled();
     });
 

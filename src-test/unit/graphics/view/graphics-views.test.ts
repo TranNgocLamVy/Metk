@@ -129,11 +129,11 @@ vi.mock("pixi.js", () => ({
     Container: viewMocks.Container,
 }));
 vi.mock("pixi-viewport", () => ({ Viewport: viewMocks.MockViewport }));
-vi.mock("@/graphics/renderer/tilemap-grid.renderer", () => ({ TilemapGridRenderer: viewMocks.MockTilemapGridRenderer }));
-vi.mock("@/graphics/renderer/tilemap.renderer", () => ({ TilemapRenderer: viewMocks.MockTilemapRenderer }));
-vi.mock("@/graphics/renderer/tileset-grid.renderer", () => ({ TilesetGridRenderer: viewMocks.MockTilesetGridRenderer }));
-vi.mock("@/graphics/renderer/tileset.renderer", () => ({ TilesetRenderer: viewMocks.MockTilesetRenderer }));
-vi.mock("@/graphics/renderer/tileset-selector.renderer", () => ({ TilesetSelectorRenderer: viewMocks.MockTilesetSelectorRenderer }));
+vi.mock("@/graphics/renderer/tilemap/tilemap-grid.renderer", () => ({ TilemapGridRenderer: viewMocks.MockTilemapGridRenderer }));
+vi.mock("@/graphics/renderer/tilemap/tilemap.renderer", () => ({ TilemapRenderer: viewMocks.MockTilemapRenderer }));
+vi.mock("@/graphics/renderer/tileset/single-tileset-grid.renderer", () => ({ TilesetGridRenderer: viewMocks.MockTilesetGridRenderer }));
+vi.mock("@/graphics/renderer/tileset/single-tileset.renderer", () => ({ TilesetRenderer: viewMocks.MockTilesetRenderer }));
+vi.mock("@/graphics/renderer/tileset/single-tileset-selector.renderer", () => ({ TilesetSelectorRenderer: viewMocks.MockTilesetSelectorRenderer }));
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: viewMocks.workspaceService }));
 
 import { TilemapView } from "@/graphics/view/tilemap.view";
@@ -299,8 +299,8 @@ describe("TilesetView", () => {
             events: { id: "renderer-events" },
         });
         expect(viewMocks.tilesetGridInstances[0].context).toMatchObject({ tileset: session.tileset });
-        expect(viewMocks.tilesetRendererInstances[0].context).toMatchObject({ tileset: session.tileset, gap: 2 });
-        expect(viewMocks.tilesetSelectorInstances[0].context).toMatchObject({ tileset: session.tileset, tilesetSession: session, gap: 2 });
+        expect(viewMocks.tilesetRendererInstances[0].context).toMatchObject({ tileset: session.tileset });
+        expect(viewMocks.tilesetSelectorInstances[0].context).toMatchObject({ tileset: session.tileset, tilesetSession: session });
         expect(view.viewport.addChild).toHaveBeenCalledWith(viewMocks.tilesetRendererInstances[0].container);
         expect(view.viewport.addChild).toHaveBeenCalledWith(view.grid.graphics);
         expect(view.viewport.addChild).toHaveBeenCalledWith(view.selector.graphics);
@@ -328,7 +328,7 @@ describe("TilesetView", () => {
         expect(view.viewport.setZoom).toHaveBeenCalledWith(1.5);
     });
 
-    it("keeps renderer and selector gaps in sync with grid visibility", () => {
+    it("toggles grid visibility", () => {
         const view = new SingleImageTilesetView(createTilesetSession() as any);
         view.activateView(createPixiApp() as any);
         const renderer = viewMocks.tilesetRendererInstances[0];
@@ -336,13 +336,13 @@ describe("TilesetView", () => {
 
         view.toggleGrid();
         expect(view.grid.disableGrid).toHaveBeenCalledTimes(1);
-        expect(renderer.setGap).toHaveBeenCalledWith(0);
-        expect(selector.setGap).toHaveBeenCalledWith(0);
+        expect(renderer.setGap).not.toHaveBeenCalled();
+        expect(selector.setGap).not.toHaveBeenCalled();
 
         view.toggleGrid();
         expect(view.grid.enableGrid).toHaveBeenCalledTimes(1);
-        expect(renderer.setGap).toHaveBeenCalledWith(2);
-        expect(selector.setGap).toHaveBeenCalledWith(2);
+        expect(renderer.setGap).not.toHaveBeenCalled();
+        expect(selector.setGap).not.toHaveBeenCalled();
     });
 
     it("unactivates and destroys the viewport plus renderer collaborators", () => {

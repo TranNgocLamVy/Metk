@@ -71,6 +71,7 @@ const mockState = vi.hoisted(() => {
         getToolContexts: vi.fn(() => toolManager.toolContexts),
         getCurrentToolId: vi.fn(() => toolManager.currentToolId),
         setActiveSession: vi.fn(),
+        setActiveView: vi.fn(),
         startTool: vi.fn((toolId: string) => {
             toolManager.currentToolId = toolId;
             toolManager.emit("onToolChanged", toolId);
@@ -93,7 +94,7 @@ const mockState = vi.hoisted(() => {
     return {
         appKernel: {
             load: vi.fn(() => Promise.resolve({ status: "Success", data: undefined })),
-            contextManager: {
+            activationContext: {
                 setFlag: vi.fn(),
             },
             editorFacade: {
@@ -362,7 +363,7 @@ describe("Metk integration workflows", () => {
         resetStore(useToolbarStore);
         resetStore(useWorkspaceStore);
 
-        mockState.appKernel.contextManager.setFlag.mockClear();
+        mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset();
         mockState.appKernel.editorFacade.getCurrentHistoryManager.mockReset();
         mockState.appKernel.workspaceManager.currentWorkspace = null;

@@ -28,7 +28,7 @@ const mockState = vi.hoisted(() => ({
     consoleSuccess: vi.fn(),
     consoleError: vi.fn(),
     appKernel: {
-        contextManager: {
+        activationContext: {
             setFlag: vi.fn(),
         },
     },
@@ -101,7 +101,7 @@ describe("system command orchestration", () => {
         mockState.storageExportToPath.mockReset();
         mockState.consoleSuccess.mockClear();
         mockState.consoleError.mockClear();
-        mockState.appKernel.contextManager.setFlag.mockClear();
+        mockState.appKernel.activationContext.setFlag.mockClear();
     });
 
     afterEach(() => {
@@ -120,7 +120,7 @@ describe("system command orchestration", () => {
                     config: { zLevel: 500 },
                 }),
             ]);
-            expect(mockState.appKernel.contextManager.setFlag).toHaveBeenCalledWith(
+            expect(mockState.appKernel.activationContext.setFlag).toHaveBeenCalledWith(
                 "isModalOpen",
                 true,
                 expect.any(String),
@@ -307,7 +307,12 @@ describe("system command orchestration", () => {
             );
             expect(workspace.savedPathManager.setExportPath).toHaveBeenCalledWith("tilemap-a", "C:/exports/overworld.tmx");
             expect(editorFacade.workspaceManager.saveCurrentWorkspace).toHaveBeenCalledTimes(1);
-            expect(Console.success).toHaveBeenCalledWith({ message: "message.tilemap.exportSuccess" });
+            expect(Console.success).toHaveBeenCalledWith({
+                message: {
+                    key: "message.tilemap.exportSuccess",
+                    options: { name: "Overworld" },
+                },
+            });
         });
 
         it("prompts for an export path when none is saved and cancels if the user dismisses", async () => {

@@ -59,7 +59,7 @@ const loadKernelModule = async () => {
         },
     };
 
-    vi.doMock("@/application/commands/register-commands", () => ({}));
+    vi.doMock("@/application/command-system/register-commands", () => ({}));
     vi.doMock("@/graphics/tool/register-tool", () => ({}));
     vi.doMock("@/infrastructure/container", () => ({
         ProjectMetadataRepo: state.projectMetadataRepo,

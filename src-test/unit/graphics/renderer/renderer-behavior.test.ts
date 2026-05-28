@@ -254,7 +254,7 @@ describe("TilesetRenderer", () => {
 
         expect(children).toHaveLength(4);
         expect(children[0].position.set).toHaveBeenCalledWith(0, 0);
-        expect(children[1].position.set).toHaveBeenCalledWith(17, 0);
+        expect(children[1].position.set).toHaveBeenCalledWith(16, 0);
         expect(children[2].texture).toEqual({ id: "error-texture", width: 16, height: 16 });
         expect(rendererMocks.appKernel.editorFacade.textureManager.getErrorTexture).toHaveBeenCalledTimes(1);
         expect(rendererMocks.appKernel.textureManager.on).toHaveBeenCalledWith("onTextureReloaded", expect.any(Function));
@@ -267,8 +267,8 @@ describe("TilesetRenderer", () => {
         const container = renderer.container as unknown as MockContainer;
         const children = container.children as MockSprite[];
 
-        expect(children[1].position.set).toHaveBeenLastCalledWith(18, 0);
-        expect(children[2].position.set).toHaveBeenLastCalledWith(0, 18);
+        expect(children[1].position.set).toHaveBeenLastCalledWith(16, 0);
+        expect(children[2].position.set).toHaveBeenLastCalledWith(0, 16);
 
         const reloadHandler = rendererMocks.appKernel.textureManager.on.mock.calls.find(([eventName]) => eventName === "onTextureReloaded")![1];
         container.removeChildren.mockClear();
@@ -315,7 +315,7 @@ describe("TilesetSelectorRenderer", () => {
             [expect.objectContaining({ id: 0 }), null],
             [null, expect.objectContaining({ id: 3 })],
         ]);
-        expect(session.updateSelectionState).toHaveBeenCalledWith({ selectedTilesSet: [0, 3], pivot: { row: 0, col: 0 } });
+        expect(session.updateSelectionState).toHaveBeenCalledWith({ selectedTilesSet: [0, 3] });
         expect(rendererMocks.workspaceService.saveCurrentWorkspace).toHaveBeenCalledWith({ waitForTimeout: false });
     });
 
@@ -328,9 +328,8 @@ describe("TilesetSelectorRenderer", () => {
 
         expect(session.updateSelectionState).toHaveBeenLastCalledWith({
             selectedTilesSet: [0, 1, 2, 3],
-            pivot: { row: 0, col: 0 },
         });
-        expect(session.updatePivot).toHaveBeenLastCalledWith({ row: 0, col: 0 });
+        expect(session.updatePivot).not.toHaveBeenCalled();
         expect(selector.getSelectedTiles()).toHaveLength(2);
         expect(rendererMocks.workspaceService.saveCurrentWorkspace).toHaveBeenLastCalledWith({ waitForTimeout: false });
     });

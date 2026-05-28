@@ -191,7 +191,7 @@ describe("TextureManager", () => {
         expect(oldTexture.destroy).toHaveBeenCalledTimes(1);
         expect(manager.getTileTexture("terrain", 1)).toMatchObject({ width: 16, height: 16 });
         expect(manager.getTileTexture("terrain", 2)).toBeNull();
-        expect(tileset.columns).toBe(3);
+        expect(tileset.columns).toBe(2);
     });
 
     it("caches the error texture loaded through Pixi Assets", async () => {

@@ -4,6 +4,18 @@ vi.mock("@/application/editor.facade", () => ({
     EditorFacade: class { },
 }));
 
+vi.mock("@/application/bootstrap/app-kernel", () => ({
+    appKernel: {
+        editorFacade: {
+            textureManager: {},
+        },
+        textureManager: {
+            on: vi.fn(),
+            off: vi.fn(),
+        },
+    },
+}));
+
 vi.mock("@/graphics/tool/tool.decorator", () => ({
     Tool: () => () => undefined,
 }));

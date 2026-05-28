@@ -26,20 +26,20 @@ describe("useDialogStore", () => {
                 config: dialogConfig,
             },
         ]);
-        expect(kernelMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", true, "dialog-id-1");
+        expect(kernelMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", true, "dialog-id-1");
     });
 
     it("closes a dialog by id and marks the modal flag closed", () => {
         const keepId = useDialogStore.getState().openDialog("keep" as any, dialogConfig);
         const closeId = useDialogStore.getState().openDialog("close" as any, dialogConfig);
-        kernelMocks.appKernel.contextManager.setFlag.mockClear();
+        kernelMocks.appKernel.activationContext.setFlag.mockClear();
 
         useDialogStore.getState().closeDialog(closeId);
 
         expect(useDialogStore.getState().dialogs).toEqual([
             expect.objectContaining({ id: keepId }),
         ]);
-        expect(kernelMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", false, closeId);
+        expect(kernelMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", false, closeId);
     });
 
     it("closes the top dialog when one is open", () => {
@@ -51,25 +51,25 @@ describe("useDialogStore", () => {
         expect(useDialogStore.getState().dialogs).toEqual([
             expect.objectContaining({ id: "dialog-id-2" }),
         ]);
-        expect(kernelMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", false, firstId);
+        expect(kernelMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", false, firstId);
     });
 
     it("does nothing when closing the top dialog with an empty stack", () => {
         useDialogStore.getState().closeTopDialog();
 
         expect(useDialogStore.getState().dialogs).toEqual([]);
-        expect(kernelMocks.appKernel.contextManager.setFlag).not.toHaveBeenCalled();
+        expect(kernelMocks.appKernel.activationContext.setFlag).not.toHaveBeenCalled();
     });
 
     it("closes all dialogs", () => {
         const firstId = useDialogStore.getState().openDialog("first" as any, dialogConfig);
         const secondId = useDialogStore.getState().openDialog("second" as any, dialogConfig);
-        kernelMocks.appKernel.contextManager.setFlag.mockClear();
+        kernelMocks.appKernel.activationContext.setFlag.mockClear();
 
         useDialogStore.getState().closeAll();
 
         expect(useDialogStore.getState().dialogs).toEqual([]);
-        expect(kernelMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", false, firstId);
-        expect(kernelMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", false, secondId);
+        expect(kernelMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", false, firstId);
+        expect(kernelMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", false, secondId);
     });
 });

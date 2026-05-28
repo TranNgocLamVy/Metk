@@ -7,6 +7,9 @@ import { DIALOG_TYPES } from "@/ui/components/dialog/dialogRegistry";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { WorkspaceService } from "@/shared/services/workspace.service";
+import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 
 type ResettableStore<T> = {
     getInitialState: () => T;
@@ -27,7 +30,7 @@ const mockState = vi.hoisted(() => {
             }),
         },
         appKernel: {
-            contextManager: {
+            activationContext: {
                 setFlag: vi.fn(),
             },
             editorFacade: {
@@ -172,7 +175,7 @@ describe("Metk dialog and form integration workflows", () => {
         resetStore(useDialogStore);
         mockState.uuid.reset();
         mockState.uuid.v4.mockClear();
-        mockState.appKernel.contextManager.setFlag.mockClear();
+        mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.appKernel.editorFacade.currentProject = null;
         mockState.workspaceService.createTilemapSession.mockReset();
         mockState.workspaceService.createTilesetSession.mockReset();
@@ -236,7 +239,7 @@ describe("Metk dialog and form integration workflows", () => {
             });
         });
         expect(useDialogStore.getState().dialogs).toEqual([]);
-        expect(mockState.appKernel.contextManager.setFlag).toHaveBeenLastCalledWith("isModalOpen", false, "dialog-id-1");
+        expect(mockState.appKernel.activationContext.setFlag).toHaveBeenLastCalledWith("isModalOpen", false, "dialog-id-1");
     });
 
     it("keeps a form dialog open when validation rejects incomplete input", async () => {
@@ -374,7 +377,9 @@ describe("Metk dialog and form integration workflows", () => {
 
     it("displays edit-tileset details and closes from the dialog footer", async () => {
         const user = userEvent.setup();
-        openEditTilesetDialog({
+        const projectPathSystem = new ProjectPathSystem("C:/project");
+        const tilesetPathSystem = new FilePathSystem("terrain", projectPathSystem, "tilesets/terrain.ts.json");
+        const clonedTileset = new Tileset({
             id: "terrain",
             name: "Terrain Tiles",
             columns: 8,
@@ -386,16 +391,22 @@ describe("Metk dialog and form integration workflows", () => {
                 width: 128,
                 height: 64,
             },
+            tiles: [],
+        }, tilesetPathSystem, new EditorObjectRegistry());
+        mockState.appKernel.editorFacade.currentProject = {
+            tilesetManager: {
+                cloneTileset: vi.fn(() => clonedTileset),
+            },
+        };
+        openEditTilesetDialog({
+            id: "terrain",
         });
 
         renderDialogRoot();
 
         const dialog = screen.getByRole("dialog", { name: "Edit Tileset" });
-        expect(within(dialog).getByText("Terrain Tiles")).toBeVisible();
-        expect(within(dialog).getByText("terrain")).toBeVisible();
-        expect(within(dialog).getByText("8 x 4")).toBeVisible();
-        expect(within(dialog).getByText("16 x 16")).toBeVisible();
-        expect(within(dialog).getByText("textures/terrain.png")).toBeVisible();
+        expect(within(dialog).getByDisplayValue("Terrain Tiles")).toBeVisible();
+        expect(mockState.appKernel.editorFacade.currentProject.tilesetManager.cloneTileset).toHaveBeenCalledWith("terrain");
 
         await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 

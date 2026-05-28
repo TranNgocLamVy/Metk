@@ -46,7 +46,7 @@ export class TilesetService {
             tilesetData = await TilesetService.createSingleImageTilesetData({
                 name: form.tileset.name,
                 tilesetAbsDir,
-                textureAbsPath: textureAbsPath[0],
+                textureAbsPath,
                 tilewidth: form.image.setting.tile.tilewidth,
                 tileheight: form.image.setting.tile.tileheight,
             })

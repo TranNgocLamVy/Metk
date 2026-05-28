@@ -6,6 +6,7 @@ import MenuBar from "@/ui/components/menuBar/MenuBar";
 import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";
+import { usePropertyStore } from "@/ui/stores/property.store";
 import { ProjectService } from "@/shared/services/project.service";
 import { TilemapService } from "@/shared/services/tilemap.service";
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
@@ -50,7 +51,7 @@ const mockState = vi.hoisted(() => ({
         toggleNonSelectedLayersLock: vi.fn(),
     },
     appKernel: {
-        contextManager: {
+        activationContext: {
             setFlag: vi.fn(),
         },
         editorFacade: {
@@ -150,6 +151,7 @@ const setActiveTilemapSession = () => {
         layerState: { selectedLayers: ["ground"] },
         tilemap: {
             id: "overworld",
+            objectId: "tilemap-overworld-object",
             name: "Overworld",
             width: 32,
             height: 24,
@@ -203,11 +205,12 @@ describe("Metk menu-driven integration workflows", () => {
     beforeEach(() => {
         resetStore(useConsoleStore);
         resetStore(useDialogStore);
+        resetStore(usePropertyStore);
         mockState.appKernel.projectManager.currentProject = null;
         mockState.appKernel.workspaceManager.currentWorkspace = null;
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset().mockReturnValue(null);
         mockState.appKernel.editorFacade.getCurrentHistoryManager.mockReset().mockReturnValue(null);
-        mockState.appKernel.contextManager.setFlag.mockClear();
+        mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.commandService.executeCommand.mockClear();
         mockState.projectService.createProject.mockClear();
         mockState.tilemapService.createTilemap.mockClear();
@@ -306,18 +309,15 @@ describe("Metk menu-driven integration workflows", () => {
         expect(useConsoleStore.getState().isConsoleOpen).toBe(false);
     });
 
-    it("opens map properties from the map menu when a tilemap session is available", async () => {
+    it("selects the active tilemap for property editing from the map menu", async () => {
         const user = userEvent.setup();
         setActiveTilemapSession();
-        renderMenuBarWithDialogs();
+        renderMenuBar();
 
         await openMenu(user, "menu.map.label");
         await clickMenuItem(user, "menu.map.action.mapProperties");
 
-        expect(useDialogStore.getState().dialogs).toHaveLength(1);
-        expect(await screen.findByRole("dialog", { name: "menu.map.action.mapProperties" })).toBeVisible();
-        expect(screen.getByLabelText("Name")).toHaveValue("Overworld");
-        expect(screen.getByLabelText("Width")).toHaveValue("32");
-        expect(screen.getByLabelText("Height")).toHaveValue("24");
+        expect(useDialogStore.getState().dialogs).toHaveLength(0);
+        expect(usePropertyStore.getState().objectId).toBe("tilemap-overworld-object");
     });
 });

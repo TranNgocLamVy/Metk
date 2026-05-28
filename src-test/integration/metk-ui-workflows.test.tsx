@@ -45,6 +45,7 @@ const mockState = vi.hoisted(() => {
         setActiveSession: vi.fn(),
         getToolContexts: vi.fn(() => []),
         getCurrentToolId: vi.fn(() => null),
+        setActiveView: vi.fn(),
         startTool: vi.fn(),
     };
     const workspaceService = {
@@ -59,7 +60,7 @@ const mockState = vi.hoisted(() => {
     return {
         createListenerRegistry,
         appKernel: {
-            contextManager: {
+            activationContext: {
                 setFlag: vi.fn(),
             },
             editorFacade: {
@@ -488,7 +489,7 @@ describe("Metk UI integration workflows", () => {
         mockState.appKernel.projectManager.currentProject = null;
         mockState.appKernel.editorFacade.currentProject = null;
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset();
-        mockState.appKernel.contextManager.setFlag.mockClear();
+        mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.appKernel.layoutManager.updateLayout.mockClear();
         mockState.appKernel.toolManager.setActiveSession.mockClear();
         mockState.workspaceService.openTilemapSession.mockReset();

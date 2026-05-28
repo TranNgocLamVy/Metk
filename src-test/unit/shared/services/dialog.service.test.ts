@@ -12,7 +12,7 @@ const dialogMocks = vi.hoisted(() => {
             return `dialog-id-${uuidCounter}`;
         }),
         appKernel: {
-            contextManager: {
+            activationContext: {
                 setFlag: vi.fn(),
             },
             editorFacade: {
@@ -33,7 +33,7 @@ beforeEach(() => {
     useDialogStore.setState(useDialogStore.getInitialState(), true);
     dialogMocks.resetUuid();
     dialogMocks.uuid.mockClear();
-    dialogMocks.appKernel.contextManager.setFlag.mockClear();
+    dialogMocks.appKernel.activationContext.setFlag.mockClear();
     dialogMocks.appKernel.editorFacade.currentProject = null;
 });
 
@@ -52,7 +52,7 @@ describe("DialogService", () => {
             type: "FORM_DIALOG",
             config: { zLevel: DialogZLevel.Modal },
         });
-        expect(dialogMocks.appKernel.contextManager.setFlag).toHaveBeenCalledWith("isModalOpen", true, "dialog-id-1");
+        expect(dialogMocks.appKernel.activationContext.setFlag).toHaveBeenCalledWith("isModalOpen", true, "dialog-id-1");
 
         (dialog.params as any).resolve({ name: "Overworld" });
 
