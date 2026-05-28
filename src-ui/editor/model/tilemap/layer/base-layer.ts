@@ -1,7 +1,7 @@
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { Result } from "@/shared/types/result";
 
-import { BaseObject, BaseObjectEvents } from "../../base-object";
+import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "../../base-object";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { BooleanProperty, NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
@@ -21,7 +21,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     @StringProperty<BaseLayer>({
         label: "Layer name",
         get: (target) => target.name,
-        set: (target, value) => { target.rename(value) },
+        set: (target, value, meta) => { target.rename(value, meta) },
     })
     public name: string;
 
@@ -34,7 +34,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
             step: 0.01,
         },
         get: (target) => target.opacity,
-        set: (target, value) => { target.updateOpacity(value) },
+        set: (target, value, meta) => { target.updateOpacity(value, meta) },
     })
     public opacity: number = 1;
 
@@ -43,7 +43,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         group: "Properties",
         order: 2,
         get: (target) => target._visible,
-        set: (target, value) => { target.toggleVisibility(value) },
+        set: (target, value, meta) => { target.toggleVisibility(value, meta) },
     })
     protected _visible: boolean = true;
 
@@ -52,7 +52,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         group: "Properties",
         order: 3,
         get: (target) => target._locked,
-        set: (target, value) => { target.toggleLock(value) },
+        set: (target, value, meta) => { target.toggleLock(value, meta) },
     })
     protected _locked: boolean = false;
 
@@ -66,13 +66,11 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     public get visible() { return this._visible && this.parentLayer ? this.parentLayer.visible : this._visible }
     public set visible(value: boolean) {
         this._visible = value;
-        (this.eventEmitter as any).emit("updateProperty", "visible", this._visible);
     }
 
     public get locked() { return this._locked || (this.parentLayer ? this.parentLayer.locked : false) }
     public set locked(value: boolean) {
         this._locked = value;
-        (this.eventEmitter as any).emit("updateProperty", "locked", this._locked);
     }
 
     public parentLayer: IGroupLayer;
@@ -96,24 +94,36 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
         this.layerType = layerType;
     }
 
-    public rename(newName: string): void {
+    public rename(newName: string, meta?: PropertyUpdateMeta): void {
         this.name = newName;
-        (this.eventEmitter as any).emit("updateProperty", "name", this.name);
+        this.emitUpdateProperty("name", this.name, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "BaseLayer.rename",
+        });
     }
 
-    public toggleVisibility(force?: boolean): void {
+    public toggleVisibility(force?: boolean, meta?: PropertyUpdateMeta): void {
         this.visible = force !== undefined ? force : !this.visible;
-        (this.eventEmitter as any).emit("updateProperty", "visible", this.visible);
+        this.emitUpdateProperty("visible", this.visible, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "BaseLayer.toggleVisibility",
+        });
     }
 
-    public toggleLock(force?: boolean): void {
+    public toggleLock(force?: boolean, meta?: PropertyUpdateMeta): void {
         this.locked = force !== undefined ? force : !this.locked;
-        (this.eventEmitter as any).emit("updateProperty", "locked", this.locked);
+        this.emitUpdateProperty("locked", this.locked, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "BaseLayer.toggleLock",
+        });
     }
 
-    public updateOpacity(newOpacity: number): void {
+    public updateOpacity(newOpacity: number, meta?: PropertyUpdateMeta): void {
         this.opacity = newOpacity;
-        (this.eventEmitter as any).emit("updateProperty", "opacity", this.opacity);
+        this.emitUpdateProperty("opacity", this.opacity, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "BaseLayer.updateOpacity",
+        });
     }
 
     public removeFromParent() {

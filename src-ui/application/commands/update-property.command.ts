@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import type { PropertyUpdateMeta } from "@/editor/model/base-object";
 import { Result } from "@/shared/types/result";
 
 export class UpdatePropertyCommand<TValue = unknown> implements IUndoableCommand {
@@ -15,18 +16,31 @@ export class UpdatePropertyCommand<TValue = unknown> implements IUndoableCommand
     ) {}
 
     public execute(editorFacade: EditorFacade): Result {
-        return this.applyValue(editorFacade, this.newValue);
+        return this.applyValue(editorFacade, this.newValue, {
+            origin: "commit",
+            source: "UpdatePropertyCommand",
+        });
     }
 
     public undo(editorFacade: EditorFacade): Result {
-        return this.applyValue(editorFacade, this.oldValue);
+        return this.applyValue(editorFacade, this.oldValue, {
+            origin: "undo",
+            source: "UpdatePropertyCommand",
+        });
+    }
+
+    public redo(editorFacade: EditorFacade): Result {
+        return this.applyValue(editorFacade, this.newValue, {
+            origin: "redo",
+            source: "UpdatePropertyCommand",
+        });
     }
 
     public delete(): void {
         // no resource cleanup needed
     }
 
-    private applyValue(editorFacade: EditorFacade, value: TValue): Result {
+    private applyValue(editorFacade: EditorFacade, value: TValue, meta: PropertyUpdateMeta): Result {
         const object = editorFacade.objectRegistry?.get(this.objectId);
 
         if (!object) {
@@ -46,8 +60,7 @@ export class UpdatePropertyCommand<TValue = unknown> implements IUndoableCommand
             return validateResult;
         }
 
-        property.setter(clonedValue);
-        object.eventEmitter.emit("updateProperty", this.propertyKey, clonedValue)
+        property.setter(clonedValue, meta);
         return Result.Success();
     }
 }

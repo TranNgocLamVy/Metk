@@ -12,8 +12,6 @@ import {
     BaseProperty,
     Point2DPropertyOptions,
     Point2DPropertyClass,
-    Point3DPropertyOptions,
-    Point3DPropertyClass,
     ImageSourcePropertyOptions,
     ImageSourcePropertyClass,
 } from "./properties";
@@ -126,16 +124,6 @@ export function Point2DProperty<TTarget>(options: Point2DPropertyOptions<TTarget
         addPropertyFactory<TTarget>(target, {
             key,
             create: instance => new Point2DPropertyClass<TTarget>(instance, key, options),
-        });
-    };
-}
-
-export function Point3DProperty<TTarget>(options: Point3DPropertyOptions<TTarget>): PropertyDecorator {
-    return function (target, propertyKey) {
-        const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, {
-            key,
-            create: instance => new Point3DPropertyClass<TTarget>(instance, key, options),
         });
     };
 }

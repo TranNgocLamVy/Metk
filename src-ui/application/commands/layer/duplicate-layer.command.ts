@@ -4,11 +4,16 @@ import { Result } from "@/shared/types/result";
 
 import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerContainer, isLayerInTilemap } from "@/application/commands/command-target.utils";
+import { LayerData } from "@/shared/schema/layer.schema";
+import { LayerUtils } from "@/shared/utils/layer.utils";
 
 export class DuplicateLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
     private newLayerObjectId: string
+    private parentLayerObjectId: string;
+    private index: number;
+    private layerData: LayerData;
     constructor(
         private readonly tilemapObjectId: string,
         private readonly targetLayerObjectId: string,
@@ -21,6 +26,19 @@ export class DuplicateLayerCommand implements IUndoableCommand {
         const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
+        if (this.layerData) {
+            const parent = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
+            if (!parent || !isLayerInTilemap(tilemap, parent) || !isLayerContainer(parent)) return Result.Error("Parent layer not found");
+
+            const restoredLayer = LayerUtils.createLayerFromData(this.layerData, parent, tilemap, tilemap.objectId);
+            if (!restoredLayer) return Result.Error("Failed to restore duplicated layer");
+
+            parent.insertLayer(restoredLayer, this.index);
+            objectRegistry.registerTree(restoredLayer);
+
+            return Result.Success();
+        }
+
         const targetLayer = getLayerByObjectId(editorFacade, this.targetLayerObjectId);
         if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Target layer not found");
 
@@ -32,8 +50,9 @@ export class DuplicateLayerCommand implements IUndoableCommand {
         this.newLayerObjectId = duplicateLayer.objectId;
         const cloneLayerName = `${targetLayer.name} (copy)`
         duplicateLayer.rename(cloneLayerName);
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
+        this.parentLayerObjectId = duplicateLayer.parentLayer.objectId;
+        this.index = duplicateLayer.parentLayer.getLayerIndex(duplicateLayer.id);
+        this.layerData = duplicateLayer.serialize();
 
         return Result.Success();
     }
@@ -51,8 +70,6 @@ export class DuplicateLayerCommand implements IUndoableCommand {
 
         objectRegistry.unregisterTree(targetLayer);
         targetLayer.destroy();
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

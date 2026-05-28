@@ -1,22 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Label } from "../shadcn/label";
+
 import { EnumPropertyClass } from "@/editor/properties/properties";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/shadcn/select";
+
 import { LocalizedText } from "../custom/LocalizeText";
+import { Label } from "../shadcn/label";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface EnumEditorProps {
     property: EnumPropertyClass<any>;
 }
 
 export function EnumPropertyEditor({ property }: EnumEditorProps) {
+    const version = usePropertyStoreVersion()
+
     const [draft, setDraft] = useState<string>();
 
     useEffect(() => {
         setDraft(property.getter());
-    }, [property]);
+    }, [property, version]);
 
-    const options = useMemo(() => property.options(), [property]);
+    const options = useMemo(() => property.options(), [property, version]);
 
     const onValueChange = useCallback((value: string) => {
         const oldValue = clonePropertyValue(property.getter());
@@ -30,6 +35,7 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
             <Label title={property.label} className="text-2xs min-w-0 truncate">
                 <LocalizedText message={property.label} />
             </Label>
+
             <Select
                 disabled={property.readonly() || property.disabled() || options.length === 0}
                 value={draft}
@@ -38,9 +44,14 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
                 <SelectTrigger size="sm" className="w-full bg-surface-sunken text-2xs">
                     <SelectValue />
                 </SelectTrigger>
+
                 <SelectContent className="bg-surface-overlay-raised">
                     {options.map((option) => (
-                        <SelectItem className="text-foreground" key={`${option.value}`} value={String(option.value)}>
+                        <SelectItem
+                            className="text-foreground"
+                            key={`${option.value}`}
+                            value={String(option.value)}
+                        >
                             {option.label}
                         </SelectItem>
                     ))}

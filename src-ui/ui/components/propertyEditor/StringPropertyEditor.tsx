@@ -1,18 +1,30 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/ui/components/shadcn/input";
 import { StringPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Label } from "../shadcn/label";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface StringEditorProps {
     property: StringPropertyClass<any>;
 }
 
 export function StringPropertyEditor({ property }: StringEditorProps) {
+    const version = usePropertyStoreVersion()
+
     const [error, setError] = useState<TranslatableMessage | null>(null);
     const [draft, setDraft] = useState<string>(property.getter());
+    const isEditingRef = useRef(false);
+
+    useEffect(() => {
+        if (isEditingRef.current) return;
+
+        setDraft(property.getter());
+        setError(null);
+    }, [property, version]);
+
 
     const resetDraft = useCallback(() => {
         setDraft(property.getter());
@@ -86,9 +98,15 @@ export function StringPropertyEditor({ property }: StringEditorProps) {
                     maxLength={property.maxLength}
                     disabled={property.disabled() || property.readonly()}
                     readOnly={property.readonly()}
+                    onFocus={() => {
+                        isEditingRef.current = true;
+                    }}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                    onBlur={() => handleConfirmChange(draft)}
+                    onBlur={() => {
+                        isEditingRef.current = false;
+                        handleConfirmChange(draft);
+                    }}
                     className="h-6 text-2xs"
                 />
             </div>

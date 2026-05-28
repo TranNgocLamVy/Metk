@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { readFile } from "@tauri-apps/plugin-fs";
 
 import { ImageSourcePropertyClass } from "@/editor/properties/properties";
@@ -13,18 +13,29 @@ import { Label } from "@/ui/components/shadcn/label";
 import { LocalizedText } from "../custom/LocalizeText";
 import { HStack } from "../custom/stack/Stack";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface ImageSourcePropertyEditorProps {
     property: ImageSourcePropertyClass<any>;
 }
 
 export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEditorProps) {
+    const version = usePropertyStoreVersion();
+
     const initialValue = useMemo(() => normalizeImageSource(property.getter()), [property]);
 
     const [draft, setDraft] = useState<string>(initialValue.source);
     const [error, setError] = useState<TranslatableMessage | null>(null);
+    const isEditingRef = useRef(false);
 
     const disabled = property.disabled() || property.readonly();
+
+    useEffect(() => {
+        if (isEditingRef.current) return;
+
+        setDraft(normalizeImageSource(property.getter()).source);
+        setError(null);
+    }, [property, version]);
 
     const resetDraft = useCallback(() => {
         setDraft(normalizeImageSource(property.getter()).source);
@@ -139,7 +150,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
         if (!value.source) return "";
 
         return `${value.source}\n${value.width} × ${value.height}`;
-    }, [property, draft]);
+    }, [property, draft, version]);
 
     return (
         <div className="px-2 h-8">
@@ -155,9 +166,15 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
                         title={title}
                         readOnly={property.readonly()}
                         disabled={disabled}
+                        onFocus={() => {
+                            isEditingRef.current = true;
+                        }}
                         onChange={handleManualChange}
                         onKeyDown={handleKeyDown}
-                        onBlur={() => handleManualConfirm(draft)}
+                        onBlur={() => {
+                            isEditingRef.current = false;
+                            handleManualConfirm(draft);
+                        }}
                         className="h-6 text-2xs"
                     />
 

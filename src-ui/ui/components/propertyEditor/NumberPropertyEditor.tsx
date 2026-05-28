@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { NumberPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
@@ -15,16 +15,20 @@ import {
     toFiniteNumber,
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface NumberEditorProps {
     property: NumberPropertyClass<any>;
 }
 
 export function NumberPropertyEditor({ property }: NumberEditorProps) {
+    const version = usePropertyStoreVersion()
+
     const [error, setError] = useState<TranslatableMessage | null>(null);
     const [draft, setDraft] = useState<string>(toDraftValue(property.getter(), property.precision));
     const dragStartValueRef = useRef<number | null>(null);
+    const isEditingRef = useRef(false);
 
     const disabled = property.disabled() || property.readonly();
 
@@ -75,7 +79,7 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
                 return false;
 
             case Result.Status.Success:
-                property.setter(value);
+                previewUpdateProperty(property, value, "NumberPropertyEditor");
                 setDraft(toDraftValue(property.getter(), property.precision));
                 return true;
         }
@@ -138,14 +142,23 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
 
             const newValue = normalizeNumber(toFiniteNumber(property.getter()), property.precision);
             dragStartValueRef.current = null;
-            
-            property.setter(oldValue);
+
+            previewUpdateProperty(property, oldValue, "NumberPropertyEditor");
 
             commitValue(newValue, true, oldValue);
             setError(null);
             resetDraft();
         },
     });
+
+    useEffect(() => {
+        if (isEditingRef.current) return;
+        if (isDragging) return;
+        if (dragStartValueRef.current !== null) return;
+
+        setDraft(toDraftValue(property.getter(), property.precision));
+        setError(null);
+    }, [property, version, isDragging]);
 
     const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         const rawValue = event.target.value;
@@ -209,9 +222,15 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
                     step={getStepFromPrecision(property.precision)}
                     readOnly={property.readonly()}
                     disabled={disabled}
+                    onFocus={() => {
+                        isEditingRef.current = true;
+                    }}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
-                    onBlur={() => handleConfirmChange(draft)}
+                    onBlur={() => {
+                        isEditingRef.current = false;
+                        handleConfirmChange(draft);
+                    }}
                     className="h-6 text-2xs"
                 />
             </div>

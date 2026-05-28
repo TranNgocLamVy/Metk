@@ -93,4 +93,24 @@ describe("HistoryManager", () => {
 
         expect(history.onStateChange).toHaveBeenCalledTimes(3);
     });
+
+    it("uses a command-specific redo implementation when available", () => {
+        const editorFacade = {} as any;
+        const history = new HistoryManager();
+        const command: IUndoableCommand = {
+            id: "redo-aware",
+            execute: vi.fn(() => Result.Success()),
+            undo: vi.fn(() => Result.Success()),
+            redo: vi.fn(() => Result.Success()),
+            delete: vi.fn(),
+        };
+
+        history.execute(command, editorFacade);
+        history.undo(editorFacade);
+        history.redo(editorFacade);
+
+        expect(command.execute).toHaveBeenCalledTimes(1);
+        expect(command.undo).toHaveBeenCalledTimes(1);
+        expect(command.redo).toHaveBeenCalledTimes(1);
+    });
 });

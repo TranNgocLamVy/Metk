@@ -6,6 +6,7 @@ import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
+import type { PropertyUpdateMeta } from "../../base-object";
 
 interface RuleLayerEvents extends BaseLayerEvents {
     rulesetRefsOutputChanged: (coordinates: Coordinate[]) => void
@@ -39,7 +40,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         group: "Properties",
         order: 6,
         readonly: true,
-        set: (target, value) => target.updateOffset(value.x, value.y),
+        set: (target, value, meta) => target.updateOffset(value.x, value.y, meta),
         get: (target) => ({ x: target.offset.x, y: target.offset.y }),
     })
     public offset: Point2D = { x: 0, y: 0 };
@@ -262,10 +263,13 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         return rulesetRefs;
     }
 
-    public updateOffset(x: number, y: number): void {
+    public updateOffset(x: number, y: number, meta?: PropertyUpdateMeta): void {
         this.offset.x = x;
         this.offset.y = y;
-        this.eventEmitter.emit("updateProperty", "offset", this.offset);
+        this.emitUpdateProperty("offset", this.offset, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "RuleLayer.updateOffset",
+        });
     }
 
     public override serialize(): RuleLayerData {

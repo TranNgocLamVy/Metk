@@ -34,7 +34,7 @@ describe("CreateTileLayerCommand", () => {
         expect(objectRegistry.has(createdLayer!.objectId)).toBe(true);
         expect(layerIds(group)[0]).toBe("created-tile");
         expect(group.isOpen).toBe(true);
-        expect(markLayerChange).toHaveBeenCalledTimes(1);
+        expect(markLayerChange).not.toHaveBeenCalled();
 
         const undoResult = command.undo(editorFacade);
 
@@ -43,13 +43,13 @@ describe("CreateTileLayerCommand", () => {
         expect(objectRegistry.has(createdLayer!.objectId)).toBe(false);
         expect(createdLayer!.destroyed).toBe(true);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markLayerChange).not.toHaveBeenCalled();
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
         const recreatedLayer = root.findLayer("created-tile");
         expect(recreatedLayer?.objectId).toBe(createdLayer!.objectId);
         expect(objectRegistry.has(createdLayer!.objectId)).toBe(true);
-        expect(markLayerChange).toHaveBeenCalledTimes(3);
+        expect(markLayerChange).not.toHaveBeenCalled();
     });
 
     it("creates a tile layer beside a non-group target by using that target's parent", () => {
@@ -61,6 +61,15 @@ describe("CreateTileLayerCommand", () => {
 
         expect(root.findLayer("sibling-tile")?.parentLayer.id).toBe("group-a");
         expect(layerIds(group)[0]).toBe("sibling-tile");
+    });
+
+    it("runs headlessly with only an object registry", () => {
+        const { tilemap, root, objectRegistry } = createLayerCommandHarness();
+        const command = new CreateTileLayerCommand(tilemap.objectId, root.objectId, createTileLayerData({ id: "headless-tile" }));
+
+        expect(command.execute({ objectRegistry } as any).status).toBe(Result.Status.Success);
+
+        expect(root.findLayer("headless-tile")).toBeInstanceOf(TileLayer);
     });
 
     it("returns an error when there is no active tilemap session", () => {
@@ -87,7 +96,7 @@ describe("CreateRuleLayerCommand", () => {
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
         expect(root.findLayer("created-rule")).toBeNull();
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markLayerChange).not.toHaveBeenCalled();
     });
 
     it("returns an error when undo runs without an active tilemap session", () => {

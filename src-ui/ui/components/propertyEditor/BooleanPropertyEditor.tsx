@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { BooleanPropertyClass } from "@/editor/properties/properties";
 import { Checkbox } from "@/ui/components/shadcn/checkbox";
@@ -6,13 +6,20 @@ import { Checkbox } from "@/ui/components/shadcn/checkbox";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Label } from "../shadcn/label";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface BooleanEditorProps {
     property: BooleanPropertyClass<any>;
 }
 
 export function BooleanPropertyEditor({ property }: BooleanEditorProps) {
+    const version = usePropertyStoreVersion()
+
     const [draft, setDraft] = useState<boolean>(property.getter());
+
+    useEffect(() => {
+        setDraft(property.getter());
+    }, [property, version]);
 
     const onCheckedChange = useCallback((checked: boolean | "indeterminate") => {
         const oldValue = clonePropertyValue(property.getter());

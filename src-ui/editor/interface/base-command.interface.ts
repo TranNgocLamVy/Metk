@@ -6,6 +6,7 @@ export interface IUndoableCommand {
     readonly id: string;
     execute(editorFacade: EditorFacade): Result;
     undo(editorFacade: EditorFacade): Result;
+    redo?(editorFacade: EditorFacade): Result;
     delete(): void;
 }
 

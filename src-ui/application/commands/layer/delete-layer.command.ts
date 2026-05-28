@@ -5,7 +5,7 @@ import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { LayerData } from "@/shared/schema/layer.schema";
 import { LayerUtils } from "@/shared/utils/layer.utils";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, isLayerContainer, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, isLayerContainer } from "@/application/commands/command-target.utils";
 
 export class DeleteLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -39,8 +39,6 @@ export class DeleteLayerCommand implements IUndoableCommand {
         objectRegistry.unregisterTree(targetLayer);
         targetLayer.destroy();
 
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
-
         return Result.Success();
     }
 
@@ -61,8 +59,6 @@ export class DeleteLayerCommand implements IUndoableCommand {
         parent.insertLayer(restoredLayer, this.index);
 
         objectRegistry.registerTree(restoredLayer);
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

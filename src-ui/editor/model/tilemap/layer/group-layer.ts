@@ -4,8 +4,9 @@ import { Result } from "@/shared/types/result";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { LayerUtils } from "@/shared/utils/layer.utils";
-import { BaseObject } from "../../base-object";
+import { BaseObject, PropertyUpdateMeta } from "../../base-object";
 import { Tilemap } from "../tilemap";
+import { BooleanProperty } from "@/editor/properties/properties.decorator";
 
 interface GroupLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -15,6 +16,14 @@ interface GroupLayerEvents extends BaseLayerEvents {
 
 export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLayer {
     public layers: BaseLayer[] = [];
+
+    @BooleanProperty<GroupLayer>({
+        label: "Open",
+        group: "Layer",
+        visible: false,
+        get: (target) => target.isOpen,
+        set: (target, value, meta) => target.toggleOpen(value, meta),
+    })
     public isOpen: boolean = false;
 
     constructor(
@@ -102,9 +111,12 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         this.eventEmitter.emit("layerReordered");
     }
 
-    public toggleOpen(force?: boolean): void {
+    public toggleOpen(force?: boolean, meta?: PropertyUpdateMeta): void {
         this.isOpen = force === undefined ? !this.isOpen : force;
-        this.eventEmitter.emit("updateProperty", "isOpen", this.isOpen);
+        this.emitUpdateProperty("isOpen", this.isOpen, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "GroupLayer.toggleOpen",
+        });
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void) {

@@ -4,7 +4,6 @@ import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
-import { TilemapSession } from "@/editor/session/tilemap.session";
 
 export type LayerContainer = (GroupLayer | RootLayer) & IGroupLayer;
 
@@ -33,24 +32,4 @@ export function isLayerInTilemap(tilemap: Tilemap, layer: BaseLayer<any>): boole
         if (candidate === layer) found = true;
     });
     return found;
-}
-
-export function getTilemapSessionByObjectId(editorFacade: EditorFacade, tilemapObjectId: string): TilemapSession | null {
-    const tilemap = getTilemapByObjectId(editorFacade, tilemapObjectId);
-    if (!tilemap) return null;
-    return editorFacade.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemap.id) ?? null;
-}
-
-export function markTilemapDirty(editorFacade: EditorFacade, tilemapObjectId: string): void {
-    getTilemapSessionByObjectId(editorFacade, tilemapObjectId)?.markAsDirty();
-}
-
-export function markTilemapLayerChanged(editorFacade: EditorFacade, tilemapObjectId: string): void {
-    getTilemapSessionByObjectId(editorFacade, tilemapObjectId)?.markLayerChange();
-}
-
-export function emitSelectedLayersChanged(editorFacade: EditorFacade, tilemapObjectId: string): void {
-    const session = getTilemapSessionByObjectId(editorFacade, tilemapObjectId);
-    if (!session) return;
-    session.emit("onSelectedLayersChanged", session.layerState.selectedLayers);
 }

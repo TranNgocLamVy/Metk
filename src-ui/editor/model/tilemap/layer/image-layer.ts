@@ -5,6 +5,7 @@ import { ImageLayerData } from "@/shared/schema/layer.schema";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import type { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { Tilemap } from "../tilemap";
+import type { PropertyUpdateMeta } from "../../base-object";
 export interface ImageLayerEvents extends BaseLayerEvents {
     imageChanged: () => void;
 }
@@ -16,7 +17,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         order: 5,
         readonly: true,
         get: (target) => target.tintcolor,
-        set: (target, value) => target.updateTintColor(value),
+        set: (target, value, meta) => target.updateTintColor(value, meta),
     })
     public tintcolor: string = "";
 
@@ -25,7 +26,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         group: "Properties",
         order: 6,
         get: (target) => target.repeatX,
-        set: (target, value) => target.updateRepeat(value, target.repeatY),
+        set: (target, value, meta) => target.updateRepeat(value, target.repeatY, meta),
     })
     public repeatX: boolean;
 
@@ -34,7 +35,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         group: "Properties",
         order: 7,
         get: (target) => target.repeatY,
-        set: (target, value) => target.updateRepeat(target.repeatX, value),
+        set: (target, value, meta) => target.updateRepeat(target.repeatX, value, meta),
     })
     public repeatY: boolean;
 
@@ -42,7 +43,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         label: "Offset",
         group: "Properties",
         order: 8,
-        set: (target, value) => target.updateOffset(value.x, value.y),
+        set: (target, value, meta) => target.updateOffset(value.x, value.y, meta),
         get: (target) => ({ x: target.offset.x, y: target.offset.y }),
     })
     public offset: Point2D = { x: 0, y: 0 }
@@ -60,7 +61,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         label: "Source",
         group: "Image",
         get: (target) => target.imageSource,
-        set: (target, value) => { target.updateImage(value) },
+        set: (target, value, meta) => { target.updateImage(value, meta) },
         absToRef: (target, absPath) => { return target.tilemap.tilemapPathSystem.getRelPathFromAbsPath(absPath) }
     })
     public imageSource: ImageSourceData;
@@ -106,28 +107,53 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         this.imageSource = imageSourceData;
     }
 
-    public updateOffset(x: number, y: number): void {
+    public updateOffset(x: number, y: number, meta?: PropertyUpdateMeta): void {
         this.offset.x = x;
         this.offset.y = y;
+        this.emitUpdateProperty("offset", this.offset, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "ImageLayer.updateOffset",
+        });
     }
 
-    public updateTintColor(tintcolor: string): void {
+    public updateTintColor(tintcolor: string, meta?: PropertyUpdateMeta): void {
         this.tintcolor = tintcolor;
-        this.eventEmitter.emit("updateProperty", "tintcolor", this.tintcolor);
+        this.emitUpdateProperty("tintcolor", this.tintcolor, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "ImageLayer.updateTintColor",
+        });
         this.eventEmitter.emit("imageChanged");
     }
 
-    public updateRepeat(x: boolean, y: boolean): void {
+    public updateRepeat(x: boolean, y: boolean, meta?: PropertyUpdateMeta): void {
+        const previousRepeatX = this.repeatX;
+        const previousRepeatY = this.repeatY;
+
         this.repeatX = x;
         this.repeatY = y;
-        this.eventEmitter.emit("updateProperty", "repeat", this.repeatX);
-        this.eventEmitter.emit("updateProperty", "repeat", this.repeatY);
+
+        const eventMeta = {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "ImageLayer.updateRepeat",
+        };
+
+        if (previousRepeatX !== this.repeatX) {
+            this.emitUpdateProperty("repeatX", this.repeatX, eventMeta);
+        }
+
+        if (previousRepeatY !== this.repeatY) {
+            this.emitUpdateProperty("repeatY", this.repeatY, eventMeta);
+        }
+
         this.eventEmitter.emit("imageChanged");
     }
 
-    public updateImage(image: ImageSourceData): void {
+    public updateImage(image: ImageSourceData, meta?: PropertyUpdateMeta): void {
         this.imageSource = image;
-        this.eventEmitter.emit("updateProperty", "image", this.imageSource);
+        this.emitUpdateProperty("imageSource", this.imageSource, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "ImageLayer.updateImage",
+        });
         this.eventEmitter.emit("imageChanged");
     }
 

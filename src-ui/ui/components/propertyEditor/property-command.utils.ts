@@ -1,5 +1,6 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
+import type { PropertyUpdateMeta } from "@/editor/model/base-object";
 import { BaseProperty } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 
@@ -46,6 +47,17 @@ export function clonePropertyValue<T>(value: T): T {
     }
 
     return JSON.parse(JSON.stringify(value)) as T;
+}
+
+export function previewUpdateProperty<TValue>(
+    property: BaseProperty<any>,
+    value: TValue,
+    source: string,
+): void {
+    property.setter(value, {
+        origin: "preview",
+        source,
+    } satisfies PropertyUpdateMeta);
 }
 
 export function arePropertyValuesEqual(a: unknown, b: unknown): boolean {

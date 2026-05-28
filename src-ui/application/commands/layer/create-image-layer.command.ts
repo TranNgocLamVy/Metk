@@ -5,7 +5,6 @@ import {
     getLayerByObjectId,
     getTilemapByObjectId,
     isLayerInTilemap,
-    markTilemapLayerChanged,
     resolveLayerInsertionParent,
 } from "@/application/commands/command-target.utils";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
@@ -55,8 +54,6 @@ export class CreateImageLayerCommand implements IUndoableCommand {
 
         this.imageLayerObjectId = newImageLayer.objectId;
 
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
-
         return Result.Success();
     }
 
@@ -81,8 +78,6 @@ export class CreateImageLayerCommand implements IUndoableCommand {
 
         objectRegistry.unregisterTree(imageLayer);
         imageLayer.destroy();
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

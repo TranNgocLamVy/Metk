@@ -80,10 +80,18 @@ export class HistoryManager {
 
     public redo(editorFacade: EditorFacade) {
         if (this.redoStack.length === 0) return;
-
+    
         const cmd = this.redoStack.pop();
+    
         if (cmd) {
-            cmd.execute(editorFacade);
+            const result = cmd.redo ? cmd.redo(editorFacade) : cmd.execute(editorFacade);
+    
+            if (result.status !== Result.Status.Success) {
+                this.redoStack.push(cmd);
+                this.notifyUI();
+                return;
+            }
+    
             this.undoStack.push(cmd);
             this.notifyUI();
         }

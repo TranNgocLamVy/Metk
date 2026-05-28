@@ -27,7 +27,7 @@ describe("DeleteLayerCommand", () => {
         expect(objectRegistry.has(originalObjectId)).toBe(false);
         expect(originalLayer.destroyed).toBe(true);
         expect(layerIds(group)).toEqual(["group-child"]);
-        expect(markLayerChange).toHaveBeenCalledTimes(1);
+        expect(markLayerChange).not.toHaveBeenCalled();
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
 
@@ -37,12 +37,12 @@ describe("DeleteLayerCommand", () => {
         expect(restoredLayer?.destroyed).toBe(false);
         expect(objectRegistry.has(originalObjectId)).toBe(true);
         expect(layerIds(group)).toEqual(["group-child", "tile-a"]);
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markLayerChange).not.toHaveBeenCalled();
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
         expect(root.findLayer("tile-a")).toBeNull();
         expect(objectRegistry.has(originalObjectId)).toBe(false);
-        expect(markLayerChange).toHaveBeenCalledTimes(3);
+        expect(markLayerChange).not.toHaveBeenCalled();
     });
 
     it("removes a group with its children and restores the complete subtree on undo", () => {
@@ -115,14 +115,14 @@ describe("DuplicateLayerCommand", () => {
         expect(root.findLayer(duplicated.id)).toBeNull();
         expect(objectRegistry.has(duplicated.objectId)).toBe(false);
         expect(duplicated.destroyed).toBe(true);
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markLayerChange).not.toHaveBeenCalled();
 
         expect(command.execute(editorFacade).status).toBe(Result.Status.Success);
         const restoredDuplicate = root.findLayer(duplicated.id);
         expect(restoredDuplicate?.objectId).toBe(duplicated.objectId);
         expect(restoredDuplicate?.serialize()).toEqual(duplicated.serialize());
         expect(objectRegistry.has(duplicated.objectId)).toBe(true);
-        expect(markLayerChange).toHaveBeenCalledTimes(3);
+        expect(markLayerChange).not.toHaveBeenCalled();
     });
 
     it("duplicates a group without flattening or moving its existing children", () => {

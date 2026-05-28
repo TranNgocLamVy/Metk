@@ -216,7 +216,13 @@ describe("Tileset model", () => {
 
         expect(tileset.name).toBe("Terrain Edited");
         expect(tileset.imageSource.source).toBe("../textures/terrain-v2.png");
-        expect(listener).toHaveBeenCalledWith("name", "Terrain Edited");
-        expect(listener).toHaveBeenCalledWith("image", tileset.imageSource);
+        expect(listener).toHaveBeenCalledWith("name", "Terrain Edited", {
+            origin: "external",
+            source: "Tileset.rename",
+        });
+        expect(listener).toHaveBeenCalledWith("image", tileset.imageSource, {
+            origin: "external",
+            source: "Tileset.updateImageSource",
+        });
     });
 });

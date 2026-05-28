@@ -5,7 +5,7 @@ import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 import { IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 
 export class MoveLayerCommand implements IUndoableCommand {
@@ -45,8 +45,6 @@ export class MoveLayerCommand implements IUndoableCommand {
         newParentLayer.insertLayer(targetLayer, this.newIndex);
         if (newParentLayer instanceof GroupLayer && !newParentLayer.isOpen) newParentLayer.toggleOpen(true);
 
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
-
         return Result.Success();
     }
 
@@ -65,8 +63,6 @@ export class MoveLayerCommand implements IUndoableCommand {
 
         oldParentLayer.insertLayer(targetLayer, this.oldIndex);
         if (oldParentLayer instanceof GroupLayer && !oldParentLayer.isOpen) oldParentLayer.toggleOpen(true);
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

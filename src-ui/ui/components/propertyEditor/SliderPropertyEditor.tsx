@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { NumberPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
@@ -7,7 +7,8 @@ import { LocalizedText } from "../custom/LocalizeText";
 import { HStack } from "../custom/stack/Stack";
 import { Label } from "../shadcn/label";
 import { Slider } from "../shadcn/slider";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface SliderEditorProps {
     property: NumberPropertyClass<any>;
@@ -19,11 +20,20 @@ export interface SliderEditorProps {
 }
 
 export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
+    const version = usePropertyStoreVersion();
+
     const [draft, setDraft] = useState<number>(property.getter());
     const commitStartValueRef = useRef<number | null>(null);
+    const isDraggingRef = useRef(false);
 
     const interactive = useMemo(() => slider.interactive ?? true, [slider]);
     const precision = useMemo(() => property.precision ?? 2, [property]);
+
+    useEffect(() => {
+        if (isDraggingRef.current) return;
+
+        setDraft(property.getter());
+    }, [property, version]);
 
     const captureCommitStartValue = useCallback(() => {
         if (commitStartValueRef.current !== null) return;
@@ -32,6 +42,7 @@ export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
     }, [property]);
 
     const handleSliderChange = useCallback((values: number[]) => {
+        isDraggingRef.current = true;
         captureCommitStartValue();
 
         const nextValue = values[0] ?? Number.NaN;
@@ -42,7 +53,7 @@ export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
         const result = property.validate(normalizedValue);
 
         if (interactive && result.status === Result.Status.Success) {
-            property.setter(normalizedValue);
+            previewUpdateProperty(property, normalizedValue, "SliderPropertyEditor");
         }
     }, [captureCommitStartValue, interactive, precision, property]);
 
@@ -55,15 +66,17 @@ export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
         if (validateResult.status !== Result.Status.Success) {
             commitStartValueRef.current = null;
             setDraft(property.getter());
+            isDraggingRef.current = false;
             return;
         }
 
         const oldValue = commitStartValueRef.current ?? clonePropertyValue(property.getter());
         commitStartValueRef.current = null;
-        property.setter(oldValue);
+        previewUpdateProperty(property, oldValue, "SliderPropertyEditor");
 
         executeUpdatePropertyCommand(property, oldValue, normalizedValue);
         setDraft(property.getter());
+        isDraggingRef.current = false;
     }, [precision, property]);
 
     return (
@@ -83,7 +96,10 @@ export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
                     max={slider.range[1]}
                     step={slider.step}
                     disabled={property.disabled() || property.readonly()}
-                    onPointerDownCapture={captureCommitStartValue}
+                    onPointerDownCapture={() => {
+                        isDraggingRef.current = true;
+                        captureCommitStartValue();
+                    }}
                     onValueChange={handleSliderChange}
                     onValueCommit={handleSliderCommit}
                     className="min-w-20 flex-1"

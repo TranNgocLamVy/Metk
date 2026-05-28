@@ -7,6 +7,7 @@ import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
+import type { PropertyUpdateMeta } from "../../base-object";
 
 interface TileLayerEvents extends BaseLayerEvents {
     tilesChanged: (coords: Coordinate[]) => void
@@ -46,7 +47,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         group: "Properties",
         order: 6,
         readonly: true,
-        set: (target, value) => target.updateOffset(value.x, value.y),
+        set: (target, value, meta) => target.updateOffset(value.x, value.y, meta),
         get: (target) => ({ x: target.offset.x, y: target.offset.y }),
     })
     public offset: Point2D = { x: 0, y: 0 };
@@ -161,10 +162,13 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         return Result.Success(result);
     }
 
-    public updateOffset(x: number, y: number): void {
+    public updateOffset(x: number, y: number, meta?: PropertyUpdateMeta): void {
         this.offset.x = x;
         this.offset.y = y;
-        this.eventEmitter.emit("updateProperty", "offset", this.offset);
+        this.emitUpdateProperty("offset", this.offset, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "TileLayer.updateOffset",
+        });
     }
 
     public override serialize(): TileLayerData {

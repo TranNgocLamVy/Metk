@@ -7,7 +7,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 
 export class CreateRuleLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -38,8 +38,6 @@ export class CreateRuleLayerCommand implements IUndoableCommand {
 
         this.ruleLayerObjectId = newRuleLayer.objectId;
 
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
-
         return Result.Success();
     }
 
@@ -58,8 +56,6 @@ export class CreateRuleLayerCommand implements IUndoableCommand {
 
         objectRegistry.unregisterTree(ruleLayer);
         ruleLayer.destroy();
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

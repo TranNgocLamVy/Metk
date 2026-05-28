@@ -6,7 +6,7 @@ import { Result } from "@/shared/types/result";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
-import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap, markTilemapLayerChanged } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 
 export class CreateGroupLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -37,8 +37,6 @@ export class CreateGroupLayerCommand implements IUndoableCommand {
 
         this.groupLayerObjectId = newGroupLayer.objectId;
 
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
-
         return Result.Success();
     }
 
@@ -57,8 +55,6 @@ export class CreateGroupLayerCommand implements IUndoableCommand {
 
         objectRegistry.unregisterTree(groupLayer);
         groupLayer.destroy();
-
-        markTilemapLayerChanged(editorFacade, this.tilemapObjectId);
 
         return Result.Success();
     }

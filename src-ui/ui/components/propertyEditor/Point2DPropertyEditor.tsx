@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ChevronUp } from "lucide-react";
 
 import { Point2DPropertyClass } from "@/editor/properties/properties";
@@ -15,7 +15,8 @@ import {
     toFiniteNumber,
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 type Point2DDraft = Record<keyof Point2D, string>;
 
@@ -24,12 +25,23 @@ export interface Point2DEditorProps {
 }
 
 export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
+    const version = usePropertyStoreVersion()
+
     const [error, setError] = useState<TranslatableMessage | null>(null);
     const [isOpen, setIsOpen] = useState<boolean>(true);
     const [draft, setDraft] = useState<Point2DDraft>(() => toDraftValue(property.getter()));
     const dragStartValueRef = useRef<Point2D | null>(null);
+    const isEditingRef = useRef(false);
 
     const disabled = property.disabled() || property.readonly();
+
+    useEffect(() => {
+        if (isEditingRef.current) return;
+        if (dragStartValueRef.current !== null) return;
+
+        setDraft(toDraftValue(property.getter()));
+        setError(null);
+    }, [property, version]);
 
     const toggleOpen = useCallback(() => {
         setIsOpen((current) => !current);
@@ -94,7 +106,7 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
                     return true;
                 }
 
-                property.setter(value);
+                previewUpdateProperty(property, value, "Point2DPropertyEditor");
                 setDraft(toDraftValue(value));
                 return true;
         }
@@ -154,11 +166,12 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
 
     const handleBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
         const nextFocusedElement = event.relatedTarget;
-
+    
         if (nextFocusedElement instanceof Node && event.currentTarget.contains(nextFocusedElement)) {
             return;
         }
-
+    
+        isEditingRef.current = false;
         handleConfirmChange(draft);
     }, [draft, handleConfirmChange]);
 
@@ -177,10 +190,7 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
 
         const newValue = clonePropertyValue(property.getter());
         dragStartValueRef.current = null;
-
-        // During drag, the property was updated directly for live preview.
-        // Restore old value, then commit one undoable command old -> new.
-        property.setter(oldValue);
+        previewUpdateProperty(property, oldValue, "Point2DPropertyEditor");
 
         applyPointValue(newValue, true, true, oldValue);
 
@@ -212,6 +222,9 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
                         onDragEnd={handleAxisDragEnd}
                         onChange={(event) => handleChange("x", event)}
                         onKeyDown={handleKeyDown}
+                        onFocus={() => {
+                            isEditingRef.current = true;
+                        }}
                     />
 
                     <PointAxisInput
@@ -226,6 +239,9 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
                         onDragEnd={handleAxisDragEnd}
                         onChange={(event) => handleChange("y", event)}
                         onKeyDown={handleKeyDown}
+                        onFocus={() => {
+                            isEditingRef.current = true;
+                        }}
                     />
                 </HStack>
             )}
@@ -245,6 +261,7 @@ function PointAxisInput({
     disabled,
     readOnly,
     getValue,
+    onFocus,
     onDragStart,
     onDragValueChange,
     onDragEnd,
@@ -257,6 +274,7 @@ function PointAxisInput({
     disabled: boolean;
     readOnly: boolean;
     getValue: () => number;
+    onFocus: () => void;
     onDragStart: () => void;
     onDragValueChange: (value: number) => boolean | void;
     onDragEnd: () => void;
@@ -295,6 +313,7 @@ function PointAxisInput({
                 readOnly={readOnly}
                 onChange={onChange}
                 onKeyDown={onKeyDown}
+                onFocus={onFocus}
             />
         </div>
     );

@@ -1,6 +1,7 @@
 import { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { Result } from "@/shared/types/result";
 import { v4 as uuidv4 } from "uuid";
+import type { PropertyUpdateMeta } from "@/editor/model/base-object";
 
 type ResolvableBoolean<TTarget> = ((target: TTarget) => boolean) | boolean;
 export type ResolvableString<TTarget> = ((target: TTarget) => string) | string;
@@ -12,7 +13,7 @@ export interface BasePropertyOptions<TTarget> {
     readonly?: ResolvableBoolean<TTarget>;
     visible?: ResolvableBoolean<TTarget>;
     disabled?: ResolvableBoolean<TTarget>;
-    set?: (target: TTarget, value: any) => void;
+    set?: (target: TTarget, value: any, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => any;
     validate?: (target: TTarget, value: any) => Result;
 }
@@ -26,7 +27,7 @@ export class BaseProperty<TTarget> {
     public readonly readonly: () => boolean;
     public readonly visible: () => boolean;
     public readonly disabled: () => boolean;
-    public readonly setter: (value: any) => void;
+    public readonly setter: (value: any, meta?: PropertyUpdateMeta) => void;
     public readonly getter: () => any;
     public readonly validate: (value: any) => Result;
 
@@ -48,7 +49,7 @@ export class BaseProperty<TTarget> {
         this.readonly = () => typeof options.readonly === "function" ? options.readonly(this.target) : (options.readonly ?? false);
         this.visible = () => typeof options.visible === "function" ? options.visible(this.target) : (options.visible ?? true);
         this.disabled = () => typeof options.disabled === "function" ? options.disabled(this.target) : (options.disabled ?? false);
-        this.setter = (value) => options.set ? options.set(this.target, value) : {};
+        this.setter = (value, meta) => options.set ? options.set(this.target, value, meta) : {};
         this.getter = () => options.get(this.target);
         this.validate = (value) => options.validate ? options.validate(this.target, value) : Result.Success();
     }
@@ -57,7 +58,7 @@ export class BaseProperty<TTarget> {
 export interface StringPropertyOptions<TTarget = unknown> extends BasePropertyOptions<TTarget> {
     maxLength?: number;
     minLength?: number;
-    set?: (target: TTarget, value: string) => void;
+    set?: (target: TTarget, value: string, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => string;
     validate?: (target: TTarget, value: string) => Result;
 }
@@ -82,7 +83,7 @@ export interface NumberPropertyOptions<TTarget = unknown> extends BasePropertyOp
         interactive?: boolean;
     };
     unit?: string;
-    set?: (target: TTarget, value: number) => void;
+    set?: (target: TTarget, value: number, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => number;
     validate?: (target: TTarget, value: number) => Result;
 }
@@ -105,7 +106,7 @@ export class NumberPropertyClass<TTarget> extends BaseProperty<TTarget> {
 }
 
 export interface BooleanPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
-    set?: (target: TTarget, value: boolean) => void;
+    set?: (target: TTarget, value: boolean, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => boolean;
     validate?: (target: TTarget, value: boolean) => Result;
 }
@@ -123,7 +124,7 @@ export interface EnumPropertyOption {
 
 export interface EnumPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
     options: (target: TTarget) => EnumPropertyOption[] | EnumPropertyOption[];
-    set?: (target: TTarget, value: string) => void;
+    set?: (target: TTarget, value: string, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => string;
     validate?: (target: TTarget, value: string) => Result;
 }
@@ -138,7 +139,7 @@ export class EnumPropertyClass<TTarget> extends BaseProperty<TTarget> {
 }
 
 export interface ColorPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
-    set?: (target: TTarget, value: string) => void;
+    set?: (target: TTarget, value: string, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => string;
     validate?: (target: TTarget, value: string) => Result;
 }
@@ -151,7 +152,7 @@ export class ColorPropertyClass<TTarget> extends BaseProperty<TTarget> {
 
 export interface Point2DPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
     pointLabel?: { x: string; y: string };
-    set?: (target: TTarget, value: Point2D) => void;
+    set?: (target: TTarget, value: Point2D, meta?: PropertyUpdateMeta) => void;
     get: (target: TTarget) => Point2D;
     validate?: (target: TTarget, value: Point2D) => Result;
 }
@@ -162,22 +163,6 @@ export class Point2DPropertyClass<TTarget> extends BaseProperty<TTarget> {
     constructor(target: TTarget, key: string, options: Point2DPropertyOptions<TTarget>) {
         super(target, key, options);
         this.pointLabel = options.pointLabel ?? { x: "X", y: "Y" };
-    }
-}
-
-export interface Point3DPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
-    pointLabel?: { x: string; y: string; z: string };
-    set?: (target: TTarget, value: Point3D) => void;
-    get: (target: TTarget) => Point3D;
-    validate?: (target: TTarget, value: Point3D) => Result;
-}
-
-export class Point3DPropertyClass<TTarget> extends BaseProperty<TTarget> {
-    public readonly pointLabel: { x: string; y: string; z: string };
-
-    constructor(target: TTarget, key: string, options: Point3DPropertyOptions<TTarget>) {
-        super(target, key, options);
-        this.pointLabel = options.pointLabel ?? { x: "X", y: "Y", z: "Z" };
     }
 }
 
@@ -192,7 +177,7 @@ type ImageSourcePropertyReadonlyOptions<TTarget> = {
 };
 
 type ImageSourcePropertyWritableOptions<TTarget> = {
-    set: (target: TTarget, value: ImageSourceData) => void;
+    set: (target: TTarget, value: ImageSourceData, meta?: PropertyUpdateMeta) => void;
     absToRef: (target: TTarget, absPath: string) => string;
 };
 

@@ -20,12 +20,12 @@ describe("MoveLayerCommand", () => {
 
         expect(layerIds(root)).toEqual(["group-a", "rule-root", "group-b", "tile-root"]);
         expect(root.findLayer("rule-root")?.parentLayer.id).toBe("root");
-        expect(markLayerChange).toHaveBeenCalledTimes(1);
+        expect(markLayerChange).not.toHaveBeenCalled();
 
         expect(command.undo(editorFacade).status).toBe(Result.Status.Success);
 
         expect(layerIds(root)).toEqual(["group-a", "group-b", "tile-root", "rule-root"]);
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markLayerChange).not.toHaveBeenCalled();
     });
 
     it("moves a layer between parents, opens the destination group, and restores it on undo", () => {

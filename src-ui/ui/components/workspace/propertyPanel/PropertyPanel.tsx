@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { BaseObject } from "@/editor/model/base-object";
+import { BaseObject, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { groupProperties } from "@/editor/properties/group-properties.utils";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 import { useProjectStore } from "@/ui/stores/project.store";
@@ -13,12 +13,11 @@ import { ScrollArea } from "../../shadcn/scroll-area";
 import { PropertyGroup } from "./PropertyGroup";
 
 export default function PropertyPanel() {
-    const { objectId, setObjectId } = usePropertyStore();
+    const { objectId, setObjectId, refresh } = usePropertyStore();
     const { activeProject } = useProjectStore();
     const { activeWorkspace } = useWorkspaceStore();
 
     const [object, setObject] = useState<BaseObject<any> | null>(null);
-    const [version, rerender] = useReducer((value: number) => value + 1, 0);
 
     useEffect(() => {
         if (!activeWorkspace) return;
@@ -48,8 +47,10 @@ export default function PropertyPanel() {
     useEffect(() => {
         if (!object) return;
 
-        const handleUpdateProperty = () => {
-            rerender();
+        const handleUpdateProperty = (_key: string, _value: unknown, meta?: PropertyUpdateMeta) => {
+            if (meta?.origin === "preview") return;
+
+            refresh();
         };
 
         object.eventEmitter.on("updateProperty", handleUpdateProperty);
@@ -90,7 +91,7 @@ export default function PropertyPanel() {
     return (
         <VStack className="w-full h-full px-1 py-2 inset bg-surface">
             <VStack className="w-full h-full bg-surface-base min-h-0">
-                {object && <PropertiesList version={version} object={object} />}
+                {object && <PropertiesList object={object} />}
             </VStack>
         </VStack>
     );
@@ -98,10 +99,9 @@ export default function PropertyPanel() {
 
 type PropertiesListProps = {
     object: BaseObject;
-    version: number;
 };
 
-function PropertiesList({ version, object }: PropertiesListProps) {
+function PropertiesList({ object }: PropertiesListProps) {
     const groups = groupProperties(object.properties);
 
     return (

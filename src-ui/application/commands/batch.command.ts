@@ -28,6 +28,13 @@ export class BatchCommand implements IUndoableCommand {
         return success ? Result.Success() : Result.Error(message);
     }
 
+    public redo(editorFacade: EditorFacade): Result {
+        const results = this.commands.map(cmd => cmd.redo ? cmd.redo(editorFacade) : cmd.execute(editorFacade))
+        const success = results.every(result => result.status === Result.Status.Success)
+        const message = results.map(result => result.message).filter(msg => msg != undefined).join("\n")
+        return success ? Result.Success() : Result.Error(message);
+    }
+
     public delete(): void {
         this.commands.forEach(cmd => cmd.delete());
     }

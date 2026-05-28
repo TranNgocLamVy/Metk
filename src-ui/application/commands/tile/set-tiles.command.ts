@@ -4,7 +4,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { SetTilesData, TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapDirty } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 
 export class SetTilesCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -30,10 +30,7 @@ export class SetTilesCommand implements IUndoableCommand {
 
         const result = layer.setTilesAt(this.data);
 
-        if (result.status === Result.Status.Success) {
-            markTilemapDirty(editorFacade, this.tilemapObjectId);
-            this.oldData = result.data;
-        }
+        if (result.status === Result.Status.Success) this.oldData = result.data;
 
         return result
     }
@@ -51,8 +48,6 @@ export class SetTilesCommand implements IUndoableCommand {
         if (this.oldData.length === 0) return Result.Cancel("No tile changed");
 
         const result = layer.setTilesAt(this.oldData);
-
-        if (result.status === Result.Status.Success) markTilemapDirty(editorFacade, this.tilemapObjectId);
 
         return result
     }

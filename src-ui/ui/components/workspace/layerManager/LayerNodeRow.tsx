@@ -9,8 +9,8 @@ import { Button } from "../../shadcn/button";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { usePropertyStore } from "@/ui/stores/property.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
+import { PropertyUpdateMeta } from "@/editor/model/base-object";
 
 type LayerNodeRowProps = {
 	view: LayerView;
@@ -27,16 +27,21 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 	const isRenaming = editingId === layer.id;
 
 	useEffect(() => {
-		const onUpdate = () => {
+		const onUpdate = (key: string, _value: unknown, meta?: PropertyUpdateMeta) => {
+			if (meta?.origin === "preview") return;
+			if (key !== "name" && key !== "_visible" && key !== "visible" && key !== "_locked" && key !== "locked" && key !== "isOpen") {
+				return;
+			}
+
 			updatedLayerView();
-			useTilemapSessionStore.getState().activeSession?.markLayerChange();
 		};
 
 		layer.eventEmitter.on("updateProperty", onUpdate);
+
 		return () => {
 			layer.eventEmitter.off("updateProperty", onUpdate);
 		};
-	}, [])
+	}, [layer, updatedLayerView]);
 
 	const isRenameByUI = useRef(false);
 	const [dragOverPos, setDragOverPos] = useState<DropPosition | null>(null);
@@ -148,7 +153,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle() }}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
-					<div className="w-4 cursor-pointer" onClick={(e) => {e.stopPropagation() ; TilemapLayerService.toggleOpenGroupLayer(layer.id)}}>
+					<div className="w-4 cursor-pointer" onClick={(e) => { e.stopPropagation(); TilemapLayerService.toggleOpenGroupLayer(layer.id) }}>
 						{(layer as GroupLayer).isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
 					</div>
 				) : (

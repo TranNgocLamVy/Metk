@@ -3,7 +3,7 @@ import PropertyRow from "./PropertyRow";
 
 export interface PropertyGroupProps {
     group: PropertyGroupModel;
-    groupIndex: number,
+    groupIndex: number;
 }
 
 export function PropertyGroup({ group, groupIndex }: PropertyGroupProps) {

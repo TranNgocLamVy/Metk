@@ -4,7 +4,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, markTilemapDirty } from "@/application/commands/command-target.utils";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 
 export class SetRulesCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()
@@ -29,7 +29,6 @@ export class SetRulesCommand implements IUndoableCommand {
 
         if (result.status === Result.Status.Success && result.data) {
             this.oldRules = result.data;
-            markTilemapDirty(editorFacade, this.tilemapObjectId);
         }
 
         return result
@@ -51,7 +50,6 @@ export class SetRulesCommand implements IUndoableCommand {
         }));
 
         const result = layer.setRuleRefsAt(undoUpdates);
-        if (result.status === Result.Status.Success) markTilemapDirty(editorFacade, this.tilemapObjectId);
 
         return result
     }

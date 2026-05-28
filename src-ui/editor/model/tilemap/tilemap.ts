@@ -1,5 +1,5 @@
 
-import { BaseObject, BaseObjectEvents } from "@/editor/model/base-object";
+import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { TilemapData, type TilemapOrientation } from "@/shared/schema/tilemap.schema";
 import { RootLayer } from "./layer/root-layer";
@@ -22,7 +22,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
     @StringProperty<Tilemap>({
         label: "Map name",
         get: (target) => target.name,
-        set: (target, value) => { target.rename(value) },
+        set: (target, value, meta) => { target.rename(value, meta) },
     })
     public name: string;
 
@@ -94,9 +94,12 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.rootLayer = new RootLayer(tilemapData.layers, this, this.objectId);
     }
 
-    public rename(newName: string) {
+    public rename(newName: string, meta?: PropertyUpdateMeta) {
         this.name = newName;
-        this.eventEmitter.emit("updateProperty", "name", newName);
+        this.emitUpdateProperty("name", newName, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "Tilemap.rename",
+        });
     }
 
     public serialize(): TilemapData {

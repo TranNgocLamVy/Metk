@@ -3,16 +3,13 @@ import { CreateTileLayerCommand } from "@/application/commands/layer/create-tile
 import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.command";
 import { DuplicateLayerCommand } from "@/application/commands/layer/duplicate-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
-import { RenameLayerCommand } from "@/application/commands/layer/rename-layer.command";
-import { ToggleLayerLockCommand } from "@/application/commands/layer/toggle-layer-lock.command";
-import { ToggleLayerVisibilityCommand } from "@/application/commands/layer/toggle-layer-visibility.command";
+import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
 import { DropPosition, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
 import { WorkspaceService } from "./workspace.service";
 import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layer.schema";
 import { CreateRuleLayerCommand } from "@/application/commands/layer/create-rule-layer.command";
-import { ToggleOpenGroupLayerCommand } from "@/application/commands/layer/toggle-open-group-layer.command";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
@@ -253,7 +250,12 @@ export class TilemapLayerService {
         ids.forEach(id => {
             const layer = root.findLayer(id);
             if (!layer) return;
-            const toggleVisibilityCommand = new ToggleLayerVisibilityCommand(currentSession.tilemap.objectId, layer.objectId, force === undefined ? !layer.visible : force);
+            const property = layer.properties.get("_visible");
+            if (!property) return;
+
+            const oldValue = property.getter();
+            const newValue = force === undefined ? !oldValue : force;
+            const toggleVisibilityCommand = new UpdatePropertyCommand(layer.objectId, "_visible", oldValue, newValue);
             historyManager.execute(toggleVisibilityCommand, editorFacade);
         });
         historyManager.commitTransaction();
@@ -263,15 +265,19 @@ export class TilemapLayerService {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
 
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
         const root = currentSession.tilemap.rootLayer;
         const targetLayer = root.findLayer(id);
         if (!targetLayer) return;
         if (!(targetLayer instanceof GroupLayer)) return;
 
-        const toggleOpenGroupLayerCommand = new ToggleOpenGroupLayerCommand(currentSession.tilemap.objectId, targetLayer.objectId, force);
+        const property = targetLayer.properties.get("isOpen");
+        if (!property) return;
+
+        const oldValue = property.getter();
+        const newValue = force === undefined ? !oldValue : force;
+        const toggleOpenGroupLayerCommand = new UpdatePropertyCommand(targetLayer.objectId, "isOpen", oldValue, newValue);
         toggleOpenGroupLayerCommand.execute(editorFacade);
     }
 
@@ -306,7 +312,12 @@ export class TilemapLayerService {
         ids.forEach(id => {
             const layer = root.findLayer(id);
             if (!layer) return;
-            const toggleLockCommand = new ToggleLayerLockCommand(currentSession.tilemap.objectId, layer.objectId, force === undefined ? !layer.locked : force);
+            const property = layer.properties.get("_locked");
+            if (!property) return;
+
+            const oldValue = property.getter();
+            const newValue = force === undefined ? !oldValue : force;
+            const toggleLockCommand = new UpdatePropertyCommand(layer.objectId, "_locked", oldValue, newValue);
             historyManager.execute(toggleLockCommand, editorFacade);
         });
         historyManager.commitTransaction();
@@ -472,11 +483,12 @@ export class TilemapLayerService {
         const layer = root.findLayer(id);
         if (!layer) return;
 
+        const command = new UpdatePropertyCommand(layer.objectId, "name", layer.name, name);
+
         if (recordUndo) {
-            const renameLayerCommand = new RenameLayerCommand(currentSession.tilemap.objectId, layer.objectId, name);
-            historyManager.execute(renameLayerCommand, editorFacade);
+            historyManager.execute(command, editorFacade);
         } else {
-            layer.rename(name);
+            command.execute(editorFacade);
         }
     }
 }

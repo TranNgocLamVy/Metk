@@ -7,6 +7,7 @@ import EventEmitter from "eventemitter3";
 import { Tilemap } from "../model/tilemap/tilemap";
 import { Tileset } from "../model/tileset/tileset";
 import { HistoryManager } from "@/application/resources/history/history.manager";
+import { TilemapChangeObserver } from "./tilemap-change.observer";
 
 interface TilemapSessionEvents {
     onMarkChange: (isDirty: boolean) => void;
@@ -22,8 +23,9 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
     public viewState: ViewState;
     public layerState: LayerState;
-    
-    private bindOnTilemapChange: () => void;
+
+    private readonly changeObserver: TilemapChangeObserver;
+
     constructor(
         public readonly tilemap: Tilemap,
         tilemapSessionData: TilemapSessionData,
@@ -43,8 +45,8 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
             selectedLayers: layers.filter(id => selectedLayers.includes(id))
         }
 
-        this.bindOnTilemapChange = this.markAsDirty.bind(this);
-        this.tilemap.eventEmitter.on("updateProperty", this.bindOnTilemapChange);
+        this.changeObserver = new TilemapChangeObserver(this, this.tilemap);
+        this.changeObserver.bind();
     }
 
     public async loadTilemapSession(): Promise<void> {
@@ -72,6 +74,20 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
         this.emit("onSelectedLayersChanged", this.layerState.selectedLayers);
     }
 
+    public reconcileSelectedLayersWithLayerTree(): void {
+        const layers = Array.from(this.tilemap.rootLayer.getAllIds());
+        const selectedLayers = this.layerState.selectedLayers.filter(id => layers.includes(id));
+
+        if (
+            selectedLayers.length === this.layerState.selectedLayers.length
+            && selectedLayers.every((id, index) => id === this.layerState.selectedLayers[index])
+        ) {
+            return;
+        }
+
+        this.updateLayerState({ selectedLayers });
+    }
+
     public markAsDirty(): void {
         this.isDirty = true;
         this.emit("onMarkChange", this.isDirty);
@@ -97,6 +113,8 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
     }
 
     public destroy() {
+        this.changeObserver.unbind();
+
         const tilesetIds = this.tilemap.tilesetRefManager.getRefIds();
         const textureManager = this.editorFacade.textureManager;
         for (const id of tilesetIds) textureManager.releaseTilesetGraphics(id); // TODO: Move this to view

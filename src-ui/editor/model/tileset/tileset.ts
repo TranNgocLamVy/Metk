@@ -1,4 +1,4 @@
-import { BaseObject, BaseObjectEvents } from "@/editor/model/base-object";
+import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { TileData, TilesetData, TilesetType } from "@/shared/schema/tileset.schema";
 import { Result } from "@/shared/types/result";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
@@ -22,7 +22,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
     @StringProperty<Tileset>({
         label: "Name",
         get: (target) => target.name,
-        set: (target, value) => { target.rename(value) },
+        set: (target, value, meta) => { target.rename(value, meta) },
     })
     public name: string;
 
@@ -138,9 +138,12 @@ export class Tileset extends BaseObject<TilesetEvent> {
         return this.name;
     }
 
-    public async rename(name: string): Promise<Result> {
+    public async rename(name: string, meta?: PropertyUpdateMeta): Promise<Result> {
         this.name = name;
-        this.eventEmitter.emit("updateProperty", "name", this.name);
+        this.emitUpdateProperty("name", this.name, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "Tileset.rename",
+        });
         return Result.Success();
     }
 
@@ -234,12 +237,18 @@ export class Tileset extends BaseObject<TilesetEvent> {
         }
 
         this.eventEmitter.emit("update");
-        this.eventEmitter.emit("updateProperty", "name", this.name);
+        this.emitUpdateProperty("name", this.name, {
+            origin: "external",
+            source: "Tileset.updateTileset",
+        });
     }
 
-    public updateImageSource(source: ImageSourceData): void {
+    public updateImageSource(source: ImageSourceData, meta?: PropertyUpdateMeta): void {
         this.imageSource.setSource(source);
-        this.eventEmitter.emit("updateProperty", "image", this.imageSource);
+        this.emitUpdateProperty("imageSource", this.imageSource, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "Tileset.updateImageSource",
+        });
     }
 
     private recalculateCollectionMetrics(): void {
@@ -349,7 +358,10 @@ export class Tile extends BaseObject {
             this.imageSource = null;
         }
 
-        this.eventEmitter.emit("updateProperty", "image", this.imageSource);
+        this.emitUpdateProperty("imageSource", this.imageSource, {
+            origin: "external",
+            source: "Tile.updateTile",
+        });
     }
 
     public serialize(): TileData {

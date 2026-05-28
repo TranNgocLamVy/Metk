@@ -138,14 +138,14 @@ describe("SetTilesCommand", () => {
             data: [{ coordinate: { col: 2, row: 0 }, tileId: null, tilesetId: null }],
         });
         expect(tileLayer.getTileRefAt({ col: 2, row: 0 })).toEqual({ tileId: 7, tilesetId: "tileset-b" });
-        expect(session.markAsDirty).toHaveBeenCalledTimes(1);
+        expect(session.markAsDirty).not.toHaveBeenCalled();
 
         expect(command.undo(editorFacade)).toEqual({
             status: "Success",
             data: [{ coordinate: { col: 2, row: 0 }, tileId: 7, tilesetId: "tileset-b" }],
         });
         expect(tileLayer.getTileRefAt({ col: 2, row: 0 })).toBeNull();
-        expect(session.markAsDirty).toHaveBeenCalledTimes(2);
+        expect(session.markAsDirty).not.toHaveBeenCalled();
     });
 
     it("sets multiple tiles and undo restores each previous tile reference", () => {
@@ -251,14 +251,14 @@ describe("SetRulesCommand", () => {
             data: [{ coordinate: { col: 2, row: 0 }, oldRulesetId: null }],
         });
         expect(ruleLayer.getRulesetRefAt({ col: 2, row: 0 })).toEqual({ rulesetId: "ruleset-a" });
-        expect(session.markAsDirty).toHaveBeenCalledTimes(1);
+        expect(session.markAsDirty).not.toHaveBeenCalled();
 
         expect(command.undo(editorFacade)).toEqual({
             status: "Success",
             data: [{ coordinate: { col: 2, row: 0 }, oldRulesetId: "ruleset-a" }],
         });
         expect(ruleLayer.getRulesetRefAt({ col: 2, row: 0 })).toBeNull();
-        expect(session.markAsDirty).toHaveBeenCalledTimes(2);
+        expect(session.markAsDirty).not.toHaveBeenCalled();
     });
 
     it("sets multiple rule references and undo restores prior rule ids exactly", () => {
@@ -343,7 +343,7 @@ describe("SetRulesCommand", () => {
             data: [{ coordinate: { col: 0, row: 2 }, oldRulesetId: null }],
         });
         expect(ruleLayer.getRulesetRefAt({ col: 0, row: 2 })).toBeNull();
-        expect(session.markAsDirty).toHaveBeenCalledTimes(2);
+        expect(session.markAsDirty).not.toHaveBeenCalled();
     });
 
     it("allows empty rule payloads without cell changes and cancels undo", () => {
@@ -356,6 +356,6 @@ describe("SetRulesCommand", () => {
             message: { key: "No rule changed" },
         });
         expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })).toEqual({ rulesetId: "ruleset-a" });
-        expect(session.markAsDirty).toHaveBeenCalledTimes(1);
+        expect(session.markAsDirty).not.toHaveBeenCalled();
     });
 });

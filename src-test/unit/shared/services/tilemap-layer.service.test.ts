@@ -19,10 +19,7 @@ import { CreateTileLayerCommand } from "@/application/commands/layer/create-tile
 import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.command";
 import { DuplicateLayerCommand } from "@/application/commands/layer/duplicate-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
-import { RenameLayerCommand } from "@/application/commands/layer/rename-layer.command";
-import { ToggleLayerLockCommand } from "@/application/commands/layer/toggle-layer-lock.command";
-import { ToggleLayerVisibilityCommand } from "@/application/commands/layer/toggle-layer-visibility.command";
-import { ToggleOpenGroupLayerCommand } from "@/application/commands/layer/toggle-open-group-layer.command";
+import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
@@ -263,7 +260,8 @@ describe("TilemapLayerService visibility workflows", () => {
         TilemapLayerService.toggleSelectedLayersVisibility();
 
         expectSingleTransaction(historyManager, 1);
-        expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(ToggleLayerVisibilityCommand);
+        expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(UpdatePropertyCommand);
+        expect(historyManager.execute.mock.calls[0][0]).toMatchObject({ propertyKey: "_visible" });
         expect(root.findLayer("tile-root")?.visible).toBe(false);
     });
 
@@ -285,6 +283,23 @@ describe("TilemapLayerService visibility workflows", () => {
         expectSingleTransaction(historyManager, 1);
         expect(root.findLayer("tile-root")?.visible).toBe(false);
     });
+
+    it("toggles raw visibility instead of inherited effective visibility", () => {
+        const { root } = createServiceHarness();
+        const group = requireGroupLayer(root, "group-a");
+        const child = root.findLayer("tile-a")!;
+        const childVisibleProperty = child.properties.get("_visible")!;
+
+        TilemapLayerService.toggleVisibility(["group-a"], false);
+        expect(group.visible).toBe(false);
+        expect(child.visible).toBe(false);
+        expect(childVisibleProperty.getter()).toBe(true);
+
+        TilemapLayerService.toggleVisibility(["tile-a"]);
+
+        expect(child.visible).toBe(false);
+        expect(childVisibleProperty.getter()).toBe(false);
+    });
 });
 
 describe("TilemapLayerService lock workflows", () => {
@@ -299,7 +314,8 @@ describe("TilemapLayerService lock workflows", () => {
         TilemapLayerService.toggleSelectedLayersLock();
 
         expectSingleTransaction(historyManager, 1);
-        expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(ToggleLayerLockCommand);
+        expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(UpdatePropertyCommand);
+        expect(historyManager.execute.mock.calls[0][0]).toMatchObject({ propertyKey: "_locked" });
         expect(root.findLayer("tile-root")?.locked).toBe(true);
     });
 
@@ -321,6 +337,23 @@ describe("TilemapLayerService lock workflows", () => {
         expectSingleTransaction(historyManager, 1);
         expect(root.findLayer("tile-root")?.locked).toBe(true);
     });
+
+    it("toggles raw lock state instead of inherited effective lock state", () => {
+        const { root } = createServiceHarness();
+        const group = requireGroupLayer(root, "group-a");
+        const child = root.findLayer("tile-a")!;
+        const childLockedProperty = child.properties.get("_locked")!;
+
+        TilemapLayerService.toggleLock(["group-a"], true);
+        expect(group.locked).toBe(true);
+        expect(child.locked).toBe(true);
+        expect(childLockedProperty.getter()).toBe(false);
+
+        TilemapLayerService.toggleLock(["tile-a"]);
+
+        expect(child.locked).toBe(true);
+        expect(childLockedProperty.getter()).toBe(true);
+    });
 });
 
 describe("TilemapLayerService.toggleOpenGroupLayer", () => {
@@ -336,6 +369,7 @@ describe("TilemapLayerService.toggleOpenGroupLayer", () => {
         TilemapLayerService.toggleOpenGroupLayer("group-a", true);
 
         expect(group.isOpen).toBe(true);
+        expect(group.properties.get("isOpen")?.getter()).toBe(true);
         expect(historyManager.execute).not.toHaveBeenCalled();
         expect(historyManager.startTransaction).not.toHaveBeenCalled();
     });
@@ -597,7 +631,8 @@ describe("TilemapLayerService.renameLayer", () => {
         TilemapLayerService.renameLayer("tile-root", "Collision", true);
 
         expect(historyManager.execute).toHaveBeenCalledTimes(1);
-        expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(RenameLayerCommand);
+        expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(UpdatePropertyCommand);
+        expect(historyManager.execute.mock.calls[0][0]).toMatchObject({ propertyKey: "name" });
         expect(historyManager.startTransaction).not.toHaveBeenCalled();
         expect(root.findLayer("tile-root")?.name).toBe("Collision");
     });

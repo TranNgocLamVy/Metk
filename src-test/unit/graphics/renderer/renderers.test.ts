@@ -189,6 +189,23 @@ describe("layer renderers", () => {
         expect(renderer.container.alpha).toBe(0.35);
     });
 
+    it("updates base renderer properties for preview property changes", () => {
+        const { tilemap, layer } = createTileLayer();
+        const renderer = new TileLayerRenderer({ layer, tilemap });
+
+        layer.toggleVisibility(false, {
+            origin: "preview",
+            source: "renderer-test",
+        });
+        layer.updateOpacity(0.45, {
+            origin: "preview",
+            source: "renderer-test",
+        });
+
+        expect(renderer.container.visible).toBe(false);
+        expect(renderer.container.alpha).toBe(0.45);
+    });
+
     it("renders rule references as colored fallback sprites without texture output", async () => {
         const { tilemap, layer } = createRuleLayer();
         (layer.rulesetRefManager.rulesetManager.getRulesetById as any) = vi.fn(() => ({
