@@ -125,18 +125,6 @@ describe("BaseObject", () => {
         expect(model.properties.get("opacity")).toMatchObject({ label: "Opacity" });
         expect(model.properties.get("name")?.target).toBe(model);
         expect(model.properties.get("opacity")?.target).toBe(model);
-        expect(model.getProperty("name")).toBe("Initial");
-    });
-
-    it("sets properties and emits update events with the changed key and value", async () => {
-        const model = new TestBaseObject(uuidv4());
-        const listener = vi.fn();
-        model.eventEmitter.on("updateProperty", listener as any);
-
-        await expect(model.setProperty("name", "Edited")).resolves.toEqual(Result.Success());
-
-        expect(model.name).toBe("Edited");
-        expect(listener).toHaveBeenCalledWith({ key: "name", value: "Edited" });
     });
 });
 

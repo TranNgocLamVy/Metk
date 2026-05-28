@@ -1,13 +1,13 @@
-import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useState } from "react";
+import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useRef, useState } from "react";
+import { ChevronUp } from "lucide-react";
 
 import { Point2DPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { Input } from "@/ui/components/shadcn/input";
-import { HStack, VStack } from "../custom/stack/Stack";
-import { ChevronUp } from "lucide-react";
-import { LocalizedText } from "../custom/LocalizeText";
-import { Label } from "../shadcn/label";
 
+import { LocalizedText } from "../custom/LocalizeText";
+import { HStack, VStack } from "../custom/stack/Stack";
+import { Label } from "../shadcn/label";
 import {
     isAllowedNumberDraft,
     isCompleteNumberInput,
@@ -15,6 +15,7 @@ import {
     toFiniteNumber,
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 type Point2DDraft = Record<keyof Point2D, string>;
 
@@ -26,6 +27,7 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
     const [error, setError] = useState<TranslatableMessage | null>(null);
     const [isOpen, setIsOpen] = useState<boolean>(true);
     const [draft, setDraft] = useState<Point2DDraft>(() => toDraftValue(property.getter()));
+    const dragStartValueRef = useRef<Point2D | null>(null);
 
     const disabled = property.disabled() || property.readonly();
 
@@ -58,7 +60,12 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
         return validatePoint(toPointValue(nextDraft));
     }, [validatePoint]);
 
-    const applyPointValue = useCallback((value: Point2D, resetOnReject: boolean): boolean => {
+    const applyPointValue = useCallback((
+        value: Point2D,
+        resetOnReject: boolean,
+        commitToHistory: boolean = true,
+        oldValue: Point2D = clonePropertyValue(property.getter()),
+    ): boolean => {
         const validateResult = property.validate(value);
 
         setError(null);
@@ -74,13 +81,32 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
                 return false;
 
             case Result.Status.Success:
+                if (commitToHistory) {
+                    const result = executeUpdatePropertyCommand(property, oldValue, value);
+
+                    if (result.status === Result.Status.Error) {
+                        setError(result.message ?? null);
+                        if (resetOnReject) resetDraft();
+                        return false;
+                    }
+
+                    setDraft(toDraftValue(property.getter()));
+                    return true;
+                }
+
                 property.setter(value);
                 setDraft(toDraftValue(value));
                 return true;
         }
     }, [property, resetDraft]);
 
-    const applyAxisValue = useCallback((axis: keyof Point2D, rawValue: number, resetOnReject: boolean): boolean => {
+    const applyAxisValue = useCallback((
+        axis: keyof Point2D,
+        rawValue: number,
+        resetOnReject: boolean,
+        commitToHistory: boolean = true,
+        oldValue?: Point2D,
+    ): boolean => {
         const currentValue = property.getter();
 
         const nextValue: Point2D = {
@@ -89,7 +115,7 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
             [axis]: normalizeNumber(rawValue, undefined),
         };
 
-        return applyPointValue(nextValue, resetOnReject);
+        return applyPointValue(nextValue, resetOnReject, commitToHistory, oldValue);
     }, [property, applyPointValue]);
 
     const handleChange = useCallback((axis: keyof Point2D, event: ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +126,7 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
         }
 
         const nextDraft = { ...draft, [axis]: rawValue };
+
         setDraft(nextDraft);
         validateDraft(nextDraft);
     }, [draft, validateDraft]);
@@ -135,6 +162,32 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
         handleConfirmChange(draft);
     }, [draft, handleConfirmChange]);
 
+    const handleAxisDragStart = useCallback(() => {
+        dragStartValueRef.current = clonePropertyValue(property.getter());
+    }, [property]);
+
+    const handleAxisDragEnd = useCallback(() => {
+        const oldValue = dragStartValueRef.current;
+
+        if (!oldValue) {
+            setError(null);
+            resetDraft();
+            return;
+        }
+
+        const newValue = clonePropertyValue(property.getter());
+        dragStartValueRef.current = null;
+
+        // During drag, the property was updated directly for live preview.
+        // Restore old value, then commit one undoable command old -> new.
+        property.setter(oldValue);
+
+        applyPointValue(newValue, true, true, oldValue);
+
+        setError(null);
+        resetDraft();
+    }, [property, applyPointValue, resetDraft]);
+
     return (
         <VStack className="px-2">
             <div className="flex h-8 items-center gap-2" onClick={toggleOpen}>
@@ -154,11 +207,9 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
                         disabled={disabled}
                         readOnly={property.readonly()}
                         getValue={() => toFiniteNumber(property.getter().x)}
-                        onDragValueChange={(value) => applyAxisValue("x", value, false)}
-                        onDragEnd={() => {
-                            setError(null);
-                            resetDraft();
-                        }}
+                        onDragStart={handleAxisDragStart}
+                        onDragValueChange={(value) => applyAxisValue("x", value, false, false)}
+                        onDragEnd={handleAxisDragEnd}
                         onChange={(event) => handleChange("x", event)}
                         onKeyDown={handleKeyDown}
                     />
@@ -170,11 +221,9 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
                         disabled={disabled}
                         readOnly={property.readonly()}
                         getValue={() => toFiniteNumber(property.getter().y)}
-                        onDragValueChange={(value) => applyAxisValue("y", value, false)}
-                        onDragEnd={() => {
-                            setError(null);
-                            resetDraft();
-                        }}
+                        onDragStart={handleAxisDragStart}
+                        onDragValueChange={(value) => applyAxisValue("y", value, false, false)}
+                        onDragEnd={handleAxisDragEnd}
                         onChange={(event) => handleChange("y", event)}
                         onKeyDown={handleKeyDown}
                     />
@@ -196,6 +245,7 @@ function PointAxisInput({
     disabled,
     readOnly,
     getValue,
+    onDragStart,
     onDragValueChange,
     onDragEnd,
     onChange,
@@ -207,6 +257,7 @@ function PointAxisInput({
     disabled: boolean;
     readOnly: boolean;
     getValue: () => number;
+    onDragStart: () => void;
     onDragValueChange: (value: number) => boolean | void;
     onDragEnd: () => void;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -215,6 +266,7 @@ function PointAxisInput({
     const { isDragging, dragProps } = useHorizontalNumberDrag({
         disabled,
         getValue,
+        onDragStart,
         onValueChange: onDragValueChange,
         onDragEnd,
         wrapCursor: true,

@@ -1,7 +1,6 @@
 import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from "react";
 import { readFile } from "@tauri-apps/plugin-fs";
 
-import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageSourcePropertyClass } from "@/editor/properties/properties";
 import type { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { Result } from "@/shared/types/result";
@@ -13,6 +12,7 @@ import { Label } from "@/ui/components/shadcn/label";
 
 import { LocalizedText } from "../custom/LocalizeText";
 import { HStack } from "../custom/stack/Stack";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface ImageSourcePropertyEditorProps {
     property: ImageSourcePropertyClass<any>;
@@ -31,7 +31,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
         setError(null);
     }, [property]);
 
-    const commitValue = useCallback((value: ImageSourceData) => {
+    const commitValue = useCallback((value: ImageSourceData, oldValue: ImageSourceData = clonePropertyValue(normalizeImageSource(property.getter()))) => {
         const validateResult = property.validate(value);
 
         setError(null);
@@ -46,10 +46,18 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
                 resetDraft();
                 break;
 
-            case Result.Status.Success:
-                property.setter(value);
+            case Result.Status.Success: {
+                const result = executeUpdatePropertyCommand(property, oldValue, value);
+
+                if (result.status === Result.Status.Error) {
+                    setError(result.message ?? null);
+                    resetDraft();
+                    return;
+                }
+
                 setDraft(normalizeImageSource(property.getter()).source);
                 break;
+            }
         }
     }, [property, resetDraft]);
 
@@ -67,11 +75,14 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
             return;
         }
 
-        commitValue({
-            source: nextSource,
-            width: current.width,
-            height: current.height,
-        });
+        commitValue(
+            {
+                source: nextSource,
+                width: current.width,
+                height: current.height,
+            },
+            current,
+        );
     }, [property, commitValue, resetDraft]);
 
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
@@ -86,6 +97,8 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
 
     const selectImage = useCallback(async () => {
         if (disabled) return;
+
+        const oldValue = clonePropertyValue(normalizeImageSource(property.getter()));
 
         const selectedPath = await FileDialogUtils.open({
             directory: false,
@@ -103,23 +116,26 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
         try {
             const buffer = await readFile(selectedPath);
             const image = await TextureUtils.processImage(buffer);
+            const source = property.absToRef(selectedPath);
 
-            const source = property.absToRef(selectedPath)
-
-            commitValue({
-                source,
-                width: image.width,
-                height: image.height,
-            });
+            commitValue(
+                {
+                    source,
+                    width: image.width,
+                    height: image.height,
+                },
+                oldValue,
+            );
         } catch (error) {
             setError({
                 key: "property.imageSource.invalidImage",
             } as TranslatableMessage);
         }
-    }, [commitValue, disabled]);
+    }, [commitValue, disabled, property]);
 
     const title = useMemo(() => {
         const value = normalizeImageSource(property.getter());
+
         if (!value.source) return "";
 
         return `${value.source}\n${value.width} × ${value.height}`;

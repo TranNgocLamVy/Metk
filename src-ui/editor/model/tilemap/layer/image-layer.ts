@@ -5,8 +5,6 @@ import { ImageLayerData } from "@/shared/schema/layer.schema";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import type { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { Tilemap } from "../tilemap";
-import { Result } from "@/shared/types/result";
-
 export interface ImageLayerEvents extends BaseLayerEvents {
     imageChanged: () => void;
 }
@@ -111,13 +109,6 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public updateOffset(x: number, y: number): void {
         this.offset.x = x;
         this.offset.y = y;
-        this.eventEmitter.emit("updateProperty", "offset", this.offset);
-    }
-
-    public updateParallax(x: number, y: number): void {
-        this.parallax.x = x;
-        this.parallax.y = y;
-        this.eventEmitter.emit("updateProperty", "parallax", this.parallax);
     }
 
     public updateTintColor(tintcolor: string): void {

@@ -1,8 +1,9 @@
-import { EnumPropertyClass } from "@/editor/properties/properties";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/shadcn/select";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label } from "../shadcn/label";
+import { EnumPropertyClass } from "@/editor/properties/properties";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/shadcn/select";
 import { LocalizedText } from "../custom/LocalizeText";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface EnumEditorProps {
     property: EnumPropertyClass<any>;
@@ -11,14 +12,18 @@ export interface EnumEditorProps {
 export function EnumPropertyEditor({ property }: EnumEditorProps) {
     const [draft, setDraft] = useState<string>();
 
-    useEffect(() => setDraft(property.getter()), [])
+    useEffect(() => {
+        setDraft(property.getter());
+    }, [property]);
 
-    const options = useMemo(() => property.options(), [])
+    const options = useMemo(() => property.options(), [property]);
 
     const onValueChange = useCallback((value: string) => {
-        property.setter(value);
+        const oldValue = clonePropertyValue(property.getter());
+
+        executeUpdatePropertyCommand(property, oldValue, value);
         setDraft(property.getter());
-    }, [])
+    }, [property]);
 
     return (
         <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center px-2 h-8 gap-2">
@@ -34,7 +39,7 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-surface-overlay-raised">
-                    {options.map((option, index) => (
+                    {options.map((option) => (
                         <SelectItem className="text-foreground" key={`${option.value}`} value={String(option.value)}>
                             {option.label}
                         </SelectItem>

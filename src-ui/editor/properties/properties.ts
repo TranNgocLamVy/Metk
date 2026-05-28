@@ -1,6 +1,6 @@
 import { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { Result } from "@/shared/types/result";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 type ResolvableBoolean<TTarget> = ((target: TTarget) => boolean) | boolean;
 export type ResolvableString<TTarget> = ((target: TTarget) => string) | string;
@@ -19,6 +19,7 @@ export interface BasePropertyOptions<TTarget> {
 
 export class BaseProperty<TTarget> {
     public readonly id: string;
+    public readonly key: string;
     public readonly label: string;
     public readonly group: () => string;
     public readonly order: number;
@@ -28,8 +29,14 @@ export class BaseProperty<TTarget> {
     public readonly setter: (value: any) => void;
     public readonly getter: () => any;
     public readonly validate: (value: any) => Result;
-    constructor(public readonly target: TTarget, options: BasePropertyOptions<TTarget>) {
+
+    constructor(
+        public readonly target: TTarget,
+        key: string,
+        options: BasePropertyOptions<TTarget>,
+    ) {
         this.id = uuidv4();
+        this.key = key;
         this.label = options.label;
         this.group = () => {
             if (typeof options.group === "function") {
@@ -38,9 +45,9 @@ export class BaseProperty<TTarget> {
             return options.group ?? "General";
         };
         this.order = options.order ?? 0;
-        this.readonly = () => typeof options.readonly === 'function' ? options.readonly(this.target) : (options.readonly ?? false);
-        this.visible = () => typeof options.visible === 'function' ? options.visible(this.target) : (options.visible ?? true);
-        this.disabled = () => typeof options.disabled === 'function' ? options.disabled(this.target) : (options.disabled ?? false);
+        this.readonly = () => typeof options.readonly === "function" ? options.readonly(this.target) : (options.readonly ?? false);
+        this.visible = () => typeof options.visible === "function" ? options.visible(this.target) : (options.visible ?? true);
+        this.disabled = () => typeof options.disabled === "function" ? options.disabled(this.target) : (options.disabled ?? false);
         this.setter = (value) => options.set ? options.set(this.target, value) : {};
         this.getter = () => options.get(this.target);
         this.validate = (value) => options.validate ? options.validate(this.target, value) : Result.Success();
@@ -58,8 +65,8 @@ export interface StringPropertyOptions<TTarget = unknown> extends BasePropertyOp
 export class StringPropertyClass<TTarget> extends BaseProperty<TTarget> {
     public readonly maxLength: number | undefined;
     public readonly minbLength: number | undefined;
-    constructor(target: any, options: StringPropertyOptions<TTarget>) {
-        super(target, options);
+    constructor(target: TTarget, key: string, options: StringPropertyOptions<TTarget>) {
+        super(target, key, options);
         this.maxLength = options.maxLength;
         this.minbLength = options.minLength;
     }
@@ -70,10 +77,10 @@ export interface NumberPropertyOptions<TTarget = unknown> extends BasePropertyOp
     max?: number;
     precision?: number;
     slider?: {
-        range: [number, number],
-        step: number,
-        interactive?: boolean,
-    }
+        range: [number, number];
+        step: number;
+        interactive?: boolean;
+    };
     unit?: string;
     set?: (target: TTarget, value: number) => void;
     get: (target: TTarget) => number;
@@ -84,11 +91,11 @@ export class NumberPropertyClass<TTarget> extends BaseProperty<TTarget> {
     public readonly min: number | undefined;
     public readonly max: number | undefined;
     public readonly precision: number | undefined;
-    public readonly slider: { range: [number, number]; step: number } | undefined;
+    public readonly slider: { range: [number, number]; step: number; interactive?: boolean } | undefined;
     public readonly unit: string | undefined;
 
-    constructor(target: TTarget, options: NumberPropertyOptions<TTarget>) {
-        super(target, options);
+    constructor(target: TTarget, key: string, options: NumberPropertyOptions<TTarget>) {
+        super(target, key, options);
         this.min = options.min;
         this.max = options.max;
         this.precision = options.precision;
@@ -104,8 +111,8 @@ export interface BooleanPropertyOptions<TTarget> extends BasePropertyOptions<TTa
 }
 
 export class BooleanPropertyClass<TTarget> extends BaseProperty<TTarget> {
-    constructor(target: TTarget, options: BooleanPropertyOptions<TTarget>) {
-        super(target, options);
+    constructor(target: TTarget, key: string, options: BooleanPropertyOptions<TTarget>) {
+        super(target, key, options);
     }
 }
 
@@ -123,9 +130,10 @@ export interface EnumPropertyOptions<TTarget> extends BasePropertyOptions<TTarge
 
 export class EnumPropertyClass<TTarget> extends BaseProperty<TTarget> {
     public readonly options: () => EnumPropertyOption[];
-    constructor(target: TTarget, options: EnumPropertyOptions<TTarget>) {
-        super(target, options);
-        this.options = () => typeof options.options === 'function' ? options.options(this.target) : options.options;
+
+    constructor(target: TTarget, key: string, options: EnumPropertyOptions<TTarget>) {
+        super(target, key, options);
+        this.options = () => typeof options.options === "function" ? options.options(this.target) : options.options;
     }
 }
 
@@ -136,38 +144,39 @@ export interface ColorPropertyOptions<TTarget> extends BasePropertyOptions<TTarg
 }
 
 export class ColorPropertyClass<TTarget> extends BaseProperty<TTarget> {
-    constructor(target: TTarget, options: ColorPropertyOptions<TTarget>) {
-        super(target, options);
+    constructor(target: TTarget, key: string, options: ColorPropertyOptions<TTarget>) {
+        super(target, key, options);
     }
 }
 
-
 export interface Point2DPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
-    pointLabel?: { x: string, y: string };
+    pointLabel?: { x: string; y: string };
     set?: (target: TTarget, value: Point2D) => void;
     get: (target: TTarget) => Point2D;
     validate?: (target: TTarget, value: Point2D) => Result;
 }
 
 export class Point2DPropertyClass<TTarget> extends BaseProperty<TTarget> {
-    public readonly pointLabel: { x: string, y: string };
-    constructor(target: TTarget, options: Point2DPropertyOptions<TTarget>) {
-        super(target, options);
+    public readonly pointLabel: { x: string; y: string };
+
+    constructor(target: TTarget, key: string, options: Point2DPropertyOptions<TTarget>) {
+        super(target, key, options);
         this.pointLabel = options.pointLabel ?? { x: "X", y: "Y" };
     }
 }
 
 export interface Point3DPropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
-    pointLabel?: { x: string, y: string, z: string };
+    pointLabel?: { x: string; y: string; z: string };
     set?: (target: TTarget, value: Point3D) => void;
     get: (target: TTarget) => Point3D;
     validate?: (target: TTarget, value: Point3D) => Result;
 }
 
 export class Point3DPropertyClass<TTarget> extends BaseProperty<TTarget> {
-    public readonly pointLabel: { x: string, y: string, z: string };
-    constructor(target: TTarget, options: Point3DPropertyOptions<TTarget>) {
-        super(target, options);
+    public readonly pointLabel: { x: string; y: string; z: string };
+
+    constructor(target: TTarget, key: string, options: Point3DPropertyOptions<TTarget>) {
+        super(target, key, options);
         this.pointLabel = options.pointLabel ?? { x: "X", y: "Y", z: "Z" };
     }
 }
@@ -196,8 +205,9 @@ export type ImageSourcePropertyOptions<TTarget> =
 
 export class ImageSourcePropertyClass<TTarget> extends BaseProperty<TTarget> {
     public readonly absToRef: (absPath: string) => string;
-    constructor(target: TTarget, options: ImageSourcePropertyOptions<TTarget>) {
-        super(target, options);
-        this.absToRef =  (value) => options.absToRef ? options.absToRef(this.target, value) : value;
+
+    constructor(target: TTarget, key: string, options: ImageSourcePropertyOptions<TTarget>) {
+        super(target, key, options);
+        this.absToRef = (value) => options.absToRef ? options.absToRef(this.target, value) : value;
     }
 }

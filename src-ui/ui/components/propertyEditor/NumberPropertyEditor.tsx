@@ -1,11 +1,11 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useRef, useState } from "react";
 
-import { Input } from "@/ui/components/shadcn/input";
 import { NumberPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
+import { Input } from "@/ui/components/shadcn/input";
+
 import { LocalizedText } from "../custom/LocalizeText";
 import { Label } from "../shadcn/label";
-
 import {
     getStepFromPrecision,
     isAllowedNumberDraft,
@@ -15,6 +15,7 @@ import {
     toFiniteNumber,
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface NumberEditorProps {
     property: NumberPropertyClass<any>;
@@ -23,6 +24,7 @@ export interface NumberEditorProps {
 export function NumberPropertyEditor({ property }: NumberEditorProps) {
     const [error, setError] = useState<TranslatableMessage | null>(null);
     const [draft, setDraft] = useState<string>(toDraftValue(property.getter(), property.precision));
+    const dragStartValueRef = useRef<number | null>(null);
 
     const disabled = property.disabled() || property.readonly();
 
@@ -56,7 +58,7 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
         return validateResult.status === Result.Status.Success;
     }, [property]);
 
-    const applyValue = useCallback((rawValue: number, resetOnReject: boolean): boolean => {
+    const applyValueDirect = useCallback((rawValue: number, resetOnReject: boolean): boolean => {
         const value = normalizeNumber(rawValue, property.precision);
         const validateResult = property.validate(value);
 
@@ -79,6 +81,41 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
         }
     }, [property, resetDraft]);
 
+    const commitValue = useCallback((
+        rawValue: number,
+        resetOnReject: boolean,
+        oldValue: number = clonePropertyValue(property.getter()),
+    ): boolean => {
+        const value = normalizeNumber(rawValue, property.precision);
+        const validateResult = property.validate(value);
+
+        setError(null);
+
+        switch (validateResult.status) {
+            case Result.Status.Error:
+                setError(validateResult.message ?? null);
+                if (resetOnReject) resetDraft();
+                return false;
+
+            case Result.Status.Cancel:
+                if (resetOnReject) resetDraft();
+                return false;
+
+            case Result.Status.Success: {
+                const result = executeUpdatePropertyCommand(property, oldValue, value);
+
+                if (result.status === Result.Status.Error) {
+                    setError(result.message ?? null);
+                    if (resetOnReject) resetDraft();
+                    return false;
+                }
+
+                setDraft(toDraftValue(property.getter(), property.precision));
+                return true;
+            }
+        }
+    }, [property, resetDraft]);
+
     const { isDragging, dragProps } = useHorizontalNumberDrag({
         disabled,
         precision: property.precision,
@@ -86,8 +123,25 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
         max: property.max,
         wrapCursor: true,
         getValue: () => toFiniteNumber(property.getter()),
-        onValueChange: (value) => applyValue(value, false),
+        onDragStart: () => {
+            dragStartValueRef.current = clonePropertyValue(property.getter());
+        },
+        onValueChange: (value) => applyValueDirect(value, false),
         onDragEnd: () => {
+            const oldValue = dragStartValueRef.current;
+
+            if (oldValue === null) {
+                setError(null);
+                resetDraft();
+                return;
+            }
+
+            const newValue = normalizeNumber(toFiniteNumber(property.getter()), property.precision);
+            dragStartValueRef.current = null;
+            
+            property.setter(oldValue);
+
+            commitValue(newValue, true, oldValue);
             setError(null);
             resetDraft();
         },
@@ -117,8 +171,8 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
             return;
         }
 
-        applyValue(Number(rawValue), true);
-    }, [property.precision, resetDraft, applyValue]);
+        commitValue(Number(rawValue), true);
+    }, [property.precision, resetDraft, commitValue]);
 
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {

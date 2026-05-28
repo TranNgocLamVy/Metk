@@ -40,9 +40,11 @@ function getPropertyFactories(target: object): PropertyFactory<any>[] {
 
     while (prototype && prototype !== Object.prototype) {
         const factories = propertyFactories.get(prototype);
+
         if (factories) {
             result.unshift(...factories);
         }
+
         prototype = Object.getPrototypeOf(prototype);
     }
 
@@ -53,70 +55,97 @@ export function ensurePropertiesMap(target: PropertyOwner): Map<string, BaseProp
     if (!(target.properties instanceof Map)) {
         target.properties = new Map<string, BaseProperty<any>>();
     }
+
     return target.properties;
 }
 
 export function initializeProperties<TTarget extends object>(target: TTarget & PropertyOwner): Map<string, BaseProperty<any>> {
     const properties = ensurePropertiesMap(target);
     const factories = getPropertyFactories(target);
+
     for (const factory of factories) {
         properties.set(factory.key, factory.create(target));
     }
+
     return properties;
 }
 
 export function StringProperty<TTarget = unknown>(options: StringPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new StringPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new StringPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function NumberProperty<TTarget = unknown>(options: NumberPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new NumberPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new NumberPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function BooleanProperty<TTarget = unknown>(options: BooleanPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new BooleanPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new BooleanPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function EnumProperty<TTarget = unknown>(options: EnumPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new EnumPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new EnumPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function ColorProperty<TTarget = unknown>(options: ColorPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new ColorPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new ColorPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function Point2DProperty<TTarget>(options: Point2DPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new Point2DPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new Point2DPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function Point3DProperty<TTarget>(options: Point3DPropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new Point3DPropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new Point3DPropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
 
 export function ImageSourceProperty<TTarget>(options: ImageSourcePropertyOptions<TTarget>): PropertyDecorator {
     return function (target, propertyKey) {
         const key = propertyKey.toString();
-        addPropertyFactory<TTarget>(target, { key, create: instance => new ImageSourcePropertyClass<TTarget>(instance, options)});
+        addPropertyFactory<TTarget>(target, {
+            key,
+            create: instance => new ImageSourcePropertyClass<TTarget>(instance, key, options),
+        });
     };
 }
