@@ -3,6 +3,7 @@ import { vi } from "vitest";
 import { EditorFacade } from "@/application/editor.facade";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilesetData } from "@/shared/schema/tileset.schema";
 import { Result } from "@/shared/types/result";
@@ -27,7 +28,7 @@ export const createTileset = (id = "tileset-a"): Tileset => {
         tiles: [],
     };
 
-    return new Tileset(data, filePathSystem, new EditorObjectRegistry());
+    return new SingleImageTileset(data, filePathSystem, new EditorObjectRegistry());
 };
 
 export const createEditorFacadeHarness = () => {

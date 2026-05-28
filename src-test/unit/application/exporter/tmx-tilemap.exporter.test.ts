@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { Tileset } from "@/editor/model/tileset/tileset";
+import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { TilemapData } from "@/shared/schema/tilemap.schema";
 import { TilesetData } from "@/shared/schema/tileset.schema";
@@ -56,7 +56,7 @@ const registerLoadedTileset = (
     relPath: string,
 ) => {
     const pathSystem = new FilePathSystem(data.id, context.projectPathSystem, relPath);
-    const tileset = new Tileset(data, pathSystem, context.objectRegistry);
+    const tileset = TilesetFactory.create(data, pathSystem, context.objectRegistry);
     (context.tilesetManager as any).loadedTilesets.set(data.id, tileset);
 };
 

@@ -8,6 +8,7 @@ import { TilesetGridRenderer } from "../renderer/tileset/single-tileset-grid.ren
 import { TilesetRenderer } from "../renderer/tileset/single-tileset.renderer";
 import { TilesetSelectorRenderer } from "../renderer/tileset/single-tileset-selector.renderer";
 import { ITilesetView } from "./tileset.view";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 
 export class SingleImageTilesetView implements ITilesetView {
     public session: TilesetSession;
@@ -84,10 +85,12 @@ export class SingleImageTilesetView implements ITilesetView {
             this.viewport.cursor = "default";
         });
 
+        const tileset = this.session.tileset;
+        if (!(tileset instanceof SingleImageTileset)) throw new Error("Tileset is not a SingleImageTileset");
+
         this.grid = new TilesetGridRenderer({ viewport: this.viewport, tileset: this.session.tileset });
         this.renderer = new TilesetRenderer({ tileset: this.session.tileset, parent: this.viewport });
-        this.selector = new TilesetSelectorRenderer({ tileset: this.session.tileset, tilesetSession: this.session, parent: this.viewport });
-
+        this.selector = new TilesetSelectorRenderer({ tileset: tileset, tilesetSession: this.session, parent: this.viewport });
 
         // Selector is on top of renderer (init after renderer)
         this.viewport.addChild(this.renderer.container);

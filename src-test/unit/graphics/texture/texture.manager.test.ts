@@ -55,14 +55,14 @@ vi.mock("@/shared/services/console.service", () => ({ Console: textureMocks.cons
 
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TextureManager } from "@/graphics/texture/texture.manager";
-import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Result } from "@/shared/types/result";
 
 const createTileset = (id = "terrain") => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/texture-project");
     const tilesetPathSystem = new FilePathSystem(id, projectPathSystem, `tilesets/${id}.json`);
-    return new Tileset(
+    return new SingleImageTileset(
         {
             id,
             name: `${id} tiles`,

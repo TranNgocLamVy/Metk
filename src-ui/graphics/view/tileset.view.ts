@@ -5,13 +5,14 @@ import { TilesetSession } from "@/editor/session/tileset.session";
 
 import { CollectionImageTilesetView } from "./collection-tileset.view";
 import { SingleImageTilesetView } from "./single-tileset.view";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 
 export class TilesetView implements ITilesetView {
     private readonly view: ITilesetView;
     public readonly session: TilesetSession;
 
     constructor(session: TilesetSession) {
-        this.view = session.tileset.type === "image-collection" ? new CollectionImageTilesetView(session) : new SingleImageTilesetView(session);
+        this.view = (session.tileset instanceof ImageCollectionTileset) ? new CollectionImageTilesetView(session) : new SingleImageTilesetView(session);
         this.session = session;
     }
 

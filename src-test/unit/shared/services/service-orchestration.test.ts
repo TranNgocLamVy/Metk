@@ -99,6 +99,9 @@ import { TilemapService } from "@/shared/services/tilemap.service";
 import { TilesetService } from "@/shared/services/tileset.service";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 
 const resetNavigationStore = () => {
     useNavigationStore.setState({ navigate: null });
@@ -180,6 +183,22 @@ const attachProjectAndWorkspace = () => {
     serviceMocks.appKernel.editorFacade.currentWorkspace = workspace;
     serviceMocks.appKernel.workspaceManager.currentWorkspace = workspace;
     return { project, workspace };
+};
+
+const createSingleImageTileset = () => {
+    const projectPathSystem = new ProjectPathSystem("C:/project");
+    const tilesetPathSystem = new FilePathSystem("tileset-a", projectPathSystem, "tilesets/tileset-a.json");
+
+    return new SingleImageTileset({
+        id: "tileset-a",
+        name: "Terrain",
+        columns: 2,
+        rows: 2,
+        tilewidth: 16,
+        tileheight: 16,
+        image: { source: "../textures/terrain.png", width: 32, height: 32 },
+        tiles: [],
+    }, tilesetPathSystem, new EditorObjectRegistry());
 };
 
 beforeEach(() => {
@@ -472,12 +491,8 @@ describe("RulesetService orchestration", () => {
 describe("TextureService orchestration", () => {
     it("imports a matching-size texture and updates the tileset texture path", async () => {
         const { project, workspace } = attachProjectAndWorkspace();
-        const tileset = {
-            id: "tileset-a",
-            imageSource: { width: 32, height: 32 },
-            tilesetPathSystem: { getFileAbsDir: vi.fn(() => "C:/project/tilesets") },
-            updateImageSource: vi.fn(),
-        };
+        const tileset = createSingleImageTileset();
+        const updateImageSource = vi.spyOn(tileset, "updateImageSource");
         project.tilesetManager.getTilesetById.mockReturnValue(tileset);
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/replacement.png");
         serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 32, height: 32 });
@@ -487,7 +502,7 @@ describe("TextureService orchestration", () => {
 
         expect(result.status).toBe(Result.Status.Success);
         expect(workspace.savedPathManager.setTextureDir).toHaveBeenCalledWith("C:/project/textures");
-        expect(tileset.updateImageSource).toHaveBeenCalledWith({
+        expect(updateImageSource).toHaveBeenCalledWith({
             source: "../textures/replacement.png",
             width: 32,
             height: 32,
@@ -499,12 +514,8 @@ describe("TextureService orchestration", () => {
 
     it("asks before accepting a mismatched texture size and cancels when declined", async () => {
         const { project } = attachProjectAndWorkspace();
-        const tileset = {
-            id: "tileset-a",
-            imageSource: { width: 32, height: 32 },
-            tilesetPathSystem: { getFileAbsDir: vi.fn(() => "C:/project/tilesets") },
-            updateImageSource: vi.fn(),
-        };
+        const tileset = createSingleImageTileset();
+        const updateImageSource = vi.spyOn(tileset, "updateImageSource");
         project.tilesetManager.getTilesetById.mockReturnValue(tileset);
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/large.png");
         serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 64, height: 64 });
@@ -517,7 +528,7 @@ describe("TextureService orchestration", () => {
             title: "dialog.import.textureMismatchSize.title",
             description: "dialog.import.textureMismatchSize.description",
         });
-        expect(tileset.updateImageSource).not.toHaveBeenCalled();
+        expect(updateImageSource).not.toHaveBeenCalled();
         expect(project.tilesetManager.saveTileset).not.toHaveBeenCalled();
     });
 

@@ -11,6 +11,7 @@ import {
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 
 type TilesetOverviewRenderOptions = {
     pixiApp: Application;
@@ -191,7 +192,7 @@ function makeSelectionGraphics(layout: TileLayout) {
 }
 
 function getTilesetLayoutInfo(tileset: Tileset): TilesetLayoutInfo {
-    if (tileset.isImageCollection()) {
+    if (tileset instanceof ImageCollectionTileset) {
         return getCollectionTilesetLayoutInfo(tileset);
     }
 

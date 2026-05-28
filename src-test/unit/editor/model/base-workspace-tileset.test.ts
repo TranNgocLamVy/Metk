@@ -69,7 +69,7 @@ vi.mock("@/application/workspace/workspace-saved-path.manager", () => ({ Workspa
 
 import { BaseObject } from "@/editor/model/base-object";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
@@ -101,7 +101,7 @@ const createTilesetPathSystem = (id = "tileset-a") => {
     return new FilePathSystem(id, projectPathSystem, `tilesets/${id}.json`);
 };
 
-const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[0]> = {}) => new Tileset(
+const createTileset = (overrides: Partial<ConstructorParameters<typeof SingleImageTileset>[0]> = {}) => new SingleImageTileset(
     {
         id: "tileset-a",
         name: "Terrain",
@@ -223,7 +223,7 @@ describe("Tileset model", () => {
         });
         expect(listener).toHaveBeenCalledWith("imageSource", tileset.imageSource, {
             origin: "external",
-            source: "Tileset.updateImageSource",
+            source: "SingleImageTileset.updateImageSource",
         });
     });
 });

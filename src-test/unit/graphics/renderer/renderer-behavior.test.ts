@@ -122,7 +122,7 @@ import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/single-tile
 import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
 import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
@@ -153,10 +153,10 @@ type MockContainer = InstanceType<typeof rendererMocks.Container>;
 type MockGraphics = InstanceType<typeof rendererMocks.Graphics>;
 type MockSprite = InstanceType<typeof rendererMocks.Sprite>;
 
-const createTileset = (overrides: Partial<ConstructorParameters<typeof Tileset>[0]> = {}) => {
+const createTileset = (overrides: Partial<ConstructorParameters<typeof SingleImageTileset>[0]> = {}) => {
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/renderer-project");
     const filePathSystem = new FilePathSystem("tileset-a", projectPathSystem, "tilesets/tileset-a.json");
-    return new Tileset(
+    return new SingleImageTileset(
         {
             id: "tileset-a",
             name: "Terrain",

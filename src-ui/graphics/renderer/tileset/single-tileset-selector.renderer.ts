@@ -1,18 +1,19 @@
 import { Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { Tile, Tileset } from "@/editor/model/tileset/tileset";
+import { Tile } from "@/editor/model/tileset/tileset";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 import { usePropertyStore } from "@/ui/stores/property.store";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 
 export type CreateTilesetViewSelectorContext = {
-    tileset: Tileset;
+    tileset: SingleImageTileset;
     tilesetSession: TilesetSession;
     parent: Container;
 }
 
 export class TilesetSelectorRenderer {
-    private tileset: Tileset;
+    private tileset: SingleImageTileset;
     private tilesetSession: TilesetSession;
     private parent: Container;
     public readonly graphics: Graphics;

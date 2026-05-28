@@ -139,6 +139,9 @@ vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: viewMo
 import { TilemapView } from "@/graphics/view/tilemap.view";
 import { SingleImageTilesetView } from "@/graphics/view/single-tileset.view";
 import { WorkspaceService } from "@/shared/services/workspace.service";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 
 type MockViewport = InstanceType<typeof viewMocks.MockViewport>;
 
@@ -171,18 +174,27 @@ const createTilemapSession = () => ({
     }),
 });
 
-const createTilesetSession = () => ({
-    tileset: {
-        id: "tileset-a",
-        tilewidth: 16,
-        tileheight: 16,
-        image: { width: 32, height: 32 },
-    },
-    viewState: { x: 32, y: 48, zoom: 1.5 },
-    updateViewState: vi.fn(function (this: any, state: any) {
-        this.viewState = { ...this.viewState, ...state };
-    }),
-});
+const createTilesetSession = () => {
+    const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/view-project");
+    const tilesetPathSystem = new FilePathSystem("tileset-a", projectPathSystem, "tilesets/tileset-a.json");
+
+    return {
+        tileset: new SingleImageTileset({
+            id: "tileset-a",
+            name: "Terrain",
+            columns: 2,
+            rows: 2,
+            tilewidth: 16,
+            tileheight: 16,
+            image: { source: "textures/terrain.png", width: 32, height: 32 },
+            tiles: [],
+        }, tilesetPathSystem, new EditorObjectRegistry()),
+        viewState: { x: 32, y: 48, zoom: 1.5 },
+        updateViewState: vi.fn(function (this: any, state: any) {
+            this.viewState = { ...this.viewState, ...state };
+        }),
+    };
+};
 
 beforeEach(() => {
     vi.useFakeTimers();

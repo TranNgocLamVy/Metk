@@ -209,6 +209,7 @@ import TilemapEditor from "@/ui/components/workspace/tilemapEditor/TilemapEditor
 import TilesetViewSelector from "@/ui/components/workspace/tilesetView/TilesetViewSelector";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { RulesetManager as ResourceRulesetManager } from "@/application/resources/ruleset/ruleset.manager";
@@ -343,7 +344,7 @@ const createTilesetSession = (id: string, tilesetId: string, name: string): Test
     const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/integration-project");
     const objectRegistry = new EditorObjectRegistry();
     const tilesetPathSystem = new FilePathSystem(tilesetId, projectPathSystem, `tilesets/${tilesetId}.json`);
-    const tileset = new Tileset(
+    const tileset = new SingleImageTileset(
         {
             id: tilesetId,
             name,

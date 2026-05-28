@@ -7,6 +7,7 @@ import { Texture } from "pixi.js";
 import { PathUtils } from "../utils/path.utils";
 import { Console } from "./console.service";
 import { DialogService } from "./dialog.service";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 
 export class TextureService {
     public static async importTexture(tilesetId: string): Promise<Result> {
@@ -36,7 +37,7 @@ export class TextureService {
         if (!tilesetManager) return Result.Cancel();
 
         const tileset = tilesetManager.getTilesetById(tilesetId);
-        if (!tileset) return Result.Cancel();
+        if (!tileset || !(tileset instanceof SingleImageTileset)) return Result.Cancel();
 
         if (texture.width != tileset.imageSource.width || texture.height != tileset.imageSource.height) {
             const confirmTexture = await DialogService.openPermissionDialog({

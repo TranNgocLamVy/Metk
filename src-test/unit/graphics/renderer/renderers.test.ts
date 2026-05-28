@@ -83,7 +83,7 @@ import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-
 import { RuleLayerData, TileLayerData } from "@/shared/schema/layer.schema";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
@@ -316,7 +316,7 @@ describe("grid renderers", () => {
     it("draws tileset grid lines, respects disabled state, and unregisters update listener", () => {
         const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/grid-test");
         const tilesetPathSystem = new FilePathSystem("tileset-a", projectPathSystem, "tilesets/tileset-a.json");
-        const tileset = new Tileset({
+        const tileset = new SingleImageTileset({
             id: "tileset-a",
             name: "Terrain",
             columns: 2,

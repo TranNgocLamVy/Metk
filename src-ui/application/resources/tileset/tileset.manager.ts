@@ -7,6 +7,7 @@ import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
 import { TilesetData, TilesetMetadata } from "@/shared/schema/tileset.schema";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -32,7 +33,7 @@ export class TilesetManager {
         }
         this.tilesetMetadata.set(tileset.id, tilesetMetadata);
         const tilesetPathSystem = new FilePathSystem(tileset.id, this.projectPathSystem, tilesetRelPath);
-        const newTileset = new Tileset(tileset, tilesetPathSystem, this.objectRegistry);
+        const newTileset = TilesetFactory.create(tileset, tilesetPathSystem, this.objectRegistry);
 
         this.objectRegistry.registerTree(newTileset);
 
@@ -142,14 +143,14 @@ export class TilesetManager {
     public updateTileset(tilesetData: TilesetData): void {
         const tileset = this.loadedTilesets.get(tilesetData.id);
         if (!tileset) return;
-    
+
         tileset.updateTileset(tilesetData);
-    
+
         const metadata = this.tilesetMetadata.get(tilesetData.id);
         if (metadata) {
             metadata.name = tilesetData.name;
         }
-    
+
         Console.success({
             message: {
                 key: "message.tileset.updatedSuccess",
@@ -199,21 +200,17 @@ export class TilesetManager {
     public cloneTileset(id: string): Tileset | null {
         const tileset = this.loadedTilesets.get(id);
         if (!tileset) return null;
-    
+
         const tilesetData = tileset.serialize();
         const tilesetPathSystem = new FilePathSystem(
             tilesetData.id,
             this.projectPathSystem,
             tileset.tilesetPathSystem.relPath,
         );
-    
+
         const cloneRegistry = new EditorObjectRegistry();
-    
-        return new Tileset(
-            tilesetData,
-            tilesetPathSystem,
-            cloneRegistry,
-        );
+
+        return TilesetFactory.create(tilesetData, tilesetPathSystem, cloneRegistry);
     }
 
     public serialize(): TilesetMetadata[] {

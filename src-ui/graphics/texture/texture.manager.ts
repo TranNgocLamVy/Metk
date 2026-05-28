@@ -6,6 +6,8 @@ import { Tileset } from "@/editor/model/tileset/tileset";
 import { Result } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { Console } from "@/shared/services/console.service";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 
 interface TextureManagerEvent {
     onTextureReloaded: (tilesetId: string) => void;
@@ -50,54 +52,55 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
     }
 
     private async performLoad(tileset: Tileset): Promise<Result> {
-        if (tileset.isImageCollection()) {
+        if (tileset instanceof ImageCollectionTileset) {
             return this.performLoadImageCollection(tileset);
+        } else if (tileset instanceof SingleImageTileset) {   
+            return this.performLoadSingleImage(tileset);
         }
-
-        return this.performLoadSingleImage(tileset);
+        return Result.Error("Invalid tileset type");
     }
 
-    private async performLoadSingleImage(tileset: Tileset): Promise<Result> {
+    private async performLoadSingleImage(tileset: SingleImageTileset): Promise<Result> {
         const tilesetAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(
             tileset.imageSource.source,
         );
-
+    
         const loadResult = await this.loadTexture(tilesetAbsPath);
-
+    
         if (loadResult.status === Result.Status.Error) {
             this.reportTilesetTextureLoadError(tileset, loadResult);
             return loadResult;
         }
-
+    
         const baseTexture = loadResult.data!;
         this.baseTexturesCache.set(tileset.id, baseTexture);
-
+    
         const slicedTextures = this.sliceTexture(
             baseTexture,
             tileset.tilewidth,
             tileset.tileheight,
         );
-
+    
         const tileTextureMap = new Map<number, Texture>();
-
+    
         const sortedTiles = Array.from(tileset.tiles).sort(
             (a, b) => a.id - b.id,
         );
-
+    
         sortedTiles.forEach((tile, index) => {
             const texture = slicedTextures[index];
             if (!texture) return;
-
+    
             tileTextureMap.set(tile.id, texture);
         });
-
+    
         this.tileTexturesCache.set(tileset.id, tileTextureMap);
         this.emit("onTextureReloaded", tileset.id);
-
+    
         return Result.Success();
     }
 
-    private async performLoadImageCollection(tileset: Tileset): Promise<Result> {
+    private async performLoadImageCollection(tileset: ImageCollectionTileset): Promise<Result> {
         const tileTextureMap = new Map<number, Texture>();
 
         const sortedTiles = Array.from(tileset.tiles).sort(
@@ -195,7 +198,7 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
     }
 
     public updateTilesetTexture(tileset: Tileset, texture: Texture): void {
-        if (tileset.isImageCollection()) return;
+        if (tileset instanceof ImageCollectionTileset) return;
 
         this.destroyTextures(tileset.id);
 

@@ -7,7 +7,7 @@ import { DIALOG_TYPES } from "@/ui/components/dialog/dialogRegistry";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { WorkspaceService } from "@/shared/services/workspace.service";
-import { Tileset } from "@/editor/model/tileset/tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 
@@ -379,7 +379,7 @@ describe("Metk dialog and form integration workflows", () => {
         const user = userEvent.setup();
         const projectPathSystem = new ProjectPathSystem("C:/project");
         const tilesetPathSystem = new FilePathSystem("terrain", projectPathSystem, "tilesets/terrain.ts.json");
-        const clonedTileset = new Tileset({
+        const clonedTileset = new SingleImageTileset({
             id: "terrain",
             name: "Terrain Tiles",
             columns: 8,

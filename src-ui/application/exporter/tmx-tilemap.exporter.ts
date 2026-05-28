@@ -10,6 +10,8 @@ import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 
 type XMLBuilder = ReturnType<typeof create>;
 
@@ -52,45 +54,56 @@ export class TmxTilemapExporter implements ITilemapExporter {
         const tilesets = tilesetRefManager.serialize().refs.sort((a, b) => a.index - b.index).map((tilesetRef) => {
             const tileset = tilesetManager.getTilesetById(tilesetRef.id);
             if (!tileset) return null;
-
             const firstGrid = firstGidCount;
             const tilesetIndex = tilesetRefManager.getTilesetRefIndex(tilesetRef.id);
             this.tilesetFirstGidMap.set(tilesetIndex, firstGrid);
             firstGidCount += tileset.tiles.length;
-
-            const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
-            const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
-
-            const imageRelPath = tileset.imageSource.source;
-            const imageAbsPath = PathUtils.join(tilesetAbsDir, imageRelPath);
-
-            const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
-
-            const name = tileset.name;
-
-            const tileWidth = tileset.tilewidth;
-            const tileHeight = tileset.tileheight;
-
-            const tileCount = tileset.tiles.length;
-            const columns = tileset.columns;
-
-            return create({
-                tileset: {
-                    '@firstgid': firstGrid,
-                    '@name': name,
-                    '@tilewidth': tileWidth,
-                    '@tileheight': tileHeight,
-                    '@tilecount': tileCount,
-                    '@columns': columns,
-                    image: {
-                        '@source': source,
-                        '@width': tileset.imageSource.width,
-                        '@height': tileset.imageSource.height
-                    }
-                }
-            })
+            if (tileset instanceof SingleImageTileset) {
+                return this.getSingleImageTileset(tileset, exportPath, firstGrid);
+            } else if (tileset instanceof ImageCollectionTileset) {
+                return this.getImageCollectionTileset(tileset, exportPath, firstGrid);
+            }
+            return null;
         }).filter((tileset) => tileset != null);
         return tilesets;
+    }
+
+    private getSingleImageTileset(tileset: SingleImageTileset, exportPath: string, firstGrid: number): XMLBuilder | null {
+        const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
+        const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
+
+        const imageRelPath = tileset.imageSource.source;
+        const imageAbsPath = PathUtils.join(tilesetAbsDir, imageRelPath);
+
+        const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
+
+        const name = tileset.name;
+
+        const tileWidth = tileset.tilewidth;
+        const tileHeight = tileset.tileheight;
+
+        const tileCount = tileset.tiles.length;
+        const columns = tileset.columns;
+
+        return create({
+            tileset: {
+                '@firstgid': firstGrid,
+                '@name': name,
+                '@tilewidth': tileWidth,
+                '@tileheight': tileHeight,
+                '@tilecount': tileCount,
+                '@columns': columns,
+                image: {
+                    '@source': source,
+                    '@width': tileset.imageSource.width,
+                    '@height': tileset.imageSource.height
+                }
+            }
+        })
+    }
+
+    private getImageCollectionTileset(tileset: ImageCollectionTileset, exportPath: string, firstGrid: number): XMLBuilder | null {
+        return null
     }
 
     private getLayers(layers: BaseLayer<any>[], baseIndex: number, tilemap: Tilemap): XMLBuilder[] {
@@ -174,23 +187,23 @@ export class TmxTilemapExporter implements ITilemapExporter {
                         if (!rulesetRef || rulesetRef.tileId === -1 || rulesetRef.tilesetIndex === -1) {
                             return 0;
                         }
-                        
+
                         const tilesetFirstGid = this.tilesetFirstGidMap.get(rulesetRef.tilesetIndex)!;
                         if (tilesetFirstGid == undefined) return 0;
-                        
+
                         return rulesetRef.tileId + tilesetFirstGid;
                     })).flat().join(',')
                 }
             }
         });
-        
+
         return layer;
     }
 
     private getImageLayer(imageLayer: ImageLayer, index: number, tilemap: Tilemap): XMLBuilder {
         const imageAbsPath = tilemap.tilemapPathSystem.getAbsPathFromRelPath(imageLayer.imageSource.source);
         const source = PathUtils.relative(PathUtils.dirname(this.exportPath), imageAbsPath);
-    
+
         return create({
             imagelayer: {
                 "@id": imageLayer.id,
@@ -202,7 +215,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 "@opacity": imageLayer.opacity,
                 "@visible": imageLayer.visible ? 1 : 0,
                 "@locked": imageLayer.locked ? 1 : 0,
-                ...(imageLayer.tintcolor ? {"@tintcolor": imageLayer.tintcolor} : {}),
+                ...(imageLayer.tintcolor ? { "@tintcolor": imageLayer.tintcolor } : {}),
                 "@repeatx": imageLayer.repeatX ? 1 : 0,
                 "@repeaty": imageLayer.repeatY ? 1 : 0,
                 image: {

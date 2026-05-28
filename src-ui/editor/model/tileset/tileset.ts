@@ -1,17 +1,31 @@
-import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
-import { TileData, TilesetData, TilesetType } from "@/shared/schema/tileset.schema";
+import {
+    BaseObject,
+    BaseObjectEvents,
+    PropertyUpdateMeta,
+} from "@/editor/model/base-object";
+import {
+    TileData,
+    TilesetData,
+    TilesetType,
+} from "@/shared/schema/tileset.schema";
 import { Result } from "@/shared/types/result";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { EnumProperty, NumberProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import {
+    EnumProperty,
+    NumberProperty,
+    Point2DProperty,
+    StringProperty,
+} from "@/editor/properties/properties.decorator";
 import { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { ImageSource } from "../image-source";
+import { ImageCollectionTileset } from "./image-collection-tileset";
 
 interface TilesetEvent extends BaseObjectEvents {
     update(): void;
 }
 
-export class Tileset extends BaseObject<TilesetEvent> {
+export abstract class Tileset extends BaseObject<TilesetEvent> {
     @StringProperty<Tileset>({
         label: "ID",
         readonly: true,
@@ -22,7 +36,9 @@ export class Tileset extends BaseObject<TilesetEvent> {
     @StringProperty<Tileset>({
         label: "Name",
         get: (target) => target.name,
-        set: (target, value, meta) => { target.rename(value, meta) },
+        set: (target, value, meta) => {
+            target.rename(value, meta);
+        },
     })
     public name: string;
 
@@ -35,7 +51,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
             return [
                 { label: "Single image", value: "single-image" },
                 { label: "Image Collection", value: "image-collection" },
-            ]
+            ];
         },
     })
     public type: TilesetType;
@@ -46,88 +62,37 @@ export class Tileset extends BaseObject<TilesetEvent> {
         order: 1,
         readonly: true,
         pointLabel: { x: "Width", y: "Height" },
-        visible: (target) => target.type == "single-image",
-        get: (target) => ({ x: target.tilewidth, y: target.tileheight }),
+        visible: (target) => target.type === TilesetType.SingleImage,
+        get: (target) => ({
+            x: target.tilewidth,
+            y: target.tileheight,
+        }),
     })
     public tilewidth: number;
+
     public tileheight: number;
 
     public columns: number;
     public rows: number;
 
-    @StringProperty<Tileset>({
-        label: "Source",
-        group: "Image",
-        order: 1,
-        readonly: true,
-        visible: (target) => target.type == "single-image",
-        get: (target) => target.imageSource?.source ?? "",
-    })
-    public imageSource: ImageSource;
-
-    @Point2DProperty<Tileset>({
-        label: "Size",
-        group: "Image",
-        order: 2,
-        readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
-        visible: (target) => target.type == "single-image",
-        get: (target) => ({ x: target.imageSource.width, y: target.imageSource.height }),
-    })
-    private imageSize: any;
-
     public tiles: Tile[] = [];
 
-
-    constructor(
+    protected constructor(
         tilesetData: TilesetData,
         public readonly tilesetPathSystem: FilePathSystem,
-        private readonly objectRegistry: EditorObjectRegistry,
+        protected readonly objectRegistry: EditorObjectRegistry,
+        type: TilesetType,
     ) {
         super(`tileset:${tilesetData.id}`);
+
         this.id = tilesetData.id;
         this.name = tilesetData.name;
-        this.type = tilesetData.type ?? TilesetType.SingleImage;
+        this.type = type;
 
         this.columns = tilesetData.columns;
         this.rows = tilesetData.rows;
         this.tilewidth = tilesetData.tilewidth;
         this.tileheight = tilesetData.tileheight;
-
-
-        const sourceData = tilesetData.image ?? {
-            source: "",
-            width: this.columns * this.tilewidth,
-            height: this.rows * this.tileheight,
-        };
-        this.imageSource = new ImageSource(sourceData);
-
-        if (this.type === TilesetType.ImageCollection) {
-            this.tiles = tilesetData.tiles.map((tileData) => {
-                const tile = new Tile(tileData, this);
-                this.objectRegistry.register(tile);
-                return tile;
-            });
-
-            this.recalculateCollectionMetrics();
-            return;
-        }
-
-        const numberOfTiles = this.columns * this.rows;
-
-        if (tilesetData.tiles.length > 0) {
-            this.tiles = tilesetData.tiles.map((tileData) => {
-                const tile = new Tile(tileData, this);
-                this.objectRegistry.register(tile);
-                return tile;
-            });
-        } else {
-            this.tiles = Array.from({ length: numberOfTiles }, (_, index) => {
-                const tile = new Tile({ id: index }, this);
-                this.objectRegistry.register(tile);
-                return tile;
-            });
-        }
     }
 
     public override getObjectChildren(): BaseObject<any>[] {
@@ -147,10 +112,6 @@ export class Tileset extends BaseObject<TilesetEvent> {
         return Result.Success();
     }
 
-    public isImageCollection(): boolean {
-        return this.type === TilesetType.ImageCollection;
-    }
-
     public getTileFromId(id: number): Tile | null {
         return this.tiles.find((tile) => tile.id === id) || null;
     }
@@ -158,7 +119,7 @@ export class Tileset extends BaseObject<TilesetEvent> {
     public getCoordinatesFromTile(id: number): Coordinate | null {
         const tileIndex = this.tiles.findIndex((tile) => tile.id === id);
         if (tileIndex === -1) return null;
-
+        if (this.columns <= 0) return null;
         const row = Math.floor(tileIndex / this.columns);
         const col = tileIndex % this.columns;
 
@@ -166,46 +127,30 @@ export class Tileset extends BaseObject<TilesetEvent> {
     }
 
     public getTileFromCoordinates(row: number, col: number): Tile | null {
+        if (this.columns <= 0) return null;
         const tileIndex = row * this.columns + col;
         return this.tiles[tileIndex] || null;
     }
 
-    public getCanvasWidth(gap = 0): number {
-        if (this.columns <= 0) return 0;
-        return this.columns * this.tilewidth + Math.max(0, this.columns - 1) * gap;
-    }
-
-    public getCanvasHeight(gap = 0): number {
-        if (this.rows <= 0) return 0;
-        return this.rows * this.tileheight + Math.max(0, this.rows - 1) * gap;
-    }
-
-    public updateTileset(tilesetData: TilesetData): void {
+    protected updateCommonData(tilesetData: TilesetData, type: TilesetType): void {
         this.name = tilesetData.name;
-        this.type = tilesetData.type ?? TilesetType.SingleImage;
+        this.type = type;
 
         this.columns = tilesetData.columns;
         this.rows = tilesetData.rows;
         this.tilewidth = tilesetData.tilewidth;
         this.tileheight = tilesetData.tileheight;
+    }
 
-        const imageSourceData = tilesetData.image ?? {
-            source: "",
-            width: this.columns * this.tilewidth,
-            height: this.rows * this.tileheight,
-        };
-        this.imageSource.setSource(imageSourceData);
+    protected createTile(tileData: TileData): Tile {
+        const tile = new Tile(tileData, this);
 
-        const nextTileData =
-            this.type === TilesetType.ImageCollection
-                ? tilesetData.tiles
-                : tilesetData.tiles.length > 0
-                    ? tilesetData.tiles
-                    : Array.from(
-                        { length: Math.max(0, this.columns * this.rows) },
-                        (_, index) => ({ id: index }),
-                    );
+        this.objectRegistry.register(tile);
 
+        return tile;
+    }
+
+    protected replaceTiles(nextTileData: TileData[]): void {
         const currentTilesById = new Map(
             this.tiles.map((tile) => [tile.id, tile]),
         );
@@ -227,73 +172,21 @@ export class Tileset extends BaseObject<TilesetEvent> {
                 return existingTile;
             }
 
-            const tile = new Tile(tileData, this);
-            this.objectRegistry.register(tile);
-            return tile;
+            return this.createTile(tileData);
         });
+    }
 
-        if (this.type === TilesetType.ImageCollection) {
-            this.recalculateCollectionMetrics();
-        }
-
+    protected emitTilesetUpdated(source: string): void {
         this.eventEmitter.emit("update");
         this.emitUpdateProperty("name", this.name, {
             origin: "external",
-            source: "Tileset.updateTileset",
+            source,
         });
     }
 
-    public updateImageSource(source: ImageSourceData, meta?: PropertyUpdateMeta): void {
-        this.imageSource.setSource(source);
-        this.emitUpdateProperty("imageSource", this.imageSource, {
-            origin: meta?.origin ?? "external",
-            source: meta?.source ?? "Tileset.updateImageSource",
-        });
-    }
+    public abstract updateTileset(tilesetData: TilesetData): void;
 
-    private recalculateCollectionMetrics(): void {
-        if (!this.isImageCollection()) return;
-
-        const tileCount = this.tiles.length;
-
-        if (tileCount === 0) {
-            this.columns = 1;
-            this.rows = 1;
-            this.tilewidth = Math.max(1, this.tilewidth);
-            this.tileheight = Math.max(1, this.tileheight);
-            return;
-        }
-
-        if (this.columns <= 0) {
-            this.columns = Math.ceil(Math.sqrt(tileCount));
-        }
-
-        this.rows = Math.ceil(tileCount / this.columns);
-
-        this.tilewidth = Math.max(
-            1,
-            ...this.tiles.map((tile) => tile.imageSource?.width ?? this.tilewidth),
-        );
-
-        this.tileheight = Math.max(
-            1,
-            ...this.tiles.map((tile) => tile.imageSource?.height ?? this.tileheight),
-        );
-    }
-
-    public serialize(): TilesetData {
-        return {
-            id: this.id,
-            name: this.name,
-            type: this.type,
-            columns: this.columns,
-            rows: this.rows,
-            tilewidth: this.tilewidth,
-            tileheight: this.tileheight,
-            image: this.isImageCollection() ? undefined : this.imageSource.serialize(),
-            tiles: this.tiles.map((tile) => tile.serialize()),
-        };
-    }
+    public abstract serialize(): TilesetData;
 
     public override destroy(): void {
         this.tiles.forEach((tile) => tile.destroy());
@@ -325,7 +218,10 @@ export class Tile extends BaseObject {
         readonly: true,
         pointLabel: { x: "Width", y: "Height" },
         visible: (target) => !!target.imageSource?.source,
-        get: (target) => ({ x: target.imageSource?.width ?? target.tileset.tilewidth, y: target.imageSource?.height ?? target.tileset.tileheight }),
+        get: (target) => ({
+            x: target.imageSource?.width ?? target.tileset.tilewidth,
+            y: target.imageSource?.height ?? target.tileset.tileheight,
+        }),
     })
     private imageSize: any;
 
@@ -335,19 +231,21 @@ export class Tile extends BaseObject {
         order: 1,
         readonly: true,
         pointLabel: { x: "Width", y: "Height" },
-        visible: (target) => { return target.imageSource == null },
-        get: (target) => ({ x: target.tileset.tilewidth, y: target.tileset.tileheight }),
+        visible: (target) => target.imageSource == null,
+        get: (target) => ({
+            x: target.tileset.tilewidth,
+            y: target.tileset.tileheight,
+        }),
     })
     private tileSize: any;
 
-    constructor(
+    public constructor(
         tileData: TileData,
-        public readonly tileset: Tileset
+        public readonly tileset: Tileset,
     ) {
         super(`${tileset.objectId}:tile:${tileData.id}`);
 
         this.id = tileData.id;
-
         this.imageSource = tileData.image ? new ImageSource(tileData.image) : null;
     }
 
@@ -371,3 +269,8 @@ export class Tile extends BaseObject {
         };
     }
 }
+
+type Coordinate = {
+    row: number;
+    col: number;
+};
