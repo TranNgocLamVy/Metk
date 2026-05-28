@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useState } from "react";
 
 import { Input } from "@/ui/components/shadcn/input";
 import { NumberPropertyClass } from "@/editor/properties/properties";
@@ -6,16 +6,28 @@ import { Result } from "@/shared/types/result";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Label } from "../shadcn/label";
 
+import {
+    getStepFromPrecision,
+    isAllowedNumberDraft,
+    isCompleteNumberInput,
+    matchesPrecision,
+    normalizeNumber,
+    toFiniteNumber,
+    useHorizontalNumberDrag,
+} from "./number-drag.utils";
+
 export interface NumberEditorProps {
     property: NumberPropertyClass<any>;
 }
 
 export function NumberPropertyEditor({ property }: NumberEditorProps) {
     const [error, setError] = useState<TranslatableMessage | null>(null);
-    const [draft, setDraft] = useState<string>(String(property.getter()));
+    const [draft, setDraft] = useState<string>(toDraftValue(property.getter(), property.precision));
+
+    const disabled = property.disabled() || property.readonly();
 
     const resetDraft = useCallback(() => {
-        setDraft(toDraftValue(property.getter()));
+        setDraft(toDraftValue(property.getter(), property.precision));
     }, [property]);
 
     const validateDraft = useCallback((rawValue: string): boolean => {
@@ -42,13 +54,52 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
 
         setError(null);
         return validateResult.status === Result.Status.Success;
-    }, [property, setError]);
+    }, [property]);
+
+    const applyValue = useCallback((rawValue: number, resetOnReject: boolean): boolean => {
+        const value = normalizeNumber(rawValue, property.precision);
+        const validateResult = property.validate(value);
+
+        setError(null);
+
+        switch (validateResult.status) {
+            case Result.Status.Error:
+                setError(validateResult.message ?? null);
+                if (resetOnReject) resetDraft();
+                return false;
+
+            case Result.Status.Cancel:
+                if (resetOnReject) resetDraft();
+                return false;
+
+            case Result.Status.Success:
+                property.setter(value);
+                setDraft(toDraftValue(property.getter(), property.precision));
+                return true;
+        }
+    }, [property, resetDraft]);
+
+    const { isDragging, dragProps } = useHorizontalNumberDrag({
+        disabled,
+        precision: property.precision,
+        min: property.min,
+        max: property.max,
+        wrapCursor: true,
+        getValue: () => toFiniteNumber(property.getter()),
+        onValueChange: (value) => applyValue(value, false),
+        onDragEnd: () => {
+            setError(null);
+            resetDraft();
+        },
+    });
 
     const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         const rawValue = event.target.value;
-        if (rawValue !== "" && Number.isNaN(Number(rawValue)) && rawValue !== "-" && rawValue !== "+") {
+
+        if (!isAllowedNumberDraft(rawValue)) {
             return;
         }
+
         setDraft(rawValue);
         validateDraft(rawValue);
     }, [validateDraft]);
@@ -66,23 +117,8 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
             return;
         }
 
-        const value = Number(rawValue);
-        const validateResult = property.validate(value);
-
-        setError(null);
-
-        switch (validateResult.status) {
-            case Result.Status.Error:
-            case Result.Status.Cancel:
-                resetDraft();
-                break;
-
-            case Result.Status.Success:
-                property.setter(value);
-                setDraft(toDraftValue(property.getter()));
-                break;
-        }
-    }, [property, resetDraft, setError]);
+        applyValue(Number(rawValue), true);
+    }, [property.precision, resetDraft, applyValue]);
 
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
@@ -93,75 +129,48 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
             resetDraft();
             event.currentTarget.blur();
         }
-    }, [draft, handleConfirmChange, resetDraft, setError]);
+    }, [draft, handleConfirmChange, resetDraft]);
 
     return (
         <div className="px-2 h-8">
             <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] h-full items-center gap-2">
-                <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <Label
+                    title={property.label}
+                    {...dragProps}
+                    className={[
+                        "text-2xs min-w-0 truncate select-none",
+                        disabled ? "cursor-default" : "cursor-ew-resize",
+                        isDragging ? "text-primary" : "",
+                    ].join(" ")}
+                >
                     <LocalizedText message={property.label} />
                 </Label>
+
                 <Input
                     type="text"
                     inputMode="decimal"
                     value={draft}
                     min={property.min}
                     max={property.max}
-                    step={property.precision}
+                    step={getStepFromPrecision(property.precision)}
                     readOnly={property.readonly()}
-                    disabled={property.disabled() || property.readonly()}
+                    disabled={disabled}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     onBlur={() => handleConfirmChange(draft)}
                     className="h-6 text-2xs"
                 />
             </div>
-            {error && <span className="mt-1 pl-[calc(40%+0.5rem)] text-2xs text-destructive"><LocalizedText message={error} /></span>}
-        </div>
 
+            {error && (
+                <span className="mt-1 pl-[calc(40%+0.5rem)] text-2xs text-destructive">
+                    <LocalizedText message={error} />
+                </span>
+            )}
+        </div>
     );
 }
 
-function toDraftValue(value: number): string {
-    return String(value);
-}
-
-function isCompleteNumberInput(rawValue: string): boolean {
-    if (rawValue.trim() === "") return false;
-    if (rawValue === "-" || rawValue === "+") return false;
-    if (rawValue.endsWith(".")) return false;
-
-    return Number.isFinite(Number(rawValue));
-}
-
-function getDecimalPlaces(rawValue: string): number {
-    const normalized = rawValue.toLowerCase();
-
-    // Handle scientific notation, e.g. 1e-3 has 3 decimal places.
-    if (normalized.includes("e")) {
-        const value = Number(normalized);
-        if (!Number.isFinite(value)) return Number.POSITIVE_INFINITY;
-
-        const [, exponentPart] = normalized.split("e");
-        const exponent = Number(exponentPart);
-        const mantissaDecimalPlaces = normalized.split("e")[0].split(".")[1]?.length ?? 0;
-
-        return Math.max(0, mantissaDecimalPlaces - exponent);
-    }
-
-    return normalized.split(".")[1]?.length ?? 0;
-}
-
-function matchesPrecision(rawValue: string, precision: number | undefined): boolean {
-    if (precision === undefined) return true;
-    if (!Number.isInteger(precision) || precision < 0) return true;
-
-    return getDecimalPlaces(rawValue) <= precision;
-}
-
-function getStepFromPrecision(precision: number | undefined): number | undefined {
-    if (precision === undefined) return undefined;
-    if (!Number.isInteger(precision) || precision < 0) return undefined;
-
-    return 1 / 10 ** precision;
+function toDraftValue(value: number, precision?: number): string {
+    return String(normalizeNumber(toFiniteNumber(value), precision));
 }

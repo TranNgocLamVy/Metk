@@ -4,6 +4,7 @@ import { Result } from "@/shared/types/result";
 import { BaseObject, BaseObjectEvents } from "../../base-object";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { BooleanProperty, NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import { Tilemap } from "../tilemap";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
     
@@ -76,10 +77,17 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     public parentLayer: IGroupLayer;
 
+    public get tilesetRefManager() {
+        return this.tilemap.tilesetRefManager;
+    }
+
+    public get rulesetRefManager() {
+        return this.tilemap.rulesetRefManager;
+    }
+
     constructor(
         id: string, 
-        public readonly tilesetRefManager: TilesetRefManager, 
-        public readonly rulesetRefManager: RulesetRefManager,
+        public readonly tilemap: Tilemap,
         public readonly objectIdScope: string = "object",
         layerType: string = "Unknow"
     ) {

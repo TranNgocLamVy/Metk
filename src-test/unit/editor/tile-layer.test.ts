@@ -3,12 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { TileLayerData } from "@/shared/schema/layer.schema";
-import { createReferenceContext, loadTilesetRefs } from "./editor-test-utils";
+import { createReferenceContext, createTilemap, loadTilesetRefs } from "./editor-test-utils";
 
 const createTileLayer = (overrides: Partial<TileLayerData> = {}) => {
     const context = createReferenceContext({ tilesets: ["tileset-a", "tileset-b"] });
     loadTilesetRefs(context.tilesetRefManager, ["tileset-a", "tileset-b"]);
-    const parent = new RootLayer([], context.tilesetRefManager, context.rulesetRefManager);
+    const tilemap = createTilemap(context);
+    const parent = new RootLayer([], tilemap);
     const data: TileLayerData = {
         id: "tile-layer",
         type: "tile",
@@ -27,7 +28,7 @@ const createTileLayer = (overrides: Partial<TileLayerData> = {}) => {
     };
 
     return {
-        layer: new TileLayer(data, parent, context.tilesetRefManager, context.rulesetRefManager),
+        layer: new TileLayer(data, parent, tilemap),
         context,
     };
 };

@@ -1,12 +1,11 @@
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { LayerData, RootLayerData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layer.utils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { GroupLayer } from "./group-layer";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { BaseObject } from "../../base-object";
+import { Tilemap } from "../tilemap";
 
 interface RootLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -19,11 +18,10 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
 
     constructor(
         layersData: RootLayerData, 
-        tilesetRefManager: TilesetRefManager, 
-        rulesetRefManager: RulesetRefManager,
+        tilemap: Tilemap,
         objectIdScope: string = "tilemap:unknown"
     ) {
-        super("root", tilesetRefManager, rulesetRefManager, objectIdScope, "Root Layer");
+        super("root", tilemap, objectIdScope, "Root Layer");
 
         layersData.forEach(layerData => {
             const layer = this.createLayerTree(layerData, this);
@@ -32,13 +30,7 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
     }
 
     private createLayerTree(layerData: LayerData, parentLayer: IGroupLayer): BaseLayer<any> | null {
-        const layer = LayerUtils.createLayerFromData(
-            layerData,
-            parentLayer,
-            this.tilesetRefManager,
-            this.rulesetRefManager,
-            this.objectIdScope
-        );
+        const layer = LayerUtils.createLayerFromData(layerData, parentLayer, this.tilemap, this.objectIdScope);
         return layer;
     }
 

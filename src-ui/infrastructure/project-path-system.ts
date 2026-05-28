@@ -27,6 +27,8 @@ export class ProjectPathSystem {
 export class FilePathSystem {
     public relDir: string;
     public get relPath(): string { return PathUtils.join(this.relDir, this.fileName); }
+    public get absDir(): string { return PathUtils.join(this.parent.absDir, this.relDir); }
+    public get absPath(): string { return PathUtils.join(this.absDir, this.fileName); }
     public fileName: string;
     public readonly fileExtension: string;
     public constructor(
@@ -55,7 +57,6 @@ export class FilePathSystem {
     }
 
     public getRelPathFromAbsPath(absPath: string): string {
-        const relDir = PathUtils.relative(this.parent.absDir, absPath);
-        return PathUtils.join(relDir, PathUtils.basename(absPath));
+        return PathUtils.relative(this.absDir, absPath);
     }
 }

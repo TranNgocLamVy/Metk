@@ -1,12 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
-import { BooleanProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import { BooleanProperty, ImageSourceProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { ImageLayerData } from "@/shared/schema/layer.schema";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import type { ImageSourceData } from "@/shared/schema/image-source.schema";
+import { Tilemap } from "../tilemap";
+import { Result } from "@/shared/types/result";
 
 export interface ImageLayerEvents extends BaseLayerEvents {
     imageChanged: () => void;
@@ -59,11 +58,12 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     })
     public parallax: Point2D = { x: 1, y: 1 }
 
-    @StringProperty<ImageLayer>({
+    @ImageSourceProperty<ImageLayer>({
         label: "Source",
         group: "Image",
-        readonly: true,
-        get: (target) => target.imageSource.source,
+        get: (target) => target.imageSource,
+        set: (target, value) => { target.updateImage(value) },
+        absToRef: (target, absPath) => { return target.tilemap.tilemapPathSystem.getRelPathFromAbsPath(absPath) }
     })
     public imageSource: ImageSourceData;
 
@@ -81,17 +81,10 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     constructor(
         imageLayerData: ImageLayerData,
         parentLayer: IGroupLayer,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
+        tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope,
     ) {
-        super(
-            imageLayerData.id,
-            tilesetRefManager,
-            rulesetRefManager,
-            objectIdScope,
-            "Image Layer",
-        );
+        super(imageLayerData.id, tilemap, objectIdScope, "Image Layer");
 
         this.parentLayer = parentLayer;
 
@@ -170,13 +163,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         const layerData = this.serialize();
         layerData.id = uuidv4();
 
-        return new ImageLayer(
-            layerData,
-            this.parentLayer,
-            this.tilesetRefManager,
-            this.rulesetRefManager,
-            this.objectIdScope,
-        );
+        return new ImageLayer(layerData, this.parentLayer, this.tilemap, this.objectIdScope);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

@@ -14,6 +14,8 @@ import {
     Point2DPropertyClass,
     Point3DPropertyOptions,
     Point3DPropertyClass,
+    ImageSourcePropertyOptions,
+    ImageSourcePropertyClass,
 } from "./properties";
 
 type PropertyOwner = {
@@ -109,5 +111,12 @@ export function Point3DProperty<TTarget>(options: Point3DPropertyOptions<TTarget
     return function (target, propertyKey) {
         const key = propertyKey.toString();
         addPropertyFactory<TTarget>(target, { key, create: instance => new Point3DPropertyClass<TTarget>(instance, options)});
+    };
+}
+
+export function ImageSourceProperty<TTarget>(options: ImageSourcePropertyOptions<TTarget>): PropertyDecorator {
+    return function (target, propertyKey) {
+        const key = propertyKey.toString();
+        addPropertyFactory<TTarget>(target, { key, create: instance => new ImageSourcePropertyClass<TTarget>(instance, options)});
     };
 }

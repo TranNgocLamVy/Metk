@@ -6,6 +6,7 @@ import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { RuleLayerData } from "@/shared/schema/layer.schema";
 import {
     createReferenceContext,
+    createTilemap,
     createRulesetData,
     loadRulesetRefs,
     loadTilesetRefs,
@@ -31,7 +32,8 @@ const createRuleLayer = (overrides: Partial<RuleLayerData> = {}) => {
     );
     registerLoadedRuleset(context.rulesetManager, ruleset);
 
-    const parent = new RootLayer([], context.tilesetRefManager, context.rulesetRefManager);
+    const tilemap = createTilemap(context);
+    const parent = new RootLayer([], tilemap);
     const data: RuleLayerData = {
         id: "rule-layer",
         type: "auto_rule",
@@ -50,7 +52,7 @@ const createRuleLayer = (overrides: Partial<RuleLayerData> = {}) => {
     };
 
     return {
-        layer: new RuleLayer(data, parent, context.tilesetRefManager, context.rulesetRefManager),
+        layer: new RuleLayer(data, parent, tilemap),
         context,
     };
 };

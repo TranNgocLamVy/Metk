@@ -54,7 +54,7 @@ export class DeleteLayerCommand implements IUndoableCommand {
         const parent = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
         if (!parent || !isLayerInTilemap(tilemap, parent) || !isLayerContainer(parent)) return Result.Error("Parent layer not found");
 
-        const restoredLayer = LayerUtils.createLayerFromData(this.layerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, tilemap.objectId);
+        const restoredLayer = LayerUtils.createLayerFromData(this.layerData, parent, tilemap, tilemap.objectId);
         if (!restoredLayer) {
             return Result.Error("Failed to restore deleted layer");
         }

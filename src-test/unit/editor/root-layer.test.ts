@@ -2,10 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { createReferenceContext } from "./editor-test-utils";
+import { createReferenceContext, createTilemap } from "./editor-test-utils";
 
 const createRootLayer = () => {
     const context = createReferenceContext();
+    const tilemap = createTilemap(context);
     const rootLayer = new RootLayer(
         [
             {
@@ -50,11 +51,10 @@ const createRootLayer = () => {
                 layerData: "0,0\n0,0",
             },
         ],
-        context.tilesetRefManager,
-        context.rulesetRefManager,
+        tilemap,
     );
 
-    return { rootLayer, context };
+    return { rootLayer, context, tilemap };
 };
 
 describe("RootLayer", () => {
@@ -87,7 +87,7 @@ describe("RootLayer", () => {
     });
 
     it("inserts and removes direct children with explicit result statuses", () => {
-        const { rootLayer, context } = createRootLayer();
+        const { rootLayer, tilemap } = createRootLayer();
         const insertedLayer = new TileLayer(
             {
                 id: "inserted-tile",
@@ -105,8 +105,7 @@ describe("RootLayer", () => {
                 layerData: "0",
             },
             rootLayer,
-            context.tilesetRefManager,
-            context.rulesetRefManager,
+            tilemap,
         );
 
         expect(rootLayer.insertLayer(insertedLayer, 1).status).toBe("Success");

@@ -46,13 +46,7 @@ export class CreateImageLayerCommand implements IUndoableCommand {
             tilemap.rootLayer,
         );
 
-        const newImageLayer = new ImageLayer(
-            this.imageLayerData,
-            parent,
-            parent.tilesetRefManager,
-            parent.rulesetRefManager,
-            tilemap.objectId,
-        );
+        const newImageLayer = new ImageLayer(this.imageLayerData, parent, tilemap, tilemap.objectId);
 
         parent.addLayer(newImageLayer);
         objectRegistry.registerTree(newImageLayer);

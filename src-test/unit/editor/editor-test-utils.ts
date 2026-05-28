@@ -6,6 +6,8 @@ import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { RulesetData } from "@/shared/schema/ruleset.schema";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { RootLayerData } from "@/shared/schema/layer.schema";
 
 type ReferenceContextOptions = {
     tilesets?: string[];
@@ -63,6 +65,29 @@ export const loadTilesetRefs = (manager: TilesetRefManager, ids: string[]) => {
 
 export const loadRulesetRefs = (manager: RulesetRefManager, ids: string[]) => {
     manager.loadData(ids.map((id, index) => ({ id, index, name: `${id} name` })), ids.length);
+};
+
+export const createTilemap = (
+    context: ReturnType<typeof createReferenceContext>,
+    layers: RootLayerData = [],
+): Tilemap => {
+    return new Tilemap(
+        {
+            id: "tilemap-a",
+            name: "Tilemap A",
+            orientation: "orthogonal",
+            width: 8,
+            height: 8,
+            tilewidth: 16,
+            tileheight: 16,
+            tilesets: context.tilesetRefManager.serialize(),
+            rulesets: context.rulesetRefManager.serialize(),
+            layers,
+        },
+        context.filePathSystem,
+        context.tilesetRefManager,
+        context.rulesetRefManager,
+    );
 };
 
 export const createRulesetData = (overrides: Partial<RulesetData> = {}): RulesetData => ({

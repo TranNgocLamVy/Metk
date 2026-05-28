@@ -1,13 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { TileLayerData, TileRefData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
+import { Tilemap } from "../tilemap";
 
 interface TileLayerEvents extends BaseLayerEvents {
     tilesChanged: (coords: Coordinate[]) => void
@@ -55,11 +54,10 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     constructor(
         tileLayerData: TileLayerData,
         parentLayer: IGroupLayer,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
+        tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope
     ) {
-        super(tileLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope, "Tile Layer");
+        super(tileLayerData.id, tilemap, objectIdScope, "Tile Layer");
 
         this.parentLayer = parentLayer;
 
@@ -195,7 +193,7 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public override clone(): TileLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new TileLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
+        return new TileLayer(layerData, this.parentLayer, this.tilemap, this.objectIdScope);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

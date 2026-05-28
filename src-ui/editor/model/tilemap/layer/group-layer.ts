@@ -1,13 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { GroupLayerData, LayerData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { LayerUtils } from "@/shared/utils/layer.utils";
 import { BaseObject } from "../../base-object";
+import { Tilemap } from "../tilemap";
 
 interface GroupLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -22,11 +20,10 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     constructor(
         groupLayerData: GroupLayerData,
         parentLayer: IGroupLayer,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
+        tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope
     ) {
-        super(groupLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope, "Group Layer");
+        super(groupLayerData.id, tilemap, objectIdScope, "Group Layer");
 
         this.parentLayer = parentLayer;
 
@@ -45,13 +42,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     }
 
     private createLayerTree(layerData: LayerData, parentLayer: IGroupLayer): BaseLayer<any> | null {
-        const layer = LayerUtils.createLayerFromData(
-            layerData,
-            parentLayer,
-            this.tilesetRefManager,
-            this.rulesetRefManager,
-            this.objectIdScope
-        );
+        const layer = LayerUtils.createLayerFromData(layerData, parentLayer, this.tilemap, this.objectIdScope);
         return layer;
     }
 
@@ -138,7 +129,7 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         const groupLayerData = this.serialize();
         groupLayerData.id = uuidv4();
         groupLayerData.layers = groupLayerData.layers!.map((layerData) => GroupLayer.cloneLayerDataWithNewIds(layerData));
-        return new GroupLayer(groupLayerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
+        return new GroupLayer(groupLayerData, this.parentLayer, this.tilemap, this.objectIdScope);
     }
 
     private static cloneLayerDataWithNewIds(layerData: LayerData): LayerData {

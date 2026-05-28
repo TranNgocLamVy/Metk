@@ -1,14 +1,11 @@
-import { Point } from "pixi.js";
 import { v4 as uuidv4 } from "uuid";
-
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { RuleLayerData, RulesetRefData } from "@/shared/schema/layer.schema";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
+import { Tilemap } from "../tilemap";
 
 interface RuleLayerEvents extends BaseLayerEvents {
     rulesetRefsOutputChanged: (coordinates: Coordinate[]) => void
@@ -51,11 +48,10 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     constructor(
         ruleLayerData: RuleLayerData,
         parentLayer: IGroupLayer,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
+        tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope,
     ) {
-        super(ruleLayerData.id, tilesetRefManager, rulesetRefManager, objectIdScope, "Rule Layer");
+        super(ruleLayerData.id, tilemap, objectIdScope, "Rule Layer");
 
         this.parentLayer = parentLayer;
         this.name = ruleLayerData.name ?? "Unknow Rule Layer";
@@ -298,7 +294,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
     public override clone(): RuleLayer {
         const layerData = this.serialize();
         layerData.id = uuidv4();
-        return new RuleLayer(layerData, this.parentLayer, this.tilesetRefManager, this.rulesetRefManager, this.objectIdScope);
+        return new RuleLayer(layerData, this.parentLayer, this.tilemap, this.objectIdScope);
     }
 
     public override traverse(cb: (layer: BaseLayer<any>) => void): void {

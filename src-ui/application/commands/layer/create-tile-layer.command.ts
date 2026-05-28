@@ -29,7 +29,7 @@ export class CreateTileLayerCommand implements IUndoableCommand {
 
         const parent = resolveLayerInsertionParent(targetLayer, tilemap.rootLayer);
 
-        const newTileLayer = new TileLayer(this.tileLayerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, tilemap.objectId);
+        const newTileLayer = new TileLayer(this.tileLayerData, parent, tilemap, tilemap.objectId);
         parent.addLayer(newTileLayer);
         objectRegistry.registerTree(newTileLayer);
         

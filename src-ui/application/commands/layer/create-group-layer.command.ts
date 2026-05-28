@@ -29,7 +29,7 @@ export class CreateGroupLayerCommand implements IUndoableCommand {
 
         const parent = resolveLayerInsertionParent(targetLayer, tilemap.rootLayer);
 
-        const newGroupLayer = new GroupLayer(this.groupLayerData, parent, parent.tilesetRefManager, parent.rulesetRefManager, tilemap.objectId);
+        const newGroupLayer = new GroupLayer(this.groupLayerData, parent, tilemap, tilemap.objectId);
         parent.addLayer(newGroupLayer);
         objectRegistry.registerTree(newGroupLayer);
 

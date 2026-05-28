@@ -1,22 +1,17 @@
-use std::fs;
-use std::path::PathBuf;
+use tauri::{PhysicalPosition, Window};
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn set_cursor_position(window: Window, x: f64, y: f64) -> Result<(), String> {
+    window
+        .set_cursor_position(PhysicalPosition::new(x, y))
+        .map_err(|err| err.to_string())
 }
 
 #[tauri::command]
-fn read_png_file(path: String) -> Result<Vec<u8>, String> {
-    let path_buf = PathBuf::from(path);
-    if !path_buf.exists() {
-        return Err("File does not exist.".to_string());
-    }
-    match fs::read(&path_buf) {
-        Ok(bytes) => Ok(bytes),
-        Err(err) => Err(format!("Failed to read file: {}", err)),
-    }
+fn set_cursor_visible(window: Window, visible: bool) -> Result<(), String> {
+    window
+        .set_cursor_visible(visible)
+        .map_err(|err| err.to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -25,7 +20,10 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![greet, read_png_file])
+        .invoke_handler(tauri::generate_handler![
+            set_cursor_position,
+            set_cursor_visible,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

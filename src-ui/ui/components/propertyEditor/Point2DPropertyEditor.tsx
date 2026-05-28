@@ -8,6 +8,14 @@ import { ChevronUp } from "lucide-react";
 import { LocalizedText } from "../custom/LocalizeText";
 import { Label } from "../shadcn/label";
 
+import {
+    isAllowedNumberDraft,
+    isCompleteNumberInput,
+    normalizeNumber,
+    toFiniteNumber,
+    useHorizontalNumberDrag,
+} from "./number-drag.utils";
+
 type Point2DDraft = Record<keyof Point2D, string>;
 
 export interface Point2DEditorProps {
@@ -16,25 +24,21 @@ export interface Point2DEditorProps {
 
 export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
     const [error, setError] = useState<TranslatableMessage | null>(null);
-
     const [isOpen, setIsOpen] = useState<boolean>(true);
-    const toggleOpen = useCallback(() => {
-        setIsOpen(!isOpen);
-    }, [isOpen])
-
     const [draft, setDraft] = useState<Point2DDraft>(() => toDraftValue(property.getter()));
+
+    const disabled = property.disabled() || property.readonly();
+
+    const toggleOpen = useCallback(() => {
+        setIsOpen((current) => !current);
+    }, []);
 
     const resetDraft = useCallback(() => {
         setDraft(toDraftValue(property.getter()));
     }, [property]);
 
-    const validateDraft = useCallback((nextDraft: Point2DDraft): boolean => {
-        if (!isCompletePointInput(nextDraft)) {
-            setError(null);
-            return false;
-        }
-
-        const validateResult = property.validate(toPointValue(nextDraft));
+    const validatePoint = useCallback((value: Point2D): boolean => {
+        const validateResult = property.validate(value);
 
         if (validateResult.status === Result.Status.Error) {
             setError(validateResult.message ?? null);
@@ -43,10 +47,54 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
 
         setError(null);
         return validateResult.status === Result.Status.Success;
-    }, [property, setError]);
+    }, [property]);
+
+    const validateDraft = useCallback((nextDraft: Point2DDraft): boolean => {
+        if (!isCompletePointInput(nextDraft)) {
+            setError(null);
+            return false;
+        }
+
+        return validatePoint(toPointValue(nextDraft));
+    }, [validatePoint]);
+
+    const applyPointValue = useCallback((value: Point2D, resetOnReject: boolean): boolean => {
+        const validateResult = property.validate(value);
+
+        setError(null);
+
+        switch (validateResult.status) {
+            case Result.Status.Error:
+                setError(validateResult.message ?? null);
+                if (resetOnReject) resetDraft();
+                return false;
+
+            case Result.Status.Cancel:
+                if (resetOnReject) resetDraft();
+                return false;
+
+            case Result.Status.Success:
+                property.setter(value);
+                setDraft(toDraftValue(value));
+                return true;
+        }
+    }, [property, resetDraft]);
+
+    const applyAxisValue = useCallback((axis: keyof Point2D, rawValue: number, resetOnReject: boolean): boolean => {
+        const currentValue = property.getter();
+
+        const nextValue: Point2D = {
+            x: currentValue.x,
+            y: currentValue.y,
+            [axis]: normalizeNumber(rawValue, undefined),
+        };
+
+        return applyPointValue(nextValue, resetOnReject);
+    }, [property, applyPointValue]);
 
     const handleChange = useCallback((axis: keyof Point2D, event: ChangeEvent<HTMLInputElement>) => {
         const rawValue = event.target.value;
+
         if (!isAllowedNumberDraft(rawValue)) {
             return;
         }
@@ -63,23 +111,8 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
             return;
         }
 
-        const value = toPointValue(nextDraft);
-        const validateResult = property.validate(value);
-
-        setError(null);
-
-        switch (validateResult.status) {
-            case Result.Status.Error:
-            case Result.Status.Cancel:
-                resetDraft();
-                break;
-
-            case Result.Status.Success:
-                property.setter(value);
-                setDraft(toDraftValue(value));
-                break;
-        }
-    }, [property, resetDraft, setError]);
+        applyPointValue(toPointValue(nextDraft), true);
+    }, [applyPointValue, resetDraft]);
 
     const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
@@ -90,10 +123,11 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
             resetDraft();
             event.currentTarget.blur();
         }
-    }, [draft, handleConfirmChange, resetDraft, setError]);
+    }, [draft, handleConfirmChange, resetDraft]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
         const nextFocusedElement = event.relatedTarget;
+
         if (nextFocusedElement instanceof Node && event.currentTarget.contains(nextFocusedElement)) {
             return;
         }
@@ -105,48 +139,101 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
         <VStack className="px-2">
             <div className="flex h-8 items-center gap-2" onClick={toggleOpen}>
                 <ChevronUp size={14} className={`${isOpen ? "rotate-180" : "rotate-90"} duration-50`} />
+
                 <Label title={property.label} className="text-2xs min-w-0 truncate">
                     <LocalizedText message={property.label} />
                 </Label>
             </div>
+
             {isOpen && (
                 <HStack className="gap-2 pb-2" onBlur={handleBlur}>
                     <PointAxisInput
+                        axis="x"
                         label={property.pointLabel.x}
                         value={draft.x}
-                        disabled={property.disabled() || property.readonly()}
+                        disabled={disabled}
                         readOnly={property.readonly()}
+                        getValue={() => toFiniteNumber(property.getter().x)}
+                        onDragValueChange={(value) => applyAxisValue("x", value, false)}
+                        onDragEnd={() => {
+                            setError(null);
+                            resetDraft();
+                        }}
                         onChange={(event) => handleChange("x", event)}
                         onKeyDown={handleKeyDown}
                     />
+
                     <PointAxisInput
+                        axis="y"
                         label={property.pointLabel.y}
                         value={draft.y}
-                        disabled={property.disabled() || property.readonly()}
+                        disabled={disabled}
                         readOnly={property.readonly()}
+                        getValue={() => toFiniteNumber(property.getter().y)}
+                        onDragValueChange={(value) => applyAxisValue("y", value, false)}
+                        onDragEnd={() => {
+                            setError(null);
+                            resetDraft();
+                        }}
                         onChange={(event) => handleChange("y", event)}
                         onKeyDown={handleKeyDown}
                     />
                 </HStack>
             )}
-            {error && <span className="mt-1 pl-[calc(40%+0.5rem)] text-2 text-destructive"><LocalizedText message={error} /></span>}
+
+            {error && (
+                <span className="mt-1 pl-[calc(40%+0.5rem)] text-2xs text-destructive">
+                    <LocalizedText message={error} />
+                </span>
+            )}
         </VStack>
-    )
+    );
 }
 
-function PointAxisInput({ label, value, disabled, readOnly, onChange, onKeyDown }: {
+function PointAxisInput({
+    label,
+    value,
+    disabled,
+    readOnly,
+    getValue,
+    onDragValueChange,
+    onDragEnd,
+    onChange,
+    onKeyDown,
+}: {
+    axis: keyof Point2D;
     label: string;
     value: string;
     disabled: boolean;
     readOnly: boolean;
+    getValue: () => number;
+    onDragValueChange: (value: number) => boolean | void;
+    onDragEnd: () => void;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
 }) {
+    const { isDragging, dragProps } = useHorizontalNumberDrag({
+        disabled,
+        getValue,
+        onValueChange: onDragValueChange,
+        onDragEnd,
+        wrapCursor: true,
+    });
+
     return (
         <div className="flex w-full items-center gap-1">
-            <span className="max-w-10 shrink-0 truncate text-[10px] text-shadow-foreground" title={label}>
+            <span
+                {...dragProps}
+                className={[
+                    "min-w-6 max-w-20 shrink-0 truncate text-[10px] text-shadow-foreground select-none",
+                    disabled ? "cursor-default" : "cursor-ew-resize",
+                    isDragging ? "text-primary" : "",
+                ].join(" ")}
+                title={label}
+            >
                 {label}
             </span>
+
             <Input
                 className="h-6 text-2xs px-1.5"
                 type="text"
@@ -177,16 +264,4 @@ function toPointValue(value: Point2DDraft): Point2D {
 
 function isCompletePointInput(value: Point2DDraft): boolean {
     return isCompleteNumberInput(value.x) && isCompleteNumberInput(value.y);
-}
-
-function isAllowedNumberDraft(rawValue: string): boolean {
-    return rawValue === "" || rawValue === "-" || rawValue === "+" || !Number.isNaN(Number(rawValue));
-}
-
-function isCompleteNumberInput(rawValue: string): boolean {
-    if (rawValue.trim() === "") return false;
-    if (rawValue === "-" || rawValue === "+") return false;
-    if (rawValue.endsWith(".")) return false;
-
-    return Number.isFinite(Number(rawValue));
 }

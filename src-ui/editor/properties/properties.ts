@@ -1,3 +1,4 @@
+import { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { Result } from "@/shared/types/result";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,7 +9,7 @@ export interface BasePropertyOptions<TTarget> {
     label: string;
     group?: ResolvableString<TTarget>;
     order?: number;
-    readonly?: ResolvableBoolean<TTarget>; 
+    readonly?: ResolvableBoolean<TTarget>;
     visible?: ResolvableBoolean<TTarget>;
     disabled?: ResolvableBoolean<TTarget>;
     set?: (target: TTarget, value: any) => void;
@@ -171,14 +172,32 @@ export class Point3DPropertyClass<TTarget> extends BaseProperty<TTarget> {
     }
 }
 
-export interface ImageSourcePropertyOptions<TTarget> extends BasePropertyOptions<TTarget> {
-    set?: (target: TTarget, value: { source: string, width: number, height: number }) => void;
-    get: (target: TTarget) => String;
-    validate?: (target: TTarget, value: { source: string, width: number, height: number }) => Result;
-}
+type ImageSourcePropertyCommonOptions<TTarget> = Omit<BasePropertyOptions<TTarget>, "set" | "get" | "validate"> & {
+    get: (target: TTarget) => ImageSourceData;
+    validate?: (target: TTarget, value: ImageSourceData) => Result;
+};
+
+type ImageSourcePropertyReadonlyOptions<TTarget> = {
+    set?: never;
+    absToRef?: never;
+};
+
+type ImageSourcePropertyWritableOptions<TTarget> = {
+    set: (target: TTarget, value: ImageSourceData) => void;
+    absToRef: (target: TTarget, absPath: string) => string;
+};
+
+export type ImageSourcePropertyOptions<TTarget> =
+    ImageSourcePropertyCommonOptions<TTarget> &
+    (
+        | ImageSourcePropertyReadonlyOptions<TTarget>
+        | ImageSourcePropertyWritableOptions<TTarget>
+    );
 
 export class ImageSourcePropertyClass<TTarget> extends BaseProperty<TTarget> {
+    public readonly absToRef: (absPath: string) => string;
     constructor(target: TTarget, options: ImageSourcePropertyOptions<TTarget>) {
         super(target, options);
+        this.absToRef =  (value) => options.absToRef ? options.absToRef(this.target, value) : value;
     }
 }

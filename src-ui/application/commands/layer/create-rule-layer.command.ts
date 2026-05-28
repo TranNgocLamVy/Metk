@@ -30,7 +30,7 @@ export class CreateRuleLayerCommand implements IUndoableCommand {
 
         const parent = resolveLayerInsertionParent(targetLayer, tilemap.rootLayer);
 
-        const newRuleLayer = new RuleLayer(this.ruleLayerData, parent, parent.tilesetRefManager, tilemap.rulesetRefManager, tilemap.objectId);
+        const newRuleLayer = new RuleLayer(this.ruleLayerData, parent, tilemap, tilemap.objectId);
         parent.addLayer(newRuleLayer);
         objectRegistry.registerTree(newRuleLayer);
 

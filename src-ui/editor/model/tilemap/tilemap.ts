@@ -91,7 +91,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.tilesetRefManager.loadData(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
         this.rulesetRefManager.loadData(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
 
-        this.rootLayer = new RootLayer(tilemapData.layers, this.tilesetRefManager, this.rulesetRefManager, this.objectId);
+        this.rootLayer = new RootLayer(tilemapData.layers, this, this.objectId);
     }
 
     public rename(newName: string) {
