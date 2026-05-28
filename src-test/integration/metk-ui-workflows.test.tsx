@@ -203,10 +203,10 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
 
 import Workspace from "@/ui/components/workspace/Workspace";
 import WorkspaceConsole from "@/ui/components/workspace/console/Console";
-import LayerManager from "@/ui/components/workspace/layerManager/LayerManager";
-import RulesetManager from "@/ui/components/workspace/rulesetManager/RulesetManager";
-import TilemapEditor from "@/ui/components/workspace/tilemapEditor/TilemapEditor";
-import TilesetViewSelector from "@/ui/components/workspace/tilesetView/TilesetViewSelector";
+import LayerManager from "@/ui/components/workspace/layer-manager/LayerManager";
+import RulesetManager from "@/ui/components/workspace/ruleset-manager/RulesetManager";
+import TilemapEditor from "@/ui/components/workspace/tilemap-editor/TilemapEditor";
+import TilesetViewSelector from "@/ui/components/workspace/tileset-view/TilesetViewSelector";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";

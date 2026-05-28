@@ -27,12 +27,12 @@ vi.mock("react-color", () => ({
     ),
 }));
 
-import { CheckBoxField } from "@/ui/components/formField/CheckboxField";
-import { ColorPickerField } from "@/ui/components/formField/ColorPickerField";
-import FilePickerField from "@/ui/components/formField/FilePickerField";
-import FolderPickerField from "@/ui/components/formField/FolderPickerField";
-import { NumberInputField } from "@/ui/components/formField/NumberInputField";
-import { TextInputField } from "@/ui/components/formField/TextInputField";
+import { CheckBoxField } from "@/ui/components/form-field/CheckboxField";
+import { ColorPickerField } from "@/ui/components/form-field/ColorPickerField";
+import FilePickerField from "@/ui/components/form-field/FilePickerField";
+import FolderPickerField from "@/ui/components/form-field/FolderPickerField";
+import { NumberInputField } from "@/ui/components/form-field/NumberInputField";
+import { TextInputField } from "@/ui/components/form-field/TextInputField";
 
 function ControlledTextField({ onChange }: { onChange: (fieldName: string, raw: unknown) => void }) {
     const [value, setValue] = useState("Untitled");

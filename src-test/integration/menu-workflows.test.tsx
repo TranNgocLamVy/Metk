@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import MenuBar from "@/ui/components/menuBar/MenuBar";
+import MenuBar from "@/ui/components/menu-bar/MenuBar";
 import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";

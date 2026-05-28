@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { groupProperties } from "@/editor/properties/group-properties.utils";
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { PropertyGroup } from "@/ui/components/workspace/propertyPanel/PropertyGroup";
+import { PropertyGroup } from "@/ui/components/workspace/properties-panel/PropertyGroup";
 
 import { useEditTileset } from "./ContextProvider";
 

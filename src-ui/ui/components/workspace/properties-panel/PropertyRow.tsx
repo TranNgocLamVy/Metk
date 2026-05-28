@@ -1,11 +1,11 @@
 import { BaseProperty, BooleanPropertyClass, EnumPropertyClass, ImageSourcePropertyClass, NumberPropertyClass, Point2DPropertyClass, StringPropertyClass } from "@/editor/properties/properties";
-import { StringPropertyEditor } from "../../propertyEditor/StringPropertyEditor";
-import { SliderPropertyEditor } from "../../propertyEditor/SliderPropertyEditor";
-import { NumberPropertyEditor } from "../../propertyEditor/NumberPropertyEditor";
-import { BooleanPropertyEditor } from "../../propertyEditor/BooleanPropertyEditor";
-import { EnumPropertyEditor } from "../../propertyEditor/EnumPropertyEditor";
-import { Point2DPropertyEditor } from "../../propertyEditor/Point2DPropertyEditor";
-import { ImageSourcePropertyEditor } from "../../propertyEditor/ImageSourcePropertyEditor";
+import { StringPropertyEditor } from "../../property-editor/StringPropertyEditor";
+import { SliderPropertyEditor } from "../../property-editor/SliderPropertyEditor";
+import { NumberPropertyEditor } from "../../property-editor/NumberPropertyEditor";
+import { BooleanPropertyEditor } from "../../property-editor/BooleanPropertyEditor";
+import { EnumPropertyEditor } from "../../property-editor/EnumPropertyEditor";
+import { Point2DPropertyEditor } from "../../property-editor/Point2DPropertyEditor";
+import { ImageSourcePropertyEditor } from "../../property-editor/ImageSourcePropertyEditor";
 
 type PropertyRowProps = {
     property: BaseProperty<any>;

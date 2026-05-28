@@ -8,13 +8,13 @@ import { useLayoutStore } from "@/ui/stores/layout.store";
 
 import { HStack, VStack } from "../custom/stack/Stack";
 import ContextBar from "./ContextBar";
-import TilesetViewSelector from "./tilesetView/TilesetViewSelector";
-import LayerManager from "./layerManager/LayerManager";
-import TilemapEditor from "./tilemapEditor/TilemapEditor";
-import RulesetManager from "./rulesetManager/RulesetManager";
+import TilesetViewSelector from "./tileset-view/TilesetViewSelector";
+import LayerManager from "./layer-manager/LayerManager";
+import TilemapEditor from "./tilemap-editor/TilemapEditor";
+import RulesetManager from "./ruleset-manager/RulesetManager";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { LocalizedText } from "../custom/LocalizeText";
-import PropertyPanel from "./propertyPanel/PropertyPanel";
+import PropertyPanel from "./properties-panel/PropertyPanel";
 
 export default function Workspace() {
 

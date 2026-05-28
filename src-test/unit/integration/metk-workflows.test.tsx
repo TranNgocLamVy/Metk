@@ -13,8 +13,8 @@ import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager"
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { Result } from "@/shared/types/result";
 import { PermissionDialog } from "@/ui/components/dialog/PermissionDialog";
-import LayerManager from "@/ui/components/workspace/layerManager/LayerManager";
-import TilemapEditorTabs from "@/ui/components/workspace/tilemapEditor/TilemapEditorTabs";
+import LayerManager from "@/ui/components/workspace/layer-manager/LayerManager";
+import TilemapEditorTabs from "@/ui/components/workspace/tilemap-editor/TilemapEditorTabs";
 import ToolBar from "@/ui/components/workspace/ToolBar";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useAppcore } from "@/ui/stores/appcore.store";

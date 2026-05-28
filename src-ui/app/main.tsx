@@ -11,7 +11,7 @@ import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { FallbackRender } from "@/ui/components/layout/FallbackRender";
 import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOverlay";
 import MainContainer from "@/ui/components/layout/MainContainer";
-import MenuBar from "@/ui/components/menuBar/MenuBar";
+import MenuBar from "@/ui/components/menu-bar/MenuBar";
 import { Toaster } from "@/ui/components/shadcn/sonner";
 import I18nProvider from "./providers/i18n.provider";
 import AppRoutes from "./routes";

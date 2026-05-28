@@ -4,7 +4,7 @@ import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
 import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
-import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
+import ContextMenuWrapper from "../../context-menu/ContextMenuWrapper";
 import { TilesetViewContextMenu } from "./ContextMenu";
 import { LocalizedText } from "../../custom/LocalizeText";
 import { VStack } from "../../custom/stack/Stack";

@@ -4,7 +4,7 @@ import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { VStack } from "../../custom/stack/Stack";
-import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
+import ContextMenuItemGroup from "../../context-menu/ContextMenuItemGroup";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
 import { ScrollArea } from "../../shadcn/scroll-area";
 import { LayerManagerContextMenu } from "./ContextMenu";

@@ -3,7 +3,7 @@ import { HStack, VStack } from "../../custom/stack/Stack";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
 import { ScrollArea, ScrollBar } from "../../shadcn/scroll-area";
 import { useCallback, useEffect } from "react";
-import ContextMenuItemGroup from "../../contextMenu/ContextMenuItemGroup";
+import ContextMenuItemGroup from "../../context-menu/ContextMenuItemGroup";
 import { RulesetManagerContextMenu } from "./ContextMenu";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 import RulesetMenuBar from "./RulesetMenuBar";

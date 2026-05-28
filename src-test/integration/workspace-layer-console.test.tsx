@@ -40,8 +40,8 @@ vi.mock("react-i18next", () => ({
     }),
 }));
 
-import LayerManager from "@/ui/components/workspace/layerManager/LayerManager";
-import LayerMenuBar from "@/ui/components/workspace/layerManager/LayerMenuBar";
+import LayerManager from "@/ui/components/workspace/layer-manager/LayerManager";
+import LayerMenuBar from "@/ui/components/workspace/layer-manager/LayerMenuBar";
 import WorkspaceConsole from "@/ui/components/workspace/console/Console";
 import LogConsole from "@/ui/components/workspace/console/LogConsole";
 import ErrorConsole from "@/ui/components/workspace/console/ErrorConsole";

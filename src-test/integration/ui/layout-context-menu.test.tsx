@@ -49,12 +49,12 @@ vi.mock("react-i18next", () => ({
     }),
 }));
 
-import ContextMenuWrapper from "@/ui/components/contextMenu/ContextMenuWrapper";
+import ContextMenuWrapper from "@/ui/components/context-menu/ContextMenuWrapper";
 import MainContainer from "@/ui/components/layout/MainContainer";
 import SecurityShield from "@/ui/components/layout/SecurityShield";
 import { FallbackRender } from "@/ui/components/layout/FallbackRender";
 import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOverlay";
-import { LayerManagerContextMenu } from "@/ui/components/workspace/layerManager/ContextMenu";
+import { LayerManagerContextMenu } from "@/ui/components/workspace/layer-manager/ContextMenu";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 

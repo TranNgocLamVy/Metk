@@ -4,13 +4,13 @@ import { Field, FieldStateResolver, FormDialogOptions, GroupFieldInput, ShapeFro
 import { Button } from "@/ui/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
 
-import { CheckBoxField } from "../formField/CheckboxField";
-import { TextInputField } from "../formField/TextInputField";
-import { NumberInputField } from "../formField/NumberInputField";
-import FolderPickerField from "../formField/FolderPickerField";
-import FilePickerField from "../formField/FilePickerField";
-import { ColorPickerField } from "../formField/ColorPickerField";
-import { SelectField } from "../formField/SelectField";
+import { CheckBoxField } from "../form-field/CheckboxField";
+import { TextInputField } from "../form-field/TextInputField";
+import { NumberInputField } from "../form-field/NumberInputField";
+import FolderPickerField from "../form-field/FolderPickerField";
+import FilePickerField from "../form-field/FilePickerField";
+import { ColorPickerField } from "../form-field/ColorPickerField";
+import { SelectField } from "../form-field/SelectField";
 import { LocalizedText } from "../custom/LocalizeText";
 import { BaseDialogProps } from "./dialogRegistry";
 import { useDialogStore } from "@/ui/stores/dialog.store";

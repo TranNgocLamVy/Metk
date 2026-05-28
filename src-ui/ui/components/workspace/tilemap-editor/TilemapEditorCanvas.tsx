@@ -4,7 +4,7 @@ import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
-import ContextMenuWrapper from "../../contextMenu/ContextMenuWrapper";
+import ContextMenuWrapper from "../../context-menu/ContextMenuWrapper";
 import { TilemapEditorContextMenu } from "./ContextMenu";
 import { LocalizedText } from "../../custom/LocalizeText";
 import { HStack, VStack } from "../../custom/stack/Stack";
