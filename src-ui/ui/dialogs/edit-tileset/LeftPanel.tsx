@@ -46,15 +46,7 @@ export function LeftPanel() {
             height: size.height,
             onSelectTile: handleSelectTile,
         });
-    }, [
-        pixiApp,
-        tileset,
-        selectedTileId,
-        size.width,
-        size.height,
-        version,
-        handleSelectTile,
-    ]);
+    }, [pixiApp, tileset, selectedTileId, size.width, size.height, version, handleSelectTile]);
 
     return (
         <VStack className="w-1/4 h-full min-w-0 min-h-0 bg-surface-overlay p-2 gap-3">
@@ -87,7 +79,7 @@ export function LeftPanel() {
                 </div>
             </VStack>
 
-            <HStack className="w-full justify-end gap-2">
+            <HStack justify="end" className="w-full gap-2">
                 <Button variant="outline" type="button" onClick={actions.closeDialog}>
                     Cancel
                 </Button>

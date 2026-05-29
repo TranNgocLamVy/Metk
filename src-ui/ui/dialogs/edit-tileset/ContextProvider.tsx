@@ -10,14 +10,19 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
     const [version, setVersion] = useState(0);
     const [tileset] = useState<Tileset>(initialTileset);
     const [tilesetName, setTilesetName] = useState(initialTileset.name);
-    const [selectedTileId, setSelectedTileId] = useState<number | null>(
-        initialTileset.tiles[0]?.id ?? null,
-    );
+    const [selectedTileId, setSelectedTileId] = useState<number | null>(initialTileset.tiles[0]?.id ?? null);
+    const [selectedCollisionObjectId, setSelectedCollisionObjectId] = useState<string | null>(null);
 
     const selectedTile = useMemo(() => {
         if (selectedTileId == null) return null;
         return tileset.getTileFromId(selectedTileId);
     }, [tileset, selectedTileId, version]);
+
+    const selectedCollisionObject = useMemo(() => {
+        if (!selectedTile) return null;
+        if (selectedCollisionObjectId == null) return null;
+        return selectedTile.collisionObjects.find((obj) => obj.id === selectedCollisionObjectId) || null;
+    }, [selectedTile, selectedCollisionObjectId, version]);
 
     const triggerUpdate = useCallback(() => {
         setVersion((value) => value + 1);
@@ -25,6 +30,11 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
 
     const selectTile = useCallback((tileId: number | null) => {
         setSelectedTileId(tileId);
+        setSelectedCollisionObjectId(null);
+    }, []);
+
+    const selectCollisionObject = useCallback((objectId: string | null) => {
+        setSelectedCollisionObjectId(objectId);
     }, []);
 
     const updateTilesetName = useCallback((name: string) => {
@@ -57,10 +67,11 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
     const actions = useMemo(() => ({
         triggerUpdate,
         selectTile,
+        selectCollisionObject,
         updateTilesetName,
         closeDialog: handleCloseDialog,
         updateTileset,
-    }), [triggerUpdate, selectTile, updateTilesetName, handleCloseDialog, updateTileset]);
+    }), [triggerUpdate, selectTile, selectCollisionObject, updateTilesetName, handleCloseDialog, updateTileset]);
 
     return {
         version,
@@ -70,6 +81,7 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         tilesetName,
         selectedTileId,
         selectedTile,
+        selectedCollisionObject,
 
         actions,
     };

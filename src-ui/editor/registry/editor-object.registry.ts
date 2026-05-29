@@ -16,7 +16,11 @@ export class EditorObjectRegistry extends EventEmitter<EditorObjectRegistryEvent
     public register<T extends BaseObject<any>>(object: T): T {
         const existingObject = this.objects.get(object.objectId);
 
-        if (existingObject && existingObject !== object) {
+        if (existingObject === object) {
+            return object;
+        }
+
+        if (existingObject) {
             throw new Error(`Editor object already registered: ${object.objectId}`);
         }
 
@@ -35,8 +39,6 @@ export class EditorObjectRegistry extends EventEmitter<EditorObjectRegistryEvent
             typeof objectOrId === "string"
                 ? objectOrId
                 : objectOrId.objectId;
-
-        this.objects.delete(objectId);
         this.emit("onObjectDeleted", objectId);
     }
 

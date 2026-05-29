@@ -12,8 +12,9 @@ import {
 
 import { EditTilesetContext, useTilesetController } from "./ContextProvider";
 import { LeftPanel } from "./LeftPanel";
-import { MiddlePanel } from "./MiddlePanel";
 import { RightPanel } from "./RightPanel";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { MiddlePanel } from "./MiddlePanel";
 
 interface EditTilesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -36,8 +37,9 @@ export function EditTilesetDialog({ dialogId, tilesetId, tileset }: EditTilesetD
     }, [sourceTilesetId]);
 
     useEffect(() => {
+        if (!clonedTileset) return;
         return () => {
-            clonedTileset?.destroy();
+            clonedTileset.destroy();
         };
     }, [clonedTileset]);
 
@@ -63,7 +65,7 @@ function EditTilesetDialogContainer({ dialogId, clonedTileset }: { dialogId: str
                     onOpenAutoFocus={(event) => event.preventDefault()}
                     showCloseButton={false}
                 >
-                    <DialogTitle className="hidden">Edit Tileset</DialogTitle>
+                    <DialogTitle className="hidden"><LocalizedText message={"Edit Tileset"} /></DialogTitle>
 
                     <HStack className="w-full h-full min-h-0 gap-4">
                         <LeftPanel />

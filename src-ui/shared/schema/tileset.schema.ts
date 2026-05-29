@@ -1,6 +1,7 @@
 import { type } from "arktype";
 import { safeArray } from "./utils";
 import { imageSourceSchema } from "./image-source.schema";
+import { collisionObjectSchema } from "./collision-object.schema";
 
 export const TilesetType = {
     SingleImage: "single-image",
@@ -16,6 +17,7 @@ const tileData = type({
     width: type("number").optional(),
     height: type("number").optional(),
     image: imageSourceSchema.optional(),
+    collisionObjects: safeArray(collisionObjectSchema).optional()
 });
 export type TileData = typeof tileData.infer;
 
@@ -40,8 +42,8 @@ export const TilesetMetadataSchema = type({
 export type TilesetMetadata = typeof TilesetMetadataSchema.infer
 
 export const TilesetRefDataSchema = type({
-    index: type("number"),
     id: type("string"),
+    index: type("number"),
     name: type("string").default("Untitled Tileset"),
 })
 export type TilesetRefData = typeof TilesetRefDataSchema.infer

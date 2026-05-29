@@ -17,9 +17,9 @@ import {
     Point2DProperty,
     StringProperty,
 } from "@/editor/properties/properties.decorator";
-import { ImageSourceData } from "@/shared/schema/image-source.schema";
 import { ImageSource } from "../image-source";
-import { ImageCollectionTileset } from "./image-collection-tileset";
+import { CollisionObject } from "../collision-object/collision-object";
+import { CollisionObjectFactory } from "../collision-object/collision-object.factory";
 
 interface TilesetEvent extends BaseObjectEvents {
     update(): void;
@@ -99,10 +99,6 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
         return this.tiles;
     }
 
-    public getName(): string {
-        return this.name;
-    }
-
     public async rename(name: string, meta?: PropertyUpdateMeta): Promise<Result> {
         this.name = name;
         this.emitUpdateProperty("name", this.name, {
@@ -143,11 +139,7 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
     }
 
     protected createTile(tileData: TileData): Tile {
-        const tile = new Tile(tileData, this);
-
-        this.objectRegistry.register(tile);
-
-        return tile;
+        return new Tile(tileData, this);
     }
 
     protected replaceTiles(nextTileData: TileData[]): void {
@@ -164,6 +156,8 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
             }
         }
 
+        const shouldRegisterNewTiles = this.objectRegistry.has(this.objectId);
+
         this.tiles = nextTileData.map((tileData) => {
             const existingTile = currentTilesById.get(tileData.id);
 
@@ -172,7 +166,13 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
                 return existingTile;
             }
 
-            return this.createTile(tileData);
+            const tile = this.createTile(tileData);
+
+            if (shouldRegisterNewTiles) {
+                this.objectRegistry.register(tile);
+            }
+
+            return tile;
         });
     }
 
@@ -194,7 +194,9 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
     }
 }
 
-export class Tile extends BaseObject {
+interface TileEvent extends BaseObjectEvents { }
+
+export class Tile extends BaseObject<TileEvent> {
     @NumberProperty<Tile>({
         label: "ID",
         readonly: true,
@@ -239,6 +241,8 @@ export class Tile extends BaseObject {
     })
     private tileSize: any;
 
+    public collisionObjects: CollisionObject[] = [];
+
     public constructor(
         tileData: TileData,
         public readonly tileset: Tileset,
@@ -247,6 +251,7 @@ export class Tile extends BaseObject {
 
         this.id = tileData.id;
         this.imageSource = tileData.image ? new ImageSource(tileData.image) : null;
+        this.collisionObjects = (tileData.collisionObjects ?? []).map((data) => CollisionObjectFactory.fromData(data)).filter((obj) => obj !== null);
     }
 
     public updateTile(tileData: TileData): void {
@@ -256,21 +261,35 @@ export class Tile extends BaseObject {
             this.imageSource = null;
         }
 
+        this.collisionObjects = (tileData.collisionObjects ?? []).map((data) => CollisionObjectFactory.fromData(data)).filter((obj) => obj !== null);
+
         this.emitUpdateProperty("imageSource", this.imageSource, {
             origin: "external",
             source: "Tile.updateTile",
         });
+
+        this.emitUpdateProperty("collisionObjects", this.collisionObjects, {
+            origin: "external",
+            source: "Tile.updateTile",
+        });
+    }
+
+    public setCollisionObjects(objects: CollisionObject[]): void {
+        this.collisionObjects = objects;
+
+        this.emitUpdateProperty("collisionObjects", this.collisionObjects, {
+            origin: "external",
+            source: "Tile.setCollisionObjects",
+        });
+
+        this.tileset.eventEmitter.emit("update");
     }
 
     public serialize(): TileData {
         return {
             id: this.id,
             image: this.imageSource ? this.imageSource.serialize() : undefined,
+            collisionObjects: this.collisionObjects.length > 0 ? this.collisionObjects.map((object) => object.serialize()) : undefined,
         };
     }
 }
-
-type Coordinate = {
-    row: number;
-    col: number;
-};
