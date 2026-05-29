@@ -1,4 +1,4 @@
-import { Container, FederatedPointerEvent } from "pixi.js";
+import { Container, FederatedPointerEvent, Rectangle } from "pixi.js";
 
 import { CollisionObjectRenderer } from "./collision-object-renderer";
 import { CollisionRendererFactory } from "./collision-renderer.factory";
@@ -6,10 +6,7 @@ import { CollisionRendererFactory } from "./collision-renderer.factory";
 import { CollisionObject } from "@/editor/model/collision-object/collision-object";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 
-import {
-    TileLayout,
-    TileLayoutResolver,
-} from "./tile-layout-resolver";
+import { TileLayout, TileLayoutResolver } from "./tile-layout-resolver";
 
 import { CollisionEditorController } from "./collision-editor.controller";
 
@@ -19,35 +16,14 @@ export type CollisionEditorLayerRendererMode =
     | "all-tiles";
 
 export type CollisionEditorLayerRendererContext = {
-    /**
-     * Dialog-local tileset being edited.
-     * No TilesetSession required.
-     */
     tileset: Tileset;
-
     layoutResolver: TileLayoutResolver;
     editorController: CollisionEditorController;
-
     parent?: Container;
-
     mode?: CollisionEditorLayerRendererMode;
     renderHidden?: boolean;
-
-    /**
-     * Used only when mode === "selected-tiles".
-     * In EditTilesetDialog this should come from dialog state, not TilesetSession.
-     */
     getSelectedTileIds?: () => number[];
-
-    /**
-     * If true, this layer forwards pointermove / pointerup to CollisionEditorController.
-     */
     bindDragEvents?: boolean;
-
-    /**
-     * When provided, only this object is rendered as editable.
-     * Other collision objects remain visible but use inactive styling.
-     */
     getSelectedObjectId?: () => string | null;
 };
 
@@ -85,6 +61,13 @@ export class CollisionEditorLayerRenderer {
 
         this.container.label = "CollisionEditorLayer";
         this.container.eventMode = "static";
+        this.container.interactiveChildren = true;
+        this.container.hitArea = new Rectangle(
+            -1_000_000,
+            -1_000_000,
+            2_000_000,
+            2_000_000,
+        );
         this.container.sortableChildren = true;
 
         this.boundPointerMove = this.onPointerMove.bind(this);

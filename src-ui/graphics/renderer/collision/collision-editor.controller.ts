@@ -34,6 +34,13 @@ export type CollisionEditorControllerContext = {
     minBoxSize?: number;
 };
 
+type BoxGeometry = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
 type ObjectDragSession = {
     type: "object";
     tile: Tile;
@@ -353,31 +360,32 @@ export class CollisionEditorController {
 
     public updateDrag(event: FederatedPointerEvent | PointLike): void {
         if (!this.dragSession) return;
-
+    
         const pointer = this.layoutResolver.globalToTileLocal(
             this.dragSession.tile,
             event,
         );
-
+    
         if (!pointer) return;
-
+    
         const dx = pointer.x - this.dragSession.startPointer.x;
         const dy = pointer.y - this.dragSession.startPointer.y;
-
+        const snapToPixel = this.shouldSnapToPixel(event);
+    
         switch (this.dragSession.type) {
             case "object":
-                this.updateObjectDrag(this.dragSession, dx, dy);
+                this.updateObjectDrag(this.dragSession, dx, dy, snapToPixel);
                 break;
-
+    
             case "box-resize":
-                this.updateBoxResizeDrag(this.dragSession, dx, dy);
+                this.updateBoxResizeDrag(this.dragSession, dx, dy, snapToPixel);
                 break;
-
+    
             case "polygon-vertex":
-                this.updatePolygonVertexDrag(this.dragSession, dx, dy);
+                this.updatePolygonVertexDrag(this.dragSession, dx, dy, snapToPixel);
                 break;
         }
-
+    
         this.emitTileCollisionPreview(this.dragSession.tile);
         this.emitChange();
     }
@@ -514,10 +522,14 @@ export class CollisionEditorController {
         session: ObjectDragSession,
         dx: number,
         dy: number,
+        snapToPixel: boolean,
     ): void {
+        const x = session.startObject.x + dx;
+        const y = session.startObject.y + dy;
+    
         session.object.moveTo(
-            session.startObject.x + dx,
-            session.startObject.y + dy,
+            snapToPixel ? this.snapPixel(x) : x,
+            snapToPixel ? this.snapPixel(y) : y,
         );
     }
 
@@ -525,6 +537,7 @@ export class CollisionEditorController {
         session: BoxResizeDragSession,
         dx: number,
         dy: number,
+        snapToPixel: boolean,
     ): void {
         const next = this.calculateResizedBox(
             session.startBox,
@@ -532,22 +545,28 @@ export class CollisionEditorController {
             dx,
             dy,
         );
-
-        session.object.x = next.x;
-        session.object.y = next.y;
-        session.object.width = next.width;
-        session.object.height = next.height;
+    
+        const box = snapToPixel
+            ? this.snapBoxToPixel(next, session.handle)
+            : next;
+    
+        session.object.moveTo(box.x, box.y);
+        session.object.resize(box.width, box.height);
     }
 
     private updatePolygonVertexDrag(
         session: PolygonVertexDragSession,
         dx: number,
         dy: number,
+        snapToPixel: boolean,
     ): void {
+        const x = session.startPoint.x + dx;
+        const y = session.startPoint.y + dy;
+    
         session.object.movePoint(
             session.pointIndex,
-            session.startPoint.x + dx,
-            session.startPoint.y + dy,
+            snapToPixel ? this.snapPixel(x) : x,
+            snapToPixel ? this.snapPixel(y) : y,
         );
     }
 
@@ -618,6 +637,59 @@ export class CollisionEditorController {
             y,
             width,
             height,
+        };
+    }
+
+    private shouldSnapToPixel(eventOrPoint: FederatedPointerEvent | PointLike): boolean {
+        const event = eventOrPoint as FederatedPointerEvent & {
+            ctrlKey?: boolean;
+            nativeEvent?: MouseEvent;
+            originalEvent?: MouseEvent;
+        };
+    
+        return (
+            event.ctrlKey === true ||
+            event.nativeEvent?.ctrlKey === true ||
+            event.originalEvent?.ctrlKey === true
+        );
+    }
+    
+    private snapPixel(value: number): number {
+        return Math.round(value);
+    }
+    
+    private snapBoxToPixel(
+        box: BoxGeometry,
+        handle: BoxResizeHandle,
+    ): BoxGeometry {
+        let left = this.snapPixel(box.x);
+        let top = this.snapPixel(box.y);
+        let right = this.snapPixel(box.x + box.width);
+        let bottom = this.snapPixel(box.y + box.height);
+    
+        const minSize = Math.max(1, this.snapPixel(this.minBoxSize));
+    
+        if (right - left < minSize) {
+            if (handle.includes("w")) {
+                left = right - minSize;
+            } else {
+                right = left + minSize;
+            }
+        }
+    
+        if (bottom - top < minSize) {
+            if (handle.includes("n")) {
+                top = bottom - minSize;
+            } else {
+                bottom = top + minSize;
+            }
+        }
+    
+        return {
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top,
         };
     }
 

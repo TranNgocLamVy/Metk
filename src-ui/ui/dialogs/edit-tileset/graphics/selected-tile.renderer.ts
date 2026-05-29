@@ -139,6 +139,13 @@ export class SelectedTilePixiRenderer {
             .decelerate({ friction: 0 })
             .clampZoom({ minScale: 0.25, maxScale: 64 });
 
+        pixiApp.renderer.on("resize", () => {
+            const w = pixiApp.renderer.width;
+            const h = pixiApp.renderer.height;
+            viewport.resize(w, h);
+            viewport.emit("resize")
+        });
+
         const tileContainer = new Container();
         tileContainer.label = "EditTilesetSelectedTileLayer";
 
@@ -197,21 +204,8 @@ export class SelectedTilePixiRenderer {
     private bindPointerEvents(): void {
         const viewport = this.viewport;
         const collisionController = this.collisionController;
-        const layoutResolver = this.layoutResolver;
 
-        if (!viewport || !collisionController || !layoutResolver) return;
-
-        const onPointerDown = (event: FederatedPointerEvent) => {
-            const tile = this.selectedTile;
-            if (!tile) return;
-            if (collisionController.hasActiveDrag()) return;
-
-            const tileLocal = layoutResolver.globalToTileLocal(tile, event);
-            if (!tileLocal) return;
-
-            collisionController.selectTile(tile);
-            this.syncSelectedCollisionObject();
-        };
+        if (!viewport || !collisionController) return;
 
         const onPointerMove = (event: FederatedPointerEvent) => {
             collisionController.updateDrag(event);
@@ -221,16 +215,20 @@ export class SelectedTilePixiRenderer {
             collisionController.endDrag();
         };
 
-        viewport.on("pointerdown", onPointerDown);
+        const onViewportZoom = () => {
+            this.collisionLayer?.render();
+        };
+
         viewport.on("pointermove", onPointerMove);
         viewport.on("pointerup", onPointerUp);
         viewport.on("pointerupoutside", onPointerUp);
+        viewport.on("zoomed", onViewportZoom);
 
         this.cleanupPointerEvents = () => {
-            viewport.off("pointerdown", onPointerDown);
             viewport.off("pointermove", onPointerMove);
             viewport.off("pointerup", onPointerUp);
             viewport.off("pointerupoutside", onPointerUp);
+            viewport.off("zoomed", onViewportZoom);
         };
     }
 
