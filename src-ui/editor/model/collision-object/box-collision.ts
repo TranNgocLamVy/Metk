@@ -1,4 +1,4 @@
-import { BoxCollisionData } from "@/shared/schema/collision-object.schema";
+import { BoxCollisionData } from "@/shared/data-types/collision-object.data";
 import { CollisionObject } from "./collision-object";
 
 export class BoxCollision extends CollisionObject {

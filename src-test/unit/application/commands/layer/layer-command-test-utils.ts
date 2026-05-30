@@ -7,8 +7,8 @@ import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { GroupLayerData, RootLayerData, RuleLayerData, TileLayerData } from "@/shared/schema/layer.schema";
-import { TilemapData } from "@/shared/schema/tilemap.schema";
+import { GroupLayerData, RootLayerData, RuleLayerData, TileLayerData } from "@/shared/data-types/layer.data";
+import { TilemapData } from "@/shared/data-types/tilemap.data";
 
 import { createReferenceContext } from "../../../editor/editor-test-utils";
 
@@ -91,7 +91,9 @@ export const createTilemap = (layers = createBaseLayers()): Tilemap => {
         layers,
     };
 
-    return new Tilemap(tilemapData, filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.create(tilemapData, filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    if (result.status !== "Success") throw new Error(String(result.message));
+    return result.data;
 };
 
 export const createLayerCommandHarness = (layers = createBaseLayers()) => {

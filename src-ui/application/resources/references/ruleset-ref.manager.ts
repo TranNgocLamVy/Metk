@@ -1,4 +1,4 @@
-import { RulesetRefData } from "@/shared/schema/ruleset.schema";
+import { RulesetRefData } from "@/shared/data-types/ruleset.data";
 import { RulesetManager } from "../ruleset/ruleset.manager";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 

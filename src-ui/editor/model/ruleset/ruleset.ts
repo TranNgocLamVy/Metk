@@ -1,13 +1,15 @@
 import { Rule } from "./rule";
-import { RuleData, RulesetData } from "@/shared/schema/ruleset.schema";
+import { RuleData, RulesetData } from "@/shared/data-types/ruleset.data";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { BaseObject, BaseObjectEvents } from "../base-object";
 import { v4 as uuidv4 } from "uuid";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
-import { RulesetRefData } from "@/shared/schema/layer.schema";
+import { RulesetRefData } from "@/shared/data-types/layer.data";
 import { Console } from "@/shared/services/console.service";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { Result } from "@/shared/types/result";
+import { normalizeRulesetData } from "./ruleset.normalizer";
 
 interface RulesetEvent extends BaseObjectEvents {
     onUpdated: () => void
@@ -20,46 +22,87 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public size: number;
     private rules: Rule[] = [];
 
-    constructor(
-        rulesetData: RulesetData,
+    private constructor(
+        data: RulesetData,
         public readonly rulesetPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager,
+        options: { preserveSerializedRefs?: boolean } = {},
 
     ) {
-        super(`ruleset:${rulesetData.id}`);
+        super(`ruleset:${data.id}`);
 
-        this.id = rulesetData.id;
-        this.name = rulesetData.name;
-        this.color = rulesetData.color;
-        this.size = rulesetData.size;
+        this.id = data.id;
+        this.name = data.name;
+        this.color = data.color;
+        this.size = data.size;
 
-        this.tilesetRefManager.loadData(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
-        this.rulesetRefManager.loadData(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
+        this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
+        this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
 
-        this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
-        this.rulesetRefManager.replaceRulesetRef(0, this.id);
+        const hasSerializedSelfRef = data.rulesets.refs.some((ref) => ref.index === 0 && ref.id === this.id);
+        if (!options.preserveSerializedRefs || !hasSerializedSelfRef) {
+            this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
+            this.rulesetRefManager.replaceRulesetRef(0, this.id);
+        }
 
-        this.rules = rulesetData.rules.map((ruleData) => {
+        this.rules = data.rules.map((ruleData) => {
             const rule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager, this.objectId)
             return rule;
         });
     }
 
+    public static create(
+        rulesetData: unknown,
+        rulesetPathSystem: FilePathSystem,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager,
+    ): Result<Ruleset> {
+        try {
+            const data = normalizeRulesetData(rulesetData);
+            return Result.Success(Ruleset.fromData(data, rulesetPathSystem, tilesetRefManager, rulesetRefManager));
+        } catch (error) {
+            return Result.Error(`Failed to create ruleset: ${String(error)}`);
+        }
+    }
+
+    public static fromData(
+        rulesetData: RulesetData,
+        rulesetPathSystem: FilePathSystem,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager,
+    ): Ruleset {
+        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+    }
+
+    public static cloneFromData(
+        rulesetData: RulesetData,
+        rulesetPathSystem: FilePathSystem,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager,
+    ): Ruleset {
+        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager, { preserveSerializedRefs: true });
+    }
+
     public updateRuleset(rulesetData: RulesetData): void {
-        if (!rulesetData) return;
-        if (this.id !== rulesetData.id) {
+        let data: RulesetData;
+        try {
+            data = normalizeRulesetData(rulesetData);
+        } catch {
+            return;
+        }
+        if (this.id !== data.id) {
             Console.warn({
-                message: `Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${rulesetData.id}`, // TODO: i18n
+                message: `Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${data.id}`, // TODO: i18n
             });
             return;
         }
-        this.name = rulesetData.name;
-        this.color = rulesetData.color;
-        this.tilesetRefManager.loadData(rulesetData.tilesets.refs, rulesetData.tilesets.nextIndex);
-        this.rulesetRefManager.loadData(rulesetData.rulesets.refs, rulesetData.rulesets.nextIndex);
+        this.name = data.name;
+        this.color = data.color;
+        this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
+        this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
         const processedRuleIds = new Set<string>();
-        for (const ruleData of rulesetData.rules) {
+        for (const ruleData of data.rules) {
             processedRuleIds.add(ruleData.id);
             const existingRule = this.getRule(ruleData.id);
             if (existingRule) {

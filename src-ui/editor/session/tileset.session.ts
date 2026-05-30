@@ -1,7 +1,7 @@
 import { IBaseSession } from "@/editor/interface/base-session.interface";
-import { SelectionState } from "@/shared/schema/selection-state.schema";
-import { ViewState } from "@/shared/schema/view-state.schema";
-import { TilesetSessionData } from "@/shared/schema/tileset-session.schema";
+import { SelectionState } from "@/shared/data-types/selection-state.data";
+import { ViewState } from "@/shared/data-types/view-state.data";
+import { TilesetSessionData } from "@/shared/data-types/tileset-session.data";
 
 import { EditorFacade } from "@/application/editor.facade";
 import EventEmitter from "eventemitter3";

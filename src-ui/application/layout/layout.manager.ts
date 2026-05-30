@@ -5,6 +5,7 @@ import { LayoutStorageService } from "@/infrastructure/container";
 import { workspaceLayout } from "@/shared/constant/workspaceJsonModel";
 import EventEmitter from "eventemitter3";
 import { Project } from "@/editor/model/project/project";
+import { validate } from "@/shared/utils/validate.utils";
 
 interface LayoutManagerEvents {
     onLayoutLoaded: (layout: IJsonModel) => void;
@@ -31,12 +32,13 @@ export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
         } else {
             const loadResult = await LayoutStorageService.load(layoutAbsPath);
             if (loadResult.status === Result.Status.Success) {
-                this.layoutData = loadResult.data;
+                this.layoutData = validate.object<IJsonModel>({ value: loadResult.data, defaultValue: workspaceLayout });
             } else {
                 this.layoutData = workspaceLayout;
                 await this.performSaveLayout();
             }
         }
+        if (!this.layoutData) this.layoutData = workspaceLayout;
         this.emit("onLayoutLoaded", this.layoutData);
         return Result.Success(this.layoutData);
     }

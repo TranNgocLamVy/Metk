@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { TileLayerData } from "@/shared/schema/layer.schema";
+import { TileLayerData } from "@/shared/data-types/layer.data";
 import { createReferenceContext, createTilemap, loadTilesetRefs } from "./editor-test-utils";
 
 const createTileLayer = (overrides: Partial<TileLayerData> = {}) => {

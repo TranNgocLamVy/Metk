@@ -1,5 +1,5 @@
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { ExportPathData, SavedPathData } from "@/shared/schema/workspaceSchema";
+import { ExportPathData, SavedPathData } from "@/shared/data-types/workspace.data";
 
 export class WorkspaceSavedPathManager {
     private exportPathMap: Map<string, string> = new Map<string, string>() // tilemapId -> exportPath

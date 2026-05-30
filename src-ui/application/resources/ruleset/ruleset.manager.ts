@@ -1,4 +1,4 @@
-import { RulesetData, RulesetMetadata } from "@/shared/schema/ruleset.schema";
+import { RulesetData, RulesetMetadata } from "@/shared/data-types/ruleset.data";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { TilesetManager } from "../tileset/tileset.manager";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
@@ -10,6 +10,7 @@ import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
 import EventEmitter from "eventemitter3";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
 
 export interface RulesetManagerEvent {
     onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
@@ -34,26 +35,34 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         this.rulesetMetadatas.set(ruleMetadata.id, ruleMetadata);
     }
 
-    public async addRuleset(ruleset: RulesetData, rulesetAbsPath: string): Promise<Result<Ruleset>> {
-        const rulesetRelPath = PathUtils.relative(this.projectPathSystem.absDir, rulesetAbsPath);
-        const rulesetMetadata: RulesetMetadata = {
-            id: ruleset.id,
-            name: ruleset.name,
-            color: ruleset.color,
-            rulesetRelPath: rulesetRelPath,
+    public async addRuleset(ruleset: unknown, rulesetAbsPath: string): Promise<Result<Ruleset>> {
+        let rulesetData: RulesetData;
+        try {
+            rulesetData = normalizeRulesetData(ruleset);
+        } catch (error) {
+            return Result.Error(`Failed to create ruleset: ${String(error)}`);
         }
-        this.rulesetMetadatas.set(ruleset.id, rulesetMetadata);
-        const rulesetPathSystem = new FilePathSystem(ruleset.id, this.projectPathSystem, rulesetRelPath);
+
+        const rulesetRelPath = PathUtils.relative(this.projectPathSystem.absDir, rulesetAbsPath);
+        const rulesetPathSystem = new FilePathSystem(rulesetData.id, this.projectPathSystem, rulesetRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
-        const newRuleset = new Ruleset(ruleset, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+        const newRuleset = Ruleset.fromData(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+
+        const rulesetMetadata: RulesetMetadata = {
+            id: newRuleset.id,
+            name: newRuleset.name,
+            color: newRuleset.color,
+            rulesetRelPath: rulesetRelPath,
+        }
+        this.rulesetMetadatas.set(newRuleset.id, rulesetMetadata);
 
         this.objectRegistry.registerTree(newRuleset);
 
-        this.loadedRulesets.set(ruleset.id, newRuleset);
+        this.loadedRulesets.set(newRuleset.id, newRuleset);
 
-        const tilesetDepIds = ruleset.tilesets.refs.map(tilesetRef => tilesetRef.id);
-        const rulesetDepIds = ruleset.rulesets.refs.map(rulesetRef => rulesetRef.id).filter(id => id !== ruleset.id && !this.pendingLoads.has(id));
+        const tilesetDepIds = newRuleset.tilesetRefManager.getRefIds();
+        const rulesetDepIds = newRuleset.rulesetRefManager.getRefIds().filter(id => id !== newRuleset.id && !this.pendingLoads.has(id));
         await Promise.all([
             this.tilesetManager.loadTilesets(tilesetDepIds),
             this.loadRulesets(rulesetDepIds),
@@ -248,7 +257,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         const rulesetPathSystem = new FilePathSystem(rulesetData.id, this.projectPathSystem, ruleset.rulesetPathSystem.relPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
-        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+        return Ruleset.cloneFromData(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
     }
 
     public async removeTilesetRef(tilesetId: string) {

@@ -5,11 +5,11 @@ import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter"
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
-import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { TilemapData } from "@/shared/schema/tilemap.schema";
-import { TilesetData } from "@/shared/schema/tileset.schema";
+import { TilemapData } from "@/shared/data-types/tilemap.data";
+import { TilesetData } from "@/shared/data-types/tileset.data";
 import {
     createReferenceContext,
+    createRuleset,
     createRulesetData,
     registerLoadedRuleset,
 } from "../../editor/editor-test-utils";
@@ -126,7 +126,9 @@ const createTilemap = (context: ReturnType<typeof createReferenceContext>, overr
         ...overrides,
     };
 
-    return new Tilemap(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.create(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    if (result.status !== "Success") throw new Error(String(result.message));
+    return result.data;
 };
 
 describe("TmxTilemapExporter", () => {
@@ -399,7 +401,8 @@ describe("TmxTilemapExporter", () => {
             tiles: [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }],
         }), "tilesets/terrain.json");
 
-        const ruleset = new Ruleset(
+        const ruleset = createRuleset(
+            context,
             createRulesetData({
                 id: "terrain-rule",
                 name: "Terrain Rule",
@@ -407,9 +410,6 @@ describe("TmxTilemapExporter", () => {
                 tilesets: { refs: [{ index: 0, id: "terrain", name: "Terrain" }], nextIndex: 1 },
                 rules: [{ id: "fallback", constraints: "", outputs: "2:0:1" }],
             }),
-            context.filePathSystem,
-            context.tilesetRefManager,
-            context.rulesetRefManager,
         );
         registerLoadedRuleset(context.rulesetManager, ruleset);
 
@@ -455,7 +455,8 @@ describe("TmxTilemapExporter", () => {
             tiles: [{ id: 0 }, { id: 1 }],
         }), "tilesets/terrain.json");
 
-        const ruleset = new Ruleset(
+        const ruleset = createRuleset(
+            context,
             createRulesetData({
                 id: "terrain-rule",
                 name: "Terrain Rule",
@@ -463,9 +464,6 @@ describe("TmxTilemapExporter", () => {
                 tilesets: { refs: [{ index: 1, id: "missing-tileset", name: "Missing" }], nextIndex: 2 },
                 rules: [{ id: "fallback", constraints: "", outputs: "7:1:1" }],
             }),
-            context.filePathSystem,
-            context.tilesetRefManager,
-            context.rulesetRefManager,
         );
         registerLoadedRuleset(context.rulesetManager, ruleset);
 

@@ -1,4 +1,4 @@
-import { LayerData, RootLayerData } from "@/shared/schema/layer.schema";
+import { LayerData, RootLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 import { LayerUtils } from "@/shared/utils/layer.utils";
 

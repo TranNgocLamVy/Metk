@@ -10,7 +10,7 @@ import {
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
-import { ImageLayerData } from "@/shared/schema/layer.schema";
+import { ImageLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 
 export class CreateImageLayerCommand implements IUndoableCommand {

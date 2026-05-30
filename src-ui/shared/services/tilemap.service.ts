@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilemapData, TilemapOrientation } from "../schema/tilemap.schema";
+import { TilemapData, TilemapOrientation } from "../data-types/tilemap.data";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspace.service";
@@ -10,6 +10,7 @@ import { DialogService } from "./dialog.service";
 import { createTilemapForm } from "../constant/form/create-tilemap.form";
 import { Console } from "./console.service";
 import i18n from "@/shared/services/i18n.service";
+import { extractTilemapId } from "@/editor/model/tilemap/tilemap.normalizer";
 
 export class TilemapService {
 
@@ -85,8 +86,18 @@ export class TilemapService {
         const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
         currentWorkspace.savedPathManager.setTilemapDir(tilemapAbsDir);
 
-        const tilemapData = loadTilemapResult.data;
-        if (refTilemapId && tilemapData.id !== refTilemapId) {
+        let tilemapId: string;
+        try {
+            tilemapId = extractTilemapId(loadTilemapResult.data);
+        } catch (error) {
+            Console.error({
+                message: "message.tilemap.importFail",
+                stacks: [String(error)],
+            });
+            return Result.Error("message.tilemap.importFail");
+        }
+
+        if (refTilemapId && tilemapId !== refTilemapId) {
             Console.error({
                 message: "message.tilemap.importFail",
                 stacks: ["message.tilemap.mismatchId"]
@@ -94,11 +105,12 @@ export class TilemapService {
             return Result.Cancel();
         }
 
-        await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
+        const addTilemapResult = await currentProject.tilemapManager.addTilemap(loadTilemapResult.data, tilemapAbsPath);
+        if (addTilemapResult.status !== Result.Status.Success) return addTilemapResult;
 
         await editorFacade.projectManager.saveCurrrentProject();
 
-        WorkspaceService.createTilemapSession(tilemapData.id);
+        WorkspaceService.createTilemapSession(addTilemapResult.data.id);
 
         Console.success({ message: "message.tilemap.importSuccess" });
 

@@ -80,7 +80,7 @@ import { RuleLayerRenderer } from "@/graphics/renderer/tilemap/rule-layer.render
 import { GroupLayerRenderer } from "@/graphics/renderer/tilemap/group-layer.renderer";
 import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
 import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
-import { RuleLayerData, TileLayerData } from "@/shared/schema/layer.schema";
+import { RuleLayerData, TileLayerData } from "@/shared/data-types/layer.data";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";

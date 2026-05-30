@@ -1,6 +1,6 @@
 import { IBaseSession } from "@/editor/interface/base-session.interface";
-import { ViewState } from "@/shared/schema/view-state.schema";
-import { LayerState, TilemapSessionData } from "@/shared/schema/tilemap-session.schema";
+import { ViewState } from "@/shared/data-types/view-state.data";
+import { LayerState, TilemapSessionData } from "@/shared/data-types/tilemap-session.data";
 
 import { EditorFacade } from "@/application/editor.facade";
 import EventEmitter from "eventemitter3";

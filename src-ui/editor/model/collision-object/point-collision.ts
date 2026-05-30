@@ -1,4 +1,4 @@
-import { PointCollisionData } from "@/shared/schema/collision-object.schema";
+import { PointCollisionData } from "@/shared/data-types/collision-object.data";
 import { CollisionObject } from "./collision-object";
 
 export class PointCollision extends CollisionObject {

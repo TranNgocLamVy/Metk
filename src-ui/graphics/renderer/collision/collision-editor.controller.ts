@@ -6,7 +6,7 @@ import { Result } from "@/shared/types/result";
 import { PointLike, TileLayoutResolver } from "./tile-layout-resolver";
 
 import { CollisionObject } from "@/editor/model/collision-object/collision-object";
-import { CollisionObjectData } from "@/shared/schema/collision-object.schema";
+import { CollisionObjectData } from "@/shared/data-types/collision-object.data";
 import { BoxCollision } from "@/editor/model/collision-object/box-collision";
 import { PolygonCollision } from "@/editor/model/collision-object/polygon-collision";
 import { CollisionObjectFactory } from "@/editor/model/collision-object/collision-object.factory";

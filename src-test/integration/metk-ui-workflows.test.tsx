@@ -262,66 +262,63 @@ const createProjectContext = () => {
 
 const createTilemapSession = (id: string, tilemapId: string, name: string, isDirty = false): TestTilemapSession => {
     const context = createProjectContext();
-    const tilemap = new Tilemap(
-        {
-            id: tilemapId,
-            name,
-            orientation: "orthogonal",
-            width: 8,
-            height: 8,
-            tilewidth: 16,
-            tileheight: 16,
-            backgroundcolor: "#00000000",
-            tilesets: { refs: [], nextIndex: 0 },
-            rulesets: { refs: [], nextIndex: 0 },
-            layers: [
-                {
-                    id: `${tilemapId}-group`,
-                    type: "group",
-                    name: `${name} Group`,
-                    opacity: 1,
-                    open: false,
-                    visible: true,
-                    locked: false,
-                    layers: [
-                        {
-                            id: `${tilemapId}-ground`,
-                            type: "tile",
-                            name: `${name} Ground`,
-                            x: 0,
-                            y: 0,
-                            width: 8,
-                            height: 8,
-                            opacity: 1,
-                            visible: true,
-                            locked: false,
-                            offsetx: 0,
-                            offsety: 0,
-                            layerData: "",
-                        },
-                    ],
-                },
-                {
-                    id: `${tilemapId}-collision`,
-                    type: "tile",
-                    name: `${name} Collision`,
-                    x: 0,
-                    y: 0,
-                    width: 8,
-                    height: 8,
-                    opacity: 1,
-                    visible: true,
-                    locked: false,
-                    offsetx: 0,
-                    offsety: 0,
-                    layerData: "",
-                },
-            ],
-        },
-        context.filePathSystem,
-        context.tilesetRefManager,
-        context.rulesetRefManager,
-    );
+    const tilemapResult = Tilemap.create({
+        id: tilemapId,
+        name,
+        orientation: "orthogonal",
+        width: 8,
+        height: 8,
+        tilewidth: 16,
+        tileheight: 16,
+        backgroundcolor: "#00000000",
+        tilesets: { refs: [], nextIndex: 0 },
+        rulesets: { refs: [], nextIndex: 0 },
+        layers: [
+            {
+                id: `${tilemapId}-group`,
+                type: "group",
+                name: `${name} Group`,
+                opacity: 1,
+                open: false,
+                visible: true,
+                locked: false,
+                layers: [
+                    {
+                        id: `${tilemapId}-ground`,
+                        type: "tile",
+                        name: `${name} Ground`,
+                        x: 0,
+                        y: 0,
+                        width: 8,
+                        height: 8,
+                        opacity: 1,
+                        visible: true,
+                        locked: false,
+                        offsetx: 0,
+                        offsety: 0,
+                        layerData: "",
+                    },
+                ],
+            },
+            {
+                id: `${tilemapId}-collision`,
+                type: "tile",
+                name: `${name} Collision`,
+                x: 0,
+                y: 0,
+                width: 8,
+                height: 8,
+                opacity: 1,
+                visible: true,
+                locked: false,
+                offsetx: 0,
+                offsety: 0,
+                layerData: "",
+            },
+        ],
+    }, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    if (tilemapResult.status !== "Success") throw new Error(String(tilemapResult.message));
+    const tilemap = tilemapResult.data;
 
     const session = new EventEmitter() as TestTilemapSession;
     session.id = id;

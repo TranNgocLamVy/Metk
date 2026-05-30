@@ -1,4 +1,4 @@
-import { ImageSourceData } from "@/shared/schema/image-source.schema";
+import { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { Result } from "@/shared/types/result";
 import { v4 as uuidv4 } from "uuid";
 import type { PropertyUpdateMeta } from "@/editor/model/base-object";

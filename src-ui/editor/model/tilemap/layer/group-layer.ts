@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { GroupLayerData, LayerData } from "@/shared/schema/layer.schema";
+import { GroupLayerData, LayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
@@ -7,6 +7,7 @@ import { LayerUtils } from "@/shared/utils/layer.utils";
 import { BaseObject, PropertyUpdateMeta } from "../../base-object";
 import { Tilemap } from "../tilemap";
 import { BooleanProperty } from "@/editor/properties/properties.decorator";
+import { validate } from "@/shared/utils/validate.utils";
 
 interface GroupLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;
@@ -32,18 +33,19 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope
     ) {
-        super(groupLayerData.id, tilemap, objectIdScope, "Group Layer");
+        const data = validate.requiredObject({ value: groupLayerData, field: "group layer" });
+        super(validate.requiredString({ value: data.id, field: "group layer.id" }), tilemap, objectIdScope, "Group Layer");
 
         this.parentLayer = parentLayer;
 
-        this.name = groupLayerData.name ?? "Unknow Group Layer";
+        this.name = validate.string({ value: data.name, defaultValue: "Unknow Group Layer" });
 
-        this.opacity = groupLayerData.opacity ?? 1;
-        this.visible = groupLayerData.visible ?? true;
-        this.locked = groupLayerData.locked ?? false;
-        this.isOpen = groupLayerData.open ?? true;
+        this.opacity = validate.number({ value: data.opacity, defaultValue: 1, min: 0, max: 1 });
+        this.visible = validate.boolean({ value: data.visible, defaultValue: true });
+        this.locked = validate.boolean({ value: data.locked, defaultValue: false });
+        this.isOpen = validate.boolean({ value: data.open, defaultValue: true });
 
-        const layers = groupLayerData.layers ?? [];
+        const layers = validate.array<LayerData>({ value: data.layers, defaultValue: [] });
         layers.forEach(layerData => {
             const layer = this.createLayerTree(layerData, this);
             if (layer) this.pushLayer(layer);

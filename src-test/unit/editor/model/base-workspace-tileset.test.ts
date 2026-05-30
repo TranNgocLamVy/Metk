@@ -73,7 +73,7 @@ import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset"
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { defaultWorkspaceData } from "@/shared/schema/workspaceSchema";
+import { defaultWorkspaceData } from "@/shared/data-types/workspace.data";
 import { Result } from "@/shared/types/result";
 
 class TestBaseObject extends BaseObject {
@@ -140,7 +140,9 @@ describe("Workspace model", () => {
     it("constructs session and saved-path managers from workspace data", () => {
         const editorFacade = { id: "editor" };
         const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/workspace-project");
-        const workspace = new Workspace(defaultWorkspaceData, {} as any, {} as any, projectPathSystem, editorFacade as any);
+        const workspaceResult = Workspace.create(defaultWorkspaceData, {} as any, {} as any, projectPathSystem, editorFacade as any);
+        if (workspaceResult.status !== Result.Status.Success) throw new Error(String(workspaceResult.message));
+        const workspace = workspaceResult.data;
 
         expect(workspace.tilesetSessionManager).toBe(workspaceModelMocks.instances.tilesetSessionManager);
         expect(workspace.tilemapSessionManager).toBe(workspaceModelMocks.instances.tilemapSessionManager);
@@ -153,7 +155,9 @@ describe("Workspace model", () => {
     it("loads, destroys, and serializes through its child managers", async () => {
         const tilesetManager = { id: "tileset-manager" };
         const tilemapManager = { id: "tilemap-manager" };
-        const workspace = new Workspace(defaultWorkspaceData, tilesetManager as any, tilemapManager as any, new ProjectPathSystem("C:/Project/Metk/workspace-project"), {} as any);
+        const workspaceResult = Workspace.create(defaultWorkspaceData, tilesetManager as any, tilemapManager as any, new ProjectPathSystem("C:/Project/Metk/workspace-project"), {} as any);
+        if (workspaceResult.status !== Result.Status.Success) throw new Error(String(workspaceResult.message));
+        const workspace = workspaceResult.data;
 
         await expect(workspace.loadSession()).resolves.toEqual(Result.Success());
 

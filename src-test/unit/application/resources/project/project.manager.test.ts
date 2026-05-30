@@ -60,6 +60,26 @@ describe("ProjectManager", () => {
         expect(changed).toHaveBeenCalledWith(metadata);
     });
 
+    it("normalizes parsed project repository metadata before storing it", () => {
+        const manager = new ProjectManager();
+
+        manager.load([
+            { id: "project-a", directory: "C:/Project/Metk/project-a", name: 123 },
+            { id: "missing-directory" },
+            null,
+        ]);
+
+        expect(manager.serialize()).toEqual([
+            expect.objectContaining({
+                id: "project-a",
+                name: "Untitled Project",
+                directory: "C:/Project/Metk/project-a",
+                version: "0.1.0",
+                description: "",
+            }),
+        ]);
+    });
+
     it("loads a project from storage, initializes child manager metadata, and emits project loaded", async () => {
         const manager = new ProjectManager();
         const loaded = vi.fn();

@@ -2,10 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
-import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { RuleLayerData } from "@/shared/schema/layer.schema";
+import { RuleLayerData } from "@/shared/data-types/layer.data";
 import {
     createReferenceContext,
+    createRuleset,
     createTilemap,
     createRulesetData,
     loadRulesetRefs,
@@ -18,7 +18,8 @@ const createRuleLayer = (overrides: Partial<RuleLayerData> = {}) => {
     loadTilesetRefs(context.tilesetRefManager, ["tileset-a"]);
     loadRulesetRefs(context.rulesetRefManager, ["terrain"]);
 
-    const ruleset = new Ruleset(
+    const ruleset = createRuleset(
+        context,
         createRulesetData({
             id: "terrain",
             name: "Terrain",
@@ -26,9 +27,6 @@ const createRuleLayer = (overrides: Partial<RuleLayerData> = {}) => {
             tilesets: { refs: [{ index: 0, id: "tileset-a", name: "Tileset A" }], nextIndex: 1 },
             rules: [{ id: "fallback", constraints: "", outputs: "12:0:1" }],
         }),
-        context.filePathSystem,
-        context.tilesetRefManager,
-        context.rulesetRefManager,
     );
     registerLoadedRuleset(context.rulesetManager, ruleset);
 

@@ -5,7 +5,7 @@ import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { TilesetData } from "@/shared/schema/tileset.schema";
+import { TilesetData } from "@/shared/data-types/tileset.data";
 import { Result } from "@/shared/types/result";
 
 import { createTilemap } from "../../commands/layer/layer-command-test-utils";

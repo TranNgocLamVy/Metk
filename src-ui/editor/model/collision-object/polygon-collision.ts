@@ -1,4 +1,4 @@
-import { PolygonCollisionData } from "@/shared/schema/collision-object.schema";
+import { PolygonCollisionData } from "@/shared/data-types/collision-object.data";
 import { CollisionObject } from "./collision-object";
 
 export class PolygonCollision extends CollisionObject {

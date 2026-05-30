@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { BooleanProperty, ImageSourceProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
-import { ImageLayerData } from "@/shared/schema/layer.schema";
+import { ImageLayerData } from "@/shared/data-types/layer.data";
 
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import type { ImageSourceData } from "@/shared/schema/image-source.schema";
+import type { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { Tilemap } from "../tilemap";
 import type { PropertyUpdateMeta } from "../../base-object";
+import { validate } from "@/shared/utils/validate.utils";
 export interface ImageLayerEvents extends BaseLayerEvents {
     imageChanged: () => void;
 }
@@ -87,24 +88,28 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
 
         this.parentLayer = parentLayer;
 
-        this.name = imageLayerData.name ?? "Unknow Image Layer";
-        this.opacity = imageLayerData.opacity ?? 1;
-        this.visible = imageLayerData.visible ?? true;
-        this.locked = imageLayerData.locked ?? false;
+        this.name = validate.string({ value: imageLayerData.name, defaultValue: "Unknow Image Layer" });
+        this.opacity = validate.number({ value: imageLayerData.opacity, defaultValue: 1, min: 0, max: 1 });
+        this.visible = validate.boolean({ value: imageLayerData.visible, defaultValue: true });
+        this.locked = validate.boolean({ value: imageLayerData.locked, defaultValue: false });
 
-        this.offset.x = imageLayerData.offsetx ?? 0;
-        this.offset.y = imageLayerData.offsety ?? 0;
+        this.offset.x = validate.number({ value: imageLayerData.offsetx, defaultValue: 0 });
+        this.offset.y = validate.number({ value: imageLayerData.offsety, defaultValue: 0 });
 
-        this.parallax.x = imageLayerData.parallaxx ?? 1;
-        this.parallax.y = imageLayerData.parallaxy ?? 1;
+        this.parallax.x = validate.number({ value: imageLayerData.parallaxx, defaultValue: 1 });
+        this.parallax.y = validate.number({ value: imageLayerData.parallaxy, defaultValue: 1 });
 
-        this.tintcolor = imageLayerData.tintcolor ?? "";
+        this.tintcolor = validate.string({ value: imageLayerData.tintcolor, defaultValue: "" });
 
-        this.repeatX = imageLayerData.repeatx ?? false;
-        this.repeatY = imageLayerData.repeaty ?? false;
+        this.repeatX = validate.boolean({ value: imageLayerData.repeatx, defaultValue: false });
+        this.repeatY = validate.boolean({ value: imageLayerData.repeaty, defaultValue: false });
 
-        const imageSourceData = imageLayerData.image ?? { source: "", width: 0, height: 0 };
-        this.imageSource = imageSourceData;
+        const imageSourceData = validate.object<Record<string, ImageSourceData>>({ value: imageLayerData.image, defaultValue: {} });
+        this.imageSource = {
+            source: validate.string({ value: imageSourceData.source, defaultValue: "" }),
+            width: validate.number({ value: imageSourceData.width, defaultValue: 0, min: 0 }),
+            height: validate.number({ value: imageSourceData.height, defaultValue: 0, min: 0 }),
+        };
     }
 
     public updateOffset(x: number, y: number, meta?: PropertyUpdateMeta): void {

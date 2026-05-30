@@ -1,11 +1,12 @@
 import { Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { Tileset } from "./tileset";
 import { ImageSource } from "../image-source";
-import { TilesetData, TilesetType } from "@/shared/schema/tileset.schema";
+import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { ImageSourceData } from "@/shared/schema/image-source.schema";
+import { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { PropertyUpdateMeta } from "../base-object";
+import { normalizeTilesetData } from "./tileset.normalizer";
 
 export class SingleImageTileset extends Tileset {
     @StringProperty<SingleImageTileset>({
@@ -64,9 +65,10 @@ export class SingleImageTileset extends Tileset {
     }
 
     public updateTileset(tilesetData: TilesetData): void {
-        this.updateCommonData(tilesetData, TilesetType.SingleImage);
+        const data = normalizeTilesetData(tilesetData);
+        this.updateCommonData(data, TilesetType.SingleImage);
 
-        const imageSourceData = tilesetData.image ?? {
+        const imageSourceData = data.image ?? {
             source: "",
             width: this.columns * this.tilewidth,
             height: this.rows * this.tileheight,
@@ -75,8 +77,8 @@ export class SingleImageTileset extends Tileset {
         this.imageSource.setSource(imageSourceData);
 
         const nextTileData =
-            tilesetData.tiles.length > 0
-                ? tilesetData.tiles
+            data.tiles.length > 0
+                ? data.tiles
                 : Array.from(
                     { length: Math.max(0, this.columns * this.rows) },
                     (_, index) => ({ id: index }),

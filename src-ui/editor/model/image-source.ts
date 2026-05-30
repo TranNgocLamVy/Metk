@@ -1,4 +1,4 @@
-import { ImageSourceData } from "@/shared/schema/image-source.schema";
+import { ImageSourceData } from "@/shared/data-types/image-source.data";
 
 export class ImageSource {
     private _source: string;

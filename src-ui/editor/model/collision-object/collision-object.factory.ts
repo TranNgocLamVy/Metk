@@ -1,4 +1,4 @@
-import { CollisionObjectData } from "@/shared/schema/collision-object.schema";
+import { CollisionObjectData } from "@/shared/data-types/collision-object.data";
 import { CollisionObject } from "./collision-object";
 import { BoxCollision } from "./box-collision";
 import { PointCollision } from "./point-collision";

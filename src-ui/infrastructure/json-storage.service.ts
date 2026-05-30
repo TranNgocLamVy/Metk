@@ -17,7 +17,7 @@ export class JsonStorageService<T> implements IStorageService {
     }
 
 
-    public async load(absFilePath: string): Promise<Result<T>> {
+    public async load(absFilePath: string): Promise<Result<unknown>> {
         const readResult = await this.storage.readTextFile(absFilePath, this.defaultOptions);
         if (readResult.status != Result.Status.Success) return Result.Error(readResult.message);
 

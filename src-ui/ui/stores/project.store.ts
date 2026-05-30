@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { appKernel } from '@/application/bootstrap/app-kernel';
-import { ProjectMetadata } from '@/shared/schema/project.schema';
+import { ProjectMetadata } from '@/shared/data-types/project.data';
 import { Project } from '@/editor/model/project/project';
 
 interface ProjectState {

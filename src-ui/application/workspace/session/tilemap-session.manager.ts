@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { defaultTilemapSessionData, TilemapSessionManagerData } from "@/shared/schema/tilemap-session.schema";
+import { defaultTilemapSessionData, TilemapSessionManagerData } from "@/shared/data-types/tilemap-session.data";
 import { EditorFacade } from "@/application/editor.facade";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";

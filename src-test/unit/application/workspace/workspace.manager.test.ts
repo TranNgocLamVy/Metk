@@ -13,7 +13,7 @@ vi.mock("@/infrastructure/container", () => storageState);
 import { WorkspaceManager } from "@/application/workspace/workspace.manager";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { WorkspaceStorageService } from "@/infrastructure/container";
-import { defaultWorkspaceData, WorkpsaceData } from "@/shared/schema/workspaceSchema";
+import { defaultWorkspaceData, WorkpsaceData } from "@/shared/data-types/workspace.data";
 import { Result } from "@/shared/types/result";
 
 const createEditorFacade = () => ({

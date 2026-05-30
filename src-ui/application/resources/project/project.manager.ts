@@ -3,8 +3,9 @@ import { PathUtils } from "@/shared/utils/path.utils";
 import { ProjectStorageService } from "@/infrastructure/container";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import EventEmitter from "eventemitter3";
-import { ProjectMetadata, ProjectRepoData } from "@/shared/schema/project.schema";
+import { ProjectMetadata } from "@/shared/data-types/project.data";
 import { Project } from "@/editor/model/project/project";
+import { normalizeProjectMetadataRepo } from "@/editor/model/project/project.normalizer";
 
 type ProjectManagerEvent = {
     onProjectMetadatasChanged: (projectMetadata: ProjectMetadata[]) => void;
@@ -19,8 +20,9 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
         super();
     }
 
-    public load(projectRepoData: ProjectRepoData) {
-        for (const metaData of projectRepoData) {
+    public load(projectRepoData: unknown) {
+        const normalizedRepoData = normalizeProjectMetadataRepo(projectRepoData);
+        for (const metaData of normalizedRepoData) {
             this.projectMetadataMap.set(metaData.id, metaData);
         }
         this.emit("onProjectMetadatasChanged", this.serialize());
@@ -42,8 +44,12 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
             return Result.Error(loadProjectResult.message);
         }
 
-        const projectData = loadProjectResult.data;
-        this.currentProject = new Project(projectData, new ProjectPathSystem(metaData.directory));
+        const projectResult = Project.create(loadProjectResult.data, new ProjectPathSystem(metaData.directory));
+        if (projectResult.status !== Result.Status.Success) {
+            return Result.Error(projectResult.message);
+        }
+
+        this.currentProject = projectResult.data;
 
         await this.currentProject.load();
         this.emit("onProjectLoaded", this.currentProject);

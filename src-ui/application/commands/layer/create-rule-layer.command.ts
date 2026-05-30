@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { RuleLayerData } from "@/shared/schema/layer.schema";
+import { RuleLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 
 import { EditorFacade } from "@/application/editor.facade";

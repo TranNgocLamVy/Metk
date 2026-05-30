@@ -1,11 +1,17 @@
 
 import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { TilemapData, type TilemapOrientation } from "@/shared/schema/tilemap.schema";
+import {
+    DEFAULT_TILEMAP_BACKGROUND_COLOR,
+    TilemapData,
+    type TilemapOrientation,
+} from "@/shared/data-types/tilemap.data";
 import { RootLayer } from "./layer/root-layer";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { EnumProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import { Result } from "@/shared/types/result";
+import { normalizeTilemapData } from "./tilemap.normalizer";
 
 interface TilemapEvent extends BaseObjectEvents {
     onChange: () => void
@@ -69,29 +75,51 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     public rootLayer: RootLayer;
 
-    constructor(
-        tilemapData: TilemapData,
+    private constructor(
+        data: TilemapData,
         public readonly tilemapPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager
     ) {
-        super(`tilemap:${tilemapData.id}`);
-        this.tilemapPathSystem = tilesetRefManager.filePathSystem;
+        super(`tilemap:${data.id}`);
 
-        this.id = tilemapData.id;
-        this.name = tilemapData.name;
-        this.orientation = tilemapData.orientation;
-        this.backgroundcolor = tilemapData.backgroundcolor ?? "#AARRGGBB";
+        this.id = data.id;
+        this.name = data.name;
+        this.orientation = data.orientation;
+        this.backgroundcolor = data.backgroundcolor ?? DEFAULT_TILEMAP_BACKGROUND_COLOR;
 
-        this.width = tilemapData.width;
-        this.height = tilemapData.height;
-        this.tilewidth = tilemapData.tilewidth;
-        this.tileheight = tilemapData.tileheight;
+        this.width = data.width;
+        this.height = data.height;
+        this.tilewidth = data.tilewidth;
+        this.tileheight = data.tileheight;
 
-        this.tilesetRefManager.loadData(tilemapData.tilesets.refs, tilemapData.tilesets.nextIndex);
-        this.rulesetRefManager.loadData(tilemapData.rulesets.refs, tilemapData.rulesets.nextIndex);
+        this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
+        this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
 
-        this.rootLayer = new RootLayer(tilemapData.layers, this, this.objectId);
+        this.rootLayer = new RootLayer(data.layers, this, this.objectId);
+    }
+
+    public static create(
+        tilemapData: unknown,
+        tilemapPathSystem: FilePathSystem,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager
+    ): Result<Tilemap> {
+        try {
+            const data = normalizeTilemapData(tilemapData);
+            return Result.Success(Tilemap.fromData(data, tilemapPathSystem, tilesetRefManager, rulesetRefManager));
+        } catch (error) {
+            return Result.Error(`Failed to create tilemap: ${String(error)}`);
+        }
+    }
+
+    public static fromData(
+        tilemapData: TilemapData,
+        tilemapPathSystem: FilePathSystem,
+        tilesetRefManager: TilesetRefManager,
+        rulesetRefManager: RulesetRefManager
+    ): Tilemap {
+        return new Tilemap(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
     }
 
     public rename(newName: string, meta?: PropertyUpdateMeta) {

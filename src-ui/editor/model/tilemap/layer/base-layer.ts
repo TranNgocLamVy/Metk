@@ -5,6 +5,7 @@ import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "../../base-obj
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { BooleanProperty, NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
+import { validate } from "@/shared/utils/validate.utils";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
     
@@ -84,13 +85,14 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     }
 
     constructor(
-        id: string, 
+        id: string,
         public readonly tilemap: Tilemap,
         public readonly objectIdScope: string = "object",
         layerType: string = "Unknow"
     ) {
-        super(`${objectIdScope}:layer:${id}`);
-        this.id = id;
+        const layerId = validate.requiredString({ value: id, field: "layer.id" });
+        super(`${objectIdScope}:layer:${layerId}`);
+        this.id = layerId;
         this.layerType = layerType;
     }
 

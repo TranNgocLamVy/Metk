@@ -1,12 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { createReferenceContext, createRulesetData } from "./editor-test-utils";
+import { createReferenceContext, createRuleset, createRulesetData } from "./editor-test-utils";
 
 describe("Ruleset", () => {
     it("calculates output from the first satisfied rule", () => {
         const context = createReferenceContext({ tilesets: ["tileset-a"], rulesets: ["terrain"] });
-        const ruleset = new Ruleset(
+        const ruleset = createRuleset(
+            context,
             createRulesetData({
                 id: "terrain",
                 name: "Terrain",
@@ -17,9 +18,6 @@ describe("Ruleset", () => {
                     { id: "fallback", constraints: "", outputs: "2:0:1" },
                 ],
             }),
-            context.filePathSystem,
-            context.tilesetRefManager,
-            context.rulesetRefManager,
         );
 
         expect(ruleset.calculateOutput([
@@ -31,7 +29,8 @@ describe("Ruleset", () => {
 
     it("updates matching rulesets, removes absent rules, and emits an update event", () => {
         const context = createReferenceContext({ tilesets: ["tileset-a"], rulesets: ["terrain"] });
-        const ruleset = new Ruleset(
+        const ruleset = createRuleset(
+            context,
             createRulesetData({
                 id: "terrain",
                 name: "Terrain",
@@ -41,9 +40,6 @@ describe("Ruleset", () => {
                     { id: "rule-b", constraints: "", outputs: "" },
                 ],
             }),
-            context.filePathSystem,
-            context.tilesetRefManager,
-            context.rulesetRefManager,
         );
         const onUpdated = vi.fn();
         ruleset.eventEmitter.on("onUpdated", onUpdated);
@@ -67,16 +63,14 @@ describe("Ruleset", () => {
 
     it("serializes rule, tileset reference, and ruleset reference state after removals", () => {
         const context = createReferenceContext({ tilesets: ["tileset-a"], rulesets: ["terrain", "neighbor"] });
-        const ruleset = new Ruleset(
+        const ruleset = createRuleset(
+            context,
             createRulesetData({
                 id: "terrain",
                 rulesets: { refs: [{ index: 0, id: "terrain", name: "Terrain" }, { index: 1, id: "neighbor", name: "Neighbor" }], nextIndex: 2 },
                 tilesets: { refs: [{ index: 0, id: "tileset-a", name: "Tileset A" }], nextIndex: 1 },
                 rules: [{ id: "rule-a", constraints: "2:0:1", outputs: "4:0:1" }],
             }),
-            context.filePathSystem,
-            context.tilesetRefManager,
-            context.rulesetRefManager,
         );
 
         expect(ruleset.removeRulesetRef("neighbor")).toBe(true);

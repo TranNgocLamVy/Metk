@@ -8,7 +8,7 @@ import { DropPosition, useLayerManagerStore } from "@/ui/stores/layer-manager.st
 
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
 import { WorkspaceService } from "./workspace.service";
-import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData } from "../schema/layer.schema";
+import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData } from "../data-types/layer.data";
 import { CreateRuleLayerCommand } from "@/application/commands/layer/create-rule-layer.command";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";

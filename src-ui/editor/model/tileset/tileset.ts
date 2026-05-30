@@ -7,7 +7,7 @@ import {
     TileData,
     TilesetData,
     TilesetType,
-} from "@/shared/schema/tileset.schema";
+} from "@/shared/data-types/tileset.data";
 import { Result } from "@/shared/types/result";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
@@ -20,6 +20,7 @@ import {
 import { ImageSource } from "../image-source";
 import { CollisionObject } from "../collision-object/collision-object";
 import { CollisionObjectFactory } from "../collision-object/collision-object.factory";
+import { normalizeTileData } from "./tileset.normalizer";
 
 interface TilesetEvent extends BaseObjectEvents {
     update(): void;
@@ -247,21 +248,26 @@ export class Tile extends BaseObject<TileEvent> {
         tileData: TileData,
         public readonly tileset: Tileset,
     ) {
-        super(`${tileset.objectId}:tile:${tileData.id}`);
+        const data = normalizeTileData(tileData);
+        if (!data) throw new Error("Invalid tile data");
+        super(`${tileset.objectId}:tile:${data.id}`);
 
-        this.id = tileData.id;
-        this.imageSource = tileData.image ? new ImageSource(tileData.image) : null;
-        this.collisionObjects = (tileData.collisionObjects ?? []).map((data) => CollisionObjectFactory.fromData(data)).filter((obj) => obj !== null);
+        this.id = data.id;
+        this.imageSource = data.image ? new ImageSource(data.image) : null;
+        this.collisionObjects = (data.collisionObjects ?? []).map((data) => CollisionObjectFactory.fromData(data)).filter((obj) => obj !== null);
     }
 
     public updateTile(tileData: TileData): void {
-        if (tileData.image) {
-            this.imageSource = new ImageSource(tileData.image);
+        const data = normalizeTileData(tileData);
+        if (!data) return;
+
+        if (data.image) {
+            this.imageSource = new ImageSource(data.image);
         } else {
             this.imageSource = null;
         }
 
-        this.collisionObjects = (tileData.collisionObjects ?? []).map((data) => CollisionObjectFactory.fromData(data)).filter((obj) => obj !== null);
+        this.collisionObjects = (data.collisionObjects ?? []).map((data) => CollisionObjectFactory.fromData(data)).filter((obj) => obj !== null);
 
         this.emitUpdateProperty("imageSource", this.imageSource, {
             origin: "external",

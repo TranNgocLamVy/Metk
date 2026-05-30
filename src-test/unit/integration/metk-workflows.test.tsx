@@ -238,55 +238,52 @@ const createTilemapSession = (options: {
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
 
-    const tilemap = new Tilemap(
-        {
-            id: options.tilemapId,
-            name: options.tilemapName,
-            orientation: "orthogonal",
-            width: 8,
-            height: 8,
-            tilewidth: 16,
-            tileheight: 16,
-            backgroundcolor: "#00000000",
-            tilesets: { refs: [], nextIndex: 0 },
-            rulesets: { refs: [], nextIndex: 0 },
-            layers: [
-                {
-                    id: "ground",
-                    type: "tile",
-                    name: "Ground",
-                    x: 0,
-                    y: 0,
-                    width: 8,
-                    height: 8,
-                    opacity: 1,
-                    visible: true,
-                    locked: false,
-                    offsetx: 0,
-                    offsety: 0,
-                    layerData: "",
-                },
-                {
-                    id: "collision",
-                    type: "tile",
-                    name: "Collision",
-                    x: 0,
-                    y: 0,
-                    width: 8,
-                    height: 8,
-                    opacity: 1,
-                    visible: true,
-                    locked: false,
-                    offsetx: 0,
-                    offsety: 0,
-                    layerData: "",
-                },
-            ],
-        },
-        filePathSystem,
-        tilesetRefManager,
-        rulesetRefManager,
-    );
+    const tilemapResult = Tilemap.create({
+        id: options.tilemapId,
+        name: options.tilemapName,
+        orientation: "orthogonal",
+        width: 8,
+        height: 8,
+        tilewidth: 16,
+        tileheight: 16,
+        backgroundcolor: "#00000000",
+        tilesets: { refs: [], nextIndex: 0 },
+        rulesets: { refs: [], nextIndex: 0 },
+        layers: [
+            {
+                id: "ground",
+                type: "tile",
+                name: "Ground",
+                x: 0,
+                y: 0,
+                width: 8,
+                height: 8,
+                opacity: 1,
+                visible: true,
+                locked: false,
+                offsetx: 0,
+                offsety: 0,
+                layerData: "",
+            },
+            {
+                id: "collision",
+                type: "tile",
+                name: "Collision",
+                x: 0,
+                y: 0,
+                width: 8,
+                height: 8,
+                opacity: 1,
+                visible: true,
+                locked: false,
+                offsetx: 0,
+                offsety: 0,
+                layerData: "",
+            },
+        ],
+    }, filePathSystem, tilesetRefManager, rulesetRefManager);
+    if (tilemapResult.status !== Result.Status.Success) throw new Error(String(tilemapResult.message));
+    const tilemap = tilemapResult.data;
 
     const session = new EventEmitter() as TestTilemapSession;
     session.id = options.sessionId;

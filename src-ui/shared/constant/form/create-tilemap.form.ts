@@ -1,4 +1,4 @@
-import { TilemapOrientation } from "@/shared/schema/tilemap.schema";
+import { TilemapOrientation } from "@/shared/data-types/tilemap.data";
 import { FormUtils } from "@/shared/utils/form.utils";
 
 export const createTilemapForm = () => {

@@ -1,4 +1,4 @@
-import { RulesetSessionManagerData } from "@/shared/schema/ruleset-session.schema";
+import { RulesetSessionManagerData } from "@/shared/data-types/ruleset-session.data";
 import { EditorFacade } from "@/application/editor.facade";
 
 

@@ -3,8 +3,9 @@ import { TilemapManager } from "@/application/resources/tilemap/tilemap.manager"
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { ProjectData, ProjectMetadata } from "@/shared/schema/project.schema";
-
+import { ProjectData, ProjectMetadata } from "@/shared/data-types/project.data";
+import { Result } from "@/shared/types/result";
+import { normalizeProjectData } from "./project.normalizer";
 
 export class Project {
     public readonly id: string;
@@ -31,7 +32,10 @@ export class Project {
     public tilemapManager: TilemapManager;
     public rulesetManager: RulesetManager;
 
-    constructor(private data: ProjectData, public readonly projectPathSystem: ProjectPathSystem) {
+    private data: ProjectData;
+
+    private constructor(data: ProjectData, public readonly projectPathSystem: ProjectPathSystem) {
+        this.data = data;
         this.id = data.id;
         this.name = data.name;
         this.version = data.version;
@@ -58,6 +62,19 @@ export class Project {
             this.projectPathSystem,
             this.objectRegistry
         );
+    }
+
+    public static create(data: unknown, projectPathSystem: ProjectPathSystem): Result<Project> {
+        try {
+            const normalized = normalizeProjectData(data);
+            return Result.Success(Project.fromData(normalized, projectPathSystem));
+        } catch (error) {
+            return Result.Error(`Failed to create project: ${String(error)}`);
+        }
+    }
+
+    public static fromData(data: ProjectData, projectPathSystem: ProjectPathSystem): Project {
+        return new Project(data, projectPathSystem);
     }
 
     public async load() {

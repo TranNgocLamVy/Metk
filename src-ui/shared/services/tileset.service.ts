@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilesetData, TilesetType } from "@/shared/schema/tileset.schema";
+import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { PathUtils } from "../utils/path.utils";
@@ -14,6 +14,7 @@ import i18n from "@/shared/services/i18n.service";
 import { Console } from "./console.service";
 import { readFile } from "@tauri-apps/plugin-fs";
 import { TextureUtils } from "../utils/texture.utils";
+import { extractTilesetId } from "@/editor/model/tileset/tileset.normalizer";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
@@ -136,8 +137,18 @@ export class TilesetService {
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
         currentWorkspace.savedPathManager.setTilesetDir(tilesetAbsDir);
 
-        const tilesetData = loadTilesetResult.data;
-        if (refTilesetId && tilesetData.id !== refTilesetId) {
+        let tilesetId: string;
+        try {
+            tilesetId = extractTilesetId(loadTilesetResult.data);
+        } catch (error) {
+            Console.error({
+                message: "message.tileset.importFail",
+                stacks: [String(error)],
+            });
+            return Result.Error("message.tileset.importFail");
+        }
+
+        if (refTilesetId && tilesetId !== refTilesetId) {
             Console.error({
                 message: "message.tileset.importFail",
                 stacks: ["message.tileset.mismatchId"]
@@ -145,13 +156,14 @@ export class TilesetService {
             return Result.Cancel();
         }
 
-        await currentProject.tilesetManager.addTileset(tilesetData, tilesetAbsPath);
+        const addTilesetResult = await currentProject.tilesetManager.addTileset(loadTilesetResult.data, tilesetAbsPath);
+        if (addTilesetResult.status !== Result.Status.Success) return addTilesetResult;
 
         await editorFacade.projectManager.saveCurrrentProject();
 
-        WorkspaceService.createTilesetSession(tilesetData.id);
+        WorkspaceService.createTilesetSession(addTilesetResult.data.id);
 
-        Console.success({ message: { key: "message.tileset.importSuccess", options: { name: tilesetData.name } } });
+        Console.success({ message: { key: "message.tileset.importSuccess", options: { name: addTilesetResult.data.name } } });
 
         return Result.Success();
     }

@@ -1,4 +1,4 @@
-import { BaseCollisionData, CollisionObjectData, CollisionObjectKind } from "@/shared/schema/collision-object.schema";
+import { BaseCollisionData, CollisionObjectData, CollisionObjectKind } from "@/shared/data-types/collision-object.data";
 
 export abstract class CollisionObject {
     public readonly id: string;

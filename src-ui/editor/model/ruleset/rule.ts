@@ -1,7 +1,7 @@
-import { RuleData, RuleOutputData, RuleConstraintData, RuleRequirement } from "@/shared/schema/ruleset.schema";
+import { RuleData, RuleOutputData, RuleConstraintData, RuleRequirement } from "@/shared/data-types/ruleset.data";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { BaseObject, BaseObjectEvents } from "../base-object";
-import { RulesetRefData } from "@/shared/schema/layer.schema";
+import { RulesetRefData } from "@/shared/data-types/layer.data";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 
 interface RuleEvent extends BaseObjectEvents {

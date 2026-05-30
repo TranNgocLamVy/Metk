@@ -1,7 +1,8 @@
-import { TilesetData, TilesetType } from "@/shared/schema/tileset.schema";
+import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 import { Tileset } from "./tileset";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { normalizeTilesetData } from "./tileset.normalizer";
 
 export class ImageCollectionTileset extends Tileset {
     public constructor(
@@ -24,9 +25,10 @@ export class ImageCollectionTileset extends Tileset {
     }
 
     public updateTileset(tilesetData: TilesetData): void {
-        this.updateCommonData(tilesetData, TilesetType.ImageCollection);
+        const data = normalizeTilesetData(tilesetData);
+        this.updateCommonData(data, TilesetType.ImageCollection);
 
-        this.replaceTiles(tilesetData.tiles);
+        this.replaceTiles(data.tiles);
         this.recalculateCollectionMetrics();
 
         this.emitTilesetUpdated("ImageCollectionTileset.updateTileset");

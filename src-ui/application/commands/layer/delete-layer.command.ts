@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Result } from "@/shared/types/result";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
-import { LayerData } from "@/shared/schema/layer.schema";
+import { LayerData } from "@/shared/data-types/layer.data";
 import { LayerUtils } from "@/shared/utils/layer.utils";
 import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, isLayerContainer } from "@/application/commands/command-target.utils";
 

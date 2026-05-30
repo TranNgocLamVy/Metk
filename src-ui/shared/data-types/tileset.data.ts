@@ -1,0 +1,48 @@
+import { CollisionObjectData } from "./collision-object.data";
+import { ImageSourceData } from "./image-source.data";
+
+export const TilesetType = {
+    SingleImage: "single-image",
+    ImageCollection: "image-collection",
+} as const;
+
+export const TilesetTypeValues = [
+    TilesetType.SingleImage,
+    TilesetType.ImageCollection,
+] as const;
+
+export type TilesetType = typeof TilesetType[keyof typeof TilesetType];
+
+export type TileData = {
+    id: number;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    image?: ImageSourceData;
+    collisionObjects?: CollisionObjectData[];
+};
+
+export type TilesetData = {
+    id: string;
+    name: string;
+    type?: TilesetType;
+    columns: number;
+    rows: number;
+    tilewidth: number;
+    tileheight: number;
+    image?: ImageSourceData;
+    tiles: TileData[];
+};
+
+export type TilesetMetadata = {
+    name: string;
+    id: string;
+    tilesetRelPath: string;
+};
+
+export type TilesetRefData = {
+    id: string;
+    index: number;
+    name: string;
+};

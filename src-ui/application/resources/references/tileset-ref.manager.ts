@@ -1,6 +1,6 @@
 import { TilesetManager } from "../tileset/tileset.manager";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
-import { TilesetRefData } from "@/shared/schema/tileset.schema";
+import { TilesetRefData } from "@/shared/data-types/tileset.data";
 
 /** Manages references to tilesets, maintaining a mapping between ruleset IDs and their numerical indices. */
 export class TilesetRefManager {

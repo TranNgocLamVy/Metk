@@ -5,7 +5,7 @@ import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { getLayerByObjectId, getTilemapByObjectId, isLayerContainer, isLayerInTilemap } from "@/application/commands/command-target.utils";
-import { LayerData } from "@/shared/schema/layer.schema";
+import { LayerData } from "@/shared/data-types/layer.data";
 import { LayerUtils } from "@/shared/utils/layer.utils";
 
 export class DuplicateLayerCommand implements IUndoableCommand {

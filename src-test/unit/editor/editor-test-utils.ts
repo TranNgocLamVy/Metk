@@ -4,10 +4,10 @@ import { RulesetRefManager } from "@/application/resources/references/ruleset-re
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { RulesetData } from "@/shared/schema/ruleset.schema";
+import { RulesetData } from "@/shared/data-types/ruleset.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { RootLayerData } from "@/shared/schema/layer.schema";
+import { RootLayerData } from "@/shared/data-types/layer.data";
 
 type ReferenceContextOptions = {
     tilesets?: string[];
@@ -71,7 +71,7 @@ export const createTilemap = (
     context: ReturnType<typeof createReferenceContext>,
     layers: RootLayerData = [],
 ): Tilemap => {
-    return new Tilemap(
+    const result = Tilemap.create(
         {
             id: "tilemap-a",
             name: "Tilemap A",
@@ -88,6 +88,8 @@ export const createTilemap = (
         context.tilesetRefManager,
         context.rulesetRefManager,
     );
+    if (result.status !== "Success") throw new Error(String(result.message));
+    return result.data;
 };
 
 export const createRulesetData = (overrides: Partial<RulesetData> = {}): RulesetData => ({
@@ -103,4 +105,13 @@ export const createRulesetData = (overrides: Partial<RulesetData> = {}): Ruleset
 
 export const registerLoadedRuleset = (rulesetManager: RulesetManager, ruleset: Ruleset) => {
     (rulesetManager as any).loadedRulesets.set(ruleset.id, ruleset);
+};
+
+export const createRuleset = (
+    context: ReturnType<typeof createReferenceContext>,
+    data: RulesetData = createRulesetData(),
+): Ruleset => {
+    const result = Ruleset.create(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    if (result.status !== "Success") throw new Error(String(result.message));
+    return result.data;
 };

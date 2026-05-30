@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { RulesetData } from "@/shared/schema/ruleset.schema";
+import { RulesetData } from "@/shared/data-types/ruleset.data";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
@@ -12,6 +12,7 @@ import { WorkspaceService } from "./workspace.service";
 import i18n from "@/shared/services/i18n.service";
 import { Console } from "./console.service";
 import { PathUtils } from "../utils/path.utils";
+import { extractRulesetId } from "@/editor/model/ruleset/ruleset.normalizer";
 
 export class RulesetService {
 
@@ -83,8 +84,18 @@ export class RulesetService {
         const rulesetAbsDir = PathUtils.dirname(rulesetAbsPath);
         currentWorkspace.savedPathManager.setRulesetDir(rulesetAbsDir);
 
-        const rulesetData = loadRulesetResult.data;
-        if (refRulesetId && rulesetData.id !== refRulesetId) {
+        let rulesetId: string;
+        try {
+            rulesetId = extractRulesetId(loadRulesetResult.data);
+        } catch (error) {
+            Console.error({
+                message: "message.ruleset.importFail",
+                stacks: [String(error)],
+            });
+            return Result.Error("message.ruleset.importFail");
+        }
+
+        if (refRulesetId && rulesetId !== refRulesetId) {
             Console.error({
                 message: "message.ruleset.importFail",
                 stacks: ["message.ruleset.mismatchId"]
@@ -92,7 +103,8 @@ export class RulesetService {
             return Result.Cancel();
         }
 
-        await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
+        const addRulesetResult = await currentProject.rulesetManager.addRuleset(loadRulesetResult.data, rulesetAbsPath);
+        if (addRulesetResult.status !== Result.Status.Success) return addRulesetResult;
 
         await editorFacade.projectManager.saveCurrrentProject();
 

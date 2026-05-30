@@ -1,9 +1,9 @@
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { ProjectData, ProjectMetadata } from "@/shared/schema/project.schema";
-import { RulesetData, RulesetMetadata } from "@/shared/schema/ruleset.schema";
-import { TilemapData, TilemapMetadata } from "@/shared/schema/tilemap.schema";
-import { TilesetData, TilesetMetadata } from "@/shared/schema/tileset.schema";
+import { ProjectData, ProjectMetadata } from "@/shared/data-types/project.data";
+import { RulesetData, RulesetMetadata } from "@/shared/data-types/ruleset.data";
+import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
+import { TilesetData, TilesetMetadata } from "@/shared/data-types/tileset.data";
 
 export const createProjectPathSystem = () => new ProjectPathSystem("C:/Project/Metk/test-project");
 

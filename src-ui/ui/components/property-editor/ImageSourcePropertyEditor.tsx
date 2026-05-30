@@ -2,7 +2,7 @@ import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, us
 import { readFile } from "@tauri-apps/plugin-fs";
 
 import { ImageSourcePropertyClass } from "@/editor/properties/properties";
-import type { ImageSourceData } from "@/shared/schema/image-source.schema";
+import type { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { Result } from "@/shared/types/result";
 import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";

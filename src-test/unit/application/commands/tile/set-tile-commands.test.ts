@@ -8,8 +8,8 @@ import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { RuleLayerData, RootLayerData, TileLayerData } from "@/shared/schema/layer.schema";
-import { TilemapData } from "@/shared/schema/tilemap.schema";
+import { RuleLayerData, RootLayerData, TileLayerData } from "@/shared/data-types/layer.data";
+import { TilemapData } from "@/shared/data-types/tilemap.data";
 
 import { createReferenceContext } from "../../../editor/editor-test-utils";
 
@@ -87,12 +87,14 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
         },
         layers,
     };
-    const tilemap = new Tilemap(
+    const tilemapResult = Tilemap.create(
         tilemapData,
         filePathSystem,
         referenceContext.tilesetRefManager,
         referenceContext.rulesetRefManager,
     );
+    if (tilemapResult.status !== "Success") throw new Error(String(tilemapResult.message));
+    const tilemap = tilemapResult.data;
     const objectRegistry = new EditorObjectRegistry();
     objectRegistry.registerTree(tilemap);
 

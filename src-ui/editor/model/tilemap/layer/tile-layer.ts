@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { TileLayerData, TileRefData } from "@/shared/schema/layer.schema";
+import { TileLayerData, TileRefData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 
@@ -8,6 +8,7 @@ import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
 import type { PropertyUpdateMeta } from "../../base-object";
+import { validate } from "@/shared/utils/validate.utils";
 
 interface TileLayerEvents extends BaseLayerEvents {
     tilesChanged: (coords: Coordinate[]) => void
@@ -58,25 +59,26 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
         tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope
     ) {
-        super(tileLayerData.id, tilemap, objectIdScope, "Tile Layer");
+        const data = validate.requiredObject({ value: tileLayerData, field: "tile layer" });
+        super(validate.requiredString({ value: data.id, field: "tile layer.id" }), tilemap, objectIdScope, "Tile Layer");
 
         this.parentLayer = parentLayer;
 
-        this.name = tileLayerData.name ?? "Unknow Tile Layer";
+        this.name = validate.string({ value: data.name, defaultValue: "Unknow Tile Layer" });
 
-        this.coordinate.col = tileLayerData.x ?? 0;
-        this.coordinate.row = tileLayerData.y ?? 0;
-        this.offset.x = tileLayerData.offsetx ?? 0;
-        this.offset.y = tileLayerData.offsety ?? 0;
+        this.coordinate.col = validate.number({ value: data.x, defaultValue: 0, integer: true });
+        this.coordinate.row = validate.number({ value: data.y, defaultValue: 0, integer: true });
+        this.offset.x = validate.number({ value: data.offsetx, defaultValue: 0 });
+        this.offset.y = validate.number({ value: data.offsety, defaultValue: 0 });
 
-        this.size.width = tileLayerData.width ?? 1;
-        this.size.height = tileLayerData.height ?? 1;
+        this.size.width = validate.number({ value: data.width, defaultValue: 1, min: 1, integer: true });
+        this.size.height = validate.number({ value: data.height, defaultValue: 1, min: 1, integer: true });
 
-        this.opacity = tileLayerData.opacity ?? 1;
-        this.visible = tileLayerData.visible ?? true;
-        this.locked = tileLayerData.locked ?? false;
+        this.opacity = validate.number({ value: data.opacity, defaultValue: 1, min: 0, max: 1 });
+        this.visible = validate.boolean({ value: data.visible, defaultValue: true });
+        this.locked = validate.boolean({ value: data.locked, defaultValue: false });
 
-        const layerData = tileLayerData.layerData ?? ""
+        const layerData = validate.string({ value: data.layerData, defaultValue: "" });
         const tilesRef = layerData.split("\n").map((tileRow) => {
             return tileRow.split(",").map((tileRef) => {
                 if (tileRef === "0") return null;

@@ -1,13 +1,13 @@
 import { Result } from "@/shared/types/result";
-
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilesetStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/shared/services/console.service";
-import { TilesetData, TilesetMetadata } from "@/shared/schema/tileset.schema";
+import { TilesetData, TilesetMetadata } from "@/shared/data-types/tileset.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
+import { normalizeTilesetData } from "@/editor/model/tileset/tileset.normalizer";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -24,20 +24,28 @@ export class TilesetManager {
         this.tilesetMetadata.set(tilesetMetadata.id, tilesetMetadata);
     }
 
-    public async addTileset(tileset: TilesetData, tilesetAbsPath: string): Promise<Result<Tileset>> {
+    public async addTileset(tileset: unknown, tilesetAbsPath: string): Promise<Result<Tileset>> {
+        let tilesetData: TilesetData;
+        try {
+            tilesetData = normalizeTilesetData(tileset);
+        } catch (error) {
+            return Result.Error(`Failed to create tileset: ${String(error)}`);
+        }
+
         const tilesetRelPath = PathUtils.relative(this.projectPathSystem.absDir, tilesetAbsPath);
+        const tilesetPathSystem = new FilePathSystem(tilesetData.id, this.projectPathSystem, tilesetRelPath);
+        const newTileset = TilesetFactory.create(tilesetData, tilesetPathSystem, this.objectRegistry);
+
         const tilesetMetadata: TilesetMetadata = {
-            id: tileset.id,
-            name: tileset.name,
+            id: newTileset.id,
+            name: newTileset.name,
             tilesetRelPath: tilesetRelPath,
         }
-        this.tilesetMetadata.set(tileset.id, tilesetMetadata);
-        const tilesetPathSystem = new FilePathSystem(tileset.id, this.projectPathSystem, tilesetRelPath);
-        const newTileset = TilesetFactory.create(tileset, tilesetPathSystem, this.objectRegistry);
+        this.tilesetMetadata.set(newTileset.id, tilesetMetadata);
 
         this.objectRegistry.registerTree(newTileset);
 
-        this.loadedTilesets.set(tileset.id, newTileset);
+        this.loadedTilesets.set(newTileset.id, newTileset);
 
         return Result.Success(newTileset);
     }

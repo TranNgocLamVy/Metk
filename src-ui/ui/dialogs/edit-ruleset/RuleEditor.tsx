@@ -1,4 +1,4 @@
-import { RuleRequirement } from "@/shared/schema/ruleset.schema";
+import { RuleRequirement } from "@/shared/data-types/ruleset.data";
 import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
 import PixiImage from "@/ui/components/custom/PixiImage";
 import { appKernel } from "@/application/bootstrap/app-kernel";

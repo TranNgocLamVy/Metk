@@ -39,6 +39,7 @@ export class EditorObjectRegistry extends EventEmitter<EditorObjectRegistryEvent
             typeof objectOrId === "string"
                 ? objectOrId
                 : objectOrId.objectId;
+        this.objects.delete(objectId);
         this.emit("onObjectDeleted", objectId);
     }
 

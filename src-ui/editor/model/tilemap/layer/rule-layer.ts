@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { RuleLayerData, RulesetRefData } from "@/shared/schema/layer.schema";
+import { RuleLayerData, RulesetRefData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
 
@@ -7,6 +7,7 @@ import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
 import type { PropertyUpdateMeta } from "../../base-object";
+import { validate } from "@/shared/utils/validate.utils";
 
 interface RuleLayerEvents extends BaseLayerEvents {
     rulesetRefsOutputChanged: (coordinates: Coordinate[]) => void
@@ -52,24 +53,25 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
         tilemap: Tilemap,
         objectIdScope: string = parentLayer.objectIdScope,
     ) {
-        super(ruleLayerData.id, tilemap, objectIdScope, "Rule Layer");
+        const data = validate.requiredObject({ value: ruleLayerData, field: "rule layer" });
+        super(validate.requiredString({ value: data.id, field: "rule layer.id" }), tilemap, objectIdScope, "Rule Layer");
 
         this.parentLayer = parentLayer;
-        this.name = ruleLayerData.name ?? "Unknow Rule Layer";
+        this.name = validate.string({ value: data.name, defaultValue: "Unknow Rule Layer" });
 
-        this.coordinate.col = ruleLayerData.x ?? 0;
-        this.coordinate.row = ruleLayerData.y ?? 0;
-        this.offset.x = ruleLayerData.offsetx ?? 0;
-        this.offset.y = ruleLayerData.offsety ?? 0;
+        this.coordinate.col = validate.number({ value: data.x, defaultValue: 0, integer: true });
+        this.coordinate.row = validate.number({ value: data.y, defaultValue: 0, integer: true });
+        this.offset.x = validate.number({ value: data.offsetx, defaultValue: 0 });
+        this.offset.y = validate.number({ value: data.offsety, defaultValue: 0 });
 
-        this.size.width = ruleLayerData.width ?? 1;
-        this.size.height = ruleLayerData.height ?? 1;
+        this.size.width = validate.number({ value: data.width, defaultValue: 1, min: 1, integer: true });
+        this.size.height = validate.number({ value: data.height, defaultValue: 1, min: 1, integer: true });
 
-        this.opacity = ruleLayerData.opacity ?? 1;
-        this.visible = ruleLayerData.visible ?? true;
-        this.locked = ruleLayerData.locked ?? false;
+        this.opacity = validate.number({ value: data.opacity, defaultValue: 1, min: 0, max: 1 });
+        this.visible = validate.boolean({ value: data.visible, defaultValue: true });
+        this.locked = validate.boolean({ value: data.locked, defaultValue: false });
 
-        const layerData = ruleLayerData.layerData ?? ""
+        const layerData = validate.string({ value: data.layerData, defaultValue: "" });
         const rulesetRefs = layerData.split("\n").map((tileRow) => {
             return tileRow.split(",").map((tileRef) => {
                 if (tileRef === "0") return null;

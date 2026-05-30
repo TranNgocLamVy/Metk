@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { GroupLayerData } from "@/shared/schema/layer.schema";
+import { GroupLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";

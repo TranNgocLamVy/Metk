@@ -76,7 +76,7 @@ vi.mock("react-i18next", () => ({
     }),
 }));
 
-import { RuleRequirement } from "@/shared/schema/ruleset.schema";
+import { RuleRequirement } from "@/shared/data-types/ruleset.data";
 import { EditRulesetDialog } from "@/ui/dialogs/edit-ruleset/EditRulesetDialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { useRulesetStore } from "@/ui/stores/ruleset.store";

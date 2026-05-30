@@ -76,8 +76,7 @@ export class AppKernel {
             return Result.Error("Failed to load project repository");
         }
 
-        const projectRepoData = projectRepoResult.data;
-        AppKernel.getIns().projectManager.load(projectRepoData);
+        AppKernel.getIns().projectManager.load(projectRepoResult.data);
 
         this.isLoaded = true;
         return Result.Success(this);

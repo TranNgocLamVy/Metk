@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { TilemapSession } from "@/editor/session/tilemap.session";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { TilemapData } from "@/shared/schema/tilemap.schema";
+import { TilemapData } from "@/shared/data-types/tilemap.data";
 import { createReferenceContext, loadRulesetRefs, loadTilesetRefs } from "./editor-test-utils";
 import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
@@ -62,7 +62,9 @@ const createTilemap = () => {
         ],
     };
 
-    return new Tilemap(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.create(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    if (result.status !== "Success") throw new Error(String(result.message));
+    return result.data;
 };
 
 const createTileLayerPayload = (id: string) => ({

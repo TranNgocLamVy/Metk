@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { defaultTilesetSessionData, TilesetSessionManagerData } from "@/shared/schema/tileset-session.schema";
+import { defaultTilesetSessionData, TilesetSessionManagerData } from "@/shared/data-types/tileset-session.data";
 import { Result } from "@/shared/types/result";
 import { EditorFacade } from "@/application/editor.facade";
 import { TilesetSession } from "@/editor/session/tileset.session";

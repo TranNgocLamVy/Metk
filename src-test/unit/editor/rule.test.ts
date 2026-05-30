@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Rule } from "@/editor/model/ruleset/rule";
-import { RuleRequirement } from "@/shared/schema/ruleset.schema";
+import { RuleRequirement } from "@/shared/data-types/ruleset.data";
 import { createReferenceContext, loadRulesetRefs, loadTilesetRefs } from "./editor-test-utils";
 
 const createRule = () => {

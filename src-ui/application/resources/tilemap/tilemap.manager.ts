@@ -9,8 +9,9 @@ import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { RulesetManager } from "../ruleset/ruleset.manager";
 import { Console } from "@/shared/services/console.service";
 import { PathUtils } from "@/shared/utils/path.utils";
-import { TilemapData, TilemapMetadata } from "@/shared/schema/tilemap.schema";
+import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -29,26 +30,33 @@ export class TilemapManager {
         this.tilemapMetadata.set(tilemapMetadata.id, tilemapMetadata);
     }
 
-    public async addTilemap(tilemap: TilemapData, tilemapAbsPath: string): Promise<Result<Tilemap>> {
-        const tilemapRelPath = PathUtils.relative(this.projectPathSystem.absDir, tilemapAbsPath);
-        const tilemapMetadata: TilemapMetadata = {
-            id: tilemap.id,
-            name: tilemap.name,
-            tilemapRelPath: tilemapRelPath,
+    public async addTilemap(tilemap: unknown, tilemapAbsPath: string): Promise<Result<Tilemap>> {
+        let tilemapData: TilemapData;
+        try {
+            tilemapData = normalizeTilemapData(tilemap);
+        } catch (error) {
+            return Result.Error(`Failed to create tilemap: ${String(error)}`);
         }
-        this.tilemapMetadata.set(tilemap.id, tilemapMetadata);
 
-        const tilemapPathSystem = new FilePathSystem(tilemap.id, this.projectPathSystem, tilemapRelPath);
+        const tilemapRelPath = PathUtils.relative(this.projectPathSystem.absDir, tilemapAbsPath);
+        const tilemapPathSystem = new FilePathSystem(tilemapData.id, this.projectPathSystem, tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
-        const newTilemap = new Tilemap(tilemap, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
+        const newTilemap = Tilemap.fromData(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
+
+        const tilemapMetadata: TilemapMetadata = {
+            id: newTilemap.id,
+            name: newTilemap.name,
+            tilemapRelPath: tilemapRelPath,
+        }
+        this.tilemapMetadata.set(newTilemap.id, tilemapMetadata);
 
         this.objectRegistry.registerTree(newTilemap);
 
-        this.loadedTilemaps.set(tilemap.id, newTilemap);
+        this.loadedTilemaps.set(newTilemap.id, newTilemap);
 
-        const tilesetDepIds = tilemap.tilesets.refs.map(tilesetRef => tilesetRef.id);
-        const rulesetDepIds = tilemap.rulesets.refs.map(rulesetRef => rulesetRef.id);
+        const tilesetDepIds = newTilemap.tilesetRefManager.getRefIds();
+        const rulesetDepIds = newTilemap.rulesetRefManager.getRefIds();
 
         await Promise.all([
             this.tilesetManager.loadTilesets(tilesetDepIds),

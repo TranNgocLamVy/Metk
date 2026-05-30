@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Project } from "@/editor/model/project/project";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { ProjectData } from "@/shared/schema/project.schema";
+import { ProjectData } from "@/shared/data-types/project.data";
 
 const createProjectData = (): ProjectData => ({
     id: "project-1",
@@ -16,10 +16,16 @@ const createProjectData = (): ProjectData => ({
     rulesets: [{ id: "ruleset-1", name: "Ruleset One", color: "#ff00ff", rulesetRelPath: "rulesets/ruleset-1.json" }],
 });
 
+const createProject = (data: ProjectData, projectPathSystem: ProjectPathSystem): Project => {
+    const result = Project.create(data, projectPathSystem);
+    if (result.status !== "Success") throw new Error(String(result.message));
+    return result.data;
+};
+
 describe("Project", () => {
     it("exposes stable metadata including the project directory", () => {
         const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/sample-project");
-        const project = new Project(createProjectData(), projectPathSystem);
+        const project = createProject(createProjectData(), projectPathSystem);
 
         expect(project.metaData).toEqual({
             id: "project-1",
@@ -36,7 +42,7 @@ describe("Project", () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2026-05-19T09:00:00Z"));
 
-        const project = new Project(createProjectData(), new ProjectPathSystem("C:/Project/Metk/sample-project"));
+        const project = createProject(createProjectData(), new ProjectPathSystem("C:/Project/Metk/sample-project"));
         project.name = "Renamed Project";
         project.description = "Updated description";
         project.tilesetManager.loadTilesetsMetadata([

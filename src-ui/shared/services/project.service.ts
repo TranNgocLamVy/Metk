@@ -2,7 +2,7 @@ import { appKernel } from "@/application/bootstrap/app-kernel";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { Result } from "../types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
-import { defaultProjectData } from "../schema/project.schema";
+import { defaultProjectData } from "../data-types/project.data";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { DialogService } from "./dialog.service";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
@@ -21,10 +21,14 @@ export class ProjectService {
             Console.error({ message: projectDataResult.message })
             return;
         }
-        const projectData = projectDataResult.data;
         const metkDir = PathUtils.dirname(projectAbsPath);
         const projectAbsDir = PathUtils.dirname(metkDir);
-        const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
+        const projectResult = Project.create(projectDataResult.data, new ProjectPathSystem(projectAbsDir));
+        if (projectResult.status !== Result.Status.Success) {
+            Console.error({ message: projectResult.message });
+            return;
+        }
+        const project = projectResult.data;
 
         const projectManager = appKernel.projectManager;
         projectManager.addProjectMetadata(project.metaData);
@@ -56,7 +60,12 @@ export class ProjectService {
         }
 
         const projectData = defaultProjectData({ name: form.name });
-        const project = new Project(projectData, new ProjectPathSystem(projectAbsDir));
+        const projectResult = Project.create(projectData, new ProjectPathSystem(projectAbsDir));
+        if (projectResult.status !== Result.Status.Success) {
+            Console.error({ message: projectResult.message })
+            return;
+        }
+        const project = projectResult.data;
 
         const projectAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "project.json"));
         const saveResult = await ProjectStorageService.save(projectAbsPath, project.serialize());
