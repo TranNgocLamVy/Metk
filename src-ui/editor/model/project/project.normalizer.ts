@@ -3,6 +3,7 @@ import { validate } from "@/shared/utils/validate.utils";
 import { TilemapMetadata } from "@/shared/data-types/tilemap.data";
 import { TilesetMetadata } from "@/shared/data-types/tileset.data";
 import { RulesetMetadata } from "@/shared/data-types/ruleset.data";
+import { EntityCollectionMetadata } from "@/shared/data-types/entity-collection.data";
 
 const normalizeTilemapMetadata = (value: unknown): TilemapMetadata | null => {
     try {
@@ -68,6 +69,32 @@ const normalizeRulesetMetadata = (value: unknown): RulesetMetadata | null => {
     }
 };
 
+const normalizeEntityCollectionMetadata = (value: unknown): EntityCollectionMetadata | null => {
+    try {
+        const data = validate.requiredObject({
+            value,
+            field: "project.entityCollections[]",
+        });
+
+        return {
+            id: validate.requiredString({
+                value: data.id,
+                field: "project.entityCollections[].id",
+            }),
+            name: validate.string({
+                value: data.name,
+                defaultValue: "Untitled Entity Collection",
+            }),
+            entityCollectionRelPath: validate.requiredString({
+                value: data.entityCollectionRelPath,
+                field: "project.entityCollections[].entityCollectionRelPath",
+            }),
+        };
+    } catch {
+        return null;
+    }
+};
+
 export const normalizeProjectData = (projectData: unknown): ProjectData => {
     const data = validate.requiredObject({ value: projectData, field: "project" });
     const now = new Date().toDateString();
@@ -79,8 +106,17 @@ export const normalizeProjectData = (projectData: unknown): ProjectData => {
         description: validate.string({ value: data.description, defaultValue: "" }),
         createdAt: validate.string({ value: data.createdAt, defaultValue: now }),
         updatedAt: validate.string({ value: data.updatedAt, defaultValue: now }),
-        tilemaps: validate.array<unknown>({ value: data.tilemaps, defaultValue: [] }).map(normalizeTilemapMetadata).filter((metadata): metadata is TilemapMetadata => metadata !== null),
-        tilesets: validate.array<unknown>({ value: data.tilesets, defaultValue: [] }).map(normalizeTilesetMetadata).filter((metadata): metadata is TilesetMetadata => metadata !== null),
-        rulesets: validate.array<unknown>({ value: data.rulesets, defaultValue: [] }).map(normalizeRulesetMetadata).filter((metadata): metadata is RulesetMetadata => metadata !== null),
+        tilemaps: validate.array<unknown>({ value: data.tilemaps, defaultValue: [] })
+            .map(normalizeTilemapMetadata)
+            .filter((metadata): metadata is TilemapMetadata => metadata !== null),
+        tilesets: validate.array<unknown>({ value: data.tilesets, defaultValue: [] })
+            .map(normalizeTilesetMetadata)
+            .filter((metadata): metadata is TilesetMetadata => metadata !== null),
+        rulesets: validate.array<unknown>({ value: data.rulesets, defaultValue: [] })
+            .map(normalizeRulesetMetadata)
+            .filter((metadata): metadata is RulesetMetadata => metadata !== null),
+        entityCollections: validate.array<unknown>({ value: data.entityCollections, defaultValue: [] })
+            .map(normalizeEntityCollectionMetadata)
+            .filter((metadata): metadata is EntityCollectionMetadata => metadata !== null),
     };
 };

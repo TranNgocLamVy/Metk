@@ -10,10 +10,7 @@ type RequiredNumberValidationInput = Omit<NumberValidationInput, "defaultValue">
     field: string;
 };
 
-const isValidNumber = (
-    value: unknown,
-    options: { min?: number; max?: number; integer?: boolean } = {},
-): value is number => {
+const isValidNumber = ( value: unknown, options: { min?: number; max?: number; integer?: boolean } = {} ): value is number => {
     if (typeof value !== "number") return false;
     if (!Number.isFinite(value)) return false;
     if (options.integer && !Number.isInteger(value)) return false;
@@ -78,9 +75,7 @@ export const validate = {
     },
 
     enum<T extends string>(input: { value: unknown; values: readonly T[]; defaultValue: T }): T {
-        return typeof input.value === "string" && input.values.includes(input.value as T)
-            ? input.value as T
-            : input.defaultValue;
+        return typeof input.value === "string" && input.values.includes(input.value as T) ? input.value as T : input.defaultValue;
     },
 
     requiredEnum<T extends string>(input: { value: unknown; values: readonly T[]; field: string }): T {

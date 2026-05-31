@@ -81,6 +81,10 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         return await Promise.all(ids.map(id => this.loadRuleset(id)));
     }
 
+    public async loadAllRulesets(): Promise<Result<Ruleset>[]> {
+        return await this.loadRulesets(Array.from(this.rulesetMetadatas.keys()));
+    }
+
     public async loadRuleset(id: string): Promise<Result<Ruleset>> {
         if (this.loadedRulesets.has(id)) return Result.Success(this.loadedRulesets.get(id)!)
         if (this.pendingLoads.has(id)) return this.pendingLoads.get(id)!;

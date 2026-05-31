@@ -6,6 +6,7 @@ import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { ProjectData, ProjectMetadata } from "@/shared/data-types/project.data";
 import { Result } from "@/shared/types/result";
 import { normalizeProjectData } from "./project.normalizer";
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
 
 export class Project {
     public readonly id: string;
@@ -31,6 +32,7 @@ export class Project {
     public tilesetManager: TilesetManager;
     public tilemapManager: TilemapManager;
     public rulesetManager: RulesetManager;
+    public entityCollectionManager: EntityCollectionManager;
 
     private data: ProjectData;
 
@@ -62,6 +64,11 @@ export class Project {
             this.projectPathSystem,
             this.objectRegistry
         );
+
+        this.entityCollectionManager = new EntityCollectionManager(
+            this.projectPathSystem,
+            this.objectRegistry
+        );
     }
 
     public static create(data: unknown, projectPathSystem: ProjectPathSystem): Result<Project> {
@@ -79,11 +86,15 @@ export class Project {
 
     public async load() {
         this.tilesetManager.loadTilesetsMetadata(this.data.tilesets);
-        this.tilemapManager.loadTilemapsMetada(this.data.tilemaps);
+        this.tilemapManager.loadTilemapsMetadata(this.data.tilemaps);
         this.rulesetManager.loadRulesetMetadata(this.data.rulesets);
+        this.entityCollectionManager.loadEntityCollectionsMetadata(this.data.entityCollections);
 
         // Default to load all ruleset since ruleset is light and fast to load, and most of the time user will need them all. Can optimize later if needed.
-        await this.rulesetManager.loadRulesets(this.data.rulesets.map(ruleset => ruleset.id));
+        await this.rulesetManager.loadAllRulesets();
+
+        // Replace this with true lazy loading when UI/resource usage sites request collections on demand.
+        await this.entityCollectionManager.loadAllEntityCollections();
     }
 
     public serialize(): ProjectData {
@@ -97,6 +108,7 @@ export class Project {
             tilemaps: this.tilemapManager.serialize(),
             tilesets: this.tilesetManager.serialize(),
             rulesets: this.rulesetManager.serialize(),
+            entityCollections: this.entityCollectionManager.serialize(),
         };
     }
 
@@ -104,7 +116,7 @@ export class Project {
         await this.tilemapManager.destroy();
         await this.rulesetManager.destroy();
         await this.tilesetManager.destroy();
-        
+        await this.entityCollectionManager.destroy();
         this.objectRegistry.clear();
     }
 }

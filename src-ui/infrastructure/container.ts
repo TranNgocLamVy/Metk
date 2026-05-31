@@ -8,6 +8,7 @@ import { TilesetData } from "@/shared/data-types/tileset.data";
 import { WorkpsaceData } from "@/shared/data-types/workspace.data";
 import { RulesetData } from "@/shared/data-types/ruleset.data";
 import { IJsonModel } from "flexlayout-react";
+import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
 
 export const TauriFileStorage = new TauriFileSystemProvider();
 
@@ -21,3 +22,5 @@ export const TilesetStorageService = new JsonStorageService<TilesetData>(TauriFi
 export const WorkspaceStorageService = new JsonStorageService<WorkpsaceData>(TauriFileStorage, new JsonSerializer<WorkpsaceData>());
 export const LayoutStorageService = new JsonStorageService<IJsonModel>(TauriFileStorage, new JsonSerializer<IJsonModel>());
 export const RulesetStorageService = new JsonStorageService<RulesetData>(TauriFileStorage, new JsonSerializer<RulesetData>());
+export const EntityCollectionStorageService = new JsonStorageService<EntityCollectionData>(TauriFileStorage, new JsonSerializer<EntityCollectionData>(),
+    );

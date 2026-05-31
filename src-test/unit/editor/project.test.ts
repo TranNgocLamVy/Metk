@@ -14,6 +14,7 @@ const createProjectData = (): ProjectData => ({
     tilemaps: [{ id: "map-1", name: "Map One", tilemapRelPath: "maps/map-1.json" }],
     tilesets: [{ id: "tileset-1", name: "Tileset One", tilesetRelPath: "tilesets/tileset-1.json" }],
     rulesets: [{ id: "ruleset-1", name: "Ruleset One", color: "#ff00ff", rulesetRelPath: "rulesets/ruleset-1.json" }],
+    entityCollections: [],
 });
 
 const createProject = (data: ProjectData, projectPathSystem: ProjectPathSystem): Project => {
@@ -48,7 +49,7 @@ describe("Project", () => {
         project.tilesetManager.loadTilesetsMetadata([
             { id: "tileset-2", name: "Tileset Two", tilesetRelPath: "tilesets/tileset-2.json" },
         ]);
-        project.tilemapManager.loadTilemapsMetada([
+        project.tilemapManager.loadTilemapsMetadata([
             { id: "map-2", name: "Map Two", tilemapRelPath: "maps/map-2.json" },
         ]);
         project.rulesetManager.loadRulesetMetadata([

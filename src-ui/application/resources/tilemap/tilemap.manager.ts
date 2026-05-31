@@ -66,7 +66,7 @@ export class TilemapManager {
         return Result.Success(newTilemap);
     }
 
-    public loadTilemapsMetada(tilemapsMetadata: TilemapMetadata[]): void {
+    public loadTilemapsMetadata(tilemapsMetadata: TilemapMetadata[]): void {
         tilemapsMetadata.forEach((meta) => this.tilemapMetadata.set(meta.id, meta));
     }
 

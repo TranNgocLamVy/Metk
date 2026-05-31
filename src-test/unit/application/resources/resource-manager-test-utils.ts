@@ -83,6 +83,7 @@ export const createProjectData = (id = "project-a", overrides: Partial<ProjectDa
     tilemaps: [],
     tilesets: [],
     rulesets: [],
+    entityCollections: [],
     ...overrides,
 });
 
