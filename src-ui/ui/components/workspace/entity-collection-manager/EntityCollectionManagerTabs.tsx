@@ -30,11 +30,17 @@ export default function EntityCollectionManagerTabs() {
                         <Plus />
                         <LocalizedText message="workspace.entityCollectionManager.dropdown.new" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { }}>
+                    <DropdownMenuItem disabled onClick={() => { }}>
                         <Pen />
                         <LocalizedText message="workspace.entityCollectionManager.dropdown.edit" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { }}>
+                    <DropdownMenuItem
+                        disabled={!currentSelectedEntityCollectionId}
+                        onClick={() => {
+                            if (!currentSelectedEntityCollectionId) return;
+                            EntityCollectionService.deleteEntityCollection(currentSelectedEntityCollectionId);
+                        }}
+                    >
                         <Trash2 className="text-destructive" />
                         <LocalizedText message="workspace.entityCollectionManager.dropdown.delete" />
                     </DropdownMenuItem>

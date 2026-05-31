@@ -1,9 +1,14 @@
 import { EntityDefinitionData } from "./entity.data";
+import { TilesetRefData } from "./tileset.data";
 
 export type EntityCollectionData = {
     id: string;
     name: string;
     entities: EntityDefinitionData[];
+    tilesets: {
+        refs: TilesetRefData[];
+        nextIndex: number;
+    };
     createdAt: string;
     updatedAt: string;
 };

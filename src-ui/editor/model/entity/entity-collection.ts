@@ -6,6 +6,7 @@ import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
 import { EntityDefinitionData } from "@/shared/data-types/entity.data";
 import { Result } from "@/shared/types/result";
+import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 
 import { EntityDefinition } from "./entity-definition";
 import { normalizeEntityCollectionData, normalizeEntityDefinitionData } from "./entity.normalizer";
@@ -29,6 +30,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
     public constructor(
         data: EntityCollectionData,
         public readonly entityCollectionPathSystem: FilePathSystem,
+        public readonly tilesetRefManager: TilesetRefManager,
         private readonly objectRegistry: EditorObjectRegistry,
     ) {
         super(`entity-collection:${data.id}`);
@@ -38,13 +40,15 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
 
+        this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
+
         this.entities = data.entities.map((entityData) => new EntityDefinition(entityData));
     }
 
-    public static createFromFileData(fileData: unknown, entityCollectionPathSystem: FilePathSystem, objectRegistry: EditorObjectRegistry): Result<EntityCollection> {
+    public static createFromFileData(fileData: unknown, entityCollectionPathSystem: FilePathSystem, tilesetRefManager: TilesetRefManager, objectRegistry: EditorObjectRegistry): Result<EntityCollection> {
         try {
             const data = normalizeEntityCollectionData(fileData);
-            return Result.Success(new EntityCollection(data, entityCollectionPathSystem, objectRegistry));
+            return Result.Success(new EntityCollection(data, entityCollectionPathSystem, tilesetRefManager, objectRegistry));
         } catch (error) {
             return Result.Error(`Failed to create entity collection: ${String(error)}`);
         }
@@ -160,6 +164,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
         this.name = data.name;
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;
+        this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
 
         this.replaceEntities(data.entities ?? []);
 
@@ -172,6 +177,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
             id: this.id,
             name: this.name,
             entities: this.entities.map((entity) => entity.serialize()),
+            tilesets: this.tilesetRefManager.serialize(),
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
         };

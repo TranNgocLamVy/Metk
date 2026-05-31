@@ -367,6 +367,7 @@
         "entityCollectionManager": {
             "label": "Entities",
             "empty": "No entity collection selected",
+            "noEntities": "This collection has no entities",
             "dropdown": {
                 "new": "New Entity Collection",
                 "edit": "Edit Entity Collection",
@@ -375,6 +376,7 @@
             "menu": {
                 "new": "New Entity",
                 "edit": "Edit Entity",
+                "clone": "Clone Entity",
                 "delete": "Delete Entity"
             }
         }
@@ -509,6 +511,19 @@
             "noTileset": "No available tileset",
             "none": "None"
         },
+        "editEntity": {
+            "title": "Edit Entity",
+            "name": "Entity Name",
+            "graphicType": "Graphic Type",
+            "color": "Color",
+            "tile": "Tile",
+            "noTileset": "No available tileset",
+            "none": "None",
+            "action": {
+                "save": "Save",
+                "discard": "Discard change"
+            }
+        },
         "save": {
             "project": {
                 "title": "Save Project"
@@ -548,6 +563,10 @@
             "entityCollection": {
                 "title": "Delete Entity Collection",
                 "description": "Are you sure you want to delete this entity collection? This action will permanently remove the file and cannot be undone."
+            },
+            "entity": {
+                "title": "Delete Entity",
+                "description": "Are you sure you want to delete this entity? This action cannot be undone."
             }
         },
         "remove": {
@@ -648,10 +667,19 @@
             "updatedSuccess": "Entity collection updated: {{name}}",
             "deleteSuccess": "Entity collection deleted: {{name}}",
             "removeSuccess": "Entity collection removed: {{name}}",
+            "entityCreateSuccess": "Entity created: {{name}}",
+            "entityEditSuccess": "Entity updated: {{name}}",
+            "entityDeleteSuccess": "Entity deleted: {{name}}",
+            "entityCloneSuccess": "Entity cloned: {{name}}",
             "loadFail": "Entity collection load failed: name: {{name}} - id: {{id}}",
             "createFail": "Entity collection creation failed",
             "saveFail": "Entity collection save failed",
             "deleteFail": "Entity collection deletion failed",
+            "entityCreateFail": "Entity creation failed",
+            "entityEditFail": "Entity update failed",
+            "entityDeleteFail": "Entity deletion failed",
+            "entityCloneFail": "Entity clone failed",
+            "entityNotFound": "Entity not found: id: {{id}}",
             "notFound": "Entity collection not found: id: {{id}}",
             "metadataNotFound": "Entity collection metadata not found: id: {{id}}",
             "unknownError": "Unknown error when load entity collection"

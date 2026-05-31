@@ -58,6 +58,7 @@ export const normalizeWorkspaceData = (workspaceData: unknown): WorkpsaceData =>
     const tilesets = validate.object<Record<string, unknown>>({ value: data.tilesets, defaultValue: {} });
     const tilemaps = validate.object<Record<string, unknown>>({ value: data.tilemaps, defaultValue: {} });
     const ruleset = validate.object<Record<string, unknown>>({ value: data.ruleset, defaultValue: {} });
+    const entityCollection = validate.object<Record<string, unknown>>({ value: data.entityCollection, defaultValue: {} });
     const toolState = validate.object<Record<string, unknown>>({ value: data.toolState, defaultValue: {} });
     const savedPath = validate.object<Record<string, unknown>>({ value: data.savedPath, defaultValue: {} });
     const propertyPanel = validate.object<Record<string, unknown>>({ value: data.propertyPanel, defaultValue: {} });
@@ -77,6 +78,10 @@ export const normalizeWorkspaceData = (workspaceData: unknown): WorkpsaceData =>
         },
         ruleset: {
             selectedRuleId: nullableString(ruleset.selectedRuleId),
+        },
+        entityCollection: {
+            selectedEntityCollectionId: nullableString(entityCollection.selectedEntityCollectionId),
+            selectedEntityId: nullableString(entityCollection.selectedEntityId),
         },
         toolState: {
             currentTool: nullableString(toolState.currentTool),

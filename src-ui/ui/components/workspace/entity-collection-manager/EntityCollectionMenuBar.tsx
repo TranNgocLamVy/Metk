@@ -1,4 +1,4 @@
-import { Pen, Plus, Trash2 } from "lucide-react";
+import { Copy, Pen, Plus, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 
 import { EntityCollectionService } from "@/shared/services/entity-collection.service";
@@ -9,17 +9,25 @@ import { HStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 
 export default function EntityCollectionMenuBar() {
-    const { selectedEntityCollectionId: currentSelectedEntityCollectionId } = useEntityCollectionStore();
+    const {
+        selectedEntityCollectionId: currentSelectedEntityCollectionId,
+        selectedEntityId,
+    } = useEntityCollectionStore();
 
     const onEditEntity = useCallback(() => {
-        if (!currentSelectedEntityCollectionId) return;
-
-    }, [currentSelectedEntityCollectionId]);
+        if (!currentSelectedEntityCollectionId || !selectedEntityId) return;
+        EntityCollectionService.editEntity(currentSelectedEntityCollectionId, selectedEntityId);
+    }, [currentSelectedEntityCollectionId, selectedEntityId]);
 
     const onDeleteEntity = useCallback(() => {
-        if (!currentSelectedEntityCollectionId) return;
+        if (!currentSelectedEntityCollectionId || !selectedEntityId) return;
+        EntityCollectionService.deleteEntity(currentSelectedEntityCollectionId, selectedEntityId);
+    }, [currentSelectedEntityCollectionId, selectedEntityId]);
 
-    }, [currentSelectedEntityCollectionId]);
+    const onCloneEntity = useCallback(() => {
+        if (!currentSelectedEntityCollectionId || !selectedEntityId) return;
+        EntityCollectionService.cloneEntity(currentSelectedEntityCollectionId, selectedEntityId);
+    }, [currentSelectedEntityCollectionId, selectedEntityId]);
 
     return (
         <HStack className="bg-surface absolute bottom-1 w-full px-1 py-1 gap-0.5">
@@ -27,6 +35,7 @@ export default function EntityCollectionMenuBar() {
                 <Button
                     variant="ghost"
                     size="icon-sm"
+                    disabled={!currentSelectedEntityCollectionId}
                     onClick={EntityCollectionService.createEntity}
                 >
                     <Plus />
@@ -37,9 +46,21 @@ export default function EntityCollectionMenuBar() {
                 <Button
                     variant="ghost"
                     size="icon-sm"
+                    disabled={!selectedEntityId}
                     onClick={onEditEntity}
                 >
                     <Pen />
+                </Button>
+            </QuickToolTip>
+
+            <QuickToolTip toolTip="workspace.entityCollectionManager.menu.clone">
+                <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    disabled={!selectedEntityId}
+                    onClick={onCloneEntity}
+                >
+                    <Copy />
                 </Button>
             </QuickToolTip>
 
@@ -48,7 +69,7 @@ export default function EntityCollectionMenuBar() {
                     variant="ghost"
                     size="icon-sm"
                     className="text-destructive"
-                    disabled={!currentSelectedEntityCollectionId}
+                    disabled={!selectedEntityId}
                     onClick={onDeleteEntity}
                 >
                     <Trash2 />

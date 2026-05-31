@@ -10,6 +10,8 @@ import { PathUtils } from "@/shared/utils/path.utils";
 import { Result } from "@/shared/types/result";
 import { Console } from "@/shared/services/console.service";
 import { normalizeEntityCollectionData } from "@/editor/model/entity/entity.normalizer";
+import { TilesetManager } from "../tileset/tileset.manager";
+import { TilesetRefManager } from "../references/tileset-ref.manager";
 
 export interface EntityCollectionManagerEvent {
     onEntityCollectionManagerUpdated: (entityCollections: EntityCollectionMetadata[]) => void;
@@ -23,6 +25,7 @@ export class EntityCollectionManager extends EventEmitter<EntityCollectionManage
     private entityDefinitionIndex: Map<string, string> = new Map<string, string>();
 
     public constructor(
+        private readonly tilesetManager: TilesetManager,
         private readonly projectPathSystem: ProjectPathSystem,
         private readonly objectRegistry: EditorObjectRegistry,
     ) {
@@ -61,10 +64,15 @@ export class EntityCollectionManager extends EventEmitter<EntityCollectionManage
             this.projectPathSystem,
             entityCollectionRelPath,
         );
+        const tilesetRefManager = new TilesetRefManager(
+            this.tilesetManager,
+            entityCollectionPathSystem,
+        );
 
         const newEntityCollection = new EntityCollection(
             entityCollectionData,
             entityCollectionPathSystem,
+            tilesetRefManager,
             this.objectRegistry,
         );
 
@@ -82,6 +90,7 @@ export class EntityCollectionManager extends EventEmitter<EntityCollectionManage
 
         this.objectRegistry.registerTree(newEntityCollection);
         this.rebuildEntityDefinitionIndex();
+        await this.tilesetManager.loadTilesets(newEntityCollection.tilesetRefManager.getRefIds());
         this.emitManagerUpdated();
 
         return Result.Success(newEntityCollection);
@@ -241,6 +250,20 @@ export class EntityCollectionManager extends EventEmitter<EntityCollectionManage
         });
     }
 
+    public notifyEntityCollectionUpdated(entityCollectionId: string): void {
+        const entityCollection = this.loadedEntityCollections.get(entityCollectionId);
+        if (!entityCollection) return;
+
+        const metadata = this.entityCollectionMetadata.get(entityCollectionId);
+        if (metadata) {
+            metadata.name = entityCollection.name;
+        }
+
+        this.rebuildEntityDefinitionIndex();
+        this.emitManagerUpdated();
+        this.emit("onEntityCollectionUpdated", entityCollectionId);
+    }
+
     public async removeEntityCollection(entityCollectionId: string): Promise<Result> {
         const metadata = this.entityCollectionMetadata.get(entityCollectionId);
 
@@ -340,10 +363,14 @@ export class EntityCollectionManager extends EventEmitter<EntityCollectionManage
             this.projectPathSystem,
             entityCollection.entityCollectionPathSystem.relPath,
         );
+        const tilesetRefManager = new TilesetRefManager(
+            this.tilesetManager,
+            entityCollectionPathSystem,
+        );
 
         const cloneRegistry = new EditorObjectRegistry();
 
-        return new EntityCollection(entityCollectionData, entityCollectionPathSystem, cloneRegistry);
+        return new EntityCollection(entityCollectionData, entityCollectionPathSystem, tilesetRefManager, cloneRegistry);
     }
 
     public serialize(): EntityCollectionMetadata[] {

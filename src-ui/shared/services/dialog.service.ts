@@ -37,6 +37,27 @@ export class DialogService {
         useDialogStore.getState().openDialog("EDIT_RULESET_MODAL", { zLevel: DialogZLevel.Modal }, { rulesetId: id })
     }
 
+    public static async openEditEntityDefinitionDialog(entityCollectionId: string, entityId: string): Promise<void> {
+        const currentProject = appKernel.editorFacade.currentProject;
+        if (!currentProject) return;
+
+        const entityCollectionManager = currentProject.entityCollectionManager;
+        const loadResult = await entityCollectionManager.loadEntityCollection(entityCollectionId);
+
+        if (loadResult.status !== Result.Status.Success) return;
+
+        const entity = loadResult.data.getEntityDefinitionById(entityId);
+        if (!entity) return;
+
+        useDialogStore
+            .getState()
+            .openDialog(
+                "EDIT_ENTITY_DEFINITION_MODAL",
+                { zLevel: DialogZLevel.Modal },
+                { entityCollectionId, entityId },
+            );
+    }
+
     public static async openEditTilesetDialog(id: string): Promise<void> {
         const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;

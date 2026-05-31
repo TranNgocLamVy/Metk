@@ -4,6 +4,7 @@ import { PermissionDialog } from "./PermissionDialog";
 import { SaveDialog } from "./SaveDialog";
 import { EditTilesetDialog } from "../../dialogs/edit-tileset/EditTilesetDialog";
 import { EditRulesetDialog } from "../../dialogs/edit-ruleset/EditRulesetDialog";
+import { EditEntityDefinitionDialog } from "../../dialogs/edit-entity-definition/EditEntityDefinitionDialog";
 
 export const DIALOG_TYPES = {
     FORM: 'FORM_DIALOG',
@@ -12,6 +13,7 @@ export const DIALOG_TYPES = {
     OPEM_FILE: 'OPEN_FILE_DIALOG',
     EDIT_TILESET: 'EDIT_TILESET_MODAL',
     EDIT_RULESET: 'EDIT_RULESET_MODAL',
+    EDIT_ENTITY_DEFINITION: 'EDIT_ENTITY_DEFINITION_MODAL',
 } as const;
 export type DialogType = typeof DIALOG_TYPES[keyof typeof DIALOG_TYPES];
 
@@ -22,7 +24,8 @@ export const DialogRegistry: Record<string, React.FC<any>> = {
     [DIALOG_TYPES.PERMISSION]: PermissionDialog,
     [DIALOG_TYPES.OPEM_FILE]: OpenFileDialog,
     [DIALOG_TYPES.EDIT_TILESET]: EditTilesetDialog,
-    [DIALOG_TYPES.EDIT_RULESET]: EditRulesetDialog
+    [DIALOG_TYPES.EDIT_RULESET]: EditRulesetDialog,
+    [DIALOG_TYPES.EDIT_ENTITY_DEFINITION]: EditEntityDefinitionDialog,
 };
 
 export interface BaseDialogProps {

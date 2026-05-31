@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { EntityCollectionData, EntityCollectionMetadata, EntityCollectionRefData } from "@/shared/data-types/entity-collection.data";
+import { TilesetRefData } from "@/shared/data-types/tileset.data";
 import { validate } from "@/shared/utils/validate.utils";
 import {
     EntityColorGraphicData,
@@ -20,6 +21,19 @@ const normalizeId = (value: unknown): string => {
 
 const normalizeStringArray = (value: unknown): string[] => {
     return validate.array<unknown>({ value, defaultValue: [] }).filter((item): item is string => typeof item === "string");
+};
+
+const normalizeTilesetRef = (value: unknown): TilesetRefData | null => {
+    try {
+        const data = validate.requiredObject({ value, field: "entityCollection.tilesets.refs[]" });
+        return {
+            id: validate.requiredString({ value: data.id, field: "entityCollection.tilesets.refs[].id" }),
+            index: validate.number({ value: data.index, defaultValue: 0, min: 0, integer: true }),
+            name: validate.string({ value: data.name, defaultValue: "Untitled Tileset" }),
+        };
+    } catch {
+        return null;
+    }
 };
 
 export const normalizeEntityFieldData = (value: unknown): EntityFieldData | null => {
@@ -108,6 +122,7 @@ export const normalizeEntityDefinitionData = (value: unknown): EntityDefinitionD
 
 export const normalizeEntityCollectionData = (value: unknown): EntityCollectionData => {
     const data = validate.object<Record<string, unknown>>({ value, defaultValue: {} });
+    const tilesets = validate.object<Record<string, unknown>>({ value: data.tilesets, defaultValue: {} });
 
     const id = normalizeId(data.id);
     const now = new Date().toISOString();
@@ -121,6 +136,12 @@ export const normalizeEntityCollectionData = (value: unknown): EntityCollectionD
         id,
         name: validate.string({ value: data.name, defaultValue: id }),
         entities,
+        tilesets: {
+            refs: validate.array<unknown>({ value: tilesets.refs, defaultValue: [] })
+                .map(normalizeTilesetRef)
+                .filter((ref): ref is TilesetRefData => ref !== null),
+            nextIndex: validate.number({ value: tilesets.nextIndex, defaultValue: 0, min: 0, integer: true }),
+        },
         createdAt: validate.string({ value: data.createdAt, defaultValue: now }),
         updatedAt: validate.string({ value: data.updatedAt, defaultValue: now }),
     };

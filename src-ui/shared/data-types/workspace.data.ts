@@ -1,6 +1,7 @@
 import { RulesetSessionManagerData } from "./ruleset-session.data";
 import { TilemapSessionManagerData } from "./tilemap-session.data";
 import { TilesetSessionManagerData } from "./tileset-session.data";
+import { EntityCollectionSessionManagerData } from "./entity-collection-session.data";
 
 export type ToolStateData = {
     currentTool: string | null;
@@ -27,6 +28,7 @@ export type WorkpsaceData = {
     tilesets: TilesetSessionManagerData;
     tilemaps: TilemapSessionManagerData;
     ruleset: RulesetSessionManagerData;
+    entityCollection: EntityCollectionSessionManagerData;
     toolState: ToolStateData;
     savedPath: SavedPathData;
     propertyPanel: PropertyPanelStateData;
@@ -43,6 +45,10 @@ export const defaultWorkspaceData: WorkpsaceData = {
     },
     ruleset: {
         selectedRuleId: null,
+    },
+    entityCollection: {
+        selectedEntityCollectionId: null,
+        selectedEntityId: null,
     },
     toolState: {
         currentTool: null,
