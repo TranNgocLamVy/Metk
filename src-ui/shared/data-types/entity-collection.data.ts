@@ -19,3 +19,5 @@ export type EntityCollectionRefData = {
     index: number;
     name: string;
 };
+
+export type CreateEntityCollectionPayload = Pick<EntityCollectionData, "id" | "name">;

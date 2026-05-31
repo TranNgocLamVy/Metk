@@ -6,10 +6,10 @@ import { useCallback, useEffect } from "react";
 import ContextMenuItemGroup from "../../context-menu/ContextMenuItemGroup";
 import { RulesetManagerContextMenu } from "./ContextMenu";
 import { WorkspaceService } from "@/shared/services/workspace.service";
-import RulesetMenuBar from "./RulesetMenuBar";
 import { useRulesetManagerEvent } from "@/ui/hooks/useRulesetManagerEvent.hook";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import { useProjectStore } from "@/ui/stores/project.store";
+import RulesetTab from "./RulesetTab";
 
 export default function RulesetManager() {
     const { activeWorkspace } = useWorkspaceStore();
@@ -47,6 +47,8 @@ export default function RulesetManager() {
     return (
         <VStack className="w-full h-full relative overflow-hidden bg-surface">
             <VStack className="absolute inset w-full h-full px-1 py-2 bg-surface">
+                <RulesetTab />
+                <div className="w-full h-2 bg-surface" />
                 <ContextMenu>
                     <ContextMenuTrigger className="w-full h-full">
                         <ScrollArea className="w-full h-full no-scrollbar bg-surface-base rounded-lg shadow-sm">
@@ -72,7 +74,6 @@ export default function RulesetManager() {
                     </ContextMenuContent>
                 </ContextMenu>
             </VStack>
-            <RulesetMenuBar />
         </VStack>
 
     )

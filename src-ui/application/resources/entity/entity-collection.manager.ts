@@ -1,3 +1,5 @@
+import EventEmitter from "eventemitter3";
+
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { EntityCollectionStorageService } from "@/infrastructure/container";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
@@ -9,7 +11,12 @@ import { Result } from "@/shared/types/result";
 import { Console } from "@/shared/services/console.service";
 import { normalizeEntityCollectionData } from "@/editor/model/entity/entity.normalizer";
 
-export class EntityCollectionManager {
+export interface EntityCollectionManagerEvent {
+    onEntityCollectionManagerUpdated: (entityCollections: EntityCollectionMetadata[]) => void;
+    onEntityCollectionUpdated: (entityCollectionId: string) => void;
+}
+
+export class EntityCollectionManager extends EventEmitter<EntityCollectionManagerEvent> {
     public readonly entityCollectionMetadata: Map<string, EntityCollectionMetadata> = new Map<string, EntityCollectionMetadata>();
     private loadedEntityCollections: Map<string, EntityCollection> = new Map<string, EntityCollection>();
     private pendingLoads: Map<string, Promise<Result<EntityCollection>>> = new Map<string, Promise<Result<EntityCollection>>>();
@@ -18,16 +25,20 @@ export class EntityCollectionManager {
     public constructor(
         private readonly projectPathSystem: ProjectPathSystem,
         private readonly objectRegistry: EditorObjectRegistry,
-    ) { }
+    ) {
+        super();
+    }
 
     public addEntityCollectionMetadata(metadata: EntityCollectionMetadata): void {
         this.entityCollectionMetadata.set(metadata.id, metadata);
+        this.emitManagerUpdated();
     }
 
     public loadEntityCollectionsMetadata(metadata: EntityCollectionMetadata[]): void {
         metadata.forEach((item) => {
             this.entityCollectionMetadata.set(item.id, item);
         });
+        this.emitManagerUpdated();
     }
 
     public async addEntityCollection(entityCollection: unknown, entityCollectionAbsPath: string): Promise<Result<EntityCollection>> {
@@ -71,6 +82,7 @@ export class EntityCollectionManager {
 
         this.objectRegistry.registerTree(newEntityCollection);
         this.rebuildEntityDefinitionIndex();
+        this.emitManagerUpdated();
 
         return Result.Success(newEntityCollection);
     }
@@ -218,6 +230,8 @@ export class EntityCollectionManager {
         }
 
         this.rebuildEntityDefinitionIndex();
+        this.emitManagerUpdated();
+        this.emit("onEntityCollectionUpdated", normalized.id);
 
         Console.success({
             message: {
@@ -246,6 +260,7 @@ export class EntityCollectionManager {
         this.pendingLoads.delete(entityCollectionId);
 
         this.rebuildEntityDefinitionIndex();
+        this.emitManagerUpdated();
 
         Console.log({
             message: {
@@ -302,6 +317,7 @@ export class EntityCollectionManager {
         this.pendingLoads.delete(entityCollectionId);
 
         this.rebuildEntityDefinitionIndex();
+        this.emitManagerUpdated();
 
         Console.log({
             message: {
@@ -358,6 +374,7 @@ export class EntityCollectionManager {
         this.loadedEntityCollections.clear();
         this.pendingLoads.clear();
         this.entityDefinitionIndex.clear();
+        this.removeAllListeners();
     }
 
     private rebuildEntityDefinitionIndex(): void {
@@ -368,5 +385,9 @@ export class EntityCollectionManager {
                 this.entityDefinitionIndex.set(entity.id, entityCollection.id);
             }
         }
+    }
+
+    private emitManagerUpdated(): void {
+        this.emit("onEntityCollectionManagerUpdated", this.serialize());
     }
 }

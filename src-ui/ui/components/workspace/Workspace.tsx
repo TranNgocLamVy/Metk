@@ -3,18 +3,20 @@ import "@/assets/style/flexLayout/workspace.css";
 import { Action, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
 import { useRef } from "react";
 
+import { HStack, VStack } from "../custom/stack/Stack";
+import { LocalizedText } from "../custom/LocalizeText";
 import { useRelativeFlexLayout } from "@/ui/hooks/useRelativeFlexLayout.hook";
 import { useLayoutStore } from "@/ui/stores/layout.store";
 
-import { HStack, VStack } from "../custom/stack/Stack";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+
 import ContextBar from "./ContextBar";
-import TilesetViewSelector from "./tileset-view/TilesetViewSelector";
 import LayerManager from "./layer-manager/LayerManager";
+import TilesetViewSelector from "./tileset-view/TilesetViewSelector";
 import TilemapEditor from "./tilemap-editor/TilemapEditor";
 import RulesetManager from "./ruleset-manager/RulesetManager";
-import { appKernel } from "@/application/bootstrap/app-kernel";
-import { LocalizedText } from "../custom/LocalizeText";
 import PropertyPanel from "./properties-panel/PropertyPanel";
+import EntityCollectionManager from "./entity-collection-manager/EntityCollectionManager";
 
 export default function Workspace() {
 
@@ -37,6 +39,8 @@ export default function Workspace() {
 				return <RulesetManager />
 			case "properties":
 				return <PropertyPanel />
+			case "entityCollectionManager":
+				return <EntityCollectionManager />;
 			default:
 				return <div className="w-full h-full flex items-center justify-center">{`Unknow "${node.getComponent()}" Component`}</div>;
 		}
@@ -59,6 +63,9 @@ export default function Workspace() {
 				break;
 			case "properties":
 				renderValues.content = <LocalizedText message={"workspace.properties.label"} />
+				break;
+			case "entityCollectionManager":
+				renderValues.content = <LocalizedText message="workspace.entityCollectionManager.label" />;
 				break;
 			default:
 				renderValues.content = "Unknow";

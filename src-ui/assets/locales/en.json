@@ -51,6 +51,13 @@
                 "export": "Export Ruleset",
                 "remove": "Remove Ruleset",
                 "delete": "Delete Ruleset"
+            },
+            "entityCollection": {
+                "create": "New Entity Collection",
+                "save": "Save Entity Collection",
+                "saveAs": "Save Entity Collection As",
+                "remove": "Remove Entity Collection",
+                "delete": "Delete Entity Collection"
             }
         }
     },
@@ -267,7 +274,7 @@
             "label": "Tileset",
             "empty": "No tileset selected",
             "open": "Open Tileset",
-            "menu": {
+            "dropdown": {
                 "new": "New Tileset",
                 "edit": "Edit Tileset",
                 "delete": "Delete Tileset"
@@ -345,7 +352,7 @@
         },
         "rulesetManager": {
             "label": "Ruleset",
-            "menu": {
+            "dropdown": {
                 "new": "New Ruleset",
                 "edit": "Edit Ruleset",
                 "delete": "Delete Ruleset"
@@ -356,11 +363,25 @@
         },
         "properties": {
             "label": "Properties"
+        },
+        "entityCollectionManager": {
+            "label": "Entities",
+            "empty": "No entity collection selected",
+            "dropdown": {
+                "new": "New Entity Collection",
+                "edit": "Edit Entity Collection",
+                "delete": "Delete Entity Collection"
+            },
+            "menu": {
+                "new": "New Entity",
+                "edit": "Edit Entity",
+                "delete": "Delete Entity"
+            }
         }
     },
     "form": {
         "project": {
-            "title": "Create new Project",
+            "title": "New Project - Metk",
             "name": {
                 "label": "Project Name",
                 "placeholder": "e.g., My Awesome Game"
@@ -378,7 +399,7 @@
             }
         },
         "tilemap": {
-            "title": "Create new Tilemap",
+            "title": "New Tilemap - Metk",
             "action": {
                 "create": "Create",
                 "cancel": "Cancel"
@@ -409,7 +430,7 @@
             }
         },
         "tileset": {
-            "title": "Create new Tileset",
+            "title": "New Tileset - Metk",
             "action": {
                 "saveAs": "Save As",
                 "cancel": "Cancel"
@@ -439,17 +460,30 @@
             "spacing": "Spacing"
         },
         "ruleset": {
-            "title": "Create new Ruleset",
+            "title": "New Ruleset - Metk",
             "action": {
                 "create": "Create",
                 "cancel": "Cancel"
             },
+            "ruleset": "Ruleset",
             "name": {
-                "label": "Ruleset Name",
+                "label": "Name",
                 "placeholder": "e.g., Auto-Tiling Rule"
             },
             "color": {
-                "label": "Ruleset Color"
+                "label": "Color"
+            }
+        },
+        "entityCollection": {
+            "title": "New Entity Collection - Metk",
+            "action": {
+                "create": "Create",
+                "cancel": "Cancel"
+            },
+            "entityCollection": "Collection",
+            "name": {
+                "label": "Name",
+                "placeholder": "e.g., Furniture"
             }
         }
     },
@@ -487,6 +521,9 @@
             },
             "ruleset": {
                 "title": "Save Ruleset"
+            },
+            "entityCollection": {
+                "title": "Save Entity Collection"
             }
         },
         "import": {
@@ -507,6 +544,10 @@
             "ruleset": {
                 "title": "Delete Ruleset",
                 "description": "Are you sure you want to delete this ruleset? This action will permanently remove the file and cannot be undone."
+            },
+            "entityCollection": {
+                "title": "Delete Entity Collection",
+                "description": "Are you sure you want to delete this entity collection? This action will permanently remove the file and cannot be undone."
             }
         },
         "remove": {
@@ -599,6 +640,21 @@
             "metadataNotFound": "Ruleset metadata not found: id: {{id}}",
             "mismatchId": "Mismatching id between ruleset",
             "unknownError": "Unknown error when load ruleset"
+        },
+        "entityCollection": {
+            "loadSuccess": "Entity collection loaded",
+            "createSuccess": "Entity collection created successfully",
+            "saveSuccess": "Entity collection saved",
+            "updatedSuccess": "Entity collection updated: {{name}}",
+            "deleteSuccess": "Entity collection deleted: {{name}}",
+            "removeSuccess": "Entity collection removed: {{name}}",
+            "loadFail": "Entity collection load failed: name: {{name}} - id: {{id}}",
+            "createFail": "Entity collection creation failed",
+            "saveFail": "Entity collection save failed",
+            "deleteFail": "Entity collection deletion failed",
+            "notFound": "Entity collection not found: id: {{id}}",
+            "metadataNotFound": "Entity collection metadata not found: id: {{id}}",
+            "unknownError": "Unknown error when load entity collection"
         },
         "system": {
             "fs": {

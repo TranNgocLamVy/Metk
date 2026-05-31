@@ -155,13 +155,14 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
                             <Button
                                 variant="outline"
                                 type="button"
+                                size={"sm"}
                                 onClick={() => cancelFormDialog()}
                             >
                                 <LocalizedText message={cancelText ?? ""} />
                             </Button>
                         </DialogClose>
 
-                        <Button type="button" onClick={handleSubmit}>
+                        <Button type="button" size={"sm"} onClick={handleSubmit}>
                             <LocalizedText message={okText ?? ""} />
                         </Button>
                     </DialogFooter>

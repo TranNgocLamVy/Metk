@@ -47,6 +47,8 @@ export type RulesetData = {
     };
 };
 
+export type CreateRulesetPayload = Pick<RulesetData, "id" | "name" | "color" | "size">;
+
 export type RulesetMetadata = {
     name: string;
     id: string;

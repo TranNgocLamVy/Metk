@@ -1,18 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
-import { RulesetData } from "@/shared/data-types/ruleset.data";
+import { CreateRulesetPayload, RulesetData } from "@/shared/data-types/ruleset.data";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
 import { DialogService } from "./dialog.service";
 import { createRulesetForm } from "../constant/form/create-ruleset.form";
 import { WorkspaceService } from "./workspace.service";
 import i18n from "@/shared/services/i18n.service";
 import { Console } from "./console.service";
 import { PathUtils } from "../utils/path.utils";
-import { extractRulesetId } from "@/editor/model/ruleset/ruleset.normalizer";
+import { extractRulesetId, normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
 
 export class RulesetService {
 
@@ -33,14 +32,19 @@ export class RulesetService {
         const rulesetAbsDir = PathUtils.dirname(rulesetAbsPath);
         currentWorkspace.savedPathManager.setRulesetDir(rulesetAbsDir);
 
-        const rulesetData: RulesetData = {
+        const createRulesetPayload: CreateRulesetPayload = {
             id: uuidv4(),
-            name: form.name,
-            color: form.color,
+            name: form.ruleset.name,
+            color: form.ruleset.color,
             size: 5, // TODO: Handle 3x3, 7x7 and 9x9
-            rules: [],
-            tilesets: { refs: [], nextIndex: 0 },
-            rulesets: { refs: [], nextIndex: 0 },
+        }
+        
+        let rulesetData: RulesetData
+        try {
+            rulesetData = normalizeRulesetData(createRulesetPayload);
+        } catch (error) {
+            Console.error({ message: "message.ruleset.createFail", stacks: [String(error)]});
+            return;
         }
 
         const saveResult = await RulesetStorageService.save(rulesetAbsPath, rulesetData);

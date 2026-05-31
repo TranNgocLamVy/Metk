@@ -27,7 +27,14 @@ const workspaceRowNode: IJsonRowNode = {
                             component: "rulesetManager",
                             enableClose: false,
                         },
-
+                        {
+                            type: "tab",
+                            name: "Entity Collections",
+                            minHeight: 200,
+                            minWidth: 300,
+                            component: "entityCollectionManager",
+                            enableClose: false,
+                        },
                     ],
                 },
                 {
@@ -43,7 +50,7 @@ const workspaceRowNode: IJsonRowNode = {
                             enableClose: false,
                         }
                     ]
-                }
+                },
             ]
         },
         {
@@ -60,7 +67,7 @@ const workspaceRowNode: IJsonRowNode = {
                     component: "tilemapEditor",
                     enableClose: false,
                     minHeight: 400,
-                    minWidth: 800,
+                    minWidth: 400,
                 },
             ],
         },

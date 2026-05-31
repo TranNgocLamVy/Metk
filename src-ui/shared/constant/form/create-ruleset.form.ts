@@ -7,20 +7,29 @@ export const createRulesetForm = FormUtils.createForm({
     size: "sm",
     inputs: [
         {
-            id: "name",
-            name: "name",
-            type: "text",
-            label: "form.ruleset.name.label",
-            placeholder: "form.ruleset.name.placeholder",
-            required: true,
+            id: "ruleset",
+            name: "ruleset",
+            type: "group",
+            label: "form.ruleset.ruleset",
+            inputs: [
+                {
+                    id: "name",
+                    name: "name",
+                    type: "text",
+                    label: "form.ruleset.name.label",
+                    placeholder: "form.ruleset.name.placeholder",
+                    required: true,
+                },
+                {
+                    id: "color",
+                    name: "color",
+                    type: "color",
+                    label: "form.ruleset.color.label",
+                    defaultValue: "#ffffff",
+                }
+            ],
         },
-        {
-            id: "color",
-            name: "color",
-            type: "color",
-            label: "form.ruleset.color.label",
-            defaultValue: "#ffffff",
-        }
+        
         // TODO: Add size
     ],
     async validateBeforeSubmit(values) {
