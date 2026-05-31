@@ -91,7 +91,7 @@ export const createTilemap = (layers = createBaseLayers()): Tilemap => {
         layers,
     };
 
-    const result = Tilemap.create(tilemapData, filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(tilemapData, filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };

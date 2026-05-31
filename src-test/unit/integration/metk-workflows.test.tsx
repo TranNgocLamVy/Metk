@@ -238,7 +238,7 @@ const createTilemapSession = (options: {
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
 
-    const tilemapResult = Tilemap.create({
+    const tilemapResult = Tilemap.createFromFileData({
         id: options.tilemapId,
         name: options.tilemapName,
         orientation: "orthogonal",

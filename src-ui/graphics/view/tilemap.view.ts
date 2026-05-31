@@ -39,7 +39,7 @@ export class TilemapView implements IBaseView {
             worldHeight: this.session.tilemap.height * this.session.tilemap.tileheight,
             passiveWheel: false,
             stopPropagation: true,
-            allowPreserveDragOutside: false,
+            allowPreserveDragOutside: true,
             events: pixiApp.renderer.events,
         });
 

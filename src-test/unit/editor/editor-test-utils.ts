@@ -71,7 +71,7 @@ export const createTilemap = (
     context: ReturnType<typeof createReferenceContext>,
     layers: RootLayerData = [],
 ): Tilemap => {
-    const result = Tilemap.create(
+    const result = Tilemap.createFromFileData(
         {
             id: "tilemap-a",
             name: "Tilemap A",
@@ -111,7 +111,7 @@ export const createRuleset = (
     context: ReturnType<typeof createReferenceContext>,
     data: RulesetData = createRulesetData(),
 ): Ruleset => {
-    const result = Ruleset.create(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Ruleset.createFromFileData(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };

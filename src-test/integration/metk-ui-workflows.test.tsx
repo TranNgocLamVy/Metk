@@ -262,7 +262,7 @@ const createProjectContext = () => {
 
 const createTilemapSession = (id: string, tilemapId: string, name: string, isDirty = false): TestTilemapSession => {
     const context = createProjectContext();
-    const tilemapResult = Tilemap.create({
+    const tilemapResult = Tilemap.createFromFileData({
         id: tilemapId,
         name,
         orientation: "orthogonal",

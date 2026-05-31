@@ -41,7 +41,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
         this.entities = data.entities.map((entityData) => new EntityDefinition(entityData));
     }
 
-    public static createFromFileDaTa(fileData: unknown, entityCollectionPathSystem: FilePathSystem, objectRegistry: EditorObjectRegistry): Result<EntityCollection> {
+    public static createFromFileData(fileData: unknown, entityCollectionPathSystem: FilePathSystem, objectRegistry: EditorObjectRegistry): Result<EntityCollection> {
         try {
             const data = normalizeEntityCollectionData(fileData);
             return Result.Success(new EntityCollection(data, entityCollectionPathSystem, objectRegistry));

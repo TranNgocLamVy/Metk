@@ -158,3 +158,8 @@ export const normalizeEntityCollectionRefData = (value: unknown): EntityCollecti
         return null;
     }
 };
+
+export const extractEntityCollectionId = (entityCollectionData: unknown): string => {
+    const data = validate.requiredObject({ value: entityCollectionData, field: "entityCollection" }) as EntityCollectionData;
+    return validate.requiredString({ value: data.id, field: "entityCollection.id" });
+};

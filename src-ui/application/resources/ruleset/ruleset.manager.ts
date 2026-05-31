@@ -47,7 +47,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         const rulesetPathSystem = new FilePathSystem(rulesetData.id, this.projectPathSystem, rulesetRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
-        const newRuleset = Ruleset.fromData(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+        const newRuleset = new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
 
         const rulesetMetadata: RulesetMetadata = {
             id: newRuleset.id,
@@ -261,7 +261,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
         const rulesetPathSystem = new FilePathSystem(rulesetData.id, this.projectPathSystem, ruleset.rulesetPathSystem.relPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
-        return Ruleset.cloneFromData(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
     }
 
     public async removeTilesetRef(tilesetId: string) {

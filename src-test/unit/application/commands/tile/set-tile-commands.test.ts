@@ -87,7 +87,7 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
         },
         layers,
     };
-    const tilemapResult = Tilemap.create(
+    const tilemapResult = Tilemap.createFromFileData(
         tilemapData,
         filePathSystem,
         referenceContext.tilesetRefManager,

@@ -36,7 +36,7 @@ export class Project {
 
     private data: ProjectData;
 
-    private constructor(data: ProjectData, public readonly projectPathSystem: ProjectPathSystem) {
+    public constructor(data: ProjectData, public readonly projectPathSystem: ProjectPathSystem) {
         this.data = data;
         this.id = data.id;
         this.name = data.name;
@@ -46,42 +46,20 @@ export class Project {
         this.updatedAt = data.updatedAt;
 
         this.objectRegistry = new EditorObjectRegistry();
-
-        this.tilesetManager = new TilesetManager(
-            this.projectPathSystem,
-            this.objectRegistry
-        );
-
-        this.rulesetManager = new RulesetManager(
-            this.tilesetManager,
-            this.projectPathSystem,
-            this.objectRegistry
-        );
-
-        this.tilemapManager = new TilemapManager(
-            this.tilesetManager,
-            this.rulesetManager,
-            this.projectPathSystem,
-            this.objectRegistry
-        );
-
-        this.entityCollectionManager = new EntityCollectionManager(
-            this.projectPathSystem,
-            this.objectRegistry
-        );
+        
+        this.tilesetManager = new TilesetManager(this.projectPathSystem, this.objectRegistry);
+        this.rulesetManager = new RulesetManager(this.tilesetManager, this.projectPathSystem, this.objectRegistry);
+        this.tilemapManager = new TilemapManager(this.tilesetManager, this.rulesetManager, this.projectPathSystem, this.objectRegistry);
+        this.entityCollectionManager = new EntityCollectionManager(this.projectPathSystem, this.objectRegistry);
     }
 
     public static create(data: unknown, projectPathSystem: ProjectPathSystem): Result<Project> {
         try {
             const normalized = normalizeProjectData(data);
-            return Result.Success(Project.fromData(normalized, projectPathSystem));
+            return Result.Success(new Project(normalized, projectPathSystem));
         } catch (error) {
             return Result.Error(`Failed to create project: ${String(error)}`);
         }
-    }
-
-    public static fromData(data: ProjectData, projectPathSystem: ProjectPathSystem): Project {
-        return new Project(data, projectPathSystem);
     }
 
     public async load() {

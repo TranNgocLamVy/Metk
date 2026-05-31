@@ -78,7 +78,7 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
 
     public tiles: Tile[] = [];
 
-    protected constructor(
+    public constructor(
         tilesetData: TilesetData,
         public readonly tilesetPathSystem: FilePathSystem,
         protected readonly objectRegistry: EditorObjectRegistry,

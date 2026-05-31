@@ -56,7 +56,7 @@ const createTilemapData = (): TilemapData => ({
 });
 
 const createTilemapModel = (tilemapData: unknown, context: ReturnType<typeof createReferenceContext>): Tilemap => {
-    const result = Tilemap.create(tilemapData, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(tilemapData, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };
@@ -108,7 +108,7 @@ describe("Tilemap", () => {
 
     it("creates from valid minimal tilemap data with defaults", () => {
         const context = createReferenceContext();
-        const result = Tilemap.create(
+        const result = Tilemap.createFromFileData(
             { id: "map-minimal" },
             context.filePathSystem,
             context.tilesetRefManager,
@@ -132,7 +132,7 @@ describe("Tilemap", () => {
 
     it("returns Result.Error when critical id is invalid", () => {
         const context = createReferenceContext();
-        const result = Tilemap.create(
+        const result = Tilemap.createFromFileData(
             { name: "Missing ID" },
             context.filePathSystem,
             context.tilesetRefManager,
@@ -145,7 +145,7 @@ describe("Tilemap", () => {
 
     it("defaults invalid orientation and size fields", () => {
         const context = createReferenceContext();
-        const result = Tilemap.create(
+        const result = Tilemap.createFromFileData(
             {
                 id: "map-invalid-fields",
                 orientation: "sideways",

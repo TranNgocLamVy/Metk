@@ -71,24 +71,12 @@ const normalizeRulesetMetadata = (value: unknown): RulesetMetadata | null => {
 
 const normalizeEntityCollectionMetadata = (value: unknown): EntityCollectionMetadata | null => {
     try {
-        const data = validate.requiredObject({
-            value,
-            field: "project.entityCollections[]",
-        });
+        const data = validate.requiredObject({ value, field: "project.entityCollections[]" });
 
         return {
-            id: validate.requiredString({
-                value: data.id,
-                field: "project.entityCollections[].id",
-            }),
-            name: validate.string({
-                value: data.name,
-                defaultValue: "Untitled Entity Collection",
-            }),
-            entityCollectionRelPath: validate.requiredString({
-                value: data.entityCollectionRelPath,
-                field: "project.entityCollections[].entityCollectionRelPath",
-            }),
+            id: validate.requiredString({ value: data.id, field: "project.entityCollections[].id" }),
+            name: validate.string({ value: data.name, defaultValue: "Untitled Entity Collection" }),
+            entityCollectionRelPath: validate.requiredString({ value: data.entityCollectionRelPath, field: "project.entityCollections[].entityCollectionRelPath" }),
         };
     } catch {
         return null;
@@ -119,4 +107,9 @@ export const normalizeProjectData = (projectData: unknown): ProjectData => {
             .map(normalizeEntityCollectionMetadata)
             .filter((metadata): metadata is EntityCollectionMetadata => metadata !== null),
     };
+};
+
+export const extractProjectId = (projectData: unknown): string => {
+    const data = validate.requiredObject({ value: projectData, field: "project" });
+    return validate.requiredString({ value: data.id, field: "project.id" });
 };

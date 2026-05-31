@@ -34,6 +34,7 @@ export class TilesetManager {
 
         const tilesetRelPath = PathUtils.relative(this.projectPathSystem.absDir, tilesetAbsPath);
         const tilesetPathSystem = new FilePathSystem(tilesetData.id, this.projectPathSystem, tilesetRelPath);
+
         const newTileset = TilesetFactory.create(tilesetData, tilesetPathSystem, this.objectRegistry);
 
         const tilesetMetadata: TilesetMetadata = {
@@ -41,6 +42,7 @@ export class TilesetManager {
             name: newTileset.name,
             tilesetRelPath: tilesetRelPath,
         }
+        
         this.tilesetMetadata.set(newTileset.id, tilesetMetadata);
 
         this.objectRegistry.registerTree(newTileset);
@@ -160,10 +162,7 @@ export class TilesetManager {
         }
 
         Console.success({
-            message: {
-                key: "message.tileset.updatedSuccess",
-                options: { name: tilesetData.name },
-            },
+            message: { key: "message.tileset.updatedSuccess", options: { name: tilesetData.name } },
         });
     }
 

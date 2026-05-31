@@ -1,17 +1,13 @@
 
 import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import {
-    DEFAULT_TILEMAP_BACKGROUND_COLOR,
-    TilemapData,
-    type TilemapOrientation,
-} from "@/shared/data-types/tilemap.data";
+import { TilemapData, type TilemapOrientation } from "@/shared/data-types/tilemap.data";
 import { RootLayer } from "./layer/root-layer";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { EnumProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { Result } from "@/shared/types/result";
-import { normalizeTilemapData } from "./tilemap.normalizer";
+import { DEFAULT_TILEMAP_BACKGROUND_COLOR, normalizeTilemapData } from "./tilemap.normalizer";
 
 interface TilemapEvent extends BaseObjectEvents {
     onChange: () => void
@@ -75,7 +71,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
     public rootLayer: RootLayer;
 
-    private constructor(
+    public constructor(
         data: TilemapData,
         public readonly tilemapPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
@@ -99,27 +95,13 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         this.rootLayer = new RootLayer(data.layers, this, this.objectId);
     }
 
-    public static create(
-        tilemapData: unknown,
-        tilemapPathSystem: FilePathSystem,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager
-    ): Result<Tilemap> {
+    public static createFromFileData(tilemapData: unknown, tilemapPathSystem: FilePathSystem, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager): Result<Tilemap> {
         try {
             const data = normalizeTilemapData(tilemapData);
-            return Result.Success(Tilemap.fromData(data, tilemapPathSystem, tilesetRefManager, rulesetRefManager));
+            return Result.Success(new Tilemap(data, tilemapPathSystem, tilesetRefManager, rulesetRefManager));
         } catch (error) {
             return Result.Error(`Failed to create tilemap: ${String(error)}`);
         }
-    }
-
-    public static fromData(
-        tilemapData: TilemapData,
-        tilemapPathSystem: FilePathSystem,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager
-    ): Tilemap {
-        return new Tilemap(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
     }
 
     public rename(newName: string, meta?: PropertyUpdateMeta) {

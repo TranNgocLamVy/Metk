@@ -2,11 +2,6 @@ import { RootLayerData } from "./layer.data";
 import { RulesetRefData } from "./ruleset.data";
 import { TilesetRefData } from "./tileset.data";
 
-export const DEFAULT_TILEMAP_WIDTH = 64;
-export const DEFAULT_TILEMAP_HEIGHT = 64;
-export const DEFAULT_TILE_SIZE = 16;
-export const DEFAULT_TILEMAP_BACKGROUND_COLOR = "#00000000";
-
 export type TilemapMetadata = {
     name: string;
     id: string;
@@ -39,8 +34,7 @@ export type TilemapData = {
     width: number;
     tilewidth: number;
     tileheight: number;
-    backgroundcolor?: string;
-    nextTilesetIndex?: number;
+    backgroundcolor: string;
     tilesets: {
         refs: TilesetRefData[];
         nextIndex: number;
@@ -51,3 +45,5 @@ export type TilemapData = {
     };
     layers: RootLayerData;
 };
+
+export type CreateTilemapPayload = Pick<TilemapData, "id" | "name" | "orientation" | "height" | "width" | "tilewidth" | "tileheight">;

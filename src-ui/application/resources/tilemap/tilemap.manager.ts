@@ -12,6 +12,7 @@ import { PathUtils } from "@/shared/utils/path.utils";
 import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
+import { relative } from "pathe";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -37,12 +38,11 @@ export class TilemapManager {
         } catch (error) {
             return Result.Error(`Failed to create tilemap: ${String(error)}`);
         }
-
-        const tilemapRelPath = PathUtils.relative(this.projectPathSystem.absDir, tilemapAbsPath);
+        const tilemapRelPath = this.projectPathSystem.getRelPathFromAbsPath(tilemapAbsPath);
         const tilemapPathSystem = new FilePathSystem(tilemapData.id, this.projectPathSystem, tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
-        const newTilemap = Tilemap.fromData(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
+        const newTilemap = new Tilemap(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
 
         const tilemapMetadata: TilemapMetadata = {
             id: newTilemap.id,
@@ -220,7 +220,7 @@ export class TilemapManager {
             this.objectRegistry?.unregisterTree(tilemap);
             tilemap.destroy();
         }
-    
+
         this.loadedTilemaps.clear();
         this.pendingLoads.clear();
     }

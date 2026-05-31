@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { RulesetRefData } from "@/shared/data-types/layer.data";
 import { Console } from "@/shared/services/console.service";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Result } from "@/shared/types/result";
 import { normalizeRulesetData } from "./ruleset.normalizer";
 
@@ -22,12 +21,11 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public size: number;
     private rules: Rule[] = [];
 
-    private constructor(
+    public constructor(
         data: RulesetData,
         public readonly rulesetPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
         public readonly rulesetRefManager: RulesetRefManager,
-        options: { preserveSerializedRefs?: boolean } = {},
 
     ) {
         super(`ruleset:${data.id}`);
@@ -41,7 +39,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
 
         const hasSerializedSelfRef = data.rulesets.refs.some((ref) => ref.index === 0 && ref.id === this.id);
-        if (!options.preserveSerializedRefs || !hasSerializedSelfRef) {
+        if (!hasSerializedSelfRef) {
             this.rulesetRefManager.addRulesetToRefs(this.id); // First ruleset ref is always the current ruleset
             this.rulesetRefManager.replaceRulesetRef(0, this.id);
         }
@@ -52,36 +50,13 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         });
     }
 
-    public static create(
-        rulesetData: unknown,
-        rulesetPathSystem: FilePathSystem,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
-    ): Result<Ruleset> {
+    public static createFromFileData(rulesetData: unknown,rulesetPathSystem: FilePathSystem,tilesetRefManager: TilesetRefManager,rulesetRefManager: RulesetRefManager): Result<Ruleset> {
         try {
             const data = normalizeRulesetData(rulesetData);
-            return Result.Success(Ruleset.fromData(data, rulesetPathSystem, tilesetRefManager, rulesetRefManager));
+            return Result.Success(new Ruleset(data, rulesetPathSystem, tilesetRefManager, rulesetRefManager));
         } catch (error) {
             return Result.Error(`Failed to create ruleset: ${String(error)}`);
         }
-    }
-
-    public static fromData(
-        rulesetData: RulesetData,
-        rulesetPathSystem: FilePathSystem,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
-    ): Ruleset {
-        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
-    }
-
-    public static cloneFromData(
-        rulesetData: RulesetData,
-        rulesetPathSystem: FilePathSystem,
-        tilesetRefManager: TilesetRefManager,
-        rulesetRefManager: RulesetRefManager,
-    ): Ruleset {
-        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager, { preserveSerializedRefs: true });
     }
 
     public updateRuleset(rulesetData: RulesetData): void {

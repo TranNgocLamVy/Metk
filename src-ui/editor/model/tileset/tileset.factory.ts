@@ -18,7 +18,7 @@ export class TilesetFactory {
         }
     }
 
-    public static fromData(tilesetData: unknown, tilesetPathSystem: FilePathSystem, objectRegistry: EditorObjectRegistry): Result<Tileset> {
+    public static createFromFileData(tilesetData: unknown, tilesetPathSystem: FilePathSystem, objectRegistry: EditorObjectRegistry): Result<Tileset> {
         try {
             const data = normalizeTilesetData(tilesetData);
             return Result.Success(this.create(data, tilesetPathSystem, objectRegistry));

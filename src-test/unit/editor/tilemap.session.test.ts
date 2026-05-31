@@ -62,7 +62,7 @@ const createTilemap = () => {
         ],
     };
 
-    const result = Tilemap.create(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };

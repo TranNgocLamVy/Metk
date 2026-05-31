@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilemapData, TilemapOrientation } from "../data-types/tilemap.data";
+import { CreateTilemapPayload, TilemapData, TilemapOrientation } from "../data-types/tilemap.data";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { Result } from "../types/result";
 import { WorkspaceService } from "./workspace.service";
@@ -10,10 +10,9 @@ import { DialogService } from "./dialog.service";
 import { createTilemapForm } from "../constant/form/create-tilemap.form";
 import { Console } from "./console.service";
 import i18n from "@/shared/services/i18n.service";
-import { extractTilemapId } from "@/editor/model/tilemap/tilemap.normalizer";
+import { extractTilemapId, normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
 
 export class TilemapService {
-
     public static async createTilemap(): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
@@ -31,7 +30,7 @@ export class TilemapService {
         const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
         currentWorkspace.savedPathManager.setTilemapDir(tilemapAbsDir);
 
-        const tilemapData: TilemapData = {
+        const createTilemapPayload: CreateTilemapPayload = {
             id: uuidv4(),
             name: form.tilemap.name,
             orientation: form.tilemap.type as TilemapOrientation,
@@ -39,9 +38,14 @@ export class TilemapService {
             width: form.options.map.mapwidth,
             tilewidth: form.options.tile.tilewidth,
             tileheight: form.options.tile.tileheight,
-            tilesets: { refs: [], nextIndex: 0 },
-            rulesets: { refs: [], nextIndex: 0 },
-            layers: [],
+        }
+
+        let tilemapData: TilemapData;
+        try {
+            tilemapData = normalizeTilemapData(createTilemapPayload);
+        } catch (error) {
+            Console.error({ message: `Failed to create tilemap: ${String(error)}` });
+            return;
         }
 
         const saveResult = await TilemapStorageService.save(tilemapAbsPath, tilemapData);
