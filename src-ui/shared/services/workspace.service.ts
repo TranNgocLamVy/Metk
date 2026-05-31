@@ -21,7 +21,7 @@ export class WorkspaceService {
             Console.error({ message: loadLayoutResult.message });
         }
 
-        const loadWorkspaceResult = await appKernel.workspaceManager.loadProjectWorkspace(project);
+        const loadWorkspaceResult = await appKernel.workspaceManager.loadWorkspace(project);
         if (loadWorkspaceResult.status !== Result.Status.Success) {
             Console.error({ message: loadWorkspaceResult.message });
             return loadWorkspaceResult;

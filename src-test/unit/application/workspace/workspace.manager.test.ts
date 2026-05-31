@@ -68,7 +68,7 @@ describe("WorkspaceManager", () => {
         manager.setEditorContext(editorFacade);
         manager.on("onWorkspaceLoaded", loaded);
 
-        const result = await manager.loadProjectWorkspace(project);
+        const result = await manager.loadWorkspace(project);
 
         expect(result.status).toBe(Result.Status.Success);
         expect(manager.currentWorkspace).toBe(result.data);
@@ -93,7 +93,7 @@ describe("WorkspaceManager", () => {
         (WorkspaceStorageService.exists as any).mockResolvedValue(true);
         (WorkspaceStorageService.load as any).mockResolvedValue(Result.Success(storedWorkspaceData));
 
-        const result = await manager.loadProjectWorkspace(project);
+        const result = await manager.loadWorkspace(project);
 
         expect(result.status).toBe(Result.Status.Success);
         expect(WorkspaceStorageService.load).toHaveBeenCalledWith("C:/Project/Metk/test-project/.metk/session.json");
@@ -109,7 +109,7 @@ describe("WorkspaceManager", () => {
         (WorkspaceStorageService.exists as any).mockResolvedValue(true);
         (WorkspaceStorageService.load as any).mockResolvedValue(Result.Error("workspace load failed"));
 
-        const result = await manager.loadProjectWorkspace(project);
+        const result = await manager.loadWorkspace(project);
 
         expect(result.status).toBe(Result.Status.Success);
         expect(manager.currentWorkspace?.serialize()).toEqual(defaultWorkspaceData);
@@ -128,7 +128,7 @@ describe("WorkspaceManager", () => {
         manager.setEditorContext(createEditorFacade());
         manager.currentWorkspace = existingWorkspace as any;
 
-        await manager.loadProjectWorkspace(project);
+        await manager.loadWorkspace(project);
 
         expect(existingWorkspace.destroy).toHaveBeenCalledTimes(1);
         expect(manager.currentWorkspace).not.toBe(existingWorkspace);
@@ -138,7 +138,7 @@ describe("WorkspaceManager", () => {
         const manager = new WorkspaceManager();
         const project = createProject();
         manager.setEditorContext(createEditorFacade());
-        await manager.loadProjectWorkspace(project);
+        await manager.loadWorkspace(project);
         (WorkspaceStorageService.save as any).mockClear();
 
         const result = await manager.saveCurrentWorkspace(false);
@@ -155,7 +155,7 @@ describe("WorkspaceManager", () => {
         const manager = new WorkspaceManager();
         const project = createProject();
         manager.setEditorContext(createEditorFacade());
-        await manager.loadProjectWorkspace(project);
+        await manager.loadWorkspace(project);
         (WorkspaceStorageService.save as any).mockClear();
 
         await manager.saveCurrentWorkspace();
@@ -183,7 +183,7 @@ describe("WorkspaceManager", () => {
         const unloaded = vi.fn();
         manager.setEditorContext(editorFacade);
         manager.on("onWorkspaceUnloaded", unloaded);
-        await manager.loadProjectWorkspace(project);
+        await manager.loadWorkspace(project);
         const workspace = manager.currentWorkspace!;
         const destroy = vi.spyOn(workspace, "destroy");
         (WorkspaceStorageService.save as any).mockClear();

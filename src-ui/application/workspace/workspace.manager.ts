@@ -27,41 +27,57 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
         this.editorFacade = editorFacade;
     }
 
-    public async loadProjectWorkspace(project: Project): Promise<Result<Workspace>> {
-        if (this.currentWorkspace) await this.currentWorkspace.destroy();
-        this.currentWorkspace = null;
-
+    public async loadWorkspace(project: Project): Promise<Result<Workspace>> {
+        this.unloadWorkspace();
+    
         const workspaceAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "session.json"));
-
-        const workspaceExist = await WorkspaceStorageService.exists(workspaceAbsPath);
-        if (!workspaceExist) {
-            this.currentWorkspace = this.createDefaultWorkspace(project);
+    
+        const workspace = await this.resolveWorkspace(project, workspaceAbsPath);
+    
+        this.currentWorkspace = workspace;
+        await workspace.loadSession();
+    
+        this.emit("onWorkspaceLoaded", workspace);
+    
+        return Result.Success(workspace);
+    }
+    
+    private async resolveWorkspace(project: Project, workspaceAbsPath: string): Promise<Workspace> {
+        const workspaceExists = await WorkspaceStorageService.exists(workspaceAbsPath);
+    
+        if (!workspaceExists) {
+            const workspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
+            this.currentWorkspace = workspace;
             await this.saveCurrentWorkspace();
-        } else {            
-            const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
-            if (loadSessionResult.status === Result.Status.Success) {
-                const workspaceResult = Workspace.create(loadSessionResult.data, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
-                if (workspaceResult.status === Result.Status.Success) {
-                    this.currentWorkspace = workspaceResult.data;
-                } else {
-                    Console.error({
-                        message: "Workspace data is invalid. Falling back to default workspace.",
-                        stacks: workspaceResult.message ? [workspaceResult.message] : [],
-                    });
-                    this.currentWorkspace = this.createDefaultWorkspace(project);
-                }
-            } else {
-                Console.error({
-                    message: "Workspace data could not be loaded. Falling back to default workspace.",
-                    stacks: loadSessionResult.message ? [loadSessionResult.message] : [],
-                });
-                this.currentWorkspace = this.createDefaultWorkspace(project);
-                await this.saveCurrentWorkspace();
-            }
+            return workspace;
         }
-        await this.currentWorkspace.loadSession();
-        this.emit("onWorkspaceLoaded", this.currentWorkspace);
-        return Result.Success(this.currentWorkspace!);
+    
+        const loadSessionResult = await WorkspaceStorageService.load(workspaceAbsPath);
+    
+        if (loadSessionResult.status !== Result.Status.Success) {
+            Console.error({
+                message: "Workspace data could not be loaded. Falling back to default workspace.",
+                stacks: loadSessionResult.message ? [loadSessionResult.message] : [],
+            });
+    
+            const workspace = new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
+            this.currentWorkspace = workspace;
+            await this.saveCurrentWorkspace();
+            return workspace;
+        }
+    
+        const workspaceResult = Workspace.createFromFileData(loadSessionResult.data,project.tilesetManager,project.tilemapManager,project.projectPathSystem,this.editorFacade);
+    
+        if (workspaceResult.status === Result.Status.Success) {
+            return workspaceResult.data;
+        }
+    
+        Console.error({
+            message: "Workspace data is invalid. Falling back to default workspace.",
+            stacks: workspaceResult.message ? [workspaceResult.message] : [],
+        });
+    
+        return new Workspace(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
     }
 
     public async saveCurrentWorkspace(waitForTimeout: boolean = true): Promise<Result> {
@@ -91,13 +107,5 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
         await this.currentWorkspace.destroy();
         this.currentWorkspace = null;
         this.emit("onWorkspaceUnloaded");
-    }
-
-    private createDefaultWorkspace(project: Project): Workspace {
-        const workspaceResult = Workspace.create(defaultWorkspaceData, project.tilesetManager, project.tilemapManager, project.projectPathSystem, this.editorFacade);
-        if (workspaceResult.status !== Result.Status.Success) {
-            throw new Error(String(workspaceResult.message ?? "Failed to create default workspace"));
-        }
-        return workspaceResult.data;
     }
 }

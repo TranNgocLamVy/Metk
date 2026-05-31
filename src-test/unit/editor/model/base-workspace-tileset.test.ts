@@ -140,7 +140,7 @@ describe("Workspace model", () => {
     it("constructs session and saved-path managers from workspace data", () => {
         const editorFacade = { id: "editor" };
         const projectPathSystem = new ProjectPathSystem("C:/Project/Metk/workspace-project");
-        const workspaceResult = Workspace.create(defaultWorkspaceData, {} as any, {} as any, projectPathSystem, editorFacade as any);
+        const workspaceResult = Workspace.createFromFileData(defaultWorkspaceData, {} as any, {} as any, projectPathSystem, editorFacade as any);
         if (workspaceResult.status !== Result.Status.Success) throw new Error(String(workspaceResult.message));
         const workspace = workspaceResult.data;
 
@@ -155,7 +155,7 @@ describe("Workspace model", () => {
     it("loads, destroys, and serializes through its child managers", async () => {
         const tilesetManager = { id: "tileset-manager" };
         const tilemapManager = { id: "tilemap-manager" };
-        const workspaceResult = Workspace.create(defaultWorkspaceData, tilesetManager as any, tilemapManager as any, new ProjectPathSystem("C:/Project/Metk/workspace-project"), {} as any);
+        const workspaceResult = Workspace.createFromFileData(defaultWorkspaceData, tilesetManager as any, tilemapManager as any, new ProjectPathSystem("C:/Project/Metk/workspace-project"), {} as any);
         if (workspaceResult.status !== Result.Status.Success) throw new Error(String(workspaceResult.message));
         const workspace = workspaceResult.data;
 
