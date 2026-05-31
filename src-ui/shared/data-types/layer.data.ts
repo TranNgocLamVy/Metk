@@ -49,6 +49,20 @@ export type ImageLayerData = LayerCommonData & {
     image?: ImageSourceData;
 };
 
+export type EntityInstanceData = {
+    id: string;
+    definitionId: string;
+    x: number;
+    y: number;
+}
+
+export type EntityLayerData = LayerCommonData & {
+    type: "entity";
+    offsetx?: number;
+    offsety?: number;
+    entities: EntityInstanceData[];
+}
+
 export type GroupLayerData = LayerCommonData & {
     type: "group";
     open?: boolean;
@@ -59,6 +73,7 @@ export type LayerData =
     | TileLayerData
     | RuleLayerData
     | ImageLayerData
+    | EntityLayerData
     | GroupLayerData;
 
 export type RootLayerData = LayerData[];
