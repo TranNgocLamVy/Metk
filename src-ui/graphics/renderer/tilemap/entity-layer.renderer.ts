@@ -6,11 +6,13 @@ import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { EntityInstanceData } from "@/shared/data-types/layer.data";
 
+import { Viewport } from "pixi-viewport";
 import { BaseLayerRenderer } from "./base-layer.renderer";
 
 type CreateEntityLayerRendererContext = {
     layer: EntityLayer;
     tilemap: Tilemap;
+    viewport: Viewport;
 };
 
 export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {

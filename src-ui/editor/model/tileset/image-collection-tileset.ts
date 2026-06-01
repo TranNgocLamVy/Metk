@@ -1,3 +1,4 @@
+import { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 import { Tileset } from "./tileset";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
@@ -32,6 +33,41 @@ export class ImageCollectionTileset extends Tileset {
         this.recalculateCollectionMetrics();
 
         this.emitTilesetUpdated("ImageCollectionTileset.updateTileset");
+    }
+
+    public addImageTiles(imageSources: ImageSourceData[]): number[] {
+        if (imageSources.length === 0) return [];
+
+        const firstTileId = Math.max(-1, ...this.tiles.map((tile) => tile.id)) + 1;
+        const addedTileIds = imageSources.map((_, index) => firstTileId + index);
+
+        this.replaceTiles([
+            ...this.tiles.map((tile) => tile.serialize()),
+            ...imageSources.map((image, index) => ({
+                id: firstTileId + index,
+                image,
+            })),
+        ]);
+        this.recalculateCollectionMetrics();
+
+        this.emitTilesetUpdated("ImageCollectionTileset.addImageTiles");
+
+        return addedTileIds;
+    }
+
+    public removeTile(tileId: number): boolean {
+        if (!this.tiles.some((tile) => tile.id === tileId)) return false;
+
+        this.replaceTiles(
+            this.tiles
+                .filter((tile) => tile.id !== tileId)
+                .map((tile) => tile.serialize()),
+        );
+        this.recalculateCollectionMetrics();
+
+        this.emitTilesetUpdated("ImageCollectionTileset.removeTile");
+
+        return true;
     }
 
     private recalculateCollectionMetrics(): void {

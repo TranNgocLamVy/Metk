@@ -3,12 +3,14 @@ import { Sprite } from "pixi.js";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 
-import { BaseLayerRenderer } from "./base-layer.renderer";
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { Viewport } from "pixi-viewport";
+import { BaseLayerRenderer } from "./base-layer.renderer";
 
 type CreateTileLayerRendererContext = {
     layer: TileLayer;
     tilemap: Tilemap;
+    viewport: Viewport;
 }
 
 export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
@@ -60,9 +62,9 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             this.sprites.set(key, currentSprite);
         }
 
-        const drawPotision = this.coordToPos({ col, row });
-        currentSprite.x = drawPotision.x;
-        currentSprite.y = drawPotision.y;
+        const drawPosition = this.coordToPos({ col, row });
+        currentSprite.x = drawPosition.x;
+        currentSprite.y = drawPosition.y;
         
         // TODO: Get textureManager from passing editorFacade
         const textureManager = appKernel.editorFacade.textureManager;

@@ -2,11 +2,13 @@ import { Container, Graphics } from "pixi.js";
 
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 
-import { GroupLayerRenderer } from "./group-layer.renderer";
+import { Viewport } from "pixi-viewport";
 import { BaseLayerRenderer } from "./base-layer.renderer";
+import { GroupLayerRenderer } from "./group-layer.renderer";
 
 type CreateTilemapRendererContext = {
     tilemap: Tilemap
+    viewport: Viewport;
 }
 
 export class TilemapRenderer {
@@ -15,14 +17,14 @@ export class TilemapRenderer {
     private borderGraphic: Graphics;
     public tilemap: Tilemap
 
-    constructor(editorFacade: CreateTilemapRendererContext) {
-        this.tilemap = editorFacade.tilemap;
+    constructor(createContext: CreateTilemapRendererContext) {
+        this.tilemap = createContext.tilemap;
 
         this.container = new Container({ isRenderGroup: true });
         this.container.label = "Tilemap-Root";
 
         // Pass tilemap to the root group renderer
-        this.rootRenderer = new GroupLayerRenderer({ layer: this.tilemap.rootLayer, tilemap: this.tilemap });
+        this.rootRenderer = new GroupLayerRenderer({ layer: this.tilemap.rootLayer, tilemap: this.tilemap, viewport: createContext.viewport });
         this.container.addChild(this.rootRenderer.container);
 
         this.borderGraphic = new Graphics();

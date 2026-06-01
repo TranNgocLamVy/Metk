@@ -1,7 +1,9 @@
 import { Application as PixiReactApplication } from "@pixi/react";
 import { Application as PixiApp } from "pixi.js";
 import { useCallback, useEffect, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
 
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
@@ -12,6 +14,7 @@ import { renderTilesetOverview } from "./graphics/tileset-overview.renderer";
 export function LeftPanel() {
     const { tileset, tilesetName, selectedTileId, version, actions } = useEditTileset();
     const { selectTile } = actions;
+    const isImageCollectionTileset = tileset instanceof ImageCollectionTileset;
 
     const [pixiApp, setPixiApp] = useState<PixiApp | null>(null);
     const [size, setSize] = useState({ width: 1, height: 1 });
@@ -68,6 +71,30 @@ export function LeftPanel() {
                 <header className="px-2 py-1.5 text-xs font-semibold bg-foreground/40 text-accent-foreground/80">
                     Tileset
                 </header>
+
+                <HStack className="bg-surface-overlay w-full px-1 py-1 gap-0.5">
+                    <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        title="Add tile images"
+                        disabled={!isImageCollectionTileset}
+                        onClick={actions.addImageTiles}
+                    >
+                        <Plus />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        type="button"
+                        title="Delete selected tile"
+                        className="text-destructive"
+                        disabled={!isImageCollectionTileset || selectedTileId == null}
+                        onClick={actions.removeSelectedTile}
+                    >
+                        <Trash2 />
+                    </Button>
+                </HStack>
 
                 <div ref={containerRef} className="w-full h-full min-h-0 overflow-hidden">
                     <PixiReactApplication

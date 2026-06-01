@@ -219,6 +219,12 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
         this.emit("onTextureReloaded", tileset.id);
     }
 
+    public async reloadTilesetGraphics(tileset: Tileset): Promise<Result> {
+        this.destroyTextures(tileset.id);
+
+        return this.performLoad(tileset);
+    }
+
     private destroyTextures(tilesetId: string): void {
         const tileTextureMap = this.tileTexturesCache.get(tilesetId);
         const baseTexture = this.baseTexturesCache.get(tilesetId);

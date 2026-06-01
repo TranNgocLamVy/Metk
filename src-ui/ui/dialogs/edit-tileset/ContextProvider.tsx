@@ -1,7 +1,13 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { readFile } from "@tauri-apps/plugin-fs";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { Console } from "@/shared/services/console.service";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { PathUtils } from "@/shared/utils/path.utils";
+import { TextureUtils } from "@/shared/utils/texture.utils";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 
 export function useTilesetController(initialTileset: Tileset, dialogId: string) {
@@ -41,6 +47,69 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         setTilesetName(name);
     }, []);
 
+    const addImageTiles = useCallback(async () => {
+        if (!(tileset instanceof ImageCollectionTileset)) return;
+
+        const currentWorkspace = appKernel.editorFacade.currentWorkspace;
+        const defaultTextureDir = currentWorkspace?.savedPathManager.getTextureDir();
+
+        const imageAbsPaths = await FileDialogUtils.open({
+            title: "Add tiles",
+            defaultPath: defaultTextureDir,
+            multiple: true,
+            filters: [
+                {
+                    name: "Images",
+                    extensions: ["png", "jpg", "jpeg", "webp", "bmp", "gif"],
+                },
+            ],
+        });
+
+        if (!imageAbsPaths || imageAbsPaths.length === 0) return;
+
+        try {
+            const imageSources = await Promise.all(
+                imageAbsPaths.map(async (imageAbsPath) => {
+                    const fileBuffer = await readFile(imageAbsPath);
+                    const image = await TextureUtils.processImage(fileBuffer);
+
+                    return {
+                        source: tileset.tilesetPathSystem.getRelPathFromAbsPath(imageAbsPath),
+                        width: image.width,
+                        height: image.height,
+                    };
+                }),
+            );
+
+            currentWorkspace?.savedPathManager.setTextureDir(PathUtils.dirname(imageAbsPaths[0]));
+
+            const addedTileIds = tileset.addImageTiles(imageSources);
+
+            setSelectedTileId(addedTileIds[0] ?? null);
+            setSelectedCollisionObjectId(null);
+            triggerUpdate();
+        } catch (error) {
+            Console.error({
+                message: "Failed to add tiles.",
+                stacks: [String(error)],
+            });
+        }
+    }, [tileset, triggerUpdate]);
+
+    const removeSelectedTile = useCallback(() => {
+        if (!(tileset instanceof ImageCollectionTileset)) return;
+        if (selectedTileId == null) return;
+
+        const selectedTileIndex = tileset.tiles.findIndex((tile) => tile.id === selectedTileId);
+        if (!tileset.removeTile(selectedTileId)) return;
+
+        const nextSelectedTile = tileset.tiles[Math.min(selectedTileIndex, tileset.tiles.length - 1)] ?? null;
+
+        setSelectedTileId(nextSelectedTile?.id ?? null);
+        setSelectedCollisionObjectId(null);
+        triggerUpdate();
+    }, [tileset, selectedTileId, triggerUpdate]);
+
     const handleCloseDialog = useCallback(() => {
         closeDialog(dialogId);
     }, [closeDialog, dialogId]);
@@ -58,6 +127,11 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         const tilesetManager = currentProject.tilesetManager;
 
         tilesetManager.updateTileset(tileset.serialize());
+        const updatedTileset = tilesetManager.getTilesetById(tileset.id);
+        if (updatedTileset && tileset instanceof ImageCollectionTileset) {
+            await appKernel.editorFacade.textureManager.reloadTilesetGraphics(updatedTileset);
+        }
+
         await tilesetManager.saveTileset(tileset.id);
         await appKernel.editorFacade.projectManager.saveCurrrentProject();
 
@@ -69,9 +143,11 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         selectTile,
         selectCollisionObject,
         updateTilesetName,
+        addImageTiles,
+        removeSelectedTile,
         closeDialog: handleCloseDialog,
         updateTileset,
-    }), [triggerUpdate, selectTile, selectCollisionObject, updateTilesetName, handleCloseDialog, updateTileset]);
+    }), [triggerUpdate, selectTile, selectCollisionObject, updateTilesetName, addImageTiles, removeSelectedTile, handleCloseDialog, updateTileset]);
 
     return {
         version,

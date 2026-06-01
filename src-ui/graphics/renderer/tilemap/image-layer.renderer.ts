@@ -6,101 +6,145 @@ import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 
+import { Viewport } from "pixi-viewport";
 import { BaseLayerRenderer } from "./base-layer.renderer";
 
 type CreateImageLayerRendererContext = {
     layer: ImageLayer;
     tilemap: Tilemap;
+    viewport: Viewport;
 };
 
 export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
-    private imageSprite: Sprite | TilingSprite | null = null;
+    private viewport: Viewport;
+    private image: Sprite | TilingSprite | null = null;
     private texture: Texture | null = null;
-
-    private bindOnImageChanged: () => void;
+    
+    private bindOnViewportChanged: () => void;
 
     constructor(context: CreateImageLayerRendererContext) {
         super(context.layer, context.tilemap);
 
-        this.bindOnImageChanged = this.renderImage.bind(this);
-        this.layer.eventEmitter.on("imageChanged", this.bindOnImageChanged);
+        this.viewport = context.viewport;
+        
+        this.bindOnViewportChanged = this.updateViewTransform.bind(this);
 
-        void this.renderImage();
+        this.layer.eventEmitter.on("imageChanged", this.bindOnViewportChanged);
+        this.viewport.on("moved", this.bindOnViewportChanged);
+        this.viewport.on("zoomed", this.bindOnViewportChanged);
+        this.viewport.on("resize", this.bindOnViewportChanged);
+
+        this.renderLayer();
     }
 
-    private async renderImage(): Promise<void> {
-        this.imageSprite?.destroy();
-        this.imageSprite = null;
+    private async renderLayer(): Promise<void> {
+        const texture = await this.getTexture();
+        if (!texture) return;
 
-        if (this.texture) {
-            this.texture.destroy(true);
-            this.texture = null;
+        this.image?.destroy();
+
+        if (this.layer.repeatX || this.layer.repeatY) {
+            this.image = new TilingSprite({ texture });
+        } else {
+            this.image = new Sprite(texture);
         }
 
-        if (!this.layer.imageSource) return;
+        this.container.addChild(this.image);
+        this.updateViewTransform();
+    }
 
+    private async getTexture(): Promise<Texture | null> {
         const imageAbsPath = this.tilemap.tilemapPathSystem.getAbsPathFromRelPath(this.layer.imageSource.source);
 
         const imageExists = await exists(imageAbsPath);
 
+        let texture: Texture | null = null;
         if (!imageExists) {
-            this.texture = await appKernel.textureManager.getErrorTexture();
+            texture = await appKernel.textureManager.getErrorTexture();
         } else {
             const fileBuffer = await readFile(imageAbsPath);
-            this.texture = await TextureUtils.processTexture(fileBuffer);
+            texture = await TextureUtils.processTexture(fileBuffer);
         }
+        return texture;
+    }
 
-        if (this.layer.repeatX || this.layer.repeatY) {
-            const width = this.layer.repeatX
-                ? this.tilemap.width * this.tilemap.tilewidth
-                : this.layer.imageSource.width;
+    private updateViewTransform(): void {
+        if (!this.image) return;
 
-            const height = this.layer.repeatY
-                ? this.tilemap.height * this.tilemap.tileheight
-                : this.layer.imageSource.height;
+        const parallaxX = this.layer.parallax.x ?? 1;
+        const parallaxY = this.layer.parallax.y ?? 1;
 
-            this.imageSprite = new TilingSprite({
-                texture: this.texture,
-                width,
-                height,
-            });
+        const parallaxOriginX = (this.tilemap as any).parallaxoriginx ?? 0;
+        const parallaxOriginY = (this.tilemap as any).parallaxoriginy ?? 0;
+
+        const viewCenterX = this.viewport.center.x;
+        const viewCenterY = this.viewport.center.y;
+
+        this.container.x = (viewCenterX - parallaxOriginX) * (1 - parallaxX);
+        this.container.y = (viewCenterY - parallaxOriginY) * (1 - parallaxY);
+
+        const offsetX = this.layer.offset.x;
+        const offsetY = this.layer.offset.y;
+
+        if (this.image instanceof TilingSprite) {
+            const left = this.viewport.left - this.container.x;
+            const top = this.viewport.top - this.container.y;
+            const right = this.viewport.right - this.container.x;
+            const bottom = this.viewport.bottom - this.container.y;
+
+            const textureWidth = this.image.texture.width;
+            const textureHeight = this.image.texture.height;
+
+            const startX = this.layer.repeatX
+                ? offsetX + Math.floor((left - offsetX) / textureWidth) * textureWidth
+                : offsetX;
+
+            const startY = this.layer.repeatY
+                ? offsetY + Math.floor((top - offsetY) / textureHeight) * textureHeight
+                : offsetY;
+
+            const endX = this.layer.repeatX
+                ? right
+                : offsetX + textureWidth;
+
+            const endY = this.layer.repeatY
+                ? bottom
+                : offsetY + textureHeight;
+
+            this.image.x = startX;
+            this.image.y = startY;
+            this.image.width = Math.max(textureWidth, endX - startX);
+            this.image.height = Math.max(textureHeight, endY - startY);
+
+            this.image.tilePosition.set(0, 0);
         } else {
-            this.imageSprite = new Sprite(this.texture);
-            this.imageSprite.width = this.layer.imageSource.width;
-            this.imageSprite.height = this.layer.imageSource.height;
+            this.image.x = offsetX;
+            this.image.y = offsetY;
         }
-
-        this.imageSprite.x = this.layer.offset.x;
-        this.imageSprite.y = this.layer.offset.y;
-
-        this.applyTint();
-
-        this.container.addChild(this.imageSprite);
-        this.updateProperties();
     }
 
     protected override updateProperties(): void {
         super.updateProperties();
 
-        if (!this.imageSprite) return;
+        if (!this.image) return;
 
-        this.imageSprite.x = this.layer.offset.x;
-        this.imageSprite.y = this.layer.offset.y;
+        this.image.x = this.layer.offset.x;
+        this.image.y = this.layer.offset.y;
 
         this.applyTint();
     }
 
     private applyTint(): void {
-        if (!this.imageSprite) return;
+        if (!this.image) return;
 
         const tint = parseTintColor(this.layer.tintcolor);
 
         if (tint == null) {
-            this.imageSprite.tint = 0xffffff;
+            this.image.tint = 0xffffff;
             return;
         }
 
-        this.imageSprite.tint = tint;
+        this.image.tint = tint;
     }
 
     public override posToCoord(pos: Position): Coordinate {
@@ -118,15 +162,12 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
     }
 
     public override destroy(): void {
-        this.layer.eventEmitter.off("imageChanged", this.bindOnImageChanged);
+        this.viewport.off("moved", this.bindOnViewportChanged);
+        this.viewport.off("zoomed", this.bindOnViewportChanged);
+        this.viewport.off("resize", this.bindOnViewportChanged);
 
-        this.imageSprite?.destroy();
-        this.imageSprite = null;
-
-        if (this.texture) {
-            this.texture.destroy(true);
-            this.texture = null;
-        }
+        this.image?.destroy();
+        this.image = null;
 
         super.destroy();
     }

@@ -1,12 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
 import { BooleanProperty, ImageSourceProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { ImageLayerData } from "@/shared/data-types/layer.data";
+import { v4 as uuidv4 } from "uuid";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import type { ImageSourceData } from "@/shared/data-types/image-source.data";
-import { Tilemap } from "../tilemap";
-import type { PropertyUpdateMeta } from "../../base-object";
 import { validate } from "@/shared/utils/validate.utils";
+import type { PropertyUpdateMeta } from "../../base-object";
+import { Tilemap } from "../tilemap";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 export interface ImageLayerEvents extends BaseLayerEvents {
     imageChanged: () => void;
 }
@@ -53,7 +53,7 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
         label: "Parallax",
         group: "Properties",
         order: 9,
-        visible: false,
+        set: (target, value, meta) => target.updateParallax(value.x, value.y, meta),
         get: (target) => ({ x: target.parallax.x, y: target.parallax.y }),
     })
     public parallax: Point2D = { x: 1, y: 1 }
@@ -150,6 +150,16 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
             this.emitUpdateProperty("repeatY", this.repeatY, eventMeta);
         }
 
+        this.eventEmitter.emit("imageChanged");
+    }
+
+    public updateParallax(x: number, y: number, meta?: PropertyUpdateMeta): void {
+        this.parallax.x = x;
+        this.parallax.y = y;
+        this.emitUpdateProperty("parallax", this.parallax, {
+            origin: meta?.origin ?? "external",
+            source: meta?.source ?? "ImageLayer.updateParallax",
+        });
         this.eventEmitter.emit("imageChanged");
     }
 

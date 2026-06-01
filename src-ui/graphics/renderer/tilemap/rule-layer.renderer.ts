@@ -1,13 +1,15 @@
 import { Color, Sprite, Texture } from "pixi.js";
 
-import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { BaseLayerRenderer } from "./base-layer.renderer";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { Viewport } from "pixi-viewport";
+import { BaseLayerRenderer } from "./base-layer.renderer";
 
 type CreateRuleLayerRendererContext = {
     layer: RuleLayer;
     tilemap: Tilemap;
+    viewport: Viewport;
 }
 
 export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {

@@ -1,8 +1,8 @@
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 
-import { TilemapSession } from "@/editor/session/tilemap.session";
 import { IBaseView } from "@/editor/interface/base-session.interface";
+import { TilemapSession } from "@/editor/session/tilemap.session";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 
 import { TilemapGridRenderer } from "../renderer/tilemap/tilemap-grid.renderer";
@@ -89,7 +89,7 @@ export class TilemapView implements IBaseView {
 
         // Initialize Renderer
         this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
-        this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap });
+        this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap, viewport: this.viewport });
         this.overlayerContainer = new Container();
 
         // Add Renderer

@@ -4,32 +4,36 @@ import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 
-import { BaseLayerRenderer } from "./base-layer.renderer";
-import { TileLayerRenderer } from "./tile-layer.renderer";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { RuleLayerRenderer } from "./rule-layer.renderer";
-import { ImageLayerRenderer } from "./image-layer.renderer";
-import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { Viewport } from "pixi-viewport";
+import { BaseLayerRenderer } from "./base-layer.renderer";
 import { EntityLayerRenderer } from "./entity-layer.renderer";
+import { ImageLayerRenderer } from "./image-layer.renderer";
+import { RuleLayerRenderer } from "./rule-layer.renderer";
+import { TileLayerRenderer } from "./tile-layer.renderer";
 
 type GroupLike = GroupLayer | RootLayer;
 
 type CreateGroupRendererContext = {
     layer: GroupLike;
     tilemap: Tilemap;
+    viewport: Viewport;
 }
 
 export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
+    private viewport: Viewport;
     private childRenderers: Map<string, BaseLayerRenderer> = new Map();
 
     private bindOnLayerAdded: (layerId: string) => void
     private bindOnLayerRemoved: (layerId: string) => void
     private bindOnLayerReordered: () => void
 
-    constructor(editorFacade: CreateGroupRendererContext) {
-        super(editorFacade.layer, editorFacade.tilemap);
+    constructor(createContext: CreateGroupRendererContext) {
+        super(createContext.layer, createContext.tilemap);
 
+        this.viewport = createContext.viewport;
         this.rebuildChildren();
 
         this.bindOnLayerAdded = this.onLayerAdded.bind(this);
@@ -67,15 +71,15 @@ export class GroupLayerRenderer extends BaseLayerRenderer<GroupLike> {
 
         // Pass this.tilemap to children
         if (childLayer instanceof TileLayer) {
-            renderer = new TileLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
+            renderer = new TileLayerRenderer({ layer: childLayer, tilemap: this.tilemap, viewport: this.viewport });
         } else if (childLayer instanceof RuleLayer) {
-            renderer = new RuleLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
+            renderer = new RuleLayerRenderer({ layer: childLayer, tilemap: this.tilemap, viewport: this.viewport });
         } else if (childLayer instanceof ImageLayer) {
-            renderer = new ImageLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
+            renderer = new ImageLayerRenderer({ layer: childLayer, tilemap: this.tilemap, viewport: this.viewport });
         } else if (childLayer instanceof EntityLayer) {
-            renderer = new EntityLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
+            renderer = new EntityLayerRenderer({ layer: childLayer, tilemap: this.tilemap, viewport: this.viewport });
         } else if (childLayer instanceof GroupLayer) {
-            renderer = new GroupLayerRenderer({ layer: childLayer, tilemap: this.tilemap });
+            renderer = new GroupLayerRenderer({ layer: childLayer, tilemap: this.tilemap, viewport: this.viewport });
         }
 
         if (renderer) {

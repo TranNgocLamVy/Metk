@@ -7,11 +7,13 @@ import {
     Sprite,
     Texture,
 } from "pixi.js";
+import { readFile } from "@tauri-apps/plugin-fs";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
+import { TextureUtils } from "@/shared/utils/texture.utils";
 
 type TilesetOverviewRenderOptions = {
     pixiApp: Application;
@@ -57,6 +59,7 @@ class TilesetOverviewPixiRenderer {
     private disposed = false;
     private root: Container | null = null;
     private layoutInfo: TilesetLayoutInfo | null = null;
+    private previewTextures: Texture[] = [];
 
     constructor(private readonly options: TilesetOverviewRenderOptions) {}
 
@@ -86,6 +89,8 @@ class TilesetOverviewPixiRenderer {
         stage.off("pointerdown", this.handlePointerDown);
         stage.removeChildren();
         this.root?.destroy({ children: true });
+        this.previewTextures.forEach((texture) => texture.destroy(true));
+        this.previewTextures = [];
     }
 
     private createRoot(layoutInfo: TilesetLayoutInfo) {
@@ -115,10 +120,7 @@ class TilesetOverviewPixiRenderer {
         let errorTexture: Texture | null = null;
 
         for (const layout of layoutInfo.layouts) {
-            let texture = textureManager.getTileTexture(
-                this.options.tileset.id,
-                layout.tile.id,
-            );
+            let texture = await this.getTileTexture(layout);
 
             if (!texture) {
                 if (!errorTexture) {
@@ -159,6 +161,35 @@ class TilesetOverviewPixiRenderer {
 
         this.options.onSelectTile(layout?.tile.id ?? null);
     };
+
+    private async getTileTexture(layout: TileLayout): Promise<Texture | null> {
+        const { tileset } = this.options;
+
+        if (tileset instanceof ImageCollectionTileset && layout.tile.imageSource?.source) {
+            try {
+                const tileAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(
+                    layout.tile.imageSource.source,
+                );
+                const fileBuffer = await readFile(tileAbsPath);
+                const texture = await TextureUtils.processTexture(fileBuffer);
+                if (this.disposed) {
+                    texture.destroy(true);
+                    return null;
+                }
+
+                this.previewTextures.push(texture);
+
+                return texture;
+            } catch {
+                return null;
+            }
+        }
+
+        return appKernel.editorFacade.textureManager.getTileTexture(
+            tileset.id,
+            layout.tile.id,
+        );
+    }
 }
 
 function makeTileSprite(layout: TileLayout, texture: Texture) {
