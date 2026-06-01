@@ -3,210 +3,343 @@ import { create } from "xmlbuilder2";
 import { ITilemapExporter } from "@/editor/interface/tilemap-exporter.interface";
 import { PathUtils } from "@/shared/utils/path.utils";
 
-import { EditorFacade } from "../editor.facade";
+import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { BaseLayer } from "@/editor/model/tilemap/layer/base-layer";
+import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
-import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { Tile, Tileset } from "@/editor/model/tileset/tileset";
+import { EntityFieldData } from "@/shared/data-types/entity.data";
+import { EntityInstanceData } from "@/shared/data-types/layer.data";
+import { EditorFacade } from "../editor.facade";
 
 type XMLBuilder = ReturnType<typeof create>;
+type XmlObject = Record<string, unknown>;
 
 export class TmxTilemapExporter implements ITilemapExporter {
-    private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // id -> firstGid
+    private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // tileset ref index -> firstgid
     private exportPath: string;
+    private nextLayerId: number = 1;
+    private nextObjectId: number = 1;
 
     public export(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): Uint8Array {
         this.tilesetFirstGidMap.clear();
         this.exportPath = exportPath;
+        this.nextLayerId = 1;
+        this.nextObjectId = 1;
 
-        const builder: XMLBuilder = create({ version: '1.0', encoding: 'UTF-8' })
+        this.ensureEntityGraphicTilesetRefs(tilemap.rootLayer.layers, tilemap);
 
-        const map = builder.ele('map', {
-            version: '1.10',
-            tiledversion: '1.10.2',
-            orientation: 'orthogonal',
-            renderorder: 'right-down',
+        const tilesets = this.getTilesets(tilemap, exportPath, editorFacade);
+        const layers = this.getLayers(tilemap.rootLayer.layers, 0, tilemap);
+
+        const builder: XMLBuilder = create({ version: "1.0", encoding: "UTF-8" });
+
+        const map = builder.ele("map", {
+            version: "1.10",
+            tiledversion: "1.10.2",
+            orientation: "orthogonal",
+            renderorder: "right-down",
             width: tilemap.width,
             height: tilemap.height,
             tilewidth: tilemap.tilewidth,
             tileheight: tilemap.tileheight,
+            nextlayerid: this.nextLayerId,
+            nextobjectid: this.nextObjectId,
         });
 
-        this.getTilesets(tilemap, exportPath, editorFacade).forEach((tileset) => map.import(tileset.root()));
-
-        const layers = this.getLayers(tilemap.rootLayer.layers, 0, tilemap);
-
+        tilesets.forEach((tileset) => map.import(tileset.root()));
         layers.forEach((layer) => map.import(layer.root()));
 
         const xml = builder.end({ prettyPrint: true });
         return new TextEncoder().encode(xml);
     }
 
-    private getTilesets(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): XMLBuilder[] {
+    private getTilesets(
+        tilemap: Tilemap,
+        exportPath: string,
+        _editorFacade: EditorFacade,
+    ): XMLBuilder[] {
         const tilesetRefManager = tilemap.tilesetRefManager;
         const tilesetManager = tilesetRefManager.tilesetManager;
 
         let firstGidCount = 1;
-        const tilesets = tilesetRefManager.serialize().refs.sort((a, b) => a.index - b.index).map((tilesetRef) => {
-            const tileset = tilesetManager.getTilesetById(tilesetRef.id);
-            if (!tileset) return null;
-            const firstGrid = firstGidCount;
-            const tilesetIndex = tilesetRefManager.getTilesetRefIndex(tilesetRef.id);
-            this.tilesetFirstGidMap.set(tilesetIndex, firstGrid);
-            firstGidCount += tileset.tiles.length;
-            if (tileset instanceof SingleImageTileset) {
-                return this.getSingleImageTileset(tileset, exportPath, firstGrid);
-            } else if (tileset instanceof ImageCollectionTileset) {
-                return this.getImageCollectionTileset(tileset, exportPath, firstGrid);
-            }
-            return null;
-        }).filter((tileset) => tileset != null);
+
+        const tilesets = tilesetRefManager
+            .serialize()
+            .refs
+            .sort((a, b) => a.index - b.index)
+            .map((tilesetRef) => {
+                const tileset = tilesetManager.getTilesetById(tilesetRef.id);
+                if (!tileset) return null;
+
+                const firstGid = firstGidCount;
+                const tilesetIndex = tilesetRefManager.getTilesetRefIndex(tilesetRef.id);
+
+                this.tilesetFirstGidMap.set(tilesetIndex, firstGid);
+                firstGidCount += this.getTilesetGidSpan(tileset);
+
+                if (tileset instanceof SingleImageTileset) {
+                    return this.getSingleImageTileset(tileset, exportPath, firstGid);
+                }
+
+                if (tileset instanceof ImageCollectionTileset) {
+                    return this.getImageCollectionTileset(tileset, exportPath, firstGid);
+                }
+
+                return null;
+            })
+            .filter((tileset): tileset is XMLBuilder => tileset != null);
+
         return tilesets;
     }
 
-    private getSingleImageTileset(tileset: SingleImageTileset, exportPath: string, firstGrid: number): XMLBuilder | null {
+    private getTilesetGidSpan(tileset: Tileset): number {
+        if (tileset.tiles.length === 0) return 0;
+
+        const maxTileId = Math.max(...tileset.tiles.map((tile) => tile.id));
+
+        return Math.max(tileset.tiles.length, maxTileId + 1);
+    }
+
+    private getSingleImageTileset(
+        tileset: SingleImageTileset,
+        exportPath: string,
+        firstGid: number,
+    ): XMLBuilder | null {
         const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
 
         const imageRelPath = tileset.imageSource.source;
         const imageAbsPath = PathUtils.join(tilesetAbsDir, imageRelPath);
-
         const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
-
-        const name = tileset.name;
-
-        const tileWidth = tileset.tilewidth;
-        const tileHeight = tileset.tileheight;
-
-        const tileCount = tileset.tiles.length;
-        const columns = tileset.columns;
 
         return create({
             tileset: {
-                '@firstgid': firstGrid,
-                '@name': name,
-                '@tilewidth': tileWidth,
-                '@tileheight': tileHeight,
-                '@tilecount': tileCount,
-                '@columns': columns,
+                "@firstgid": firstGid,
+                "@name": tileset.name,
+                "@tilewidth": tileset.tilewidth,
+                "@tileheight": tileset.tileheight,
+                "@tilecount": tileset.tiles.length,
+                "@columns": tileset.columns,
                 image: {
-                    '@source': source,
-                    '@width': tileset.imageSource.width,
-                    '@height': tileset.imageSource.height
-                }
-            }
-        })
+                    "@source": source,
+                    "@width": tileset.imageSource.width,
+                    "@height": tileset.imageSource.height,
+                },
+            },
+        });
     }
 
-    private getImageCollectionTileset(tileset: ImageCollectionTileset, exportPath: string, firstGrid: number): XMLBuilder | null {
-        return null
+    private getImageCollectionTileset(
+        tileset: ImageCollectionTileset,
+        exportPath: string,
+        firstGid: number,
+    ): XMLBuilder | null {
+        const tiles = tileset.tiles.map((tile) =>
+            this.getImageCollectionTile(tile, tileset, exportPath),
+        );
+
+        return create({
+            tileset: {
+                "@firstgid": firstGid,
+                "@name": tileset.name,
+                "@tilewidth": tileset.tilewidth,
+                "@tileheight": tileset.tileheight,
+                "@tilecount": tileset.tiles.length,
+                "@columns": tileset.columns,
+                ...(tiles.length > 0 ? { tile: tiles } : {}),
+            },
+        });
     }
 
-    private getLayers(layers: BaseLayer<any>[], baseIndex: number, tilemap: Tilemap): XMLBuilder[] {
+    private getImageCollectionTile(
+        tile: Tile,
+        tileset: ImageCollectionTileset,
+        exportPath: string,
+    ): XmlObject {
+        const tileData: XmlObject = {
+            "@id": tile.id,
+        };
+
+        if (!tile.imageSource) return tileData;
+
+        const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
+        const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
+        const imageAbsPath = PathUtils.join(tilesetAbsDir, tile.imageSource.source);
+        const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
+
+        tileData.image = {
+            "@source": source,
+            "@width": tile.imageSource.width,
+            "@height": tile.imageSource.height,
+        };
+
+        return tileData;
+    }
+
+    private getLayers(
+        layers: BaseLayer<any>[],
+        baseIndex: number,
+        tilemap: Tilemap,
+    ): XMLBuilder[] {
         let index = baseIndex;
-        return layers.map((childLayer) => {
-            let layer: XMLBuilder | null = null;
-            if (childLayer instanceof TileLayer) {
-                layer = this.getTileLayer(childLayer, index, tilemap);
-                index++;
-            } else if (childLayer instanceof GroupLayer) {
-                layer = this.getGroupLayer(childLayer, index, tilemap);
-                index++;
-            } else if (childLayer instanceof RuleLayer) {
-                layer = this.getRuleLayer(childLayer, index, tilemap);
-                index++;
-            } else if (childLayer instanceof ImageLayer) {
-                layer = this.getImageLayer(childLayer, index, tilemap);
-                index++;
-            }
-            return layer;
-        }).filter((layer) => layer != null).reverse();
+
+        return layers
+            .map((childLayer) => {
+                let layer: XMLBuilder | null = null;
+
+                if (childLayer instanceof TileLayer) {
+                    layer = this.getTileLayer(childLayer, index, tilemap);
+                    index++;
+                } else if (childLayer instanceof GroupLayer) {
+                    layer = this.getGroupLayer(childLayer, index, tilemap);
+                    index++;
+                } else if (childLayer instanceof RuleLayer) {
+                    layer = this.getRuleLayer(childLayer, index, tilemap);
+                    index++;
+                } else if (childLayer instanceof ImageLayer) {
+                    layer = this.getImageLayer(childLayer, index, tilemap);
+                    index++;
+                } else if (childLayer instanceof EntityLayer) {
+                    layer = this.getEntityLayer(childLayer, index, tilemap);
+                    index++;
+                }
+
+                return layer;
+            })
+            .filter((layer): layer is XMLBuilder => layer != null)
+            .reverse();
     }
 
-    private getGroupLayer(groupLayer: GroupLayer, index: number, tilemap: Tilemap): XMLBuilder {
+    private getGroupLayer(
+        groupLayer: GroupLayer,
+        index: number,
+        tilemap: Tilemap,
+    ): XMLBuilder {
         const childLayers = this.getLayers(groupLayer.layers, index + 1, tilemap);
+
         const layer = create({
             group: {
-                '@id': groupLayer.id,
-                '@name': groupLayer.name,
-                '@visible': groupLayer.visible ? 1 : 0,
-                '@locked': groupLayer.locked ? 1 : 0,
-            }
-        })
-        childLayers.forEach((childLayer) => layer.root().import(childLayer.root()));
-        return layer;
-    }
-
-    private getTileLayer(tileLayer: TileLayer, index: number, tilemap: Tilemap): XMLBuilder {
-        const layer = create({
-            layer: {
-                '@id': tileLayer.id,
-                '@name': tileLayer.name,
-                '@width': tileLayer.size.width,
-                '@height': tileLayer.size.height,
-                '@x': tileLayer.coordinate.col,
-                '@y': tileLayer.coordinate.row,
-                '@opacity': tileLayer.opacity,
-                '@visible': tileLayer.visible ? 1 : 0,
-                '@locked': tileLayer.locked ? 1 : 0,
-                data: {
-                    '@encoding': 'csv',
-                    '#text': tileLayer.tilesRef.map((row) => row.map((tileRef) => {
-                        if (!tileRef) return 0;
-                        const tilesetFirstGid = this.tilesetFirstGidMap.get(tileRef.tilesetIndex)!;
-                        if (tilesetFirstGid == undefined) return 0;
-                        return tileRef.tileId + tilesetFirstGid
-                    })).flat().join(',')
-                }
-            }
-        })
-        return layer;
-    }
-
-    private getRuleLayer(ruleLayer: RuleLayer, index: number, tilemap: Tilemap): XMLBuilder {
-        ruleLayer.reCalculateAllOutputs();
-
-        const layer = create({
-            layer: {
-                '@id': ruleLayer.id,
-                '@name': ruleLayer.name,
-                '@width': ruleLayer.size.width,
-                '@height': ruleLayer.size.height,
-                '@x': ruleLayer.coordinate.col,
-                '@y': ruleLayer.coordinate.row,
-                '@opacity': ruleLayer.opacity,
-                '@visible': ruleLayer.visible ? 1 : 0,
-                '@locked': ruleLayer.locked ? 1 : 0,
-                data: {
-                    '@encoding': 'csv',
-                    '#text': ruleLayer.rulesetsRef.map((row) => row.map((rulesetRef) => {
-                        if (!rulesetRef || rulesetRef.tileId === -1 || rulesetRef.tilesetIndex === -1) {
-                            return 0;
-                        }
-
-                        const tilesetFirstGid = this.tilesetFirstGidMap.get(rulesetRef.tilesetIndex)!;
-                        if (tilesetFirstGid == undefined) return 0;
-
-                        return rulesetRef.tileId + tilesetFirstGid;
-                    })).flat().join(',')
-                }
-            }
+                "@id": this.getNextLayerId(),
+                "@name": groupLayer.name,
+                "@opacity": groupLayer.opacity,
+                "@visible": groupLayer.visible ? 1 : 0,
+                "@locked": groupLayer.locked ? 1 : 0,
+                properties: {
+                    property: [this.createProperty("metk.layerId", groupLayer.id)],
+                },
+            },
         });
 
+        childLayers.forEach((childLayer) => layer.root().import(childLayer.root()));
+
         return layer;
     }
 
-    private getImageLayer(imageLayer: ImageLayer, index: number, tilemap: Tilemap): XMLBuilder {
-        const imageAbsPath = tilemap.tilemapPathSystem.getAbsPathFromRelPath(imageLayer.imageSource.source);
+    private getTileLayer(
+        tileLayer: TileLayer,
+        _index: number,
+        _tilemap: Tilemap,
+    ): XMLBuilder {
+        return create({
+            layer: {
+                "@id": this.getNextLayerId(),
+                "@name": tileLayer.name,
+                "@width": tileLayer.size.width,
+                "@height": tileLayer.size.height,
+                "@x": tileLayer.coordinate.col,
+                "@y": tileLayer.coordinate.row,
+                "@opacity": tileLayer.opacity,
+                "@visible": tileLayer.visible ? 1 : 0,
+                "@locked": tileLayer.locked ? 1 : 0,
+                properties: {
+                    property: [this.createProperty("metk.layerId", tileLayer.id)],
+                },
+                data: {
+                    "@encoding": "csv",
+                    "#text": tileLayer.tilesRef
+                        .map((row) =>
+                            row.map((tileRef) => {
+                                if (!tileRef) return 0;
+                                return this.getTileGidFromRefIndex(
+                                    tileRef.tilesetIndex,
+                                    tileRef.tileId,
+                                );
+                            }),
+                        )
+                        .flat()
+                        .join(","),
+                },
+            },
+        });
+    }
+
+    private getRuleLayer(
+        ruleLayer: RuleLayer,
+        _index: number,
+        _tilemap: Tilemap,
+    ): XMLBuilder {
+        ruleLayer.reCalculateAllOutputs();
+
+        return create({
+            layer: {
+                "@id": this.getNextLayerId(),
+                "@name": ruleLayer.name,
+                "@width": ruleLayer.size.width,
+                "@height": ruleLayer.size.height,
+                "@x": ruleLayer.coordinate.col,
+                "@y": ruleLayer.coordinate.row,
+                "@opacity": ruleLayer.opacity,
+                "@visible": ruleLayer.visible ? 1 : 0,
+                "@locked": ruleLayer.locked ? 1 : 0,
+                properties: {
+                    property: [this.createProperty("metk.layerId", ruleLayer.id)],
+                },
+                data: {
+                    "@encoding": "csv",
+                    "#text": ruleLayer.rulesetsRef
+                        .map((row) =>
+                            row.map((rulesetRef) => {
+                                if (
+                                    !rulesetRef ||
+                                    rulesetRef.tileId === -1 ||
+                                    rulesetRef.tilesetIndex === -1
+                                ) {
+                                    return 0;
+                                }
+
+                                return this.getTileGidFromRefIndex(
+                                    rulesetRef.tilesetIndex,
+                                    rulesetRef.tileId,
+                                );
+                            }),
+                        )
+                        .flat()
+                        .join(","),
+                },
+            },
+        });
+    }
+
+    private getImageLayer(
+        imageLayer: ImageLayer,
+        _index: number,
+        tilemap: Tilemap,
+    ): XMLBuilder {
+        const imageAbsPath = tilemap.tilemapPathSystem.getAbsPathFromRelPath(
+            imageLayer.imageSource.source,
+        );
         const source = PathUtils.relative(PathUtils.dirname(this.exportPath), imageAbsPath);
 
         return create({
             imagelayer: {
-                "@id": imageLayer.id,
+                "@id": this.getNextLayerId(),
                 "@name": imageLayer.name,
                 "@offsetx": imageLayer.offset.x,
                 "@offsety": imageLayer.offset.y,
@@ -218,6 +351,9 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 ...(imageLayer.tintcolor ? { "@tintcolor": imageLayer.tintcolor } : {}),
                 "@repeatx": imageLayer.repeatX ? 1 : 0,
                 "@repeaty": imageLayer.repeatY ? 1 : 0,
+                properties: {
+                    property: [this.createProperty("metk.layerId", imageLayer.id)],
+                },
                 image: {
                     "@source": source,
                     "@width": imageLayer.imageSource.width,
@@ -225,5 +361,212 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 },
             },
         });
+    }
+
+    private getEntityLayer(
+        entityLayer: EntityLayer,
+        _index: number,
+        tilemap: Tilemap,
+    ): XMLBuilder {
+        const objects = entityLayer
+            .getAllEntities()
+            .map((entity) => this.getEntityObject(entityLayer, entity, tilemap))
+            .filter((entity): entity is XmlObject => entity !== null);
+
+        return create({
+            objectgroup: {
+                "@id": this.getNextLayerId(),
+                "@name": entityLayer.name,
+                "@offsetx": entityLayer.offset.x,
+                "@offsety": entityLayer.offset.y,
+                "@opacity": entityLayer.opacity,
+                "@visible": entityLayer.visible ? 1 : 0,
+                "@locked": entityLayer.locked ? 1 : 0,
+                "@draworder": "index",
+                properties: {
+                    property: [this.createProperty("metk.layerId", entityLayer.id)],
+                },
+                ...(objects.length > 0 ? { object: objects } : {}),
+            },
+        });
+    }
+
+    private getEntityObject(
+        entityLayer: EntityLayer,
+        entity: EntityInstanceData,
+        tilemap: Tilemap,
+    ): XmlObject | null {
+        const definition = entityLayer.getEntityDefinition(entity);
+        if (!definition) return null;
+
+        const x = entity.x - definition.pivotX;
+        const y = entity.y - definition.pivotY;
+
+        const object: XmlObject = {
+            "@id": this.nextObjectId++,
+            "@name": definition.name,
+            "@type": definition.id,
+            "@x": x,
+            "@y": y,
+            "@width": definition.width,
+            "@height": definition.height,
+        };
+
+        if (definition.graphic.type === "tile") {
+            const gid = this.getTileGidByTilesetId(
+                tilemap,
+                definition.graphic.tilesetId,
+                definition.graphic.tileId,
+            );
+
+            if (gid !== null) {
+                object["@gid"] = gid;
+
+                // Tiled aligns orthogonal tile objects to bottom-left.
+                object["@y"] = y + definition.height;
+            }
+        }
+
+        const properties = this.getEntityObjectProperties(entity, definition);
+
+        if (properties.length > 0) {
+            object.properties = {
+                property: properties,
+            };
+        }
+
+        return object;
+    }
+
+    private getEntityObjectProperties(
+        entity: EntityInstanceData,
+        definition: EntityDefinition,
+    ): XmlObject[] {
+        const properties: XmlObject[] = [
+            this.createProperty("metk.entityId", entity.id),
+            this.createProperty("metk.entityCollectionId", entity.entityRef.entityCollectionId),
+            this.createProperty("metk.entityDefinitionId", entity.entityRef.entityDefinitionId),
+        ];
+
+        definition.fields.forEach((field) => {
+            const hasInstanceValue =
+                entity.fields &&
+                Object.prototype.hasOwnProperty.call(entity.fields, field.id);
+
+            const value = hasInstanceValue ? entity.fields?.[field.id] : field.value;
+
+            properties.push(
+                this.createProperty(
+                    field.name ?? field.id,
+                    value,
+                    this.getTiledPropertyType(field),
+                ),
+            );
+        });
+
+        return properties;
+    }
+
+    private createProperty(name: string, value: unknown, type?: string): XmlObject {
+        const property: XmlObject = {
+            "@name": name,
+        };
+
+        if (type) {
+            property["@type"] = type;
+        }
+
+        const formattedValue = this.formatTiledPropertyValue(value, type);
+
+        if (typeof formattedValue === "string" && formattedValue.includes("\n")) {
+            property["#text"] = formattedValue;
+        } else {
+            property["@value"] = formattedValue;
+        }
+
+        return property;
+    }
+
+    private getTiledPropertyType(field: EntityFieldData): string | undefined {
+        switch (field.type) {
+            case "int":
+            case "float":
+            case "bool":
+            case "color":
+                return field.type;
+            default:
+                return undefined;
+        }
+    }
+
+    private formatTiledPropertyValue(value: unknown, type?: string): string | number {
+        if (type === "bool") {
+            return value === true || value === "true" ? "true" : "false";
+        }
+
+        if (type === "int") {
+            return Math.trunc(Number(value ?? 0));
+        }
+
+        if (type === "float") {
+            return Number(value ?? 0);
+        }
+
+        if (value == null) return "";
+
+        if (typeof value === "object") {
+            try {
+                return JSON.stringify(value) ?? "";
+            } catch {
+                return String(value);
+            }
+        }
+
+        return String(value);
+    }
+
+    private getTileGidFromRefIndex(tilesetIndex: number, tileId: number): number {
+        const tilesetFirstGid = this.tilesetFirstGidMap.get(tilesetIndex);
+        if (tilesetFirstGid === undefined) return 0;
+
+        return tileId + tilesetFirstGid;
+    }
+
+    private getTileGidByTilesetId(
+        tilemap: Tilemap,
+        tilesetId: string,
+        tileId: number,
+    ): number | null {
+        const tilesetIndex = tilemap.tilesetRefManager.getTilesetRefIndex(tilesetId);
+        if (tilesetIndex === -1) return null;
+
+        const gid = this.getTileGidFromRefIndex(tilesetIndex, tileId);
+        return gid === 0 ? null : gid;
+    }
+
+    private ensureEntityGraphicTilesetRefs(
+        layers: BaseLayer<any>[],
+        tilemap: Tilemap,
+    ): void {
+        layers.forEach((layer) => {
+            if (layer instanceof GroupLayer) {
+                this.ensureEntityGraphicTilesetRefs(layer.layers, tilemap);
+                return;
+            }
+
+            if (!(layer instanceof EntityLayer)) return;
+
+            layer.getAllEntities().forEach((entity) => {
+                const definition = layer.getEntityDefinition(entity);
+
+                if (definition?.graphic.type !== "tile") return;
+
+                tilemap.tilesetRefManager.getTilesetRefIndex(definition.graphic.tilesetId);
+            });
+        });
+    }
+
+    private getNextLayerId(): number {
+        return this.nextLayerId++;
     }
 }
