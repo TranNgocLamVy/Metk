@@ -62,6 +62,7 @@ export const createTilemapData = (id = "tilemap-a", overrides: Partial<TilemapDa
     backgroundcolor: "#00000000",
     tilesets: { refs: [], nextIndex: 0 },
     rulesets: { refs: [], nextIndex: 0 },
+    entityCollections: { refs: [], nextIndex: 0 },
     layers: [],
     ...overrides,
 });

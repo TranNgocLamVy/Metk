@@ -21,6 +21,7 @@ const createTilemapData = (): TilemapData => ({
         refs: [{ index: 0, id: "ruleset-a", name: "Ruleset A" }],
         nextIndex: 1,
     },
+    entityCollections: { refs: [], nextIndex: 0 },
     layers: [
         {
             id: "tile-layer",
@@ -56,7 +57,13 @@ const createTilemapData = (): TilemapData => ({
 });
 
 const createTilemapModel = (tilemapData: unknown, context: ReturnType<typeof createReferenceContext>): Tilemap => {
-    const result = Tilemap.createFromFileData(tilemapData, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(
+        tilemapData,
+        context.filePathSystem,
+        context.tilesetRefManager,
+        context.rulesetRefManager,
+        context.entityCollectionRefManager,
+    );
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };
@@ -113,6 +120,7 @@ describe("Tilemap", () => {
             context.filePathSystem,
             context.tilesetRefManager,
             context.rulesetRefManager,
+            context.entityCollectionRefManager,
         );
 
         expect(result.status).toBe("Success");
@@ -137,6 +145,7 @@ describe("Tilemap", () => {
             context.filePathSystem,
             context.tilesetRefManager,
             context.rulesetRefManager,
+            context.entityCollectionRefManager,
         );
 
         expect(result.status).toBe("Error");
@@ -158,6 +167,7 @@ describe("Tilemap", () => {
             context.filePathSystem,
             context.tilesetRefManager,
             context.rulesetRefManager,
+            context.entityCollectionRefManager,
         );
 
         expect(result.status).toBe("Success");
@@ -172,4 +182,3 @@ describe("Tilemap", () => {
         });
     });
 });
-

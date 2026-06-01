@@ -9,13 +9,15 @@ import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
 import { Result } from "@/shared/types/result";
 import { PermissionDialog } from "@/ui/components/dialog/PermissionDialog";
-import LayerManager from "@/ui/components/workspace/layer-manager/LayerManager";
-import TilemapEditorTabs from "@/ui/components/workspace/tilemap-editor/TilemapEditorTabs";
-import ToolBar from "@/ui/components/workspace/ToolBar";
+import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
+import TilemapEditorTabs from "@/ui/workspace/tilemap-editor/TilemapEditorTabs";
+import ToolBar from "@/ui/workspace/ToolBar";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useAppcore } from "@/ui/stores/appcore.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";
@@ -194,7 +196,7 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
     },
 }));
 
-vi.mock("@/ui/components/workspace/Workspace", () => ({
+vi.mock("@/ui/workspace/Workspace", () => ({
     default: () => <section>Workspace ready</section>,
 }));
 
@@ -235,8 +237,10 @@ const createTilemapSession = (options: {
     );
     const tilesetManager = new TilesetManager(projectPathSystem, objectRegistry);
     const rulesetManager = new RulesetManager(tilesetManager, projectPathSystem, objectRegistry);
+    const entityCollectionManager = new EntityCollectionManager(tilesetManager, projectPathSystem, objectRegistry);
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
+    const entityCollectionRefManager = new EntityCollectionRefManager(entityCollectionManager, filePathSystem);
 
     const tilemapResult = Tilemap.createFromFileData({
         id: options.tilemapId,
@@ -249,6 +253,7 @@ const createTilemapSession = (options: {
         backgroundcolor: "#00000000",
         tilesets: { refs: [], nextIndex: 0 },
         rulesets: { refs: [], nextIndex: 0 },
+        entityCollections: { refs: [], nextIndex: 0 },
         layers: [
             {
                 id: "ground",
@@ -281,7 +286,7 @@ const createTilemapSession = (options: {
                 layerData: "",
             },
         ],
-    }, filePathSystem, tilesetRefManager, rulesetRefManager);
+    }, filePathSystem, tilesetRefManager, rulesetRefManager, entityCollectionRefManager);
     if (tilemapResult.status !== Result.Status.Success) throw new Error(String(tilemapResult.message));
     const tilemap = tilemapResult.data;
 

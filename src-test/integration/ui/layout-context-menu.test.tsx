@@ -54,7 +54,7 @@ import MainContainer from "@/ui/components/layout/MainContainer";
 import SecurityShield from "@/ui/components/layout/SecurityShield";
 import { FallbackRender } from "@/ui/components/layout/FallbackRender";
 import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOverlay";
-import { LayerManagerContextMenu } from "@/ui/components/workspace/layer-manager/ContextMenu";
+import { LayerManagerContextMenu } from "@/ui/workspace/layer-manager/ContextMenu";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 

@@ -88,10 +88,17 @@ export const createTilemap = (layers = createBaseLayers()): Tilemap => {
         backgroundcolor: "#00000000",
         tilesets: { refs: [{ id: "tileset-a", index: 0, name: "Tileset A" }], nextIndex: 1 },
         rulesets: { refs: [{ id: "ruleset-a", index: 0, name: "Ruleset A" }], nextIndex: 1 },
+        entityCollections: { refs: [], nextIndex: 0 },
         layers,
     };
 
-    const result = Tilemap.createFromFileData(tilemapData, filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(
+        tilemapData,
+        filePathSystem,
+        context.tilesetRefManager,
+        context.rulesetRefManager,
+        context.entityCollectionRefManager,
+    );
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };

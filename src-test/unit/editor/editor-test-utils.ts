@@ -2,12 +2,14 @@ import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager"
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { RulesetData } from "@/shared/data-types/ruleset.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { RootLayerData } from "@/shared/data-types/layer.data";
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
 
 type ReferenceContextOptions = {
     tilesets?: string[];
@@ -47,6 +49,8 @@ export const createReferenceContext = (options: ReferenceContextOptions = {}) =>
 
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
+    const entityCollectionManager = new EntityCollectionManager(tilesetManager, projectPathSystem, objectRegistry);
+    const entityCollectionRefManager = new EntityCollectionRefManager(entityCollectionManager, filePathSystem);
 
     return {
         projectPathSystem,
@@ -54,8 +58,10 @@ export const createReferenceContext = (options: ReferenceContextOptions = {}) =>
         objectRegistry,
         tilesetManager,
         rulesetManager,
+        entityCollectionManager,
         tilesetRefManager,
         rulesetRefManager,
+        entityCollectionRefManager,
     };
 };
 
@@ -82,11 +88,13 @@ export const createTilemap = (
             tileheight: 16,
             tilesets: context.tilesetRefManager.serialize(),
             rulesets: context.rulesetRefManager.serialize(),
+            entityCollections: context.entityCollectionRefManager.serialize(),
             layers,
         },
         context.filePathSystem,
         context.tilesetRefManager,
         context.rulesetRefManager,
+        context.entityCollectionRefManager,
     );
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;

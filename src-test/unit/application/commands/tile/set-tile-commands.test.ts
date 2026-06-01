@@ -85,6 +85,7 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
             ],
             nextIndex: 2,
         },
+        entityCollections: { refs: [], nextIndex: 0 },
         layers,
     };
     const tilemapResult = Tilemap.createFromFileData(
@@ -92,6 +93,7 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
         filePathSystem,
         referenceContext.tilesetRefManager,
         referenceContext.rulesetRefManager,
+        referenceContext.entityCollectionRefManager,
     );
     if (tilemapResult.status !== "Success") throw new Error(String(tilemapResult.message));
     const tilemap = tilemapResult.data;

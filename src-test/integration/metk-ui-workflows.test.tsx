@@ -201,12 +201,12 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
     },
 }));
 
-import Workspace from "@/ui/components/workspace/Workspace";
-import WorkspaceConsole from "@/ui/components/workspace/console/Console";
-import LayerManager from "@/ui/components/workspace/layer-manager/LayerManager";
-import RulesetManager from "@/ui/components/workspace/ruleset-manager/RulesetManager";
-import TilemapEditor from "@/ui/components/workspace/tilemap-editor/TilemapEditor";
-import TilesetViewSelector from "@/ui/components/workspace/tileset-view/TilesetViewSelector";
+import Workspace from "@/ui/workspace/Workspace";
+import WorkspaceConsole from "@/ui/workspace/console/Console";
+import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
+import RulesetManager from "@/ui/workspace/ruleset-manager/RulesetManager";
+import TilemapEditor from "@/ui/workspace/tilemap-editor/TilemapEditor";
+import TilesetViewSelector from "@/ui/workspace/tileset-view/TilesetViewSelector";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
@@ -216,6 +216,8 @@ import { RulesetManager as ResourceRulesetManager } from "@/application/resource
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useLayoutStore } from "@/ui/stores/layout.store";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
@@ -254,10 +256,12 @@ const createProjectContext = () => {
     const objectRegistry = new EditorObjectRegistry();
     const tilesetManager = new TilesetManager(projectPathSystem, objectRegistry);
     const rulesetManager = new ResourceRulesetManager(tilesetManager, projectPathSystem, objectRegistry);
+    const entityCollectionManager = new EntityCollectionManager(tilesetManager, projectPathSystem, objectRegistry);
     const tilesetRefManager = new TilesetRefManager(tilesetManager, filePathSystem);
     const rulesetRefManager = new RulesetRefManager(rulesetManager, filePathSystem);
+    const entityCollectionRefManager = new EntityCollectionRefManager(entityCollectionManager, filePathSystem);
 
-    return { projectPathSystem, filePathSystem, objectRegistry, tilesetManager, rulesetManager, tilesetRefManager, rulesetRefManager };
+    return { projectPathSystem, filePathSystem, objectRegistry, tilesetManager, rulesetManager, entityCollectionManager, tilesetRefManager, rulesetRefManager, entityCollectionRefManager };
 };
 
 const createTilemapSession = (id: string, tilemapId: string, name: string, isDirty = false): TestTilemapSession => {
@@ -273,6 +277,7 @@ const createTilemapSession = (id: string, tilemapId: string, name: string, isDir
         backgroundcolor: "#00000000",
         tilesets: { refs: [], nextIndex: 0 },
         rulesets: { refs: [], nextIndex: 0 },
+        entityCollections: { refs: [], nextIndex: 0 },
         layers: [
             {
                 id: `${tilemapId}-group`,
@@ -316,7 +321,7 @@ const createTilemapSession = (id: string, tilemapId: string, name: string, isDir
                 layerData: "",
             },
         ],
-    }, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    }, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager, context.entityCollectionRefManager);
     if (tilemapResult.status !== "Success") throw new Error(String(tilemapResult.message));
     const tilemap = tilemapResult.data;
 

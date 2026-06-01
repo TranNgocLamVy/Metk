@@ -122,11 +122,18 @@ const createTilemap = (context: ReturnType<typeof createReferenceContext>, overr
             nextIndex: 2,
         },
         rulesets: { refs: [], nextIndex: 0 },
+        entityCollections: { refs: [], nextIndex: 0 },
         layers: [defaultLayer],
         ...overrides,
     };
 
-    const result = Tilemap.createFromFileData(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(
+        data,
+        context.filePathSystem,
+        context.tilesetRefManager,
+        context.rulesetRefManager,
+        context.entityCollectionRefManager,
+    );
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };

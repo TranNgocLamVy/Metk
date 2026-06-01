@@ -28,6 +28,7 @@ const createTilemap = () => {
         backgroundcolor: "#11223344",
         tilesets: context.tilesetRefManager.serialize(),
         rulesets: context.rulesetRefManager.serialize(),
+        entityCollections: context.entityCollectionRefManager.serialize(),
         layers: [
             {
                 id: "tile-layer",
@@ -62,7 +63,13 @@ const createTilemap = () => {
         ],
     };
 
-    const result = Tilemap.createFromFileData(data, context.filePathSystem, context.tilesetRefManager, context.rulesetRefManager);
+    const result = Tilemap.createFromFileData(
+        data,
+        context.filePathSystem,
+        context.tilesetRefManager,
+        context.rulesetRefManager,
+        context.entityCollectionRefManager,
+    );
     if (result.status !== "Success") throw new Error(String(result.message));
     return result.data;
 };
