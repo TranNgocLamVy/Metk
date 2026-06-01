@@ -5,8 +5,8 @@ import { WorkspaceService } from "@/shared/services/workspace.service";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 
-import { HStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
 
 export default function TilemapEditorTabs() {
 	const ref = useRef<HTMLDivElement>(null);

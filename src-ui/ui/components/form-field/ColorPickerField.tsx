@@ -1,11 +1,11 @@
-import { SketchPicker } from 'react-color'
-import { useState } from "react";
+import { LocalizedText } from '@/ui/components/custom/LocalizeText';
+import { HStack, VStack } from '@/ui/components/custom/stack/Stack';
 import { Button } from "@/ui/components/shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
-import { Label } from "@/ui/components/shadcn/label";
 import { Input } from "@/ui/components/shadcn/input";
-import { HStack, VStack } from '../custom/stack/Stack';
-import { LocalizedText } from '../custom/LocalizeText';
+import { Label } from "@/ui/components/shadcn/label";
+import { useState } from "react";
+import { SketchPicker } from 'react-color';
 
 interface ColorPickerProps {
 	id: string;

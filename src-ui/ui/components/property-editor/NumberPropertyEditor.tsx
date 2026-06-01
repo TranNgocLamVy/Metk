@@ -4,8 +4,9 @@ import { NumberPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { Input } from "@/ui/components/shadcn/input";
 
-import { LocalizedText } from "../custom/LocalizeText";
-import { Label } from "../shadcn/label";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { Label } from "@/ui/components/shadcn/label";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 import {
     getStepFromPrecision,
     isAllowedNumberDraft,
@@ -16,7 +17,6 @@ import {
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
 import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
-import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 export interface NumberEditorProps {
     property: NumberPropertyClass<any>;

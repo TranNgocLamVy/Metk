@@ -8,8 +8,8 @@ import { useProjectStore } from "@/ui/stores/project.store";
 import { usePropertyStore } from "@/ui/stores/property.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 
-import { VStack } from "../../custom/stack/Stack";
-import { ScrollArea } from "../../shadcn/scroll-area";
+import { VStack } from "@/ui/components/custom/stack/Stack";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
 import { PropertyGroup } from "./PropertyGroup";
 
 export default function PropertyPanel() {

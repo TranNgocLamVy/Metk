@@ -1,7 +1,7 @@
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
 import { useTranslation } from "react-i18next";
-import { LocalizedText } from "../custom/LocalizeText";
 
 interface NumberInputProps {
 	id: string;

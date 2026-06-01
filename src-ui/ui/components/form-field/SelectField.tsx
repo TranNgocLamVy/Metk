@@ -1,6 +1,6 @@
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { Label } from "@/ui/components/shadcn/label";
-import { LocalizedText } from "../custom/LocalizeText";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../shadcn/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/shadcn/select";
 
 type SelectFieldProps = {
     id: string;

@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
-import { DialogConfig, DialogItem } from '@/shared/types/dialog';
-import { DialogType } from '../components/dialog/dialogRegistry';
 import { appKernel } from '@/application/bootstrap/app-kernel';
+import { DialogConfig, DialogItem } from '@/shared/types/dialog';
+import { DialogType } from '@/ui/components/dialog/dialogRegistry';
+import { v4 as uuidv4 } from 'uuid';
+import { create } from 'zustand';
 
 interface DialogState {
     dialogs: DialogItem[];

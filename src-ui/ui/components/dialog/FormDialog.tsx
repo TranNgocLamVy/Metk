@@ -4,18 +4,18 @@ import { Field, FieldStateResolver, FormDialogOptions, GroupFieldInput, ShapeFro
 import { Button } from "@/ui/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
 
-import { CheckBoxField } from "../form-field/CheckboxField";
-import { TextInputField } from "../form-field/TextInputField";
-import { NumberInputField } from "../form-field/NumberInputField";
-import FolderPickerField from "../form-field/FolderPickerField";
-import FilePickerField from "../form-field/FilePickerField";
-import { ColorPickerField } from "../form-field/ColorPickerField";
-import { SelectField } from "../form-field/SelectField";
-import { LocalizedText } from "../custom/LocalizeText";
-import { BaseDialogProps } from "./dialogRegistry";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { VStack } from "@/ui/components/custom/stack/Stack";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { ScrollArea } from "../shadcn/scroll-area";
-import { VStack } from "../custom/stack/Stack";
+import { CheckBoxField } from "../form-field/CheckboxField";
+import { ColorPickerField } from "../form-field/ColorPickerField";
+import FilePickerField from "../form-field/FilePickerField";
+import FolderPickerField from "../form-field/FolderPickerField";
+import { NumberInputField } from "../form-field/NumberInputField";
+import { SelectField } from "../form-field/SelectField";
+import { TextInputField } from "../form-field/TextInputField";
+import { BaseDialogProps } from "./dialogRegistry";
 
 interface FormDialogProps extends BaseDialogProps {
     formDialog: FormDialogOptions;

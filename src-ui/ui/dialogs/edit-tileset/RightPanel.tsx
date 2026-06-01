@@ -9,14 +9,14 @@ import { Tile } from "@/editor/model/tileset/tileset";
 import { groupProperties } from "@/editor/properties/group-properties.utils";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { PropertyGroup } from "@/ui/components/workspace/properties-panel/PropertyGroup";
 
-import { useEditTileset } from "./ContextProvider";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/ui/components/shadcn/resizable";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { Button } from "@/ui/components/shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/ui/components/shadcn/resizable";
+import { PropertyGroup } from "@/ui/workspace/properties-panel/PropertyGroup";
 import { Box, Dot, LineSquiggle, Plus, Trash2 } from "lucide-react";
+import { useEditTileset } from "./ContextProvider";
 
 export function RightPanel() {
     const { selectedTile } = useEditTileset();

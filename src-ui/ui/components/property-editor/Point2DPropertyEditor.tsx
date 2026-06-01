@@ -1,13 +1,14 @@
-import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ChevronUp } from "lucide-react";
+import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { Point2DPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 import { Input } from "@/ui/components/shadcn/input";
 
-import { LocalizedText } from "../custom/LocalizeText";
-import { HStack, VStack } from "../custom/stack/Stack";
-import { Label } from "../shadcn/label";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Label } from "@/ui/components/shadcn/label";
+import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 import {
     isAllowedNumberDraft,
     isCompleteNumberInput,
@@ -16,7 +17,6 @@ import {
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
 import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
-import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 
 type Point2DDraft = Record<keyof Point2D, string>;
 

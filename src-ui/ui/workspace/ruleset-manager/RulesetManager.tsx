@@ -1,14 +1,14 @@
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
-import { HStack, VStack } from "../../custom/stack/Stack";
-import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
-import { ScrollArea, ScrollBar } from "../../shadcn/scroll-area";
-import { useCallback, useEffect } from "react";
-import ContextMenuItemGroup from "../../context-menu/ContextMenuItemGroup";
-import { RulesetManagerContextMenu } from "./ContextMenu";
 import { WorkspaceService } from "@/shared/services/workspace.service";
+import ContextMenuItemGroup from "@/ui/components/context-menu/ContextMenuItemGroup";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
+import { ScrollArea, ScrollBar } from "@/ui/components/shadcn/scroll-area";
 import { useRulesetManagerEvent } from "@/ui/hooks/useRulesetManagerEvent.hook";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import { useProjectStore } from "@/ui/stores/project.store";
+import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useCallback, useEffect } from "react";
+import { RulesetManagerContextMenu } from "./ContextMenu";
 import RulesetTab from "./RulesetTab";
 
 export default function RulesetManager() {

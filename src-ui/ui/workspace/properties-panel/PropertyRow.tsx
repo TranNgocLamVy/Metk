@@ -1,11 +1,11 @@
 import { BaseProperty, BooleanPropertyClass, EnumPropertyClass, ImageSourcePropertyClass, NumberPropertyClass, Point2DPropertyClass, StringPropertyClass } from "@/editor/properties/properties";
-import { StringPropertyEditor } from "../../property-editor/StringPropertyEditor";
-import { SliderPropertyEditor } from "../../property-editor/SliderPropertyEditor";
-import { NumberPropertyEditor } from "../../property-editor/NumberPropertyEditor";
-import { BooleanPropertyEditor } from "../../property-editor/BooleanPropertyEditor";
-import { EnumPropertyEditor } from "../../property-editor/EnumPropertyEditor";
-import { Point2DPropertyEditor } from "../../property-editor/Point2DPropertyEditor";
-import { ImageSourcePropertyEditor } from "../../property-editor/ImageSourcePropertyEditor";
+import { BooleanPropertyEditor } from "@/ui/components/property-editor/BooleanPropertyEditor";
+import { EnumPropertyEditor } from "@/ui/components/property-editor/EnumPropertyEditor";
+import { ImageSourcePropertyEditor } from "@/ui/components/property-editor/ImageSourcePropertyEditor";
+import { NumberPropertyEditor } from "@/ui/components/property-editor/NumberPropertyEditor";
+import { Point2DPropertyEditor } from "@/ui/components/property-editor/Point2DPropertyEditor";
+import { SliderPropertyEditor } from "@/ui/components/property-editor/SliderPropertyEditor";
+import { StringPropertyEditor } from "@/ui/components/property-editor/StringPropertyEditor";
 
 type PropertyRowProps = {
     property: BaseProperty<any>;

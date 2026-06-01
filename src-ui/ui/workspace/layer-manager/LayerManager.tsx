@@ -3,21 +3,21 @@ import { DragEvent, FocusEvent, useCallback, useEffect, useRef } from "react";
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
-import { VStack } from "../../custom/stack/Stack";
-import ContextMenuItemGroup from "../../context-menu/ContextMenuItemGroup";
-import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "../../shadcn/context-menu";
-import { ScrollArea } from "../../shadcn/scroll-area";
-import { LayerManagerContextMenu } from "./ContextMenu";
-import LayerNodeRow from "./LayerNodeRow";
-import LayerMenuBar from "./LayerMenuBar";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
-import { LocalizedText } from "../../custom/LocalizeText";
-import { Button } from "../../shadcn/button";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { DialogZLevel } from "@/shared/types/dialog";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { BaseLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { appKernel } from "@/application/bootstrap/app-kernel";
+import { DialogZLevel } from "@/shared/types/dialog";
+import ContextMenuItemGroup from "@/ui/components/context-menu/ContextMenuItemGroup";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { LayerManagerContextMenu } from "./ContextMenu";
+import LayerMenuBar from "./LayerMenuBar";
+import LayerNodeRow from "./LayerNodeRow";
 
 const LAYER_MANAGER_CONTEXT_INSTIGATOR_ID = "layer-manager";
 

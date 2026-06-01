@@ -1,13 +1,12 @@
-import { useEffect } from "react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ToolbarItemDisplayData, useToolbarStore } from "@/ui/stores/toolbar.store";
 
-import { HStack, VStack } from "../custom/stack/Stack";
-import SVGIcon from "../custom/icons/SvgIcon";
-import { Button } from "../shadcn/button";
-import QuickToolTip from "../custom/QuickToolTip";
+import SVGIcon from "@/ui/components/custom/icons/SvgIcon";
+import QuickToolTip from "@/ui/components/custom/QuickToolTip";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
 
 export default function ToolBar() {
 	const { tools, activeTool, setTools, setActiveTool } = useToolbarStore();

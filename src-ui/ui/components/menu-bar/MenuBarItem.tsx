@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useReducer, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { Button } from "@/ui/components/shadcn/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
-import { LocalizedText } from "../custom/LocalizeText";
 
 
 interface MenuBarItemProps {

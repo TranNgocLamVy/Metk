@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { BooleanPropertyClass } from "@/editor/properties/properties";
 import { Checkbox } from "@/ui/components/shadcn/checkbox";
 
-import { LocalizedText } from "../custom/LocalizeText";
-import { Label } from "../shadcn/label";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { Label } from "@/ui/components/shadcn/label";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface BooleanEditorProps {
     property: BooleanPropertyClass<any>;

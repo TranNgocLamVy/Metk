@@ -1,4 +1,4 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "../shadcn/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/components/shadcn/tooltip";
 import { LocalizedText } from "./LocalizeText";
 
 

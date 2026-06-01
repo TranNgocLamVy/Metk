@@ -1,11 +1,11 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
-import { Input } from "@/ui/components/shadcn/input";
 import { StringPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
-import { LocalizedText } from "../custom/LocalizeText";
-import { Label } from "../shadcn/label";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { Input } from "@/ui/components/shadcn/input";
+import { Label } from "@/ui/components/shadcn/label";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface StringEditorProps {
     property: StringPropertyClass<any>;

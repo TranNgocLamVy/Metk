@@ -3,10 +3,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { EnumPropertyClass } from "@/editor/properties/properties";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/shadcn/select";
 
-import { LocalizedText } from "../custom/LocalizeText";
-import { Label } from "../shadcn/label";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { Label } from "@/ui/components/shadcn/label";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface EnumEditorProps {
     property: EnumPropertyClass<any>;

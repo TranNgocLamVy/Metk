@@ -1,9 +1,9 @@
-import { useCallback, useRef, useState } from "react";
-import { HStack, VStack } from "../../custom/stack/Stack";
+import QuickToolTip from "@/ui/components/custom/QuickToolTip";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
 import { useConsoleStore } from "@/ui/stores/console.store";
-import { Button } from "../../shadcn/button";
 import { Ban, ChevronsDown, Info, TriangleAlert } from "lucide-react";
-import QuickToolTip from "../../custom/QuickToolTip";
+import { useCallback, useRef, useState } from "react";
 import ErrorConsole from "./ErrorConsole";
 import LogConsole from "./LogConsole";
 

@@ -1,10 +1,10 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { WorkspaceService } from "@/shared/services/workspace.service";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { VStack } from "@/ui/components/custom/stack/Stack";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "./dialogRegistry";
-import { LocalizedText } from "../custom/LocalizeText";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../shadcn/dialog";
-import { VStack } from "../custom/stack/Stack";
 
 interface OpenFileModalProps extends BaseDialogProps {
     dialogId: string;

@@ -4,9 +4,9 @@ import { useCallback } from "react";
 import { EntityCollectionService } from "@/shared/services/entity-collection.service";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 
-import QuickToolTip from "../../custom/QuickToolTip";
-import { HStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
+import QuickToolTip from "@/ui/components/custom/QuickToolTip";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
 
 export default function EntityCollectionMenuBar() {
     const {

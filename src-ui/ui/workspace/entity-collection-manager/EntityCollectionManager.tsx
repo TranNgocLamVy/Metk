@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { EntityCollectionService } from "@/shared/services/entity-collection.service";
+import { useEntityCollectionManagerEvent } from "@/ui/hooks/useEntityCollectionManagerEvent.hook";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 import { useProjectStore } from "@/ui/stores/project.store";
-import { useEntityCollectionManagerEvent } from "@/ui/hooks/useEntityCollectionManagerEvent.hook";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 
-import { HStack, VStack } from "../../custom/stack/Stack";
-import { LocalizedText } from "../../custom/LocalizeText";
-import { ScrollArea, ScrollBar } from "../../shadcn/scroll-area";
+import { appKernel } from "@/application/bootstrap/app-kernel";
+import { EntityDefinition } from "@/editor/model/entity/entity-definition";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import PixiImage from "@/ui/components/custom/PixiImage";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { ScrollArea, ScrollBar } from "@/ui/components/shadcn/scroll-area";
 import EntityCollectionManagerTabs from "./EntityCollectionManagerTabs";
 import EntityCollectionMenuBar from "./EntityCollectionMenuBar";
-import { EntityDefinition } from "@/editor/model/entity/entity-definition";
-import { appKernel } from "@/application/bootstrap/app-kernel";
-import PixiImage from "../../custom/PixiImage";
 
 export default function EntityCollectionManager() {
     const { activeProject } = useProjectStore();

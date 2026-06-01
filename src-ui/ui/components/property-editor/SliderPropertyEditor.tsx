@@ -3,12 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NumberPropertyClass } from "@/editor/properties/properties";
 import { Result } from "@/shared/types/result";
 
-import { LocalizedText } from "../custom/LocalizeText";
-import { HStack } from "../custom/stack/Stack";
-import { Label } from "../shadcn/label";
-import { Slider } from "../shadcn/slider";
-import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Label } from "@/ui/components/shadcn/label";
+import { Slider } from "@/ui/components/shadcn/slider";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
+import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
 
 export interface SliderEditorProps {
     property: NumberPropertyClass<any>;

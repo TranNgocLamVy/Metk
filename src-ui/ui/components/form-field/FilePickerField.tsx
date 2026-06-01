@@ -1,15 +1,11 @@
 import { FileFilter } from "@/shared/types/form-dialog";
 import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
 import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
-import { Tooltip, TooltipContent } from "@/ui/components/shadcn/tooltip";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useTranslation } from "react-i18next";
-import { LocalizedText } from "../custom/LocalizeText";
-import { ScrollArea } from "../shadcn/scroll-area";
-import { HStack, VStack } from "../custom/stack/Stack";
-import { Button } from "../shadcn/button";
-import { DotSquare, Ellipsis } from "lucide-react";
 
 type FilePickerProps = {
 	id: string;

@@ -5,13 +5,13 @@ import { WorkspaceService } from "@/shared/services/workspace.service";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
 import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 
-import { HStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
-import { LocalizedText } from "../../custom/LocalizeText";
-import { TilesetService } from "@/shared/services/tileset.service";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { DialogService } from "@/shared/services/dialog.service";
+import { TilesetService } from "@/shared/services/tileset.service";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 
 export default function TilesetViewTabs() {
 	const ref = useRef<HTMLDivElement>(null);

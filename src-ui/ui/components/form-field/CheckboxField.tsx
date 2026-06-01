@@ -1,6 +1,6 @@
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { Checkbox } from "@/ui/components/shadcn/checkbox";
 import { Label } from "@/ui/components/shadcn/label";
-import { LocalizedText } from "../custom/LocalizeText";
 
 interface CheckBoxProps {
 	id: string;

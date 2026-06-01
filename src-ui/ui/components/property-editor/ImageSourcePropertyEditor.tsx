@@ -1,5 +1,5 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { readFile } from "@tauri-apps/plugin-fs";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ImageSourcePropertyClass } from "@/editor/properties/properties";
 import type { ImageSourceData } from "@/shared/data-types/image-source.data";
@@ -10,10 +10,10 @@ import { Button } from "@/ui/components/shadcn/button";
 import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
 
-import { LocalizedText } from "../custom/LocalizeText";
-import { HStack } from "../custom/stack/Stack";
-import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack } from "@/ui/components/custom/stack/Stack";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
+import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface ImageSourcePropertyEditorProps {
     property: ImageSourcePropertyClass<any>;

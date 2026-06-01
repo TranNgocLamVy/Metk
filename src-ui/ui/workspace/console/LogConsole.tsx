@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
-import { HStack, VStack } from "../../custom/stack/Stack";
-import { ScrollArea } from "../../shadcn/scroll-area";
-import { useConsoleStore } from "@/ui/stores/console.store";
-import { Info, CheckCircle2, AlertTriangle, X } from "lucide-react";
-import { Button } from "../../shadcn/button";
-import { LocalizedText } from "../../custom/LocalizeText";
 import { Result } from "@/shared/types/result";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { useConsoleStore } from "@/ui/stores/console.store";
+import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export default function LogConsole() {
     const { logs } = useConsoleStore();

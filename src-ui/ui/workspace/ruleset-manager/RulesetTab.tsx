@@ -1,12 +1,12 @@
-import { Ellipsis, Pen, Plus, Trash2 } from "lucide-react";
-import { HStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
-import { RulesetService } from "@/shared/services/ruleset.service";
-import { useCallback } from "react";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
 import { DialogService } from "@/shared/services/dialog.service";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
-import { LocalizedText } from "../../custom/LocalizeText";
+import { RulesetService } from "@/shared/services/ruleset.service";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
+import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { Ellipsis, Pen, Plus, Trash2 } from "lucide-react";
+import { useCallback } from "react";
 
 export default function RulesetTab() {
     const { currentSelectedRuleId } = useRulesetStore();

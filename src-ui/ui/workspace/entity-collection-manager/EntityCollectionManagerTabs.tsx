@@ -4,11 +4,11 @@ import { EntityCollectionService } from "@/shared/services/entity-collection.ser
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 
-import { HStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { Ellipsis, Pen, Plus, Trash2 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
-import { LocalizedText } from "../../custom/LocalizeText";
 
 export default function EntityCollectionManagerTabs() {
     const ref = useRef<HTMLDivElement>(null);

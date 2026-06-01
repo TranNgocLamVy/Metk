@@ -1,8 +1,8 @@
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/ui/components/shadcn/alert-dialog";
-import { BaseDialogProps } from "./dialogRegistry";
 import { SaveDialogOptions } from "@/shared/types/confirmation-dialog";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/ui/components/shadcn/alert-dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { LocalizedText } from "../custom/LocalizeText";
+import { BaseDialogProps } from "./dialogRegistry";
 
 interface SaveDialogProps extends BaseDialogProps {
     saveDialog: SaveDialogOptions;

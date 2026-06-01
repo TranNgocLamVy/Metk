@@ -1,13 +1,13 @@
-import { ArrowBigDown, ArrowBigUp, Box, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
-import { HStack, VStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
-import QuickToolTip from "../../custom/QuickToolTip";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { useMemo } from "react";
-import { Separator } from "../../shadcn/separator";
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
-import { LocalizedText } from "../../custom/LocalizeText";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import QuickToolTip from "@/ui/components/custom/QuickToolTip";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
+import { Separator } from "@/ui/components/shadcn/separator";
+import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { ArrowBigDown, ArrowBigUp, Box, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 export default function LayerMenuBar() {
     const { layerViews, selectedLayers } = useLayerManagerStore();
 

@@ -4,15 +4,15 @@ import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
-import ContextMenuWrapper from "../../context-menu/ContextMenuWrapper";
-import { TilemapEditorContextMenu } from "./ContextMenu";
-import { LocalizedText } from "../../custom/LocalizeText";
-import { HStack, VStack } from "../../custom/stack/Stack";
-import { Button } from "../../shadcn/button";
-import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
 import { TilemapService } from "@/shared/services/tilemap.service";
+import { DialogZLevel } from "@/shared/types/dialog";
+import ContextMenuWrapper from "@/ui/components/context-menu/ContextMenuWrapper";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 import { useEffect } from "react";
+import { TilemapEditorContextMenu } from "./ContextMenu";
 
 export default function TilemapEditorCanvas() {
 	const { pixiApp, activeSession,  setPixiApp } = useTilemapSessionStore();

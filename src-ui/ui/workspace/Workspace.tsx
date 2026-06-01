@@ -3,20 +3,20 @@ import "@/assets/style/flexLayout/workspace.css";
 import { Action, ITabRenderValues, Layout, Model, TabNode } from "flexlayout-react";
 import { useRef } from "react";
 
-import { HStack, VStack } from "../custom/stack/Stack";
-import { LocalizedText } from "../custom/LocalizeText";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { useRelativeFlexLayout } from "@/ui/hooks/useRelativeFlexLayout.hook";
 import { useLayoutStore } from "@/ui/stores/layout.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 
 import ContextBar from "./ContextBar";
-import LayerManager from "./layer-manager/LayerManager";
-import TilesetViewSelector from "./tileset-view/TilesetViewSelector";
-import TilemapEditor from "./tilemap-editor/TilemapEditor";
-import RulesetManager from "./ruleset-manager/RulesetManager";
-import PropertyPanel from "./properties-panel/PropertyPanel";
 import EntityCollectionManager from "./entity-collection-manager/EntityCollectionManager";
+import LayerManager from "./layer-manager/LayerManager";
+import PropertyPanel from "./properties-panel/PropertyPanel";
+import RulesetManager from "./ruleset-manager/RulesetManager";
+import TilemapEditor from "./tilemap-editor/TilemapEditor";
+import TilesetViewSelector from "./tileset-view/TilesetViewSelector";
 
 export default function Workspace() {
 

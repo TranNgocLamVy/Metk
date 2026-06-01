@@ -5,13 +5,13 @@ import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
-import { Button } from "../../shadcn/button";
-import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import { usePropertyStore } from "@/ui/stores/property.store";
-import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { PropertyUpdateMeta } from "@/editor/model/base-object";
 import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { Button } from "@/ui/components/shadcn/button";
+import { usePropertyStore } from "@/ui/stores/property.store";
 
 type LayerNodeRowProps = {
 	view: LayerView;
