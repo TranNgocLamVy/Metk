@@ -5,7 +5,7 @@ import type { Tilemap } from "@/editor/model/tilemap/tilemap";
 import type { TilemapSession } from "./tilemap.session";
 
 type StructureEventName = "layerAdded" | "layerRemoved" | "layerReordered";
-type ContentEventName = "tilesChanged" | "rulesetRefsOutputChanged";
+type ContentEventName = "tilesChanged" | "rulesetRefsOutputChanged" | "entitiesChanged";
 
 export class TilemapChangeObserver {
     private disposers: Array<() => void> = [];
@@ -73,7 +73,7 @@ export class TilemapChangeObserver {
         };
 
         const eventEmitter = layer.eventEmitter as any;
-        const eventNames: ContentEventName[] = ["tilesChanged", "rulesetRefsOutputChanged"];
+        const eventNames: ContentEventName[] = ["tilesChanged", "rulesetRefsOutputChanged", "entitiesChanged"];
 
         eventNames.forEach((eventName) => {
             eventEmitter.on(eventName, markChanged);

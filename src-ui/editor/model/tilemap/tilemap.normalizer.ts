@@ -3,22 +3,24 @@ import { LayerData } from "@/shared/data-types/layer.data";
 import { TilemapData, TilemapOrientationValues } from "@/shared/data-types/tilemap.data";
 import { TilesetRefData } from "@/shared/data-types/tileset.data";
 import { validate } from "@/shared/utils/validate.utils";
+import { EntityCollectionRefData } from "@/shared/data-types/entity-collection.data";
 
 export const DEFAULT_TILEMAP_WIDTH = 64;
 export const DEFAULT_TILEMAP_HEIGHT = 64;
 export const DEFAULT_TILE_SIZE = 16;
 export const DEFAULT_TILEMAP_BACKGROUND_COLOR = "#00000000";
 
-type RawRefData = Partial<TilesetRefData & RulesetRefData>;
+type RawRefData = Partial<TilesetRefData & RulesetRefData & EntityCollectionRefData>;
 
 type RawRefCollection<TRef> = Partial<{
     refs: Partial<TRef>[];
     nextIndex: number;
 }>;
 
-type RawTilemapData = Partial<Omit<TilemapData, "tilesets" | "rulesets" | "layers">> & {
+type RawTilemapData = Partial<Omit<TilemapData, "tilesets" | "rulesets" | "entityCollections" | "layers">> & {
     tilesets?: RawRefCollection<TilesetRefData>;
     rulesets?: RawRefCollection<RulesetRefData>;
+    entityCollections?: RawRefCollection<EntityCollectionRefData>;
     layers?: LayerData[];
 };
 
@@ -82,6 +84,30 @@ const normalizeRulesetRef = (value: unknown): RulesetRefData => {
     };
 };
 
+const normalizeEntityCollectionRef = (value: unknown): EntityCollectionRefData => {
+    const data = validate.requiredObject({
+        value,
+        field: "tilemap.entityCollections.refs[]",
+    }) as RawRefData;
+
+    return {
+        id: validate.requiredString({
+            value: data.id,
+            field: "tilemap.entityCollections.refs[].id",
+        }),
+        name: validate.string({
+            value: data.name,
+            defaultValue: "Untitled Entity Collection",
+        }),
+        index: validate.number({
+            value: data.index,
+            defaultValue: 0,
+            min: 0,
+            integer: true,
+        }),
+    };
+};
+
 export const normalizeTilemapData = (tilemapData: unknown): TilemapData => {
     const data = validate.requiredObject({ value: tilemapData, field: "tilemap" }) as RawTilemapData;
 
@@ -113,6 +139,10 @@ export const normalizeTilemapData = (tilemapData: unknown): TilemapData => {
             min: 1,
             integer: true,
         }),
+        entityCollections: normalizeRefCollection<EntityCollectionRefData>(
+            data.entityCollections,
+            normalizeEntityCollectionRef,
+        ),
         backgroundcolor: validate.string({ value: data.backgroundcolor, defaultValue: DEFAULT_TILEMAP_BACKGROUND_COLOR }),
         tilesets: normalizeRefCollection<TilesetRefData>(data.tilesets, normalizeTilesetRef),
         rulesets: normalizeRefCollection<RulesetRefData>(data.rulesets, normalizeRulesetRef),

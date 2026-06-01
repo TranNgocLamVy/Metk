@@ -1,6 +1,7 @@
 import { RootLayerData } from "./layer.data";
 import { RulesetRefData } from "./ruleset.data";
 import { TilesetRefData } from "./tileset.data";
+import { EntityCollectionRefData } from "./entity-collection.data";
 
 export type TilemapMetadata = {
     name: string;
@@ -41,6 +42,10 @@ export type TilemapData = {
     };
     rulesets: {
         refs: RulesetRefData[];
+        nextIndex: number;
+    };
+    entityCollections: {
+        refs: EntityCollectionRefData[];
         nextIndex: number;
     };
     layers: RootLayerData;

@@ -49,19 +49,25 @@ export type ImageLayerData = LayerCommonData & {
     image?: ImageSourceData;
 };
 
+export type EntityRefData = {
+    entityCollectionId: string;
+    entityDefinitionId: string;
+};
+
 export type EntityInstanceData = {
     id: string;
-    definitionId: string;
+    entityRef: EntityRefData;
     x: number;
     y: number;
-}
+    fields?: Record<string, unknown>;
+};
 
 export type EntityLayerData = LayerCommonData & {
     type: "entity";
     offsetx?: number;
     offsety?: number;
     entities: EntityInstanceData[];
-}
+};
 
 export type GroupLayerData = LayerCommonData & {
     type: "group";
@@ -111,5 +117,16 @@ export const defaultGroupLayerData = (): GroupLayerData => {
         id: uuidv4(),
         name: "New Group Layer",
         type: "group",
+    };
+};
+
+export const defaultEntityLayerData = (): EntityLayerData => {
+    return {
+        id: uuidv4(),
+        name: "New Entity Layer",
+        type: "entity",
+        offsetx: 0,
+        offsety: 0,
+        entities: [],
     };
 };

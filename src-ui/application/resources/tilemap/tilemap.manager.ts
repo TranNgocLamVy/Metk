@@ -8,11 +8,11 @@ import { TilemapStorageService } from "@/infrastructure/container";
 import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { RulesetManager } from "../ruleset/ruleset.manager";
 import { Console } from "@/shared/services/console.service";
-import { PathUtils } from "@/shared/utils/path.utils";
 import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
-import { relative } from "pathe";
+import { EntityCollectionManager } from "../entity/entity-collection.manager";
+import { EntityCollectionRefManager } from "../references/entity-collection-ref.manager";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -23,6 +23,7 @@ export class TilemapManager {
     public constructor(
         private readonly tilesetManager: TilesetManager,
         private readonly rulesetManager: RulesetManager,
+        private readonly entityCollectionManager: EntityCollectionManager,
         private readonly projectPathSystem: ProjectPathSystem,
         private readonly objectRegistry: EditorObjectRegistry,
     ) { }
@@ -42,7 +43,15 @@ export class TilemapManager {
         const tilemapPathSystem = new FilePathSystem(tilemapData.id, this.projectPathSystem, tilemapRelPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, tilemapPathSystem);
         const rulesetRefManager = new RulesetRefManager(this.rulesetManager, tilemapPathSystem);
-        const newTilemap = new Tilemap(tilemapData, tilemapPathSystem, tilesetRefManager, rulesetRefManager);
+        const entityCollectionRefManager = new EntityCollectionRefManager(this.entityCollectionManager, tilemapPathSystem);
+        
+        const newTilemap = new Tilemap(
+            tilemapData,
+            tilemapPathSystem,
+            tilesetRefManager,
+            rulesetRefManager,
+            entityCollectionRefManager,
+        );
 
         const tilemapMetadata: TilemapMetadata = {
             id: newTilemap.id,
@@ -57,10 +66,12 @@ export class TilemapManager {
 
         const tilesetDepIds = newTilemap.tilesetRefManager.getRefIds();
         const rulesetDepIds = newTilemap.rulesetRefManager.getRefIds();
+        const entityCollectionDepIds = newTilemap.entityCollectionRefManager.getRefIds();   
 
         await Promise.all([
             this.tilesetManager.loadTilesets(tilesetDepIds),
             this.rulesetManager.loadRulesets(rulesetDepIds),
+            this.entityCollectionManager.loadEntityCollections(entityCollectionDepIds),
         ])
 
         return Result.Success(newTilemap);
@@ -203,6 +214,13 @@ export class TilemapManager {
     public async removeRulesetRef(rulesetId: string) {
         for (const tilemap of this.loadedTilemaps.values()) {
             const result = tilemap.removeRulesetRef(rulesetId);
+            if (result) await this.saveTilemap(tilemap.id);
+        }
+    }
+
+    public async removeEntityCollectionRef(entityCollectionId: string): Promise<void> {
+        for (const tilemap of this.loadedTilemaps.values()) {
+            const result = tilemap.removeEntityCollectionRef(entityCollectionId);
             if (result) await this.saveTilemap(tilemap.id);
         }
     }

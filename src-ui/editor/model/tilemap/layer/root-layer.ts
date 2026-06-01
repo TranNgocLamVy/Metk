@@ -128,6 +128,10 @@ export class RootLayer extends BaseLayer<RootLayerEvents> implements IGroupLayer
         this.layers.forEach((layer) => layer.removeTilesetRef(tilesetIndex));
     }
 
+    public override removeEntityCollectionRef(entityCollectionId: string): void {
+        this.layers.forEach((layer) => layer.removeEntityCollectionRef(entityCollectionId));
+    }
+
     public override serialize(): RootLayerData {
         return this.layers.map(layer => layer.serialize());
     }

@@ -15,6 +15,8 @@ import { TilemapView } from "../view/tilemap.view";
 import { Tool } from "./tool.decorator";
 import { BatchCommand } from "@/application/commands/batch.command";
 import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
+import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
+import { RemoveEntityCommand } from "@/application/commands/layer/remove-entity.command";
 
 @Tool({
     id: "tool.eraser",
@@ -252,6 +254,24 @@ export class EraserTool implements ITool {
                 eraseCommand = new SetTilesCommand(this.tilemapObjectId, this.targetLayerObjectId, eraseCoordinates.map(c => ({ coordinate: c, tileId: null, tilesetId: null })));
             } else if (targetLayer instanceof RuleLayer) {
                 eraseCommand = new SetRulesCommand(this.tilemapObjectId, this.targetLayerObjectId, eraseCoordinates.map(c => ({ coordinate: c, rulesetId: null })));
+            } else if (targetLayer instanceof EntityLayer) {
+                const entityIds = Array.from(
+                    new Set(
+                        eraseCoordinates
+                            .map((c) => {
+                                const position = this.targetLayerRenderer!.coordToPos(c);
+                                return this.activeDrawStrategy!.getRefAt(
+                                    position,
+                                    this.targetLayerRenderer!,
+                                )?.id as string | undefined;
+                            })
+                            .filter((id): id is string => !!id),
+                    ),
+                );
+            
+                if (entityIds.length === 0) return;
+            
+                eraseCommand = new RemoveEntityCommand(this.tilemapObjectId, this.targetLayerObjectId, entityIds);
             } else {
                 return;
             }

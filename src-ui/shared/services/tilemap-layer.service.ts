@@ -1,5 +1,6 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { CreateTileLayerCommand } from "@/application/commands/layer/create-tile-layer.command";
+import { CreateEntityLayerCommand } from "@/application/commands/layer/create-entity-layer.command";
 import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.command";
 import { DuplicateLayerCommand } from "@/application/commands/layer/duplicate-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
@@ -8,7 +9,7 @@ import { DropPosition, useLayerManagerStore } from "@/ui/stores/layer-manager.st
 
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
 import { WorkspaceService } from "./workspace.service";
-import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData } from "../data-types/layer.data";
+import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData, defaultEntityLayerData, } from "../data-types/layer.data";
 import { CreateRuleLayerCommand } from "@/application/commands/layer/create-rule-layer.command";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
@@ -55,6 +56,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
+        console.log(root);
         const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
@@ -113,6 +115,35 @@ export class TilemapLayerService {
     
         historyManager.startTransaction();
         historyManager.execute(createImageLayerCommand, editorFacade);
+        historyManager.commitTransaction();
+    
+        useLayerManagerStore.getState().setEditingId(payload.id);
+    }
+
+    public static async createNewEntityLayer() {
+        const editorFacade = appKernel.editorFacade;
+    
+        const currentSession = editorFacade.getActiveTilemapSession();
+        const historyManager = editorFacade.getCurrentHistoryManager();
+    
+        if (!currentSession || !historyManager) return;
+    
+        const tilemap = currentSession.tilemap;
+        const root = tilemap.rootLayer;
+        const targetLayer = this.getSelectedParentLayer(tilemap);
+    
+        const parent = targetLayer instanceof GroupLayer ? targetLayer : targetLayer?.parentLayer ? targetLayer.parentLayer : root;
+    
+        const payload = defaultEntityLayerData();
+    
+        const createEntityLayerCommand = new CreateEntityLayerCommand(
+            tilemap.objectId,
+            parent.objectId,
+            payload,
+        );
+    
+        historyManager.startTransaction();
+        historyManager.execute(createEntityLayerCommand, editorFacade);
         historyManager.commitTransaction();
     
         useLayerManagerStore.getState().setEditingId(payload.id);

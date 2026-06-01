@@ -333,6 +333,7 @@
                     "ruleLayer": "Rule Layer",
                     "objectLayer": "Object Layer",
                     "imageLayer": "Image Layer",
+                    "entityLayer": "Entity Layer",
                     "groupLayer": "Group Layer"
                 },
                 "group": {

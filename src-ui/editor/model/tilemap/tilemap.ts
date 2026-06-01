@@ -5,6 +5,7 @@ import { TilemapData, type TilemapOrientation } from "@/shared/data-types/tilema
 import { RootLayer } from "./layer/root-layer";
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { EnumProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { Result } from "@/shared/types/result";
 import { DEFAULT_TILEMAP_BACKGROUND_COLOR, normalizeTilemapData } from "./tilemap.normalizer";
@@ -75,10 +76,11 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         data: TilemapData,
         public readonly tilemapPathSystem: FilePathSystem,
         public readonly tilesetRefManager: TilesetRefManager,
-        public readonly rulesetRefManager: RulesetRefManager
+        public readonly rulesetRefManager: RulesetRefManager,
+        public readonly entityCollectionRefManager: EntityCollectionRefManager,
     ) {
         super(`tilemap:${data.id}`);
-
+    
         this.id = data.id;
         this.name = data.name;
         this.orientation = data.orientation;
@@ -91,18 +93,36 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
         this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
         this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
+        this.entityCollectionRefManager.loadData(
+            data.entityCollections.refs,
+            data.entityCollections.nextIndex,
+        );
 
         this.rootLayer = new RootLayer(data.layers, this, this.objectId);
     }
 
-    public static createFromFileData(tilemapData: unknown, tilemapPathSystem: FilePathSystem, tilesetRefManager: TilesetRefManager, rulesetRefManager: RulesetRefManager): Result<Tilemap> {
-        try {
-            const data = normalizeTilemapData(tilemapData);
-            return Result.Success(new Tilemap(data, tilemapPathSystem, tilesetRefManager, rulesetRefManager));
-        } catch (error) {
-            return Result.Error(`Failed to create tilemap: ${String(error)}`);
-        }
+    public static createFromFileData(
+    tilemapData: unknown,
+    tilemapPathSystem: FilePathSystem,
+    tilesetRefManager: TilesetRefManager,
+    rulesetRefManager: RulesetRefManager,
+    entityCollectionRefManager: EntityCollectionRefManager,
+): Result<Tilemap> {
+    try {
+        const data = normalizeTilemapData(tilemapData);
+        return Result.Success(
+            new Tilemap(
+                data,
+                tilemapPathSystem,
+                tilesetRefManager,
+                rulesetRefManager,
+                entityCollectionRefManager,
+            ),
+        );
+    } catch (error) {
+        return Result.Error(`Failed to create tilemap: ${String(error)}`);
     }
+}
 
     public rename(newName: string, meta?: PropertyUpdateMeta) {
         this.name = newName;
@@ -124,6 +144,7 @@ export class Tilemap extends BaseObject<TilemapEvent> {
             backgroundcolor: this.backgroundcolor,
             tilesets: this.tilesetRefManager.serialize(),
             rulesets: this.rulesetRefManager.serialize(),
+            entityCollections: this.entityCollectionRefManager.serialize(),
             layers: this.rootLayer.serialize(),
         }
     }
@@ -139,6 +160,17 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         const tilesetIndex = this.tilesetRefManager.removeTilesetRef(tileset);
         if (tilesetIndex === -1) return false;
         this.rootLayer.removeTilesetRef(tilesetIndex);
+        return true;
+    }
+
+    public removeEntityCollectionRef(entityCollectionId: string): boolean {
+        const entityCollectionIndex =
+            this.entityCollectionRefManager.removeEntityCollectionRef(entityCollectionId);
+    
+        if (entityCollectionIndex === -1) return false;
+    
+        this.rootLayer.removeEntityCollectionRef(entityCollectionId);
+    
         return true;
     }
 

@@ -6,6 +6,7 @@ import { RulesetRefManager } from "@/application/resources/references/ruleset-re
 import { BooleanProperty, NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
 import { Tilemap } from "../tilemap";
 import { validate } from "@/shared/utils/validate.utils";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 
 export interface BaseLayerEvents extends BaseObjectEvents {
     
@@ -82,6 +83,10 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
 
     public get rulesetRefManager() {
         return this.tilemap.rulesetRefManager;
+    }
+
+    public get entityCollectionRefManager(): EntityCollectionRefManager {
+        return this.tilemap.entityCollectionRefManager;
     }
 
     constructor(
@@ -163,6 +168,10 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     }
 
     public removeTilesetRef(tilesetIndex: number): void {
+        // pass
+    }
+
+    public removeEntityCollectionRef(entityCollectionId: string): void {
         // pass
     }
 

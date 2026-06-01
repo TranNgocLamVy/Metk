@@ -134,11 +134,17 @@ export class EntityGraphicOutputSelectorRenderer {
     private selectTile(tileId: number) {
         if (!this.currentTileset) return;
 
+        const tileSize = getTileSize(this.currentTileset, tileId);
+
         this.tilesetRefManager.getTilesetRefIndex(this.currentTileset.id);
         this.entity.setGraphic({
             type: EntityGraphicType.Tile,
             tileId,
             tilesetId: this.currentTileset.id,
+        });
+        this.entity.resize(tileSize.width, tileSize.height, {
+            origin: "external",
+            source: "EntityGraphicOutputSelectorRenderer.selectTile",
         });
 
         this.triggerUpdate();
@@ -205,4 +211,13 @@ export class EntityGraphicOutputSelectorRenderer {
         this.viewport.destroy({ children: true });
         this.isInit = false;
     }
+}
+
+export function getTileSize(tileset: Tileset, tileId: number): { width: number; height: number } {
+    const tile = tileset.getTileFromId(tileId);
+
+    return {
+        width: Math.max(1, Math.floor(tile?.imageSource?.width ?? tileset.tilewidth)),
+        height: Math.max(1, Math.floor(tile?.imageSource?.height ?? tileset.tileheight)),
+    };
 }

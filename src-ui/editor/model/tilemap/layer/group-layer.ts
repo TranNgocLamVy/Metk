@@ -169,6 +169,10 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
         this.layers.forEach((layer) => layer.removeTilesetRef(tilesetIndex));
     }
 
+    public override removeEntityCollectionRef(entityCollectionId: string): void {
+        this.layers.forEach((layer) => layer.removeEntityCollectionRef(entityCollectionId));
+    }
+
     public override getObjectChildren(): BaseObject<any>[] {
         return this.layers;
     }

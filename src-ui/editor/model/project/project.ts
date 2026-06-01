@@ -49,8 +49,8 @@ export class Project {
         
         this.tilesetManager = new TilesetManager(this.projectPathSystem, this.objectRegistry);
         this.rulesetManager = new RulesetManager(this.tilesetManager, this.projectPathSystem, this.objectRegistry);
-        this.tilemapManager = new TilemapManager(this.tilesetManager, this.rulesetManager, this.projectPathSystem, this.objectRegistry);
         this.entityCollectionManager = new EntityCollectionManager(this.tilesetManager, this.projectPathSystem, this.objectRegistry);
+        this.tilemapManager = new TilemapManager(this.tilesetManager, this.rulesetManager, this.entityCollectionManager, this.projectPathSystem, this.objectRegistry);
     }
 
     public static create(data: unknown, projectPathSystem: ProjectPathSystem): Result<Project> {

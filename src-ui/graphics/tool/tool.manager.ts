@@ -9,6 +9,7 @@ import { ToolContext } from "@/graphics/tool/tool.decorator";
 import { ITool, IToolContructor } from "@/editor/interface/tool.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { TilemapView } from "../view/tilemap.view";
+import { DrawEntityStrategy } from "../strategies/draw-entity.strategy";
 
 type ToolManagerEvent = {
     onToolChanged: (toolId: string | null) => void;
@@ -36,7 +37,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
         this.drawStrategys = [
             new DrawTileStrategy(),
-            new DrawRuleStrategy()
+            new DrawRuleStrategy(),
+            new DrawEntityStrategy(),
         ];
 
         this.bindOnSelectedLayersChanged = this.onSelectedLayersChanged.bind(this);

@@ -1,4 +1,4 @@
-import { ArrowBigDown, ArrowBigUp, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Box, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
 import { HStack, VStack } from "../../custom/stack/Stack";
 import { Button } from "../../shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../shadcn/dropdown-menu";
@@ -40,6 +40,10 @@ export default function LayerMenuBar() {
                     <DropdownMenuItem onClick={TilemapLayerService.createNewImageLayer}>
                         <Image className="text-fuchsia-500" />
                         <LocalizedText message="workspace.layerManager.menu.new.imageLayer" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={TilemapLayerService.createNewEntityLayer}>
+                        <Box className="text-cyan-400" />
+                        <LocalizedText message="workspace.layerManager.menu.new.entityLayer" />
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={TilemapLayerService.createNewGroupLayer}>
                         <Folder className="text-blue-500" />
