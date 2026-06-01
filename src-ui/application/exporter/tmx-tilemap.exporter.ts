@@ -14,6 +14,7 @@ import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
+import { CollisionObjectData } from "@/shared/data-types/collision-object.data";
 import { EntityFieldData } from "@/shared/data-types/entity.data";
 import { EntityInstanceData } from "@/shared/data-types/layer.data";
 import { EditorFacade } from "../editor.facade";
@@ -25,13 +26,15 @@ export class TmxTilemapExporter implements ITilemapExporter {
     private tilesetFirstGidMap: Map<number, number> = new Map<number, number>(); // tileset ref index -> firstgid
     private exportPath: string;
     private nextLayerId: number = 1;
-    private nextObjectId: number = 1;
+    private nextMapObjectId: number = 1;
+    private nextTilesetObjectId: number = 1;
 
     public export(tilemap: Tilemap, exportPath: string, editorFacade: EditorFacade): Uint8Array {
         this.tilesetFirstGidMap.clear();
         this.exportPath = exportPath;
         this.nextLayerId = 1;
-        this.nextObjectId = 1;
+        this.nextMapObjectId = 1;
+        this.nextTilesetObjectId = 1;
 
         this.ensureEntityGraphicTilesetRefs(tilemap.rootLayer.layers, tilemap);
 
@@ -50,7 +53,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
             tilewidth: tilemap.tilewidth,
             tileheight: tilemap.tileheight,
             nextlayerid: this.nextLayerId,
-            nextobjectid: this.nextObjectId,
+            nextobjectid: this.nextMapObjectId,
         });
 
         tilesets.forEach((tileset) => map.import(tileset.root()));
@@ -119,6 +122,15 @@ export class TmxTilemapExporter implements ITilemapExporter {
         const imageAbsPath = PathUtils.join(tilesetAbsDir, imageRelPath);
         const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
 
+        const tiles = tileset.tiles
+            .map((tile) =>
+                this.getTilesetTile(tile, tileset, exportPath, {
+                    includeImage: false,
+                    skipEmptyTile: true,
+                }),
+            )
+            .filter((tile): tile is XmlObject => tile !== null);
+
         return create({
             tileset: {
                 "@firstgid": firstGid,
@@ -132,6 +144,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
                     "@width": tileset.imageSource.width,
                     "@height": tileset.imageSource.height,
                 },
+                ...(tiles.length > 0 ? { tile: tiles } : {}),
             },
         });
     }
@@ -141,9 +154,14 @@ export class TmxTilemapExporter implements ITilemapExporter {
         exportPath: string,
         firstGid: number,
     ): XMLBuilder | null {
-        const tiles = tileset.tiles.map((tile) =>
-            this.getImageCollectionTile(tile, tileset, exportPath),
-        );
+        const tiles = tileset.tiles
+            .map((tile) =>
+                this.getTilesetTile(tile, tileset, exportPath, {
+                    includeImage: true,
+                    skipEmptyTile: false,
+                }),
+            )
+            .filter((tile): tile is XmlObject => tile !== null);
 
         return create({
             tileset: {
@@ -158,29 +176,102 @@ export class TmxTilemapExporter implements ITilemapExporter {
         });
     }
 
-    private getImageCollectionTile(
+    private getTilesetTile(
         tile: Tile,
-        tileset: ImageCollectionTileset,
+        tileset: Tileset,
         exportPath: string,
-    ): XmlObject {
+        options: {
+            includeImage: boolean;
+            skipEmptyTile: boolean;
+        },
+    ): XmlObject | null {
         const tileData: XmlObject = {
             "@id": tile.id,
         };
 
-        if (!tile.imageSource) return tileData;
+        if (options.includeImage && tile.imageSource) {
+            const image = this.getTileImage(tile, tileset, exportPath);
+            if (image) {
+                tileData.image = image;
+            }
+        }
+
+        const objectgroup = this.getTileObjectGroup(tile);
+        if (objectgroup) {
+            tileData.objectgroup = objectgroup;
+        }
+
+        const hasTileContent = Boolean(tileData.image || tileData.objectgroup);
+        if (options.skipEmptyTile && !hasTileContent) return null;
+
+        return tileData;
+    }
+
+    private getTileImage(tile: Tile, tileset: Tileset, exportPath: string): XmlObject | null {
+        if (!tile.imageSource) return null;
 
         const tilesetAbsPath = tileset.tilesetPathSystem.getFileAbsPath();
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
         const imageAbsPath = PathUtils.join(tilesetAbsDir, tile.imageSource.source);
         const source = PathUtils.relative(PathUtils.dirname(exportPath), imageAbsPath);
 
-        tileData.image = {
+        return {
             "@source": source,
             "@width": tile.imageSource.width,
             "@height": tile.imageSource.height,
         };
+    }
 
-        return tileData;
+    private getTileObjectGroup(tile: Tile): XmlObject | null {
+        if (tile.collisionObjects.length === 0) return null;
+
+        const objects = tile.collisionObjects.map((collisionObject) =>
+            this.getCollisionObject(collisionObject.serialize()),
+        );
+
+        return {
+            "@draworder": "index",
+            object: objects,
+        };
+    }
+
+    private getCollisionObject(collisionObject: CollisionObjectData): XmlObject {
+        const object: XmlObject = {
+            "@id": this.nextTilesetObjectId++,
+            "@name": collisionObject.name ?? "",
+            "@type": collisionObject.kind,
+            "@x": collisionObject.x,
+            "@y": collisionObject.y,
+            "@visible": collisionObject.visible === false ? 0 : 1,
+            properties: {
+                property: [
+                    this.createProperty("metk.collisionId", collisionObject.id),
+                    this.createProperty("metk.collisionKind", collisionObject.kind),
+                    this.createProperty("metk.locked", collisionObject.locked ?? false, "bool"),
+                ],
+            },
+        };
+
+        switch (collisionObject.kind) {
+            case "box":
+                object["@width"] = collisionObject.width;
+                object["@height"] = collisionObject.height;
+                break;
+
+            case "point":
+                object.point = {};
+                break;
+
+            case "polygon":
+                object.polygon = {
+                    "@points": collisionObject.points
+                        .map((point) => `${point.x},${point.y}`)
+                        .join(" "),
+                };
+                break;
+        }
+
+        return object;
     }
 
     private getLayers(
@@ -403,7 +494,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
         const y = entity.y - definition.pivotY;
 
         const object: XmlObject = {
-            "@id": this.nextObjectId++,
+            "@id": this.nextMapObjectId++,
             "@name": definition.name,
             "@type": definition.id,
             "@x": x,
