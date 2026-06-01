@@ -1,7 +1,7 @@
-import { FormUtils } from "@/shared/utils/form.utils";
+import { createForm } from "./form.utils";
 
 export const createTilesetForm = (textureDefaultDir?: string) => {
-    return FormUtils.createForm({
+    return createForm({
         title: "form.tileset.title",
         okText: "form.tileset.action.saveAs",
         cancelText: "form.tileset.action.cancel",

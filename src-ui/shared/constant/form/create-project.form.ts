@@ -1,9 +1,9 @@
-import { FormUtils } from "@/shared/utils/form.utils";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { exists } from "@tauri-apps/plugin-fs";
+import { createForm } from "./form.utils";
 
 export const createProjectForm = () => {
-    return FormUtils.createForm({
+    return createForm({
         title: "form.project.title",
         okText: "form.project.action.create",
         cancelText: "form.project.action.cancel",

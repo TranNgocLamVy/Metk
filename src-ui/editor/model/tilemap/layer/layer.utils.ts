@@ -1,12 +1,12 @@
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
-import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
-import { EntityLayerData, GroupLayerData, ImageLayerData, LayerData, RuleLayerData, TileLayerData } from "../data-types/layer.data";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { validate } from "./validate.utils";
+import { EntityLayerData, GroupLayerData, ImageLayerData, LayerData, RuleLayerData, TileLayerData } from "../../../../shared/data-types/layer.data";
+import { validate } from "../../../../shared/utils/validate.utils";
 
 export class LayerUtils {
     public static createLayerFromData(layerData: LayerData, parent: IGroupLayer, tilemap: Tilemap, objectIdScope: string): BaseLayer<any> | null {

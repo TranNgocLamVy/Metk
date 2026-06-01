@@ -1,11 +1,11 @@
+import { LayerUtils } from "@/editor/model/tilemap/layer/layer.utils";
 import { LayerData, RootLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
-import { LayerUtils } from "@/shared/utils/layer.utils";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import { GroupLayer } from "./group-layer";
 import { BaseObject } from "../../base-object";
 import { Tilemap } from "../tilemap";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
+import { GroupLayer } from "./group-layer";
 
 interface RootLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;

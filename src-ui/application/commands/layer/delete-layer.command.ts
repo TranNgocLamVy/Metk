@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { Result } from "@/shared/types/result";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { getLayerByObjectId, getTilemapByObjectId, isLayerContainer, isLayerInTilemap } from "@/application/commands/command-target.utils";
 import { EditorFacade } from "@/application/editor.facade";
+import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { LayerUtils } from "@/editor/model/tilemap/layer/layer.utils";
 import { LayerData } from "@/shared/data-types/layer.data";
-import { LayerUtils } from "@/shared/utils/layer.utils";
-import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap, isLayerContainer } from "@/application/commands/command-target.utils";
+import { Result } from "@/shared/types/result";
 
 export class DeleteLayerCommand implements IUndoableCommand {
     public readonly id: string = uuidv4()

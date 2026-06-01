@@ -1,8 +1,8 @@
 import { TilemapOrientation } from "@/shared/data-types/tilemap.data";
-import { FormUtils } from "@/shared/utils/form.utils";
+import { createForm } from "./form.utils";
 
 export const createTilemapForm = () => {
-    return FormUtils.createForm({
+    return createForm({
         title: "form.tilemap.title",
         okText: "form.tilemap.action.create",
         cancelText: "form.tilemap.action.cancel",

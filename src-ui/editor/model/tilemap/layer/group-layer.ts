@@ -1,13 +1,13 @@
-import { v4 as uuidv4 } from "uuid";
 import { GroupLayerData, LayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
+import { v4 as uuidv4 } from "uuid";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import { LayerUtils } from "@/shared/utils/layer.utils";
-import { BaseObject, PropertyUpdateMeta } from "../../base-object";
-import { Tilemap } from "../tilemap";
+import { LayerUtils } from "@/editor/model/tilemap/layer/layer.utils";
 import { BooleanProperty } from "@/editor/properties/properties.decorator";
 import { validate } from "@/shared/utils/validate.utils";
+import { BaseObject, PropertyUpdateMeta } from "../../base-object";
+import { Tilemap } from "../tilemap";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 
 interface GroupLayerEvents extends BaseLayerEvents {
     layerReordered: () => void;

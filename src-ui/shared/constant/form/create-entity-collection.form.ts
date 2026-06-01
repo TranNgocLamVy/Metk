@@ -1,6 +1,6 @@
-import { FormUtils } from "@/shared/utils/form.utils";
+import { createForm } from "./form.utils";
 
-export const createEntityCollectionForm = FormUtils.createForm({
+export const createEntityCollectionForm = createForm({
     title: "form.entityCollection.title",
     okText: "form.entityCollection.action.create",
     cancelText: "form.entityCollection.action.cancel",
