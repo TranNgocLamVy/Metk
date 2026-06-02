@@ -4,21 +4,19 @@ import EventEmitter from "eventemitter3";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ProjectPathSystem, FilePathSystem } from "@/infrastructure/project-path-system";
-import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
-import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
+import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { DialogZLevel } from "@/shared/types/dialog";
 import { Result } from "@/shared/types/result";
 import { PermissionDialog } from "@/ui/components/dialog/PermissionDialog";
-import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
-import TilemapEditorTabs from "@/ui/workspace/tilemap-editor/TilemapEditorTabs";
-import ToolBar from "@/ui/workspace/ToolBar";
-import { DialogZLevel } from "@/shared/types/dialog";
+import WorkspacePage from "@/ui/pages/Workspace";
 import { useAppcore } from "@/ui/stores/appcore.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
@@ -27,7 +25,9 @@ import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 import { useToolbarStore } from "@/ui/stores/toolbar.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
-import WorkspacePage from "@/ui/pages/Workspace";
+import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
+import TilemapEditorTabs from "@/ui/workspace/tilemap-editor/TilemapEditorTabs";
+import ToolBar from "@/ui/workspace/ToolBar";
 
 type ListenerMap = Record<string, Array<(...args: any[]) => void>>;
 
@@ -248,8 +248,8 @@ const createTilemapSession = (options: {
         orientation: "orthogonal",
         width: 8,
         height: 8,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         backgroundcolor: "#00000000",
         tilesets: { refs: [], nextIndex: 0 },
         rulesets: { refs: [], nextIndex: 0 },

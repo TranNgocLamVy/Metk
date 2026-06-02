@@ -3,18 +3,18 @@ import { v4 as uuidv4 } from "uuid";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 
+import { extractTilesetId } from "@/editor/model/tileset/tileset.normalizer";
+import { TilesetStorageService } from "@/infrastructure/container";
+import i18n from "@/shared/services/i18n.service";
+import { readFile } from "@tauri-apps/plugin-fs";
+import { createTilesetForm } from "../constant/form/create-tileset.form";
+import { Result } from "../types/result";
 import { FileDialogUtils } from "../utils/file-dialog.utils";
 import { PathUtils } from "../utils/path.utils";
-import { WorkspaceService } from "./workspace.service";
-import { Result } from "../types/result";
-import { TilesetStorageService } from "@/infrastructure/container";
-import { DialogService } from "./dialog.service";
-import { createTilesetForm } from "../constant/form/create-tileset.form";
-import i18n from "@/shared/services/i18n.service";
-import { Console } from "./console.service";
-import { readFile } from "@tauri-apps/plugin-fs";
 import { TextureUtils } from "../utils/texture.utils";
-import { extractTilesetId } from "@/editor/model/tileset/tileset.normalizer";
+import { Console } from "./console.service";
+import { DialogService } from "./dialog.service";
+import { WorkspaceService } from "./workspace.service";
 
 export class TilesetService {
     public static async createTileset(): Promise<void> {
@@ -48,8 +48,8 @@ export class TilesetService {
                 name: form.tileset.name,
                 tilesetAbsDir,
                 textureAbsPath,
-                tilewidth: form.image.setting.tile.tilewidth,
-                tileheight: form.image.setting.tile.tileheight,
+                tileWidth: form.image.setting.tile.tileWidth,
+                tileHeight: form.image.setting.tile.tileHeight,
             })
         } else {
             tilesetData = await TilesetService.createImageCollectionTilesetData({
@@ -76,12 +76,12 @@ export class TilesetService {
         Console.success({ message: "message.tileset.createSuccess" });
     }
 
-    private static async createSingleImageTilesetData(args: { name: string; tilesetAbsDir: string; textureAbsPath: string; tilewidth: number; tileheight: number }): Promise<TilesetData> {
+    private static async createSingleImageTilesetData(args: { name: string; tilesetAbsDir: string; textureAbsPath: string; tileWidth: number; tileHeight: number }): Promise<TilesetData> {
         const fileBuffer = await readFile(args.textureAbsPath);
         const image = await TextureUtils.processImage(fileBuffer);
 
-        const columns = Math.ceil(image.width / args.tilewidth);
-        const rows = Math.ceil(image.height / args.tileheight);
+        const columns = Math.ceil(image.width / args.tileWidth);
+        const rows = Math.ceil(image.height / args.tileHeight);
 
         return {
             id: uuidv4(),
@@ -95,8 +95,8 @@ export class TilesetService {
                 height: image.height,
             },
             tiles: [],
-            tilewidth: args.tilewidth,
-            tileheight: args.tileheight,
+            tileWidth: args.tileWidth,
+            tileHeight: args.tileHeight,
         };
     }
 
@@ -107,8 +107,8 @@ export class TilesetService {
             type: "image-collection",
             columns: 0,
             rows: 0,
-            tilewidth: 1,
-            tileheight: 1,
+            tileWidth: 1,
+            tileHeight: 1,
             tiles: [],
         };
     }

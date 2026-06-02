@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EventEmitter from "eventemitter3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -201,32 +201,32 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
     },
 }));
 
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
+import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
+import { RulesetManager as ResourceRulesetManager } from "@/application/resources/ruleset/ruleset.manager";
+import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
+import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { WorkspaceService } from "@/shared/services/workspace.service";
+import { useConsoleStore } from "@/ui/stores/console.store";
+import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { useLayoutStore } from "@/ui/stores/layout.store";
+import { useProjectStore } from "@/ui/stores/project.store";
+import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
+import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import Workspace from "@/ui/workspace/Workspace";
 import WorkspaceConsole from "@/ui/workspace/console/Console";
 import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
 import RulesetManager from "@/ui/workspace/ruleset-manager/RulesetManager";
 import TilemapEditor from "@/ui/workspace/tilemap-editor/TilemapEditor";
 import TilesetViewSelector from "@/ui/workspace/tileset-view/TilesetViewSelector";
-import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { Tileset } from "@/editor/model/tileset/tileset";
-import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { RulesetManager as ResourceRulesetManager } from "@/application/resources/ruleset/ruleset.manager";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
-import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
-import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
-import { useConsoleStore } from "@/ui/stores/console.store";
-import { useLayoutStore } from "@/ui/stores/layout.store";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
-import { WorkspaceService } from "@/shared/services/workspace.service";
 
 type TestTilemapSession = EventEmitter & {
     id: string;
@@ -272,8 +272,8 @@ const createTilemapSession = (id: string, tilemapId: string, name: string, isDir
         orientation: "orthogonal",
         width: 8,
         height: 8,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         backgroundcolor: "#00000000",
         tilesets: { refs: [], nextIndex: 0 },
         rulesets: { refs: [], nextIndex: 0 },
@@ -352,8 +352,8 @@ const createTilesetSession = (id: string, tilesetId: string, name: string): Test
             name,
             columns: 2,
             rows: 2,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             image: { source: `textures/${tilesetId}.png`, width: 32, height: 32 },
             tiles: [],
         },

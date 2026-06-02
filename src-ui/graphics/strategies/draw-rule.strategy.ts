@@ -1,12 +1,12 @@
-import { IDrawStrategy, DrawPayload } from "./draw-strategy.interface";
-import { EditorFacade } from "@/application/editor.facade";
-import { TilemapSession } from "@/editor/session/tilemap.session";
-import { Color, Container, Sprite, Texture } from "pixi.js";
 import { SetRulesCommand } from "@/application/commands/tile/set-rules.command";
+import { EditorFacade } from "@/application/editor.facade";
 import { ITool } from "@/editor/interface/tool.interface";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { TilemapSession } from "@/editor/session/tilemap.session";
 import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { RuleLayerRenderer } from "@/graphics/renderer/tilemap/rule-layer.renderer";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { Color, Container, Sprite, Texture } from "pixi.js";
+import { DrawPayload, IDrawStrategy } from "./draw-strategy.interface";
 
 
 export class DrawRuleStrategy implements IDrawStrategy {
@@ -47,8 +47,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
         const sprite = new Sprite(Texture.WHITE);
         sprite.tint = new Color(selectedRuleset.color);
         sprite.alpha = DrawRuleStrategy.spriteAlpha;
-        sprite.width = session.tilemap.tilewidth;
-        sprite.height = session.tilemap.tileheight;
+        sprite.width = session.tilemap.tileWidth;
+        sprite.height = session.tilemap.tileHeight;
         const drawPotision = layerRenderer.coordToPos({ col, row });
         sprite.position.set(drawPotision.x, drawPotision.y);
         
@@ -69,8 +69,8 @@ export class DrawRuleStrategy implements IDrawStrategy {
         const sprite = new Sprite(Texture.WHITE);
         sprite.tint = new Color(selectedRuleset.color);
         sprite.alpha = DrawRuleStrategy.spriteAlpha;
-        sprite.width = session.tilemap.tilewidth;
-        sprite.height = session.tilemap.tileheight;
+        sprite.width = session.tilemap.tileWidth;
+        sprite.height = session.tilemap.tileHeight;
         const drawPotision = layerRenderer.coordToPos({ col: coord.col, row: coord.row });
         sprite.position.set(drawPotision.x, drawPotision.y);
         

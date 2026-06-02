@@ -1,13 +1,13 @@
 
-import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { TilemapData, type TilemapOrientation } from "@/shared/data-types/tilemap.data";
-import { RootLayer } from "./layer/root-layer";
-import { FilePathSystem } from "@/infrastructure/project-path-system";
-import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
+import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
+import { BaseObject, BaseObjectEvents, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { EnumProperty, Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
+import { TilemapData, type TilemapOrientation } from "@/shared/data-types/tilemap.data";
 import { Result } from "@/shared/types/result";
+import { RootLayer } from "./layer/root-layer";
 import { DEFAULT_TILEMAP_BACKGROUND_COLOR, normalizeTilemapData } from "./tilemap.normalizer";
 
 interface TilemapEvent extends BaseObjectEvents {
@@ -65,10 +65,10 @@ export class Tilemap extends BaseObject<TilemapEvent> {
         order: 1,
         readonly: true,
         pointLabel: { x: "Width", y: "Height" },
-        get: (target) => ({ x: target.tilewidth, y: target.tileheight }),
+        get: (target) => ({ x: target.tileWidth, y: target.tileHeight }),
     })
-    public tilewidth: number;
-    public tileheight: number;
+    public tileWidth: number;
+    public tileHeight: number;
 
     public rootLayer: RootLayer;
 
@@ -88,8 +88,8 @@ export class Tilemap extends BaseObject<TilemapEvent> {
 
         this.width = data.width;
         this.height = data.height;
-        this.tilewidth = data.tilewidth;
-        this.tileheight = data.tileheight;
+        this.tileWidth = data.tileWidth;
+        this.tileHeight = data.tileHeight;
 
         this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
         this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
@@ -139,8 +139,8 @@ export class Tilemap extends BaseObject<TilemapEvent> {
             orientation: this.orientation,
             height: this.height,
             width: this.width,
-            tilewidth: this.tilewidth,
-            tileheight: this.tileheight,
+            tileWidth: this.tileWidth,
+            tileHeight: this.tileHeight,
             backgroundcolor: this.backgroundcolor,
             tilesets: this.tilesetRefManager.serialize(),
             rulesets: this.rulesetRefManager.serialize(),

@@ -1,13 +1,13 @@
-import { Application, Container, Graphics, Sprite } from "pixi.js";
 import { Viewport } from "pixi-viewport";
+import { Application, Container, Graphics, Sprite } from "pixi.js";
 
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { EntityGraphicType } from "@/shared/data-types/entity.data";
-import { DrawLineOption, GraphicUtils } from "@/shared/utils/graphic-utils";
 import { Result } from "@/shared/types/result";
+import { DrawLineOption, GraphicUtils } from "@/shared/utils/graphic-utils";
 
 export class EntityGraphicOutputSelectorRenderer {
     private pixiApp: Application;
@@ -114,8 +114,8 @@ export class EntityGraphicOutputSelectorRenderer {
             const sprite = new Sprite(tex);
             const col = index % tileset.columns;
             const row = Math.floor(index / tileset.columns);
-            const x = col * (tileset.tilewidth + this.gridGap);
-            const y = row * (tileset.tileheight + this.gridGap);
+            const x = col * (tileset.tileWidth + this.gridGap);
+            const y = row * (tileset.tileHeight + this.gridGap);
 
             sprite.position.set(x, y);
             sprite.eventMode = "static";
@@ -160,17 +160,17 @@ export class EntityGraphicOutputSelectorRenderer {
         if (graphic.type !== EntityGraphicType.Tile) return;
         if (graphic.tilesetId !== this.currentTileset.id) return;
 
-        const { tilewidth, tileheight, columns } = this.currentTileset;
+        const { tileWidth: tileWidth, tileHeight: tileHeight, columns } = this.currentTileset;
         const tileIndex = this.currentTileset.tiles.findIndex((tile) => tile.id === graphic.tileId);
         if (tileIndex === -1) return;
 
         const tx = tileIndex % columns;
         const ty = Math.floor(tileIndex / columns);
 
-        const x = tx * (tilewidth + this.gridGap);
-        const y = ty * (tileheight + this.gridGap);
+        const x = tx * (tileWidth + this.gridGap);
+        const y = ty * (tileHeight + this.gridGap);
 
-        this.highlightGraphics.rect(x, y, tilewidth, tileheight);
+        this.highlightGraphics.rect(x, y, tileWidth, tileHeight);
         this.highlightGraphics.fill({ color: 0x3b82f6, alpha: 0.4 });
     }
 
@@ -187,8 +187,8 @@ export class EntityGraphicOutputSelectorRenderer {
         this.gridGraphics.clear();
         if (!this.currentTileset) return;
 
-        const tileWidth = this.currentTileset.tilewidth;
-        const tileHeight = this.currentTileset.tileheight;
+        const tileWidth = this.currentTileset.tileWidth;
+        const tileHeight = this.currentTileset.tileHeight;
 
         const columns = this.currentTileset.columns;
         const rows = Math.ceil(this.currentTileset.tiles.length / columns);
@@ -217,7 +217,7 @@ export function getTileSize(tileset: Tileset, tileId: number): { width: number; 
     const tile = tileset.getTileFromId(tileId);
 
     return {
-        width: Math.max(1, Math.floor(tile?.imageSource?.width ?? tileset.tilewidth)),
-        height: Math.max(1, Math.floor(tile?.imageSource?.height ?? tileset.tileheight)),
+        width: Math.max(1, Math.floor(tile?.imageSource?.width ?? tileset.tileWidth)),
+        height: Math.max(1, Math.floor(tile?.imageSource?.height ?? tileset.tileHeight)),
     };
 }

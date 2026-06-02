@@ -4,22 +4,22 @@ import {
     PropertyUpdateMeta,
 } from "@/editor/model/base-object";
 import {
-    TileData,
-    TilesetData,
-    TilesetType,
-} from "@/shared/data-types/tileset.data";
-import { Result } from "@/shared/types/result";
-import { FilePathSystem } from "@/infrastructure/project-path-system";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import {
     EnumProperty,
     NumberProperty,
     Point2DProperty,
     StringProperty,
 } from "@/editor/properties/properties.decorator";
-import { ImageSource } from "../image-source";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
+import {
+    TileData,
+    TilesetData,
+    TilesetType,
+} from "@/shared/data-types/tileset.data";
+import { Result } from "@/shared/types/result";
 import { CollisionObject } from "../collision-object/collision-object";
 import { CollisionObjectFactory } from "../collision-object/collision-object.factory";
+import { ImageSource } from "../image-source";
 import { normalizeTileData } from "./tileset.normalizer";
 
 interface TilesetEvent extends BaseObjectEvents {
@@ -65,13 +65,13 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
         pointLabel: { x: "Width", y: "Height" },
         visible: (target) => target.type === TilesetType.SingleImage,
         get: (target) => ({
-            x: target.tilewidth,
-            y: target.tileheight,
+            x: target.tileWidth,
+            y: target.tileHeight,
         }),
     })
-    public tilewidth: number;
+    public tileWidth: number;
 
-    public tileheight: number;
+    public tileHeight: number;
 
     public columns: number;
     public rows: number;
@@ -92,8 +92,8 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
 
         this.columns = tilesetData.columns;
         this.rows = tilesetData.rows;
-        this.tilewidth = tilesetData.tilewidth;
-        this.tileheight = tilesetData.tileheight;
+        this.tileWidth = tilesetData.tileWidth;
+        this.tileHeight = tilesetData.tileHeight;
     }
 
     public override getObjectChildren(): BaseObject<any>[] {
@@ -135,8 +135,8 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
 
         this.columns = tilesetData.columns;
         this.rows = tilesetData.rows;
-        this.tilewidth = tilesetData.tilewidth;
-        this.tileheight = tilesetData.tileheight;
+        this.tileWidth = tilesetData.tileWidth;
+        this.tileHeight = tilesetData.tileHeight;
     }
 
     protected createTile(tileData: TileData): Tile {
@@ -222,8 +222,8 @@ export class Tile extends BaseObject<TileEvent> {
         pointLabel: { x: "Width", y: "Height" },
         visible: (target) => !!target.imageSource?.source,
         get: (target) => ({
-            x: target.imageSource?.width ?? target.tileset.tilewidth,
-            y: target.imageSource?.height ?? target.tileset.tileheight,
+            x: target.imageSource?.width ?? target.tileset.tileWidth,
+            y: target.imageSource?.height ?? target.tileset.tileHeight,
         }),
     })
     private imageSize: any;
@@ -236,8 +236,8 @@ export class Tile extends BaseObject<TileEvent> {
         pointLabel: { x: "Width", y: "Height" },
         visible: (target) => target.imageSource == null,
         get: (target) => ({
-            x: target.tileset.tilewidth,
-            y: target.tileset.tileheight,
+            x: target.tileset.tileWidth,
+            y: target.tileset.tileHeight,
         }),
     })
     private tileSize: any;

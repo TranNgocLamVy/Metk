@@ -35,8 +35,8 @@ export class TilemapView implements IBaseView {
         this.viewport = new Viewport({
             screenWidth: pixiApp.screen.width,
             screenHeight: pixiApp.screen.height,
-            worldWidth: this.session.tilemap.width * this.session.tilemap.tilewidth,
-            worldHeight: this.session.tilemap.height * this.session.tilemap.tileheight,
+            worldWidth: this.session.tilemap.width * this.session.tilemap.tileWidth,
+            worldHeight: this.session.tilemap.height * this.session.tilemap.tileHeight,
             passiveWheel: false,
             stopPropagation: true,
             allowPreserveDragOutside: true,

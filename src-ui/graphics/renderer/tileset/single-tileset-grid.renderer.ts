@@ -31,8 +31,8 @@ export class TilesetGridRenderer {
     }
 
     private drawGrid(): void {
-        const tileWidth = this.tileset.tilewidth;
-        const tileHeight = this.tileset.tileheight;
+        const tileWidth = this.tileset.tileWidth;
+        const tileHeight = this.tileset.tileHeight;
 
         const columns = this.tileset.columns;
         const rows = Math.ceil(this.tileset.tiles.length / columns);

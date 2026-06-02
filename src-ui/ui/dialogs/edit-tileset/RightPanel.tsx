@@ -255,7 +255,7 @@ function createPolygonCollision(tile: Tile): PolygonCollision {
 
 function getTileSize(tile: Tile): { width: number; height: number } {
     return {
-        width: Math.max(1, tile.imageSource?.width ?? tile.tileset.tilewidth ?? 1),
-        height: Math.max(1, tile.imageSource?.height ?? tile.tileset.tileheight ?? 1),
+        width: Math.max(1, tile.imageSource?.width ?? tile.tileset.tileWidth ?? 1),
+        height: Math.max(1, tile.imageSource?.height ?? tile.tileset.tileHeight ?? 1),
     };
 }

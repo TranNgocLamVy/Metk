@@ -104,17 +104,17 @@ const appMock = vi.hoisted(() => ({
 vi.mock("pixi.js", () => graphicsMock);
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: appMock }));
 
-import { TileLayerRenderer } from "@/graphics/renderer/tilemap/tile-layer.renderer";
-import { RuleLayerRenderer } from "@/graphics/renderer/tilemap/rule-layer.renderer";
-import { GroupLayerRenderer } from "@/graphics/renderer/tilemap/group-layer.renderer";
-import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
-import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
-import { RuleLayerData, TileLayerData } from "@/shared/data-types/layer.data";
-import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { GroupLayerRenderer } from "@/graphics/renderer/tilemap/group-layer.renderer";
+import { RuleLayerRenderer } from "@/graphics/renderer/tilemap/rule-layer.renderer";
+import { TileLayerRenderer } from "@/graphics/renderer/tilemap/tile-layer.renderer";
+import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
+import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { RuleLayerData, TileLayerData } from "@/shared/data-types/layer.data";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 
 import {
@@ -123,7 +123,6 @@ import {
     createTileLayerData,
     createTilemap,
 } from "../../application/commands/layer/layer-command-test-utils";
-import { createReferenceContext } from "../../editor/editor-test-utils";
 
 const flushAsync = async () => {
     await Promise.resolve();
@@ -352,8 +351,8 @@ describe("grid renderers", () => {
             name: "Terrain",
             columns: 2,
             rows: 2,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             image: { source: "terrain.png", width: 32, height: 32 },
             tiles: [],
         }, tilesetPathSystem, new EditorObjectRegistry());

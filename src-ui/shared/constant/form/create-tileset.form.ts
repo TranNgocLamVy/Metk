@@ -78,16 +78,16 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                                 orientation: "vertical",
                                 inputs: [
                                     {
-                                        id: "tilewidth",
-                                        name: "tilewidth",
+                                        id: "tileWidth",
+                                        name: "tileWidth",
                                         type: "number",
                                         label: "form.tileset.size.width",
                                         defaultValue: 16,
                                         required: true,
                                     },
                                     {
-                                        id: "tileheight",
-                                        name: "tileheight",
+                                        id: "tileHeight",
+                                        name: "tileHeight",
                                         type: "number",
                                         label: "form.tileset.size.height",
                                         defaultValue: 16,

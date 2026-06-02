@@ -90,8 +90,8 @@ export const normalizeTilesetData = (tilesetData: unknown): TilesetData => {
         type: validate.enum({ value: data.type, values: TilesetTypeValues, defaultValue: TilesetType.SingleImage }),
         columns: validate.number({ value: data.columns, defaultValue: 16, min: 1, integer: true }),
         rows: validate.number({ value: data.rows, defaultValue: 16, min: 1, integer: true }),
-        tilewidth: validate.number({ value: data.tilewidth, defaultValue: 16, min: 1, integer: true }),
-        tileheight: validate.number({ value: data.tileheight, defaultValue: 16, min: 1, integer: true }),
+        tileWidth: validate.number({ value: data.tileWidth, defaultValue: 16, min: 1, integer: true }),
+        tileHeight: validate.number({ value: data.tileHeight, defaultValue: 16, min: 1, integer: true }),
         image,
         tiles,
     };

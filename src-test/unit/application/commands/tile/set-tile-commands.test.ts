@@ -8,7 +8,7 @@ import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { RuleLayerData, RootLayerData, TileLayerData } from "@/shared/data-types/layer.data";
+import { RootLayerData, RuleLayerData, TileLayerData } from "@/shared/data-types/layer.data";
 import { TilemapData } from "@/shared/data-types/tilemap.data";
 
 import { createReferenceContext } from "../../../editor/editor-test-utils";
@@ -68,8 +68,8 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
         orientation: "orthogonal",
         width: 3,
         height: 3,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         backgroundcolor: "#00000000",
         tilesets: {
             refs: [

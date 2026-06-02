@@ -1,9 +1,9 @@
-import { RulesetRefData } from "@/shared/data-types/ruleset.data";
+import { EntityCollectionRefData } from "@/shared/data-types/entity-collection.data";
 import { LayerData } from "@/shared/data-types/layer.data";
+import { RulesetRefData } from "@/shared/data-types/ruleset.data";
 import { TilemapData, TilemapOrientationValues } from "@/shared/data-types/tilemap.data";
 import { TilesetRefData } from "@/shared/data-types/tileset.data";
 import { validate } from "@/shared/utils/validate.utils";
-import { EntityCollectionRefData } from "@/shared/data-types/entity-collection.data";
 
 export const DEFAULT_TILEMAP_WIDTH = 64;
 export const DEFAULT_TILEMAP_HEIGHT = 64;
@@ -127,14 +127,14 @@ export const normalizeTilemapData = (tilemapData: unknown): TilemapData => {
             min: 1,
             integer: true,
         }),
-        tilewidth: validate.number({
-            value: data.tilewidth,
+        tileWidth: validate.number({
+            value: data.tileWidth,
             defaultValue: DEFAULT_TILE_SIZE,
             min: 1,
             integer: true,
         }),
-        tileheight: validate.number({
-            value: data.tileheight,
+        tileHeight: validate.number({
+            value: data.tileHeight,
             defaultValue: DEFAULT_TILE_SIZE,
             min: 1,
             integer: true,

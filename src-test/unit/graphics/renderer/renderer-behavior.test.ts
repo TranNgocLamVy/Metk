@@ -131,15 +131,15 @@ vi.mock("pixi.js", () => ({
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: rendererMocks.appKernel }));
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: rendererMocks.workspaceService }));
 
-import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
-import { TilemapRenderer } from "@/graphics/renderer/tilemap/tilemap.renderer";
-import { TilesetRenderer } from "@/graphics/renderer/tileset/single-tileset.renderer";
-import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/single-tileset-selector.renderer";
-import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
-import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
+import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
+import { TilemapRenderer } from "@/graphics/renderer/tilemap/tilemap.renderer";
+import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
+import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/single-tileset-selector.renderer";
+import { TilesetRenderer } from "@/graphics/renderer/tileset/single-tileset.renderer";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 
@@ -180,8 +180,8 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof SingleIma
             name: "Terrain",
             columns: 2,
             rows: 2,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             image: { source: "textures/terrain.png", width: 32, height: 32 },
             tiles: [],
             ...overrides,

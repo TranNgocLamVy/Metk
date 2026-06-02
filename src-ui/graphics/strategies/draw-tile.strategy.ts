@@ -64,7 +64,7 @@ export class DrawTileStrategy implements IDrawStrategy {
                 sprite.alpha = DrawTileStrategy.spriteAlpha;
                 const drawPotision = layerRenderer.coordToPos({ col, row });
                 const spriteHeight = texture.height;
-                const tileHeight = layerRenderer.tilemap.tileheight;
+                const tileHeight = layerRenderer.tilemap.tileHeight;
                 sprite.position.set(drawPotision.x, drawPotision.y + (tileHeight - spriteHeight));
                 overlayContainer.addChild(sprite);
                 sprites.push(sprite);
@@ -99,7 +99,7 @@ export class DrawTileStrategy implements IDrawStrategy {
                 sprite.alpha = DrawTileStrategy.spriteAlpha;
                 const drawPotision = layerRenderer.coordToPos({ col, row });
                 const spriteHeight = texture.height;
-                const tileHeight = layerRenderer.tilemap.tileheight;
+                const tileHeight = layerRenderer.tilemap.tileHeight;
                 sprite.position.set(drawPotision.x, drawPotision.y + (tileHeight - spriteHeight));
                 data.push({ key: `${col},${row}`, sprite, coordinate: { col, row }, position: drawPotision, tileId: tile.id, tilesetId: tile.tileset.id });
             }

@@ -173,8 +173,8 @@ export class CollectionTilesetGridRenderer {
     }
 
     private getCellSize(): number {
-        const fallbackWidth = Math.max(1, this.tileset.tilewidth || 1);
-        const fallbackHeight = Math.max(1, this.tileset.tileheight || 1);
+        const fallbackWidth = Math.max(1, this.tileset.tileWidth || 1);
+        const fallbackHeight = Math.max(1, this.tileset.tileHeight || 1);
 
         const maxTileSide = this.tileset.tiles.reduce((max, tile) => {
             const { width, height } = this.getTileNaturalSize(tile);
@@ -188,11 +188,11 @@ export class CollectionTilesetGridRenderer {
         return {
             width: Math.max(
                 1,
-                tile.imageSource?.width ?? this.tileset.tilewidth ?? 1,
+                tile.imageSource?.width ?? this.tileset.tileWidth ?? 1,
             ),
             height: Math.max(
                 1,
-                tile.imageSource?.height ?? this.tileset.tileheight ?? 1,
+                tile.imageSource?.height ?? this.tileset.tileHeight ?? 1,
             ),
         };
     }

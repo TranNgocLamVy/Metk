@@ -1,8 +1,8 @@
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 import { Tileset } from "./tileset";
-import { FilePathSystem } from "@/infrastructure/project-path-system";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeTilesetData } from "./tileset.normalizer";
 
 export class ImageCollectionTileset extends Tileset {
@@ -76,8 +76,8 @@ export class ImageCollectionTileset extends Tileset {
         if (tileCount === 0) {
             this.columns = 1;
             this.rows = 1;
-            this.tilewidth = Math.max(1, this.tilewidth);
-            this.tileheight = Math.max(1, this.tileheight);
+            this.tileWidth = Math.max(1, this.tileWidth);
+            this.tileHeight = Math.max(1, this.tileHeight);
             return;
         }
 
@@ -87,14 +87,14 @@ export class ImageCollectionTileset extends Tileset {
 
         this.rows = Math.ceil(tileCount / this.columns);
 
-        this.tilewidth = Math.max(
+        this.tileWidth = Math.max(
             1,
-            ...this.tiles.map((tile) => tile.imageSource?.width ?? this.tilewidth),
+            ...this.tiles.map((tile) => tile.imageSource?.width ?? this.tileWidth),
         );
 
-        this.tileheight = Math.max(
+        this.tileHeight = Math.max(
             1,
-            ...this.tiles.map((tile) => tile.imageSource?.height ?? this.tileheight),
+            ...this.tiles.map((tile) => tile.imageSource?.height ?? this.tileHeight),
         );
     }
 
@@ -105,8 +105,8 @@ export class ImageCollectionTileset extends Tileset {
             type: TilesetType.ImageCollection,
             columns: this.columns,
             rows: this.rows,
-            tilewidth: this.tilewidth,
-            tileheight: this.tileheight,
+            tileWidth: this.tileWidth,
+            tileHeight: this.tileHeight,
             image: undefined,
             tiles: this.tiles.map((tile) => tile.serialize()),
         };

@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { TilemapSession } from "@/editor/session/tilemap.session";
-import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { TilemapData } from "@/shared/data-types/tilemap.data";
-import { createReferenceContext, loadRulesetRefs, loadTilesetRefs } from "./editor-test-utils";
-import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { CreateTileLayerCommand } from "@/application/commands/layer/create-tile-layer.command";
 import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
+import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
+import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { TilemapSession } from "@/editor/session/tilemap.session";
+import { TilemapData } from "@/shared/data-types/tilemap.data";
+import { createReferenceContext, loadRulesetRefs, loadTilesetRefs } from "./editor-test-utils";
 
 const createTilemap = () => {
     const context = createReferenceContext({ tilesets: ["tileset-a"], rulesets: ["ruleset-a"] });
@@ -23,8 +23,8 @@ const createTilemap = () => {
         orientation: "orthogonal",
         width: 4,
         height: 3,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         backgroundcolor: "#11223344",
         tilesets: context.tilesetRefManager.serialize(),
         rulesets: context.rulesetRefManager.serialize(),

@@ -1,9 +1,9 @@
 import { vi } from "vitest";
 
 import { EditorFacade } from "@/application/editor.facade";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { Tileset } from "@/editor/model/tileset/tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { Tileset } from "@/editor/model/tileset/tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilesetData } from "@/shared/data-types/tileset.data";
 import { Result } from "@/shared/types/result";
@@ -18,8 +18,8 @@ export const createTileset = (id = "tileset-a"): Tileset => {
         name: `${id} name`,
         columns: 2,
         rows: 2,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         image: {
             source: `textures/${id}.png`,
             width: 32,

@@ -4,13 +4,13 @@ import type { Tileset } from "@/editor/model/tileset/tileset";
 import { getTileSize } from "@/ui/dialogs/edit-entity-definition/graphics/entity-graphic-output-selector.renderer";
 
 function createTileset(
-    tilewidth: number,
-    tileheight: number,
+    tileWidth: number,
+    tileHeight: number,
     tile: { id: number; imageSource?: { width: number; height: number } | null } | null = null,
 ): Tileset {
     return {
-        tilewidth,
-        tileheight,
+        tileWidth,
+        tileHeight,
         getTileFromId: (id: number) => (tile?.id === id ? tile : null),
     } as unknown as Tileset;
 }

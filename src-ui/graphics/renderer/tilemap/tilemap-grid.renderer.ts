@@ -42,7 +42,7 @@ export class TilemapGridRenderer {
         const topLeft = new Point(this.viewport.left, this.viewport.top);
         const bottomRight = new Point(this.viewport.right, this.viewport.bottom)
 
-        let stepX = this.tilemap.tilewidth, stepY = this.tilemap.tileheight;
+        let stepX = this.tilemap.tileWidth, stepY = this.tilemap.tileHeight;
         let minX = Math.floor(topLeft.x / stepX) * stepX;
         let minY = Math.floor(topLeft.y / stepY) * stepY;
         let maxX = Math.ceil(bottomRight.x / stepX) * stepX;

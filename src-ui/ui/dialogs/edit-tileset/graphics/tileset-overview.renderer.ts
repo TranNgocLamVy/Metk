@@ -1,3 +1,4 @@
+import { readFile } from "@tauri-apps/plugin-fs";
 import {
     Application,
     Container,
@@ -7,12 +8,11 @@ import {
     Sprite,
     Texture,
 } from "pixi.js";
-import { readFile } from "@tauri-apps/plugin-fs";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
-import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 
 type TilesetOverviewRenderOptions = {
@@ -237,8 +237,8 @@ function getSingleImageTilesetLayoutInfo(tileset: Tileset): TilesetLayoutInfo {
         tileset.rows || Math.ceil(tileset.tiles.length / columns),
     );
 
-    const cellWidth = Math.max(1, tileset.tilewidth);
-    const cellHeight = Math.max(1, tileset.tileheight);
+    const cellWidth = Math.max(1, tileset.tileWidth);
+    const cellHeight = Math.max(1, tileset.tileHeight);
 
     const layouts = tileset.tiles.map((tile, index) => {
         const col = index % columns;
@@ -328,8 +328,8 @@ function getCollectionTilesetLayoutInfo(tileset: Tileset): TilesetLayoutInfo {
 function getCollectionCellSize(tileset: Tileset): number {
     return Math.max(
         1,
-        tileset.tilewidth || 1,
-        tileset.tileheight || 1,
+        tileset.tileWidth || 1,
+        tileset.tileHeight || 1,
         ...tileset.tiles.map((tile) => {
             const size = getTileNaturalSize(tileset, tile);
             return Math.max(size.width, size.height);
@@ -345,8 +345,8 @@ function getTileNaturalSize(
     height: number;
 } {
     return {
-        width: Math.max(1, tile.imageSource?.width ?? tileset.tilewidth ?? 1),
-        height: Math.max(1, tile.imageSource?.height ?? tileset.tileheight ?? 1),
+        width: Math.max(1, tile.imageSource?.width ?? tileset.tileWidth ?? 1),
+        height: Math.max(1, tile.imageSource?.height ?? tileset.tileHeight ?? 1),
     };
 }
 

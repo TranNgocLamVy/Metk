@@ -10,8 +10,8 @@ const createTilemapData = (): TilemapData => ({
     orientation: "orthogonal",
     width: 2,
     height: 2,
-    tilewidth: 16,
-    tileheight: 16,
+    tileWidth: 16,
+    tileHeight: 16,
     backgroundcolor: "#00000000",
     tilesets: {
         refs: [{ index: 0, id: "tileset-a", name: "Tileset A" }],
@@ -131,8 +131,8 @@ describe("Tilemap", () => {
             orientation: "orthogonal",
             width: 64,
             height: 64,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             backgroundcolor: "#00000000",
             layers: [],
         });
@@ -160,8 +160,8 @@ describe("Tilemap", () => {
                 orientation: "sideways",
                 width: 0,
                 height: Number.NaN,
-                tilewidth: -1,
-                tileheight: Infinity,
+                tileWidth: -1,
+                tileHeight: Infinity,
                 layers: "not-layers",
             },
             context.filePathSystem,
@@ -176,8 +176,8 @@ describe("Tilemap", () => {
             orientation: "orthogonal",
             width: 64,
             height: 64,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             layers: [],
         });
     });

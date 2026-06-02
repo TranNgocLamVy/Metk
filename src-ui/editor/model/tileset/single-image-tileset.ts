@@ -1,11 +1,11 @@
 import { Point2DProperty, StringProperty } from "@/editor/properties/properties.decorator";
-import { Tileset } from "./tileset";
-import { ImageSource } from "../image-source";
-import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
-import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { ImageSourceData } from "@/shared/data-types/image-source.data";
+import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 import { PropertyUpdateMeta } from "../base-object";
+import { ImageSource } from "../image-source";
+import { Tileset } from "./tileset";
 import { normalizeTilesetData } from "./tileset.normalizer";
 
 export class SingleImageTileset extends Tileset {
@@ -45,8 +45,8 @@ export class SingleImageTileset extends Tileset {
 
         const sourceData = tilesetData.image ?? {
             source: "",
-            width: this.columns * this.tilewidth,
-            height: this.rows * this.tileheight,
+            width: this.columns * this.tileWidth,
+            height: this.rows * this.tileHeight,
         };
 
         this.imageSource = new ImageSource(sourceData);
@@ -70,8 +70,8 @@ export class SingleImageTileset extends Tileset {
 
         const imageSourceData = data.image ?? {
             source: "",
-            width: this.columns * this.tilewidth,
-            height: this.rows * this.tileheight,
+            width: this.columns * this.tileWidth,
+            height: this.rows * this.tileHeight,
         };
 
         this.imageSource.setSource(imageSourceData);
@@ -105,8 +105,8 @@ export class SingleImageTileset extends Tileset {
             type: TilesetType.SingleImage,
             columns: this.columns,
             rows: this.rows,
-            tilewidth: this.tilewidth,
-            tileheight: this.tileheight,
+            tileWidth: this.tileWidth,
+            tileHeight: this.tileHeight,
             image: this.imageSource.serialize(),
             tiles: this.tiles.map((tile) => tile.serialize()),
         };

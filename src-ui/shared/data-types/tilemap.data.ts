@@ -1,7 +1,7 @@
+import { EntityCollectionRefData } from "./entity-collection.data";
 import { RootLayerData } from "./layer.data";
 import { RulesetRefData } from "./ruleset.data";
 import { TilesetRefData } from "./tileset.data";
-import { EntityCollectionRefData } from "./entity-collection.data";
 
 export type TilemapMetadata = {
     name: string;
@@ -33,8 +33,8 @@ export type TilemapData = {
     orientation: TilemapOrientation;
     height: number;
     width: number;
-    tilewidth: number;
-    tileheight: number;
+    tileWidth: number;
+    tileHeight: number;
     backgroundcolor: string;
     tilesets: {
         refs: TilesetRefData[];
@@ -51,4 +51,4 @@ export type TilemapData = {
     layers: RootLayerData;
 };
 
-export type CreateTilemapPayload = Pick<TilemapData, "id" | "name" | "orientation" | "height" | "width" | "tilewidth" | "tileheight">;
+export type CreateTilemapPayload = Pick<TilemapData, "id" | "name" | "orientation" | "height" | "width" | "tileWidth" | "tileHeight">;

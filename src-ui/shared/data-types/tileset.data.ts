@@ -29,8 +29,8 @@ export type TilesetData = {
     type?: TilesetType;
     columns: number;
     rows: number;
-    tilewidth: number;
-    tileheight: number;
+    tileWidth: number;
+    tileHeight: number;
     image?: ImageSourceData;
     tiles: TileData[];
 };

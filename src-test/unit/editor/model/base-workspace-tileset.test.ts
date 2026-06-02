@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { v4 as uuidv4 } from "uuid";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const workspaceModelMocks = vi.hoisted(() => {
     const instances = {
@@ -68,10 +68,10 @@ vi.mock("@/application/workspace/session/tool-session.manager", () => ({ ToolSes
 vi.mock("@/application/workspace/workspace-saved-path.manager", () => ({ WorkspaceSavedPathManager: workspaceModelMocks.MockWorkspaceSavedPathManager }));
 
 import { BaseObject } from "@/editor/model/base-object";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { NumberProperty, StringProperty } from "@/editor/properties/properties.decorator";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { defaultWorkspaceData } from "@/shared/data-types/workspace.data";
 import { Result } from "@/shared/types/result";
@@ -107,8 +107,8 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof SingleIma
         name: "Terrain",
         columns: 2,
         rows: 2,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         image: { source: "textures/terrain.png", width: 32, height: 32 },
         tiles: [],
         ...overrides,

@@ -1,13 +1,13 @@
-import { EventEmitter } from "eventemitter3";
-import { Assets, Rectangle, Texture } from "pixi.js";
-import { exists, readFile } from "@tauri-apps/plugin-fs";
 import errorTexture from "@/assets/sprites/Missing_texture.png";
+import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { Console } from "@/shared/services/console.service";
 import { Result } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/texture.utils";
-import { Console } from "@/shared/services/console.service";
-import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
-import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
+import { exists, readFile } from "@tauri-apps/plugin-fs";
+import { EventEmitter } from "eventemitter3";
+import { Assets, Rectangle, Texture } from "pixi.js";
 
 interface TextureManagerEvent {
     onTextureReloaded: (tilesetId: string) => void;
@@ -77,8 +77,8 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
     
         const slicedTextures = this.sliceTexture(
             baseTexture,
-            tileset.tilewidth,
-            tileset.tileheight,
+            tileset.tileWidth,
+            tileset.tileHeight,
         );
     
         const tileTextureMap = new Map<number, Texture>();
@@ -204,7 +204,7 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
 
         this.baseTexturesCache.set(tileset.id, texture);
 
-        const slicedTextures = this.sliceTexture(texture, tileset.tilewidth, tileset.tileheight);
+        const slicedTextures = this.sliceTexture(texture, tileset.tileWidth, tileset.tileHeight);
         const tileTextureMap = new Map<number, Texture>();
         const sortedTiles = Array.from(tileset.tiles).sort((a, b) => a.id - b.id);
 

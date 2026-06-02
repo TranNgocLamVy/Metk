@@ -1,15 +1,15 @@
-import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
-import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
+import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
+import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
 import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { EntityCollectionRefManager } from "@/application/resources/references/entity-collection-ref.manager";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { RulesetManager } from "@/application/resources/ruleset/ruleset.manager";
+import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { RulesetData } from "@/shared/data-types/ruleset.data";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { RootLayerData } from "@/shared/data-types/layer.data";
-import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
+import { RulesetData } from "@/shared/data-types/ruleset.data";
 
 type ReferenceContextOptions = {
     tilesets?: string[];
@@ -84,8 +84,8 @@ export const createTilemap = (
             orientation: "orthogonal",
             width: 8,
             height: 8,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             tilesets: context.tilesetRefManager.serialize(),
             rulesets: context.rulesetRefManager.serialize(),
             entityCollections: context.entityCollectionRefManager.serialize(),

@@ -1,8 +1,8 @@
 import { Container, FederatedPointerEvent, Point } from "pixi.js";
 
-import { Tile, Tileset } from "@/editor/model/tileset/tileset";
-import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 import { CollectionTileLayout } from "@/graphics/renderer/tileset/collection-tileset-grid.renderer";
 
 export type PointLike = {
@@ -164,8 +164,8 @@ export abstract class TileLayoutResolver {
 
     protected getTileNaturalSize(tile: Tile): { width: number; height: number } {
         return {
-            width: Math.max(1, tile.imageSource?.width ?? this.tileset.tilewidth ?? 1),
-            height: Math.max(1, tile.imageSource?.height ?? this.tileset.tileheight ?? 1),
+            width: Math.max(1, tile.imageSource?.width ?? this.tileset.tileWidth ?? 1),
+            height: Math.max(1, tile.imageSource?.height ?? this.tileset.tileHeight ?? 1),
         };
     }
 
@@ -200,7 +200,7 @@ export abstract class TileLayoutResolver {
 
         /**
          * Fallback to single-image resolver because the base Tileset still has
-         * tilewidth/tileheight/columns/rows.
+         * tileWidth/tileHeight/columns/rows.
          */
         return new SingleImageTileLayoutResolver(context);
     }
@@ -218,8 +218,8 @@ export class SingleImageTileLayoutResolver extends TileLayoutResolver {
         const index = this.tileset.tiles.findIndex((candidate) => candidate.id === tile.id);
         if (index < 0) return null;
 
-        const sourceWidth = Math.max(1, this.tileset.tilewidth);
-        const sourceHeight = Math.max(1, this.tileset.tileheight);
+        const sourceWidth = Math.max(1, this.tileset.tileWidth);
+        const sourceHeight = Math.max(1, this.tileset.tileHeight);
 
         const x = coordinates.col * sourceWidth;
         const y = coordinates.row * sourceHeight;

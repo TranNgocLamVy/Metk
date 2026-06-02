@@ -53,10 +53,10 @@ vi.mock("@tauri-apps/plugin-fs", () => textureMocks.fs);
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: textureMocks.textureUtils }));
 vi.mock("@/shared/services/console.service", () => ({ Console: textureMocks.console }));
 
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { TextureManager } from "@/graphics/texture/texture.manager";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { TextureManager } from "@/graphics/texture/texture.manager";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { Result } from "@/shared/types/result";
 
 const createTileset = (id = "terrain") => {
@@ -68,8 +68,8 @@ const createTileset = (id = "terrain") => {
             name: `${id} tiles`,
             columns: 2,
             rows: 1,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             image: { source: `../textures/${id}.png`, width: 32, height: 16 },
             tiles: [],
         },

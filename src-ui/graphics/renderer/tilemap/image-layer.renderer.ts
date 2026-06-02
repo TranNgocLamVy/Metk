@@ -149,15 +149,15 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
 
     public override posToCoord(pos: Position): Coordinate {
         return {
-            col: Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tilewidth),
-            row: Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileheight),
+            col: Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tileWidth),
+            row: Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileHeight),
         };
     }
 
     public override coordToPos(coord: Coordinate): Position {
         return {
-            x: coord.col * this.tilemap.tilewidth + this.layer.offset.x,
-            y: coord.row * this.tilemap.tileheight + this.layer.offset.y,
+            x: coord.col * this.tilemap.tileWidth + this.layer.offset.x,
+            y: coord.row * this.tilemap.tileHeight + this.layer.offset.y,
         };
     }
 

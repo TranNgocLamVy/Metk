@@ -2,9 +2,9 @@ import { XMLParser } from "fast-xml-parser";
 import { describe, expect, it } from "vitest";
 
 import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter";
-import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { TilemapData } from "@/shared/data-types/tilemap.data";
 import { TilesetData } from "@/shared/data-types/tileset.data";
 import {
@@ -39,8 +39,8 @@ const createTilesetData = (overrides: Partial<TilesetData>): TilesetData => ({
     name: "Tileset",
     columns: 1,
     rows: 1,
-    tilewidth: 16,
-    tileheight: 16,
+    tileWidth: 16,
+    tileHeight: 16,
     image: {
         source: "tiles.png",
         width: 16,
@@ -111,8 +111,8 @@ const createTilemap = (context: ReturnType<typeof createReferenceContext>, overr
         orientation: "orthogonal",
         width: 2,
         height: 2,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         backgroundcolor: "#00000000",
         tilesets: {
             refs: [
@@ -171,15 +171,15 @@ describe("TmxTilemapExporter", () => {
             orientation: "orthogonal",
             width: 2,
             height: 2,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
         }));
         expect(parsed.map.tileset).toEqual([
             expect.objectContaining({
                 firstgid: 1,
                 name: "Terrain",
-                tilewidth: 16,
-                tileheight: 16,
+                tileWidth: 16,
+                tileHeight: 16,
                 tilecount: 3,
                 columns: 3,
                 image: expect.objectContaining({ source: "../tilesets/terrain.png", width: 48, height: 16 }),

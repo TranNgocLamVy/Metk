@@ -90,7 +90,9 @@ vi.mock("react-i18next", () => ({
     useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-import { Result } from "@/shared/types/result";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { DialogService } from "@/shared/services/dialog.service";
 import { ProjectService } from "@/shared/services/project.service";
 import { RulesetService } from "@/shared/services/ruleset.service";
@@ -98,10 +100,8 @@ import { TextureService } from "@/shared/services/texture.service";
 import { TilemapService } from "@/shared/services/tilemap.service";
 import { TilesetService } from "@/shared/services/tileset.service";
 import { WorkspaceService } from "@/shared/services/workspace.service";
+import { Result } from "@/shared/types/result";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
-import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 
 const resetNavigationStore = () => {
     useNavigationStore.setState({ navigate: null });
@@ -194,8 +194,8 @@ const createSingleImageTileset = () => {
         name: "Terrain",
         columns: 2,
         rows: 2,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
         image: { source: "../textures/terrain.png", width: 32, height: 32 },
         tiles: [],
     }, tilesetPathSystem, new EditorObjectRegistry());
@@ -349,7 +349,7 @@ describe("TilemapService orchestration", () => {
             tilemap: { name: "Overworld", type: "orthogonal" },
             options: {
                 map: { mapwidth: 20, mapheight: 10 },
-                tile: { tilewidth: 16, tileheight: 16 },
+                tile: { tileWidth: 16, tileHeight: 16 },
             },
         } as any);
         serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/tilemaps/overworld.tm.json");
@@ -402,7 +402,7 @@ describe("TilesetService orchestration", () => {
             tileset: { name: "Terrain", type: "single-image" },
             image: {
                 source: ["C:/project/textures/terrain.png"],
-                setting: { tile: { tilewidth: 16, tileheight: 16 } },
+                setting: { tile: { tileWidth: 16, tileHeight: 16 } },
             },
         } as any);
         serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/tilesets/terrain.ts.json");

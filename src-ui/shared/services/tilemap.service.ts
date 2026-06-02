@@ -1,16 +1,16 @@
-import { v4 as uuidv4 } from "uuid";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { CreateTilemapPayload, TilemapData, TilemapOrientation } from "../data-types/tilemap.data";
-import { FileDialogUtils } from "../utils/file-dialog.utils";
-import { Result } from "../types/result";
-import { WorkspaceService } from "./workspace.service";
-import { TilemapStorageService } from "@/infrastructure/container";
-import { PathUtils } from "../utils/path.utils";
-import { DialogService } from "./dialog.service";
-import { createTilemapForm } from "../constant/form/create-tilemap.form";
-import { Console } from "./console.service";
-import i18n from "@/shared/services/i18n.service";
 import { extractTilemapId, normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
+import { TilemapStorageService } from "@/infrastructure/container";
+import i18n from "@/shared/services/i18n.service";
+import { v4 as uuidv4 } from "uuid";
+import { createTilemapForm } from "../constant/form/create-tilemap.form";
+import { CreateTilemapPayload, TilemapData, TilemapOrientation } from "../data-types/tilemap.data";
+import { Result } from "../types/result";
+import { FileDialogUtils } from "../utils/file-dialog.utils";
+import { PathUtils } from "../utils/path.utils";
+import { Console } from "./console.service";
+import { DialogService } from "./dialog.service";
+import { WorkspaceService } from "./workspace.service";
 
 export class TilemapService {
     public static async createTilemap(): Promise<void> {
@@ -36,8 +36,8 @@ export class TilemapService {
             orientation: form.tilemap.type as TilemapOrientation,
             height: form.options.map.mapheight,
             width: form.options.map.mapwidth,
-            tilewidth: form.options.tile.tilewidth,
-            tileheight: form.options.tile.tileheight,
+            tileWidth: form.options.tile.tileWidth,
+            tileHeight: form.options.tile.tileHeight,
         }
 
         let tilemapData: TilemapData;

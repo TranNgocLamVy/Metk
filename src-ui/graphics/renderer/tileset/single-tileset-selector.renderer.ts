@@ -1,10 +1,10 @@
 import { Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 
-import { TilesetSession } from "@/editor/session/tileset.session";
+import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tile } from "@/editor/model/tileset/tileset";
+import { TilesetSession } from "@/editor/session/tileset.session";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 import { usePropertyStore } from "@/ui/stores/property.store";
-import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 
 export type CreateTilesetViewSelectorContext = {
     tileset: SingleImageTileset;
@@ -205,8 +205,8 @@ export class TilesetSelectorRenderer {
         if (!merged) return;
         const { rect: shape, topLeft } = merged;
 
-        const tilewidth = this.tileset.tilewidth;
-        const tileheight = this.tileset.tileheight;
+        const tileWidth = this.tileset.tileWidth;
+        const tileHeight = this.tileset.tileHeight;
         const rowsCount = shape.length;
         const colsCount = shape[0].length;
 
@@ -238,10 +238,10 @@ export class TilesetSelectorRenderer {
                 }
                 const minR = topLeft.row + r;
                 const minC = topLeft.col + c;
-                const x = minC * (tilewidth);
-                const y = minR * (tileheight);
-                const w = run * (tilewidth);
-                const h = height * (tileheight);
+                const x = minC * (tileWidth);
+                const y = minR * (tileHeight);
+                const w = run * (tileWidth);
+                const h = height * (tileHeight);
                 this.graphics.rect(x, y, w, h);
             }
         }
@@ -403,16 +403,16 @@ export class TilesetSelectorRenderer {
     }
 
     private posToCoordinates(x: number, y: number): Coordinate | null {
-        const tilewidth = this.tileset.tilewidth;
-        const tileheight = this.tileset.tileheight;
+        const tileWidth = this.tileset.tileWidth;
+        const tileHeight = this.tileset.tileHeight;
         const columns = this.tileset.columns;
 
-        if (tilewidth <= 0 || tileheight <= 0 || columns <= 0) return null;
+        if (tileWidth <= 0 || tileHeight <= 0 || columns <= 0) return null;
         if (x < 0 || y < 0) return null;
 
 
-        const col = Math.floor(x / (tilewidth));
-        const row = Math.floor(y / (tileheight));
+        const col = Math.floor(x / (tileWidth));
+        const row = Math.floor(y / (tileHeight));
         if (col < 0 || row < 0) return null;
         return { row: Math.min(row, this.tileset.rows - 1), col: Math.min(col, this.tileset.columns - 1) };
     }

@@ -1,11 +1,11 @@
-import { Application, Container, FederatedPointerEvent, Graphics, Sprite, Texture } from "pixi.js";
 import { Viewport } from "pixi-viewport";
+import { Application, Container, FederatedPointerEvent, Graphics, Sprite, Texture } from "pixi.js";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
-import { CollisionEditorController } from "@/graphics/renderer/collision/collision-editor.controller";
 import { CollisionEditorLayerRenderer } from "@/graphics/renderer/collision/collision-editor-layer.renderer";
+import { CollisionEditorController } from "@/graphics/renderer/collision/collision-editor.controller";
 import { PointLike, TileLayout, TileLayoutResolver, TileLayoutResolverContext } from "@/graphics/renderer/collision/tile-layout-resolver";
 
 type SelectedTileRendererOptions = {
@@ -455,13 +455,13 @@ function getTileSourceSize(
 } {
     if (tileset instanceof ImageCollectionTileset) {
         return {
-            width: Math.max(1, tile.imageSource?.width ?? tileset.tilewidth ?? 1),
-            height: Math.max(1, tile.imageSource?.height ?? tileset.tileheight ?? 1),
+            width: Math.max(1, tile.imageSource?.width ?? tileset.tileWidth ?? 1),
+            height: Math.max(1, tile.imageSource?.height ?? tileset.tileHeight ?? 1),
         };
     }
 
     return {
-        width: Math.max(1, tileset.tilewidth),
-        height: Math.max(1, tileset.tileheight),
+        width: Math.max(1, tileset.tileWidth),
+        height: Math.max(1, tileset.tileHeight),
     };
 }

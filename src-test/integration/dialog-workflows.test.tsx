@@ -2,14 +2,14 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import DialogRoot from "@/ui/components/dialog/DialogRoot";
-import { DIALOG_TYPES } from "@/ui/components/dialog/dialogRegistry";
-import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { WorkspaceService } from "@/shared/services/workspace.service";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { WorkspaceService } from "@/shared/services/workspace.service";
+import { DialogZLevel } from "@/shared/types/dialog";
+import DialogRoot from "@/ui/components/dialog/DialogRoot";
+import { DIALOG_TYPES } from "@/ui/components/dialog/dialogRegistry";
+import { useDialogStore } from "@/ui/stores/dialog.store";
 
 type ResettableStore<T> = {
     getInitialState: () => T;
@@ -384,8 +384,8 @@ describe("Metk dialog and form integration workflows", () => {
             name: "Terrain Tiles",
             columns: 8,
             rows: 4,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             image: {
                 source: "textures/terrain.png",
                 width: 128,

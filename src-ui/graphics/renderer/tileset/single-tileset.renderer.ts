@@ -1,7 +1,7 @@
 import { Container, Sprite, Texture } from "pixi.js";
 
-import { Tileset } from "@/editor/model/tileset/tileset";
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { Tileset } from "@/editor/model/tileset/tileset";
 
 export type CreateTilesetRendererContext = {
     tileset: Tileset;
@@ -39,8 +39,8 @@ export class TilesetRenderer {
                 texture = errorTexture;
             }
             const sprite = this.makeTileSprite(texture, i, this.container);
-            sprite.width = this.tileset.tilewidth;
-            sprite.height = this.tileset.tileheight;
+            sprite.width = this.tileset.tileWidth;
+            sprite.height = this.tileset.tileHeight;
             this.sprites.push(sprite);
             this.container.addChild(sprite);
         }
@@ -62,11 +62,11 @@ export class TilesetRenderer {
     }
 
     private indexToPos(index: number): { x: number, y: number } {
-        const tilewidth = this.tileset.tilewidth;
-        const tileheight = this.tileset.tileheight;
+        const tileWidth = this.tileset.tileWidth;
+        const tileHeight = this.tileset.tileHeight;
         const columns = this.tileset.columns;
-        const x = (index % columns) * (tilewidth);
-        const y = Math.floor(index / columns) * (tileheight);
+        const x = (index % columns) * (tileWidth);
+        const y = Math.floor(index / columns) * (tileHeight);
         return { x, y };
     }
 

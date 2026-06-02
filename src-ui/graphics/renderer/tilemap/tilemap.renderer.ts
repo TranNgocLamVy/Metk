@@ -40,9 +40,9 @@ export class TilemapRenderer {
         this.borderGraphic.clear();
 
         const { width, height } = this.tilemap;
-        const { tilewidth , tileheight } = this.tilemap;
+        const { tileWidth , tileHeight } = this.tilemap;
 
-        const minX = 0, maxX = width * tilewidth, minY = 0, maxY = height * tileheight;
+        const minX = 0, maxX = width * tileWidth, minY = 0, maxY = height * tileHeight;
 
         this.borderGraphic.moveTo(minX, minY).lineTo(maxX, minY).lineTo(maxX, maxY).lineTo(minX, maxY).lineTo(minX, minY);
 

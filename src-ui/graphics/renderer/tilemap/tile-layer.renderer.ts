@@ -69,8 +69,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         if (!texture) {
             const errorTexture = await textureManager.getErrorTexture();
             currentSprite.texture = errorTexture;
-            currentSprite.width = this.tilemap.tilewidth;
-            currentSprite.height = this.tilemap.tileheight;
+            currentSprite.width = this.tilemap.tileWidth;
+            currentSprite.height = this.tilemap.tileHeight;
         } else {
             currentSprite.texture = texture;
             currentSprite.width = texture.width;
@@ -79,8 +79,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
 
         const drawPosition = this.coordToPos({ col, row });
 
-        const spriteHeight = currentSprite.texture ? currentSprite.texture.height : this.tilemap.tileheight;
-        const tileHeight = this.tilemap.tileheight;
+        const spriteHeight = currentSprite.texture ? currentSprite.texture.height : this.tilemap.tileHeight;
+        const tileHeight = this.tilemap.tileHeight;
 
         currentSprite.position.set(drawPosition.x, drawPosition.y + (tileHeight - spriteHeight));
     }
@@ -95,8 +95,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     public override posToCoord(pos: Position): Coordinate {
         switch (this.tilemap.orientation) {
             case "orthogonal":
-                const col = Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tilewidth) - this.layer.coordinate.col;
-                const row = Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileheight) - this.layer.coordinate.row;
+                const col = Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tileWidth) - this.layer.coordinate.col;
+                const row = Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileHeight) - this.layer.coordinate.row;
                 return { col, row };
             case "isometric":
                 // TODO: Implement isometric
@@ -116,8 +116,8 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
     public override coordToPos(coord: Coordinate): Position {
         switch (this.tilemap.orientation) {
             case "orthogonal":
-                const x = (coord.col + this.layer.coordinate.col) * this.tilemap.tilewidth + this.layer.offset.x;
-                const y = (coord.row + this.layer.coordinate.row) * this.tilemap.tileheight + this.layer.offset.y;
+                const x = (coord.col + this.layer.coordinate.col) * this.tilemap.tileWidth + this.layer.offset.x;
+                const y = (coord.row + this.layer.coordinate.row) * this.tilemap.tileHeight + this.layer.offset.y;
                 return { x, y };
             case "isometric":
                 // TODO: Implement isometric

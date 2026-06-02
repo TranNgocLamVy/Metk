@@ -97,16 +97,16 @@ export const createTilemapForm = () => {
                         label: "form.tilemap.tileSize.label",
                         inputs: [
                             {
-                                id: "tilewidth",
-                                name: "tilewidth",
+                                id: "tileWidth",
+                                name: "tileWidth",
                                 type: "number",
                                 label: "form.tilemap.tileSize.width",
                                 defaultValue: 16,
                                 required: true,
                             },
                             {
-                                id: "tileheight",
-                                name: "tileheight",
+                                id: "tileHeight",
+                                name: "tileHeight",
                                 type: "number",
                                 label: "form.tilemap.tileSize.height",
                                 defaultValue: 16,

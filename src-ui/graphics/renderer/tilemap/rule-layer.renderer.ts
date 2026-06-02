@@ -77,8 +77,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         if (!output && ruleset) {
             currentSprite.texture = Texture.WHITE;
             currentSprite.tint = ruleset ? new Color(ruleset.color) : 0xFF0000;
-            currentSprite.width = this.tilemap.tilewidth;
-            currentSprite.height = this.tilemap.tileheight;
+            currentSprite.width = this.tilemap.tileWidth;
+            currentSprite.height = this.tilemap.tileHeight;
         } else if (outputTexture && ruleset) {
             currentSprite.texture = outputTexture;
             currentSprite.tint = 0xFFFFFF; // Clear tint to show natural texture colors
@@ -88,8 +88,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
             const errorTexture = await textureManager.getErrorTexture();
             currentSprite.texture = errorTexture;
             currentSprite.tint = 0xFFFFFF;
-            currentSprite.width = this.tilemap.tilewidth;
-            currentSprite.height = this.tilemap.tileheight;
+            currentSprite.width = this.tilemap.tileWidth;
+            currentSprite.height = this.tilemap.tileHeight;
         }
     }
 
@@ -110,8 +110,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     public override posToCoord(pos: Position): Coordinate {
         switch (this.tilemap.orientation) {
             case "orthogonal":
-                const col = Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tilewidth) - this.layer.coordinate.col;
-                const row = Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileheight) - this.layer.coordinate.row;
+                const col = Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tileWidth) - this.layer.coordinate.col;
+                const row = Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileHeight) - this.layer.coordinate.row;
                 return { col, row };
             case "isometric":
                 // TODO: Implement isometric
@@ -131,8 +131,8 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
     public override coordToPos(coord: Coordinate): Position {
         switch (this.tilemap.orientation) {
             case "orthogonal":
-                const x = (coord.col + this.layer.coordinate.col) * this.tilemap.tilewidth + this.layer.offset.x;
-                const y = (coord.row + this.layer.coordinate.row) * this.tilemap.tileheight + this.layer.offset.y;
+                const x = (coord.col + this.layer.coordinate.col) * this.tilemap.tileWidth + this.layer.offset.x;
+                const y = (coord.row + this.layer.coordinate.row) * this.tilemap.tileHeight + this.layer.offset.y;
                 return { x, y };
             case "isometric":
                 // TODO: Implement isometric

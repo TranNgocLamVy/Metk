@@ -154,8 +154,8 @@ const terrainTileset = {
     id: "terrain",
     columns: 2,
     rows: 2,
-    tilewidth: 16,
-    tileheight: 16,
+    tileWidth: 16,
+    tileHeight: 16,
     tiles: [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }],
 };
 

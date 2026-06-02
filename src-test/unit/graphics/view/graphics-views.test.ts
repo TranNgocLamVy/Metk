@@ -136,12 +136,12 @@ vi.mock("@/graphics/renderer/tileset/single-tileset.renderer", () => ({ TilesetR
 vi.mock("@/graphics/renderer/tileset/single-tileset-selector.renderer", () => ({ TilesetSelectorRenderer: viewMocks.MockTilesetSelectorRenderer }));
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: viewMocks.workspaceService }));
 
-import { TilemapView } from "@/graphics/view/tilemap.view";
-import { SingleImageTilesetView } from "@/graphics/view/single-tileset.view";
-import { WorkspaceService } from "@/shared/services/workspace.service";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { SingleImageTilesetView } from "@/graphics/view/single-tileset.view";
+import { TilemapView } from "@/graphics/view/tilemap.view";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { WorkspaceService } from "@/shared/services/workspace.service";
 
 type MockViewport = InstanceType<typeof viewMocks.MockViewport>;
 
@@ -165,8 +165,8 @@ const createTilemapSession = () => ({
         id: "tilemap-a",
         width: 10,
         height: 8,
-        tilewidth: 16,
-        tileheight: 16,
+        tileWidth: 16,
+        tileHeight: 16,
     },
     viewState: { x: 128, y: 96, zoom: 2 },
     updateViewState: vi.fn(function (this: any, state: any) {
@@ -184,8 +184,8 @@ const createTilesetSession = () => {
             name: "Terrain",
             columns: 2,
             rows: 2,
-            tilewidth: 16,
-            tileheight: 16,
+            tileWidth: 16,
+            tileHeight: 16,
             image: { source: "textures/terrain.png", width: 32, height: 32 },
             tiles: [],
         }, tilesetPathSystem, new EditorObjectRegistry()),
