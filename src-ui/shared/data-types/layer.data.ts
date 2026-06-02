@@ -56,6 +56,7 @@ export type EntityRefData = {
 
 export type EntityInstanceData = {
     id: string;
+    name?: string;
     entityRef: EntityRefData;
     x: number;
     y: number;

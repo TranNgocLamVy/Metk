@@ -1,19 +1,20 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
+import { EntityInstance } from "@/editor/model/entity/entity-instance";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
 import { EntityInstanceData, EntityLayerData, EntityRefData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 import { validate } from "@/shared/utils/validate.utils";
-import { PropertyUpdateMeta } from "../../base-object";
+import { BaseObject, PropertyUpdateMeta } from "../../base-object";
 import { Tilemap } from "../tilemap";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { AddEntityData } from "@/application/commands/layer/add-entity.command";
 
 export interface EntityLayerEvents extends BaseLayerEvents {
     entitiesChanged: (entityIds: string[]) => void;
-    entityAdded: (entity: EntityInstanceData) => void;
-    entityRemoved: (entity: EntityInstanceData) => void;
+    entityAdded: (entity: EntityInstance) => void;
+    entityRemoved: (entity: EntityInstance) => void;
 }
 
 export class EntityLayer extends BaseLayer<EntityLayerEvents> {
@@ -26,7 +27,7 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
     })
     public offset: Point2D = { x: 0, y: 0 };
 
-    private entities: EntityInstanceData[] = [];
+    private entities: EntityInstance[] = [];
 
     public constructor(
         entityLayerData: EntityLayerData,
@@ -86,28 +87,34 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
         });
 
         this.entities = rawEntities
-            .map((raw) => this.normalizeEntityInstance(raw))
-            .filter((entity): entity is EntityInstanceData => entity !== null);
+            .map((raw) => this.createEntityInstance(raw))
+            .filter((entity): entity is EntityInstance => entity !== null);
+
+        this.entities.forEach((entity) => this.bindEntityInstanceEvents(entity));
     }
 
-    public getAllEntities(): EntityInstanceData[] {
-        return this.entities.map((entity) => ({
-            ...entity,
-            entityRef: { ...entity.entityRef },
-            fields: entity.fields ? { ...entity.fields } : undefined,
-        }));
+    public override getObjectChildren(): BaseObject<any>[] {
+        return this.entities;
     }
 
-    public getEntityById(entityId: string): EntityInstanceData | null {
+    public getAllEntities(): EntityInstance[] {
+        return [...this.entities];
+    }
+
+    public getAllEntityData(): EntityInstanceData[] {
+        return this.entities.map((entity) => entity.toData());
+    }
+
+    public getEntityById(entityId: string): EntityInstance | null {
         return this.entities.find((entity) => entity.id === entityId) ?? null;
     }
 
-    public getEntityDefinition(entity: EntityInstanceData | EntityRefData): EntityDefinition | null {
+    public getEntityDefinition(entity: EntityInstance | EntityInstanceData | EntityRefData): EntityDefinition | null {
         const entityRef = "entityRef" in entity ? entity.entityRef : entity;
         return this.entityCollectionRefManager.getEntityDefinitionByRef(entityRef);
     }
 
-    public getEntityAt(worldPosition: Position): EntityInstanceData | null {
+    public getEntityAt(worldPosition: Position): EntityInstance | null {
         const localPosition = {
             x: worldPosition.x - this.offset.x,
             y: worldPosition.y - this.offset.y,
@@ -137,10 +144,10 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
         return null;
     }
 
-    public addEntity(data: AddEntityData): Result<EntityInstanceData> {
+    public addEntity(data: AddEntityData | EntityInstanceData): Result<EntityInstance> {
         if (this.locked || !this.visible) return Result.Cancel();
 
-        const entity = this.normalizeEntityInstance({
+        const entity = this.createEntityInstance({
             ...data,
             id: data.id ?? uuidv4(),
         });
@@ -162,10 +169,12 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
         }
 
         if (this.entities.some((item) => item.id === entity.id)) {
+            entity.destroy();
             return Result.Cancel("Entity already exists");
         }
 
         this.entities.push(entity);
+        this.bindEntityInstanceEvents(entity);
 
         this.eventEmitter.emit("entityAdded", entity);
         this.eventEmitter.emit("entitiesChanged", [entity.id]);
@@ -177,7 +186,7 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
         if (this.locked || !this.visible) return Result.Cancel();
 
         const entityIdSet = new Set(entityIds);
-        const removed: EntityInstanceData[] = [];
+        const removed: EntityInstance[] = [];
 
         this.entities = this.entities.filter((entity) => {
             if (!entityIdSet.has(entity.id)) return true;
@@ -190,6 +199,7 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
 
         removed.forEach((entity) => {
             this.eventEmitter.emit("entityRemoved", entity);
+            entity.destroy();
         });
 
         this.eventEmitter.emit(
@@ -197,7 +207,7 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
             removed.map((entity) => entity.id),
         );
 
-        return Result.Success(removed);
+        return Result.Success(removed.map((entity) => entity.toData()));
     }
 
     public updateOffset(x: number, y: number, meta?: PropertyUpdateMeta): void {
@@ -216,15 +226,21 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
     }
 
     public override removeEntityCollectionRef(entityCollectionId: string): void {
-        const removedIds = this.entities
-            .filter((entity) => entity.entityRef.entityCollectionId === entityCollectionId)
-            .map((entity) => entity.id);
+        const removedEntities = this.entities.filter(
+            (entity) => entity.entityRef.entityCollectionId === entityCollectionId,
+        );
+        const removedIds = removedEntities.map((entity) => entity.id);
 
         if (removedIds.length === 0) return;
 
         this.entities = this.entities.filter(
             (entity) => entity.entityRef.entityCollectionId !== entityCollectionId,
         );
+
+        removedEntities.forEach((entity) => {
+            this.eventEmitter.emit("entityRemoved", entity);
+            entity.destroy();
+        });
 
         this.eventEmitter.emit("entitiesChanged", removedIds);
     }
@@ -239,7 +255,7 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
             locked: this._locked,
             offsetx: this.offset.x,
             offsety: this.offset.y,
-            entities: this.getAllEntities(),
+            entities: this.getAllEntityData(),
         };
     }
 
@@ -261,29 +277,25 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
         cb(this);
     }
 
-    private normalizeEntityInstance(value: unknown): EntityInstanceData | null {
-        const data = validate.object<Record<string, any>>({ value, defaultValue: {} });
+    public override destroy(): void {
+        this.entities.forEach((entity) => entity.destroy());
+        super.destroy();
+    }
 
-        const entityRef = validate.object<Record<string, unknown>>({ value: data.entityRef, defaultValue: {} });
+    private createEntityInstance(value: unknown): EntityInstance | null {
+        try {
+            return EntityInstance.fromData(
+                EntityInstance.normalizeData(value),
+                this.objectId,
+            );
+        } catch {
+            return null;
+        }
+    }
 
-        const entityCollectionId = validate.string({ value: entityRef.entityCollectionId, defaultValue: "" });
-
-        const entityDefinitionId = validate.string({ value: entityRef.entityDefinitionId, defaultValue: "" });
-
-        if (!entityCollectionId || !entityDefinitionId) return null;
-
-        return {
-            id: validate.string({ value: data.id, defaultValue: uuidv4() }),
-            entityRef: {
-                entityCollectionId,
-                entityDefinitionId,
-            },
-            x: validate.number({ value: data.x, defaultValue: 0 }),
-            y: validate.number({ value: data.y, defaultValue: 0 }),
-            fields: validate.object<Record<string, unknown>>({
-                value: data.fields,
-                defaultValue: {},
-            }),
-        };
+    private bindEntityInstanceEvents(entity: EntityInstance): void {
+        entity.eventEmitter.on("update", (updatedEntity) => {
+            this.eventEmitter.emit("entitiesChanged", [updatedEntity.id]);
+        });
     }
 }

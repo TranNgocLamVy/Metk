@@ -460,7 +460,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
         tilemap: Tilemap,
     ): XMLBuilder {
         const objects = entityLayer
-            .getAllEntities()
+            .getAllEntityData()
             .map((entity) => this.getEntityObject(entityLayer, entity, tilemap))
             .filter((entity): entity is XmlObject => entity !== null);
 
@@ -647,7 +647,7 @@ export class TmxTilemapExporter implements ITilemapExporter {
 
             if (!(layer instanceof EntityLayer)) return;
 
-            layer.getAllEntities().forEach((entity) => {
+            layer.getAllEntityData().forEach((entity) => {
                 const definition = layer.getEntityDefinition(entity);
 
                 if (definition?.graphic.type !== "tile") return;

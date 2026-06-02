@@ -79,10 +79,25 @@ const rendererMocks = vi.hoisted(() => {
         constructor(public value: any) {}
     }
 
+    class Text {
+        public label = "";
+        public x = 0;
+        public y = 0;
+        public height = 12;
+        public text: string;
+
+        constructor(options: { text?: string }) {
+            this.text = options.text ?? "";
+        }
+
+        public destroy = vi.fn();
+    }
+
     return {
         Container,
         Sprite,
         Graphics,
+        Text,
         Point,
         Color,
         Texture: { WHITE: { id: "white-texture" } },
@@ -108,6 +123,7 @@ vi.mock("pixi.js", () => ({
     Container: rendererMocks.Container,
     Sprite: rendererMocks.Sprite,
     Graphics: rendererMocks.Graphics,
+    Text: rendererMocks.Text,
     Point: rendererMocks.Point,
     Color: rendererMocks.Color,
     Texture: rendererMocks.Texture,
@@ -148,6 +164,8 @@ const flushAsync = async () => {
     await Promise.resolve();
     await Promise.resolve();
 };
+
+const viewportStub = {} as any;
 
 type MockContainer = InstanceType<typeof rendererMocks.Container>;
 type MockGraphics = InstanceType<typeof rendererMocks.Graphics>;
@@ -215,7 +233,7 @@ describe("BaseLayerRenderer and TilemapRenderer", () => {
             createRuleLayerData({ id: "rule-root", name: "Rule Root", layerData: "0:-1:-1,0\n0,0" }),
         ]);
 
-        const renderer = new TilemapRenderer({ tilemap });
+        const renderer = new TilemapRenderer({ tilemap, viewport: viewportStub });
         await flushAsync();
 
         expect(renderer.container.label).toBe("Tilemap-Root");

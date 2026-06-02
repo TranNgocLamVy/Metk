@@ -4,6 +4,8 @@ const graphicsMock = vi.hoisted(() => {
     class Container {
         public children: any[] = [];
         public label = "";
+        public x = 0;
+        public y = 0;
         public visible = true;
         public alpha = 1;
         public destroyed = false;
@@ -28,6 +30,14 @@ const graphicsMock = vi.hoisted(() => {
         public tint: any = null;
         public texture: any = null;
         public destroyed = false;
+        public position = {
+            x: 0,
+            y: 0,
+            set: vi.fn((x: number, y: number) => {
+                this.position.x = x;
+                this.position.y = y;
+            }),
+        };
         public destroy = vi.fn(() => {
             this.destroyed = true;
         });
@@ -37,8 +47,26 @@ const graphicsMock = vi.hoisted(() => {
         public clear = vi.fn(() => this);
         public moveTo = vi.fn(() => this);
         public lineTo = vi.fn(() => this);
+        public rect = vi.fn(() => this);
         public stroke = vi.fn(() => this);
         public destroy = vi.fn();
+    }
+
+    class Text {
+        public label = "";
+        public x = 0;
+        public y = 0;
+        public height = 12;
+        public destroyed = false;
+        public text: string;
+
+        constructor(options: { text?: string }) {
+            this.text = options.text ?? "";
+        }
+
+        public destroy = vi.fn(() => {
+            this.destroyed = true;
+        });
     }
 
     class Point {
@@ -53,6 +81,7 @@ const graphicsMock = vi.hoisted(() => {
         Container: vi.fn(Container),
         Sprite: vi.fn(Sprite),
         Graphics: vi.fn(Graphics),
+        Text: vi.fn(Text),
         Point,
         Color: vi.fn(Color),
         Texture: { WHITE: { id: "white-texture" } },
@@ -101,6 +130,8 @@ const flushAsync = async () => {
     await Promise.resolve();
 };
 
+const viewportStub = {} as any;
+
 const createTileLayer = (overrides: Partial<TileLayerData> = {}) => {
     const tilemap = createTilemap([createTileLayerData({
         id: "tile-layer",
@@ -144,7 +175,7 @@ describe("layer renderers", () => {
         const { tilemap, layer } = createTileLayer();
         appMock.editorFacade.textureManager.getTileTexture.mockReturnValueOnce(null);
 
-        const renderer = new TileLayerRenderer({ layer, tilemap });
+        const renderer = new TileLayerRenderer({ layer, tilemap, viewport: viewportStub });
         await flushAsync();
 
         const sprite = spriteMap(renderer).get("0,0");
@@ -160,7 +191,7 @@ describe("layer renderers", () => {
 
     it("updates tile sprites when cells change and removes them when cells become empty", async () => {
         const { tilemap, layer } = createTileLayer({ layerData: "0,0,0\n0,0,0\n0,0,0" });
-        const renderer = new TileLayerRenderer({ layer, tilemap });
+        const renderer = new TileLayerRenderer({ layer, tilemap, viewport: viewportStub });
         await flushAsync();
 
         expect(spriteMap(renderer).size).toBe(0);
@@ -180,7 +211,7 @@ describe("layer renderers", () => {
 
     it("updates base renderer properties from visible and opacity changes", () => {
         const { tilemap, layer } = createTileLayer();
-        const renderer = new TileLayerRenderer({ layer, tilemap });
+        const renderer = new TileLayerRenderer({ layer, tilemap, viewport: viewportStub });
 
         layer.toggleVisibility(false);
         layer.updateOpacity(0.35);
@@ -191,7 +222,7 @@ describe("layer renderers", () => {
 
     it("updates base renderer properties for preview property changes", () => {
         const { tilemap, layer } = createTileLayer();
-        const renderer = new TileLayerRenderer({ layer, tilemap });
+        const renderer = new TileLayerRenderer({ layer, tilemap, viewport: viewportStub });
 
         layer.toggleVisibility(false, {
             origin: "preview",
@@ -214,7 +245,7 @@ describe("layer renderers", () => {
             calculateOutput: vi.fn(() => null),
         }));
 
-        const renderer = new RuleLayerRenderer({ layer, tilemap });
+        const renderer = new RuleLayerRenderer({ layer, tilemap, viewport: viewportStub });
         await flushAsync();
 
         const sprite = spriteMap(renderer).get("0,0");
@@ -233,7 +264,7 @@ describe("layer renderers", () => {
         }));
         appMock.editorFacade.textureManager.getTileTexture.mockReturnValue(null);
 
-        const renderer = new RuleLayerRenderer({ layer, tilemap });
+        const renderer = new RuleLayerRenderer({ layer, tilemap, viewport: viewportStub });
         await flushAsync();
 
         const sprite = spriteMap(renderer).get("0,0");
@@ -250,7 +281,7 @@ describe("layer renderers", () => {
             }),
             createTileLayerData({ id: "tile-root", name: "Root Tile", layerData: "0,0\n0,0" }),
         ]);
-        const renderer = new GroupLayerRenderer({ layer: tilemap.rootLayer, tilemap });
+        const renderer = new GroupLayerRenderer({ layer: tilemap.rootLayer, tilemap, viewport: viewportStub });
 
         expect(renderer.findChildRenderer("root")).toBe(renderer);
         expect(renderer.findChildRenderer("group-a")).toBeInstanceOf(GroupLayerRenderer);
