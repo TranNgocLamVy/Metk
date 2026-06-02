@@ -5,8 +5,8 @@ import { TilesetSession } from "@/editor/session/tileset.session";
 import { WorkspaceService } from "@/shared/services/workspace.service";
 
 import { CollectionTilesetGridRenderer } from "../renderer/tileset/collection-tileset-grid.renderer";
-import { CollectionTilesetRenderer } from "../renderer/tileset/collection-tileset.renderer";
 import { CollectionTilesetSelectorRenderer } from "../renderer/tileset/collection-tileset-selector.renderer";
+import { CollectionTilesetRenderer } from "../renderer/tileset/collection-tileset.renderer";
 import { ITilesetView } from "./tileset.view";
 
 export class CollectionTilesetView implements ITilesetView {
@@ -58,7 +58,6 @@ export class CollectionTilesetView implements ITilesetView {
             .drag({ mouseButtons: "middle" })
             .wheel({ smooth: 15 })
             .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.5, maxScale: 50 });
 
         this.pixiApp.renderer.on("resize", this.onResize);
 

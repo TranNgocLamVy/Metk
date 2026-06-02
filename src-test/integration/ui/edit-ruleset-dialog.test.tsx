@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -164,6 +164,17 @@ class FakeRuleset {
         const rule = this.getRule(ruleId);
         if (rule) this.rules.push(new FakeRule(editRulesetMocks.uuid(), rule.outputs[0]?.tileId));
     };
+    moveRule = (ruleId: string, targetRuleId: string, position: "before" | "after") => {
+        const sourceIndex = this.rules.findIndex((rule) => rule.id === ruleId);
+        if (sourceIndex === -1 || ruleId === targetRuleId) return false;
+
+        const [rule] = this.rules.splice(sourceIndex, 1);
+        const targetIndex = this.rules.findIndex((targetRule) => targetRule.id === targetRuleId);
+        if (targetIndex === -1 || !rule) return false;
+
+        this.rules.splice(position === "before" ? targetIndex : targetIndex + 1, 0, rule);
+        return true;
+    };
     removeRule = (ruleId: string) => {
         this.rules = this.rules.filter((rule) => rule.id !== ruleId);
     };
@@ -179,6 +190,42 @@ class FakeRuleset {
 }
 
 const renderDialog = () => render(<EditRulesetDialog dialogId="dialog-a" rulesetId="ruleset-a" />);
+
+const createDataTransfer = () => {
+    const data: Record<string, string> = {};
+    return {
+        dropEffect: "move",
+        effectAllowed: "move",
+        setData: vi.fn((type: string, value: string) => {
+            data[type] = value;
+        }),
+        getData: vi.fn((type: string) => data[type] ?? ""),
+    } as unknown as DataTransfer;
+};
+
+const mockRuleRowRect = (row: HTMLElement) => {
+    Object.defineProperty(row, "getBoundingClientRect", {
+        configurable: true,
+        value: () => ({
+            top: 0,
+            bottom: 48,
+            left: 0,
+            right: 200,
+            width: 200,
+            height: 48,
+            x: 0,
+            y: 0,
+            toJSON: () => ({}),
+        }),
+    });
+};
+
+const createDragEvent = (type: string, dataTransfer: DataTransfer, clientY = 0) => {
+    const event = new Event(type, { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: dataTransfer });
+    Object.defineProperty(event, "clientY", { value: clientY });
+    return event;
+};
 
 beforeEach(() => {
     useDialogStore.setState(useDialogStore.getInitialState(), true);
@@ -282,6 +329,44 @@ describe("Edit ruleset dialog workflow", () => {
         await user.click(screen.getByText("dialog.editRuleset.action.discard"));
 
         expect(container).toBeTruthy();
+    });
+
+    it("reorders rules by drag and drop and saves the new order", async () => {
+        const user = userEvent.setup({ pointerEventsCheck: 0 });
+        const clonedRuleset = new FakeRuleset();
+        const rulesetManager = {
+            cloneRuleset: vi.fn(() => clonedRuleset),
+            updateRuleset: vi.fn(),
+            saveRuleset: vi.fn().mockResolvedValue(undefined),
+        };
+        editRulesetMocks.appKernel.editorFacade.currentProject = {
+            rulesetManager,
+            tilesetManager: {
+                serialize: vi.fn(() => [{ id: "terrain-tiles", name: "Terrain Tiles" }]),
+            },
+        };
+
+        renderDialog();
+
+        const firstRow = screen.getByText("1").closest("[draggable='true']") as HTMLElement;
+        const secondRow = screen.getByText("2").closest("[draggable='true']") as HTMLElement;
+        mockRuleRowRect(firstRow);
+
+        const dataTransfer = createDataTransfer();
+        fireEvent(secondRow, createDragEvent("dragstart", dataTransfer));
+        fireEvent(firstRow, createDragEvent("dragover", dataTransfer, 1));
+        fireEvent(firstRow, createDragEvent("drop", dataTransfer, 1));
+
+        expect(clonedRuleset.rules.map((rule) => rule.id)).toEqual(["rule-b", "rule-a"]);
+
+        await user.click(screen.getByText("dialog.editRuleset.action.save"));
+
+        expect(rulesetManager.updateRuleset).toHaveBeenCalledWith(expect.objectContaining({
+            rules: [
+                expect.objectContaining({ id: "rule-b" }),
+                expect.objectContaining({ id: "rule-a" }),
+            ],
+        }));
     });
 
     it("selects output tilesets through OutputSelector and saves the cloned ruleset only on confirmation", async () => {

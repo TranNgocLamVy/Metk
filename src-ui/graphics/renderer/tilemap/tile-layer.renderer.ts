@@ -26,7 +26,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
         this.layer.eventEmitter.on("tilesChanged", this.bindOnTilesChanged)
         appKernel.textureManager.on("onTextureReloaded", this.bindOnTextureReloaded);
-        
+
         this.renderLayer();
     }
 
@@ -62,14 +62,10 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             this.sprites.set(key, currentSprite);
         }
 
-        const drawPosition = this.coordToPos({ col, row });
-        currentSprite.x = drawPosition.x;
-        currentSprite.y = drawPosition.y;
-        
         // TODO: Get textureManager from passing editorFacade
         const textureManager = appKernel.editorFacade.textureManager;
         const texture = textureManager.getTileTexture(tileRef.tilesetId, tileRef.tileId);
-        
+
         if (!texture) {
             const errorTexture = await textureManager.getErrorTexture();
             currentSprite.texture = errorTexture;
@@ -80,6 +76,13 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
             currentSprite.width = texture.width;
             currentSprite.height = texture.height;
         }
+
+        const drawPosition = this.coordToPos({ col, row });
+
+        const spriteHeight = currentSprite.texture ? currentSprite.texture.height : this.tilemap.tileheight;
+        const tileHeight = this.tilemap.tileheight;
+
+        currentSprite.position.set(drawPosition.x, drawPosition.y + (tileHeight - spriteHeight));
     }
 
     private onTextureReloaded(tilesetId: string) {

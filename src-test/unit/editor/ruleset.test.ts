@@ -49,16 +49,40 @@ describe("Ruleset", () => {
             name: "Updated Terrain",
             color: "#222222",
             rules: [
-                { id: "rule-a", constraints: "", outputs: "3:0:1" },
                 { id: "rule-c", constraints: "", outputs: "" },
+                { id: "rule-a", constraints: "", outputs: "3:0:1" },
             ],
         }));
 
         expect(ruleset.name).toBe("Updated Terrain");
         expect(ruleset.color).toBe("#222222");
-        expect(ruleset.getAllRules().map((rule) => rule.id)).toEqual(["rule-a", "rule-c"]);
+        expect(ruleset.getAllRules().map((rule) => rule.id)).toEqual(["rule-c", "rule-a"]);
         expect(ruleset.getRule("rule-a")?.serialize().outputs).toBe("3:0:1");
         expect(onUpdated).toHaveBeenCalledTimes(1);
+    });
+
+    it("moves rules before and after target rules", () => {
+        const context = createReferenceContext();
+        const ruleset = createRuleset(
+            context,
+            createRulesetData({
+                rules: [
+                    { id: "rule-a", constraints: "", outputs: "" },
+                    { id: "rule-b", constraints: "", outputs: "" },
+                    { id: "rule-c", constraints: "", outputs: "" },
+                ],
+            }),
+        );
+
+        expect(ruleset.moveRule("rule-c", "rule-a", "before")).toBe(true);
+        expect(ruleset.getAllRules().map((rule) => rule.id)).toEqual(["rule-c", "rule-a", "rule-b"]);
+
+        expect(ruleset.moveRule("rule-c", "rule-b", "after")).toBe(true);
+        expect(ruleset.getAllRules().map((rule) => rule.id)).toEqual(["rule-a", "rule-b", "rule-c"]);
+
+        expect(ruleset.moveRule("rule-c", "rule-c", "before")).toBe(false);
+        expect(ruleset.moveRule("missing-rule", "rule-a", "before")).toBe(false);
+        expect(ruleset.getAllRules().map((rule) => rule.id)).toEqual(["rule-a", "rule-b", "rule-c"]);
     });
 
     it("serializes rule, tileset reference, and ruleset reference state after removals", () => {
@@ -81,7 +105,7 @@ describe("Ruleset", () => {
             id: "terrain",
             rules: [expect.objectContaining({ id: "rule-a", outputs: "" })],
             tilesets: { refs: [], nextIndex: 1 },
-            rulesets: { refs: [{ index: 0, id: "terrain", name: "terrain name" }], nextIndex: 2 },
+            rulesets: { refs: [{ index: 0, id: "terrain", name: "Terrain" }], nextIndex: 2 },
         }));
     });
 });

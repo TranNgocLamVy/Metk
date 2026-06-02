@@ -1,9 +1,8 @@
-import { createContext, useContext } from "react";
-import { useState, useCallback, useMemo } from 'react';
+import { appKernel } from '@/application/bootstrap/app-kernel';
 import { Ruleset } from '@/editor/model/ruleset/ruleset';
 import { RuleRequirement } from '@/shared/data-types/ruleset.data';
 import { useRulesetStore } from '@/ui/stores/ruleset.store';
-import { appKernel } from '@/application/bootstrap/app-kernel';
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { RulesetOutputSelector } from "./graphics/ruleset-ouput-selector.renderer";
 
 export function useRulesetController(initialRuleset: Ruleset) {
@@ -104,6 +103,12 @@ export function useRulesetController(initialRuleset: Ruleset) {
             ruleset.duplicateRule(ruleId);
             triggerUpdate();
         },
+        moveRule: (ruleId: string, targetRuleId: string, position: "before" | "after") => {
+            if (ruleset.moveRule(ruleId, targetRuleId, position)) {
+                setSelectedRuleId(ruleId);
+                triggerUpdate();
+            }
+        },
         removeRule: (ruleId: string) => {
             ruleset.removeRule(ruleId);
             if (selectedRuleId === ruleId) {
@@ -113,7 +118,17 @@ export function useRulesetController(initialRuleset: Ruleset) {
             triggerUpdate();
         },
         addEmptyRule: () => {
-            ruleset.addEmptyRule();
+            if (!ruleset) return;
+            if (!selectedRule) {
+                ruleset.addEmptyRule();
+            } else {
+                const selectedRuleIndex = ruleset.getAllRules().findIndex((r) => r.id === selectedRuleId);
+                if (selectedRuleIndex === -1) {
+                    ruleset.addEmptyRule();
+                } else {
+                    ruleset.addEmptyRule(selectedRuleIndex + 1);
+                }
+            }
             triggerUpdate();
         },
         updateRulesetName: (name: string) => {

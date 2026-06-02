@@ -1,13 +1,13 @@
-import { Rule } from "./rule";
-import { RuleData, RulesetData } from "@/shared/data-types/ruleset.data";
-import { FilePathSystem } from "@/infrastructure/project-path-system";
-import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
-import { BaseObject, BaseObjectEvents } from "../base-object";
-import { v4 as uuidv4 } from "uuid";
 import { RulesetRefManager } from "@/application/resources/references/ruleset-ref.manager";
+import { TilesetRefManager } from "@/application/resources/references/tileset-ref.manager";
+import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefData } from "@/shared/data-types/layer.data";
+import { RuleData, RulesetData } from "@/shared/data-types/ruleset.data";
 import { Console } from "@/shared/services/console.service";
 import { Result } from "@/shared/types/result";
+import { v4 as uuidv4 } from "uuid";
+import { BaseObject, BaseObjectEvents } from "../base-object";
+import { Rule } from "./rule";
 import { normalizeRulesetData } from "./ruleset.normalizer";
 
 interface RulesetEvent extends BaseObjectEvents {
@@ -77,19 +77,24 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         this.tilesetRefManager.loadData(data.tilesets.refs, data.tilesets.nextIndex);
         this.rulesetRefManager.loadData(data.rulesets.refs, data.rulesets.nextIndex);
         const processedRuleIds = new Set<string>();
+        const existingRules = new Map(this.rules.map((rule) => [rule.id, rule]));
+        const nextRules: Rule[] = [];
+
         for (const ruleData of data.rules) {
             processedRuleIds.add(ruleData.id);
-            const existingRule = this.getRule(ruleData.id);
+            const existingRule = existingRules.get(ruleData.id);
             if (existingRule) {
                 existingRule.update(ruleData);
+                nextRules.push(existingRule);
             } else {
                 const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager, this.objectId);
-                this.rules.push(newRule);
+                nextRules.push(newRule);
             }
         }
+
         const removedRules = this.rules.filter((rule) => !processedRuleIds.has(rule.id));
         removedRules.forEach((rule) => rule.destroy());
-        this.rules = this.rules.filter((rule) => processedRuleIds.has(rule.id));
+        this.rules = nextRules;
         this.eventEmitter.emit("onUpdated");
     }
 
@@ -107,10 +112,14 @@ export class Ruleset extends BaseObject<RulesetEvent> {
 
     public getAllRules(): Rule[] { return this.rules }
 
-    public addEmptyRule(): void {
+    public addEmptyRule(at?: number): void {
         const ruleData: RuleData = { id: uuidv4(), constraints: "", outputs: "" };
         const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager, this.objectId);
-        this.rules.push(newRule);
+        if (at !== undefined) {
+            this.rules.splice(at, 0, newRule);
+        } else {
+            this.rules.push(newRule);
+        }
     }
 
     public duplicateRule(ruleId: string): void {
@@ -120,6 +129,21 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         ruleData.id = uuidv4();
         const newRule = new Rule(ruleData, this.size, this.tilesetRefManager, this.rulesetRefManager, this.objectId);
         this.rules.push(newRule);
+    }
+
+    public moveRule(ruleId: string, targetRuleId: string, position: "before" | "after"): boolean {
+        const sourceIndex = this.rules.findIndex((rule) => rule.id === ruleId);
+        if (sourceIndex === -1 || ruleId === targetRuleId) return false;
+
+        const [rule] = this.rules.splice(sourceIndex, 1);
+        const targetIndex = this.rules.findIndex((targetRule) => targetRule.id === targetRuleId);
+        if (targetIndex === -1 || !rule) {
+            if (rule) this.rules.splice(sourceIndex, 0, rule);
+            return false;
+        }
+
+        this.rules.splice(position === "before" ? targetIndex : targetIndex + 1, 0, rule);
+        return true;
     }
 
     public removeRule(ruleId: string): void {

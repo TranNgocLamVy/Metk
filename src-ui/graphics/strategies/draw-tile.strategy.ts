@@ -1,13 +1,13 @@
-import { Container, Sprite } from "pixi.js";
-import { IDrawStrategy, DrawPayload } from "./draw-strategy.interface";
-import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
-import { EditorFacade } from "@/application/editor.facade";
-import { TilemapSession } from "@/editor/session/tilemap.session";
 import { SetTilesCommand } from "@/application/commands/tile/set-tiles.command";
+import { EditorFacade } from "@/application/editor.facade";
 import { ITool } from "@/editor/interface/tool.interface";
+import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { Tile } from "@/editor/model/tileset/tileset";
+import { TilemapSession } from "@/editor/session/tilemap.session";
 import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { TileLayerRenderer } from "@/graphics/renderer/tilemap/tile-layer.renderer";
-import { Tile } from "@/editor/model/tileset/tileset";
+import { Container, Sprite } from "pixi.js";
+import { DrawPayload, IDrawStrategy } from "./draw-strategy.interface";
 
 
 export class DrawTileStrategy implements IDrawStrategy {
@@ -63,7 +63,9 @@ export class DrawTileStrategy implements IDrawStrategy {
                 const sprite = new Sprite(texture);
                 sprite.alpha = DrawTileStrategy.spriteAlpha;
                 const drawPotision = layerRenderer.coordToPos({ col, row });
-                sprite.position.set(drawPotision.x, drawPotision.y);
+                const spriteHeight = texture.height;
+                const tileHeight = layerRenderer.tilemap.tileheight;
+                sprite.position.set(drawPotision.x, drawPotision.y + (tileHeight - spriteHeight));
                 overlayContainer.addChild(sprite);
                 sprites.push(sprite);
             }
@@ -96,7 +98,9 @@ export class DrawTileStrategy implements IDrawStrategy {
                 const sprite = new Sprite(texture);
                 sprite.alpha = DrawTileStrategy.spriteAlpha;
                 const drawPotision = layerRenderer.coordToPos({ col, row });
-                sprite.position.set(drawPotision.x, drawPotision.y);
+                const spriteHeight = texture.height;
+                const tileHeight = layerRenderer.tilemap.tileheight;
+                sprite.position.set(drawPotision.x, drawPotision.y + (tileHeight - spriteHeight));
                 data.push({ key: `${col},${row}`, sprite, coordinate: { col, row }, position: drawPotision, tileId: tile.id, tilesetId: tile.tileset.id });
             }
         }
