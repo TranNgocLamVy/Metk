@@ -69,9 +69,9 @@ const mockState = vi.hoisted(() => {
     const toolManager = {
         ...createListenerRegistry(),
         currentFamilyId: "stamp",
-        toolFamilies: [] as any[],
+        toolGroups: [] as any[],
         availableFamilyIds: [] as string[],
-        getToolFamilies: vi.fn(() => toolManager.toolFamilies),
+        getToolGroups: vi.fn(() => toolManager.toolGroups),
         getAvailableFamilyIds: vi.fn(() => toolManager.availableFamilyIds),
         getCurrentToolId: vi.fn(() => toolManager.currentFamilyId),
         getCurrentFamilyId: vi.fn(() => toolManager.currentFamilyId),
@@ -379,9 +379,9 @@ describe("Metk integration workflows", () => {
         mockState.routeProjectId = "project-alpha";
         mockState.navigate.mockClear();
         mockState.appKernel.toolManager.currentFamilyId = "stamp";
-        mockState.appKernel.toolManager.toolFamilies = [];
+        mockState.appKernel.toolManager.toolGroups = [];
         mockState.appKernel.toolManager.availableFamilyIds = [];
-        mockState.appKernel.toolManager.getToolFamilies.mockClear();
+        mockState.appKernel.toolManager.getToolGroups.mockClear();
         mockState.appKernel.toolManager.getAvailableFamilyIds.mockClear();
         mockState.appKernel.toolManager.getCurrentToolId.mockClear();
         mockState.appKernel.toolManager.getCurrentFamilyId.mockClear();
@@ -480,11 +480,15 @@ describe("Metk integration workflows", () => {
     it("changes the active toolbar tool after a toolbar button interaction", async () => {
         const user = userEvent.setup();
 
-        mockState.appKernel.toolManager.toolFamilies = [
+        mockState.appKernel.toolManager.toolGroups = [{
+            id: "drawing",
+            label: "Drawing",
+            families: [
             {
                 id: "stamp",
                 shortcuts: ["S"],
                 icon: '<svg role="img" aria-label="Stamp tool"></svg>',
+                label: "Stamp",
                 description: "Stamp",
                 priority: 0,
             },
@@ -492,10 +496,12 @@ describe("Metk integration workflows", () => {
                 id: "eraser",
                 shortcuts: ["E"],
                 icon: '<svg role="img" aria-label="Eraser tool"></svg>',
+                label: "Eraser",
                 description: "Eraser",
                 priority: 1,
             },
-        ];
+            ],
+        }];
         mockState.appKernel.toolManager.availableFamilyIds = ["stamp", "eraser"];
 
         render(<ToolBar />);

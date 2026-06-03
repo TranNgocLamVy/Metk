@@ -66,6 +66,7 @@ describe("Project", () => {
             tilemaps: [{ id: "map-2", name: "Map Two", tilemapRelPath: "maps/map-2.json" }],
             tilesets: [{ id: "tileset-2", name: "Tileset Two", tilesetRelPath: "tilesets/tileset-2.json" }],
             rulesets: [{ id: "ruleset-2", name: "Ruleset Two", color: "#00ff00", rulesetRelPath: "rulesets/ruleset-2.json" }],
+            entityCollections: [],
         });
 
         vi.useRealTimers();

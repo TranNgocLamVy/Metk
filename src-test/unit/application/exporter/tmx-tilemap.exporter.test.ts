@@ -30,6 +30,11 @@ const orderedParser = new XMLParser({
 
 const decode = (bytes: Uint8Array) => new TextDecoder().decode(bytes);
 const asArray = <T,>(value: T | T[] | undefined): T[] => value === undefined ? [] : Array.isArray(value) ? value : [value];
+const getMetkLayerId = (layer: any): string | undefined => {
+    const properties = asArray(layer?.properties?.property);
+    return properties.find((property: any) => property.name === "metk.layerId")?.value;
+};
+const findLayerByMetkId = (layers: any, id: string) => asArray(layers).find((layer: any) => getMetkLayerId(layer) === id);
 const exportXml = (tilemap: Tilemap, exportPath = "C:/Project/Metk/test-project/exports/map-a.tmx") => {
     return decode(new TmxTilemapExporter().export(tilemap, exportPath, {} as any));
 };
@@ -66,11 +71,25 @@ const exportParsed = (tilemap: Tilemap, exportPath = "C:/Project/Metk/test-proje
 
 const orderedChildIds = (xml: string, parentElement: "map" | "group" = "map", targetId?: string): string[] => {
     const parsed = orderedParser.parse(xml);
+    const metkLayerIdFromOrderedNode = (node: any): string | undefined => {
+        const children = node.layer ?? node.group;
+        if (!children) return undefined;
+
+        for (const child of children) {
+            const propertyNodes = child.properties?.flatMap((propertiesNode: any) =>
+                asArray(propertiesNode.property).length > 0 ? asArray(propertiesNode.property) : [propertiesNode],
+            ) ?? [];
+            const property = propertyNodes.find((propertyNode: any) => propertyNode[":@"]?.name === "metk.layerId");
+            if (property) return property[":@"]?.value;
+        }
+
+        return undefined;
+    };
     const findElement = (nodes: any[]): any[] | null => {
         for (const node of nodes) {
             const children = node[parentElement];
             if (children) {
-                if (!targetId || node[":@"]?.id === targetId) return children;
+                if (!targetId || metkLayerIdFromOrderedNode(node) === targetId) return children;
                 const nested = findElement(children);
                 if (nested) return nested;
             }
@@ -86,7 +105,8 @@ const orderedChildIds = (xml: string, parentElement: "map" | "group" = "map", ta
 
     return (findElement(parsed) ?? [])
         .filter((node: any) => node.layer || node.group)
-        .map((node: any) => node[":@"]?.id);
+        .map((node: any) => metkLayerIdFromOrderedNode(node))
+        .filter((id: string | undefined): id is string => id !== undefined);
 };
 
 const createTilemap = (context: ReturnType<typeof createReferenceContext>, overrides: Partial<TilemapData> = {}) => {
@@ -193,7 +213,7 @@ describe("TmxTilemapExporter", () => {
             }),
         ]);
         expect(parsed.map.layer).toEqual(expect.objectContaining({
-            id: "ground",
+            id: 1,
             name: "Ground",
             width: 2,
             height: 2,
@@ -207,6 +227,7 @@ describe("TmxTilemapExporter", () => {
                 "#text": "2,4,3,0",
             },
         }));
+        expect(getMetkLayerId(parsed.map.layer)).toBe("ground");
     });
 
     it("does not reuse tileset gid state between exports", () => {
@@ -374,28 +395,32 @@ describe("TmxTilemapExporter", () => {
 
         const parentGroup = parsed.map.group;
         expect(parentGroup).toEqual(expect.objectContaining({
-            id: "parent-group",
+            id: expect.any(Number),
             name: "Parent Group",
             visible: 0,
             locked: 1,
         }));
+        expect(getMetkLayerId(parentGroup)).toBe("parent-group");
         expect(parentGroup.layer).toEqual(expect.objectContaining({
-            id: "child-tile",
+            id: expect.any(Number),
             visible: 0,
             locked: 1,
             data: { encoding: "csv", "#text": 3 },
         }));
+        expect(getMetkLayerId(parentGroup.layer)).toBe("child-tile");
         expect(parentGroup.group).toEqual(expect.objectContaining({
-            id: "nested-group",
+            id: expect.any(Number),
             visible: 0,
             locked: 1,
             layer: expect.objectContaining({
-                id: "nested-tile",
+                id: expect.any(Number),
                 visible: 0,
                 locked: 1,
                 data: { encoding: "csv", "#text": 1 },
             }),
         }));
+        expect(getMetkLayerId(parentGroup.group)).toBe("nested-group");
+        expect(getMetkLayerId(parentGroup.group.layer)).toBe("nested-tile");
     });
 
     it("exports rule layer data after recalculating rule outputs", () => {
@@ -443,13 +468,14 @@ describe("TmxTilemapExporter", () => {
         const parsed = exportParsed(tilemap);
 
         expect(parsed.map.layer).toEqual(expect.objectContaining({
-            id: "rules",
+            id: 1,
             name: "Rules",
             data: {
                 encoding: "csv",
                 "#text": "3,0,0,0",
             },
         }));
+        expect(getMetkLayerId(parsed.map.layer)).toBe("rules");
     });
 
     it("exports unresolved tile and rule output tileset gids as zero", () => {
@@ -513,9 +539,11 @@ describe("TmxTilemapExporter", () => {
 
         const parsed = exportParsed(tilemap);
         const layers = asArray(parsed.map.layer);
+        const tileLayer = findLayerByMetkId(layers, "tiles");
+        const ruleLayer = findLayerByMetkId(layers, "rules");
 
-        expect(layers.find((layer: any) => layer.id === "tiles").data["#text"]).toBe("2,0");
-        expect(layers.find((layer: any) => layer.id === "rules").data["#text"]).toBe(0);
+        expect(tileLayer.data["#text"]).toBe("2,0");
+        expect(ruleLayer.data["#text"]).toBe(0);
     });
 
     it("exports available tilesets and zeroes references to missing tilesets in partially resolvable maps", () => {

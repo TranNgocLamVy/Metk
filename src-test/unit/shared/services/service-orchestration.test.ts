@@ -18,7 +18,7 @@ const serviceMocks = vi.hoisted(() => ({
         },
         workspaceManager: {
             currentWorkspace: null as any,
-            loadProjectWorkspace: vi.fn(),
+            loadWorkspace: vi.fn(),
             unloadWorkspace: vi.fn(),
             saveCurrentWorkspace: vi.fn(),
         },
@@ -211,7 +211,7 @@ beforeEach(() => {
     serviceMocks.appKernel.workspaceManager.currentWorkspace = null;
     serviceMocks.appKernel.projectManager.setAndLoadProject.mockResolvedValue(Result.Success(createProject()));
     serviceMocks.appKernel.layoutManager.loadLayout.mockResolvedValue(Result.Success());
-    serviceMocks.appKernel.workspaceManager.loadProjectWorkspace.mockResolvedValue(Result.Success(createWorkspace()));
+    serviceMocks.appKernel.workspaceManager.loadWorkspace.mockResolvedValue(Result.Success(createWorkspace()));
     serviceMocks.appKernel.workspaceManager.saveCurrentWorkspace.mockResolvedValue(undefined);
     serviceMocks.appKernel.saveProjectManager.mockResolvedValue(undefined);
     serviceMocks.appKernel.editorFacade.projectManager.saveCurrrentProject.mockResolvedValue(undefined);
@@ -236,7 +236,7 @@ describe("WorkspaceService orchestration", () => {
     it("loads project, layout, workspace, reopens the persisted tileset tab, and persists workspace state", async () => {
         const workspace = createWorkspace();
         workspace.tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId = "session-tileset";
-        serviceMocks.appKernel.workspaceManager.loadProjectWorkspace.mockImplementation(async () => {
+        serviceMocks.appKernel.workspaceManager.loadWorkspace.mockImplementation(async () => {
             serviceMocks.appKernel.workspaceManager.currentWorkspace = workspace;
             return Result.Success(workspace);
         });
@@ -447,7 +447,7 @@ describe("TilesetService orchestration", () => {
 describe("RulesetService orchestration", () => {
     it("creates a ruleset and persists project plus workspace state", async () => {
         const { project, workspace } = attachProjectAndWorkspace();
-        vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({ name: "Terrain Rules", color: "#22cc88" } as any);
+        vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({ ruleset: { name: "Terrain Rules", color: "#22cc88" } } as any);
         serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/rulesets/terrain.rs.json");
 
         await RulesetService.createRuleset();

@@ -278,27 +278,31 @@ export class TmxTilemapExporter implements ITilemapExporter {
         layers: BaseLayer<any>[],
         baseIndex: number,
         tilemap: Tilemap,
+        inheritedVisible = true,
+        inheritedLocked = false,
     ): XMLBuilder[] {
         let index = baseIndex;
 
         return layers
             .map((childLayer) => {
                 let layer: XMLBuilder | null = null;
+                const effectiveVisible = inheritedVisible && childLayer.visible;
+                const effectiveLocked = inheritedLocked || childLayer.locked;
 
                 if (childLayer instanceof TileLayer) {
-                    layer = this.getTileLayer(childLayer, index, tilemap);
+                    layer = this.getTileLayer(childLayer, index, tilemap, effectiveVisible, effectiveLocked);
                     index++;
                 } else if (childLayer instanceof GroupLayer) {
-                    layer = this.getGroupLayer(childLayer, index, tilemap);
+                    layer = this.getGroupLayer(childLayer, index, tilemap, effectiveVisible, effectiveLocked);
                     index++;
                 } else if (childLayer instanceof RuleLayer) {
-                    layer = this.getRuleLayer(childLayer, index, tilemap);
+                    layer = this.getRuleLayer(childLayer, index, tilemap, effectiveVisible, effectiveLocked);
                     index++;
                 } else if (childLayer instanceof ImageLayer) {
-                    layer = this.getImageLayer(childLayer, index, tilemap);
+                    layer = this.getImageLayer(childLayer, index, tilemap, effectiveVisible, effectiveLocked);
                     index++;
                 } else if (childLayer instanceof EntityLayer) {
-                    layer = this.getEntityLayer(childLayer, index, tilemap);
+                    layer = this.getEntityLayer(childLayer, index, tilemap, effectiveVisible, effectiveLocked);
                     index++;
                 }
 
@@ -312,16 +316,18 @@ export class TmxTilemapExporter implements ITilemapExporter {
         groupLayer: GroupLayer,
         index: number,
         tilemap: Tilemap,
+        effectiveVisible: boolean,
+        effectiveLocked: boolean,
     ): XMLBuilder {
-        const childLayers = this.getLayers(groupLayer.layers, index + 1, tilemap);
+        const childLayers = this.getLayers(groupLayer.layers, index + 1, tilemap, effectiveVisible, effectiveLocked);
 
         const layer = create({
             group: {
                 "@id": this.getNextLayerId(),
                 "@name": groupLayer.name,
                 "@opacity": groupLayer.opacity,
-                "@visible": groupLayer.visible ? 1 : 0,
-                "@locked": groupLayer.locked ? 1 : 0,
+                "@visible": effectiveVisible ? 1 : 0,
+                "@locked": effectiveLocked ? 1 : 0,
                 properties: {
                     property: [this.createProperty("metk.layerId", groupLayer.id)],
                 },
@@ -337,6 +343,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
         tileLayer: TileLayer,
         _index: number,
         _tilemap: Tilemap,
+        effectiveVisible: boolean,
+        effectiveLocked: boolean,
     ): XMLBuilder {
         return create({
             layer: {
@@ -347,8 +355,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 "@x": tileLayer.coordinate.col,
                 "@y": tileLayer.coordinate.row,
                 "@opacity": tileLayer.opacity,
-                "@visible": tileLayer.visible ? 1 : 0,
-                "@locked": tileLayer.locked ? 1 : 0,
+                "@visible": effectiveVisible ? 1 : 0,
+                "@locked": effectiveLocked ? 1 : 0,
                 properties: {
                     property: [this.createProperty("metk.layerId", tileLayer.id)],
                 },
@@ -375,6 +383,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
         ruleLayer: RuleLayer,
         _index: number,
         _tilemap: Tilemap,
+        effectiveVisible: boolean,
+        effectiveLocked: boolean,
     ): XMLBuilder {
         ruleLayer.reCalculateAllOutputs();
 
@@ -387,8 +397,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 "@x": ruleLayer.coordinate.col,
                 "@y": ruleLayer.coordinate.row,
                 "@opacity": ruleLayer.opacity,
-                "@visible": ruleLayer.visible ? 1 : 0,
-                "@locked": ruleLayer.locked ? 1 : 0,
+                "@visible": effectiveVisible ? 1 : 0,
+                "@locked": effectiveLocked ? 1 : 0,
                 properties: {
                     property: [this.createProperty("metk.layerId", ruleLayer.id)],
                 },
@@ -422,6 +432,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
         imageLayer: ImageLayer,
         _index: number,
         tilemap: Tilemap,
+        effectiveVisible: boolean,
+        effectiveLocked: boolean,
     ): XMLBuilder {
         const imageAbsPath = tilemap.tilemapPathSystem.getAbsPathFromRelPath(
             imageLayer.imageSource.source,
@@ -437,8 +449,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 "@parallaxx": imageLayer.parallax.x,
                 "@parallaxy": imageLayer.parallax.y,
                 "@opacity": imageLayer.opacity,
-                "@visible": imageLayer.visible ? 1 : 0,
-                "@locked": imageLayer.locked ? 1 : 0,
+                "@visible": effectiveVisible ? 1 : 0,
+                "@locked": effectiveLocked ? 1 : 0,
                 ...(imageLayer.tintcolor ? { "@tintcolor": imageLayer.tintcolor } : {}),
                 "@repeatx": imageLayer.repeatX ? 1 : 0,
                 "@repeaty": imageLayer.repeatY ? 1 : 0,
@@ -458,6 +470,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
         entityLayer: EntityLayer,
         _index: number,
         tilemap: Tilemap,
+        effectiveVisible: boolean,
+        effectiveLocked: boolean,
     ): XMLBuilder {
         const objects = entityLayer
             .getAllEntityData()
@@ -471,8 +485,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
                 "@offsetx": entityLayer.offset.x,
                 "@offsety": entityLayer.offset.y,
                 "@opacity": entityLayer.opacity,
-                "@visible": entityLayer.visible ? 1 : 0,
-                "@locked": entityLayer.locked ? 1 : 0,
+                "@visible": effectiveVisible ? 1 : 0,
+                "@locked": effectiveLocked ? 1 : 0,
                 "@draworder": "index",
                 properties: {
                     property: [this.createProperty("metk.layerId", entityLayer.id)],

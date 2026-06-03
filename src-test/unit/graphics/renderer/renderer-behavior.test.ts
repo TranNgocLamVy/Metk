@@ -405,6 +405,9 @@ describe("Grid renderers", () => {
         vi.advanceTimersByTime(100);
 
         expect(viewport.on).toHaveBeenCalledWith("moved", expect.any(Function));
+        expect(GraphicUtils.drawVerticelDashLine).not.toHaveBeenCalled();
+
+        renderer.enableGrid();
         expect(GraphicUtils.drawVerticelDashLine).toHaveBeenCalled();
         expect(GraphicUtils.drawVerticelLine).toHaveBeenCalled();
         expect(
@@ -414,6 +417,7 @@ describe("Grid renderers", () => {
 
         renderer.disableGrid();
         vi.mocked(GraphicUtils.drawVerticelLine).mockClear();
+        vi.mocked(GraphicUtils.drawVerticelDashLine).mockClear();
         renderer.enableGrid();
         expect(GraphicUtils.drawVerticelLine).toHaveBeenCalled();
     });

@@ -25,8 +25,8 @@ describe("JsonSerializer", () => {
     it("returns Result.Error for malformed JSON instead of throwing", () => {
         const serializer = new JsonSerializer<unknown>();
 
-        expect(() => serializer.deserialize("{bad json")).not.toThrow();
-        expect(serializer.deserialize("{bad json")).toMatchObject({
+        expect(() => serializer.deserialize("1 2 3")).not.toThrow();
+        expect(serializer.deserialize("1 2 3")).toMatchObject({
             status: "Error",
             message: { key: expect.stringContaining("Invalid JSON:") },
         });

@@ -43,7 +43,7 @@ const mockState = vi.hoisted(() => {
     const toolManager = {
         ...createListenerRegistry(),
         setActiveSession: vi.fn(),
-        getToolFamilies: vi.fn(() => []),
+        getToolGroups: vi.fn(() => []),
         getAvailableFamilyIds: vi.fn(() => []),
         getCurrentToolId: vi.fn(() => null),
         getCurrentFamilyId: vi.fn(() => null),

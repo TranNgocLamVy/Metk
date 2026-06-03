@@ -228,7 +228,7 @@ describe("TilemapView", () => {
         });
         expect(view.viewport.drag).toHaveBeenCalledWith({ mouseButtons: "middle" });
         expect(viewMocks.tilemapGridInstances[0].context).toMatchObject({ tilemap: session.tilemap });
-        expect(viewMocks.tilemapRendererInstances[0].context).toEqual({ tilemap: session.tilemap });
+        expect(viewMocks.tilemapRendererInstances[0].context).toMatchObject({ tilemap: session.tilemap, viewport: view.viewport });
         expect(view.viewport.addChild).toHaveBeenCalledWith(view.renderer.container);
         expect(view.viewport.addChild).toHaveBeenCalledWith(view.overlayerContainer);
         expect(view.viewport.addChild).toHaveBeenCalledWith(view.grid.graphics);

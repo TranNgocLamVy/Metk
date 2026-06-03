@@ -329,8 +329,8 @@ describe("grid renderers", () => {
         expect(viewport.on).toHaveBeenCalledWith("moved", expect.any(Function));
         expect(viewport.on).toHaveBeenCalledWith("zoomed", expect.any(Function));
         expect(viewport.on).toHaveBeenCalledWith("resize", expect.any(Function));
-        expect(GraphicUtils.drawVerticelDashLine).toHaveBeenCalled();
-        expect(GraphicUtils.drawHorizontalDashLine).toHaveBeenCalled();
+        expect(GraphicUtils.drawVerticelDashLine).not.toHaveBeenCalled();
+        expect(GraphicUtils.drawHorizontalDashLine).not.toHaveBeenCalled();
 
         renderer.disableGrid();
         expect(renderer.gridEnabled).toBe(false);
@@ -340,6 +340,8 @@ describe("grid renderers", () => {
         vi.mocked(GraphicUtils.drawHorizontalLine).mockClear();
         renderer.enableGrid();
         expect(renderer.gridEnabled).toBe(true);
+        expect(GraphicUtils.drawVerticelDashLine).toHaveBeenCalled();
+        expect(GraphicUtils.drawHorizontalDashLine).toHaveBeenCalled();
         expect(GraphicUtils.drawVerticelLine).toHaveBeenCalled();
     });
 
