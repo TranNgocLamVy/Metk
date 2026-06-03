@@ -1,13 +1,13 @@
-import { useCallback, useState } from 'react';
-import { Application } from 'pixi.js';
-import { Application as PixiApplication } from '@pixi/react';
-import useResizeObserver from '@/ui/hooks/useResizeObserver.hook';
+import { LocalizedText } from '@/ui/components/custom/LocalizeText';
+import { HStack, VStack } from '@/ui/components/custom/stack/Stack';
 import { Button } from '@/ui/components/shadcn/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/components/shadcn/dropdown-menu';
 import { ScrollArea, ScrollBar } from '@/ui/components/shadcn/scroll-area';
+import useResizeObserver from '@/ui/hooks/useResizeObserver.hook';
+import { Application as PixiApplication } from '@pixi/react';
 import { Plus } from 'lucide-react';
-import { HStack, VStack } from '@/ui/components/custom/stack/Stack';
-import { LocalizedText } from '@/ui/components/custom/LocalizeText';
+import { Application } from 'pixi.js';
+import { useCallback, useState } from 'react';
 import { useEditRuleset } from './ContextProvider';
 
 export default function OutputSelector() {
@@ -56,7 +56,7 @@ export default function OutputSelector() {
                             <Plus className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
+                    <DropdownMenuContent align="start" className="w-48 bg-surface">
                         {tilesetList.length === 0 ? (
                             <DropdownMenuItem disabled className="h-7"><LocalizedText message="dialog.editRuleset.noTileset" /></DropdownMenuItem>
                         ) : (
@@ -76,14 +76,14 @@ export default function OutputSelector() {
 
                             if (isActive) {
                                 return (
-                                    <Button key={tilesetRef.id} variant="empty" size="sm" className="rounded-none border-none h-8 text-foreground cursor-pointer bg-surface-overlay rs_tab relative">
+                                    <Button key={tilesetRef.id} variant="empty" size="sm" className="rounded-none border-none h-8 text-foreground cursor-pointer bg-surface rs_tab relative">
                                         {tilesetRef.name}
                                     </Button>
                                 )
                             }
 
                             return (
-                                <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant="empty" size="sm" className="rounded-none border-none h-8 text-foreground cursor-pointer bg-transparent hover:bg-surface-overlay">
+                                <Button key={tilesetRef.id} onClick={() => selectTileset(tilesetRef.id)} variant="empty" size="sm" className="rounded-none border-none h-8 text-foreground cursor-pointer bg-transparent hover:bg-surface">
                                     {tilesetRef.name}
                                 </Button>
                             )

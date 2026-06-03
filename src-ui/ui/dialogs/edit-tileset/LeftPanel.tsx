@@ -1,7 +1,7 @@
 import { Application as PixiReactApplication } from "@pixi/react";
+import { Plus, Trash2 } from "lucide-react";
 import { Application as PixiApp } from "pixi.js";
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
 
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
@@ -52,7 +52,7 @@ export function LeftPanel() {
     }, [pixiApp, tileset, selectedTileId, size.width, size.height, version, handleSelectTile]);
 
     return (
-        <VStack className="w-1/4 h-full min-w-0 min-h-0 bg-surface-overlay p-2 gap-3">
+        <VStack className="w-1/4 h-full min-w-0 min-h-0 bg-surface p-2 gap-3">
             <VStack className="gap-2">
                 <HStack className="items-center gap-2">
                     <span className="text-sm font-semibold shrink-0">
@@ -63,7 +63,7 @@ export function LeftPanel() {
                 <input
                     value={tilesetName}
                     onChange={(event) => actions.updateTilesetName(event.target.value)}
-                    className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-overlay-sunken"
+                    className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-sunken"
                 />
             </VStack>
 
@@ -72,7 +72,7 @@ export function LeftPanel() {
                     Tileset
                 </header>
 
-                <HStack className="bg-surface-overlay w-full px-1 py-1 gap-0.5">
+                <HStack className="bg-surface w-full px-1 py-1 gap-0.5">
                     <Button
                         variant="ghost"
                         size="icon-sm"

@@ -1,15 +1,15 @@
-import { type DragEvent, useCallback, useEffect, useRef, useState } from "react";
-import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
-import { SketchPicker } from "react-color";
-import { Button } from "@/ui/components/shadcn/button";
-import { Copy, EllipsisVertical, GripHorizontal, Plus, Trash2 } from "lucide-react";
-import { DialogClose } from "@/ui/components/shadcn/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import PixiImage from "@/ui/components/custom/PixiImage";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { Button } from "@/ui/components/shadcn/button";
+import { DialogClose } from "@/ui/components/shadcn/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { useDialogStore } from "@/ui/stores/dialog.store";
+import { Copy, EllipsisVertical, GripHorizontal, Plus, Trash2 } from "lucide-react";
+import { type DragEvent, useCallback, useEffect, useRef, useState } from "react";
+import { SketchPicker } from "react-color";
 import { useEditRuleset } from "./ContextProvider";
 
 const RULE_DRAG_DATA_TYPE = "application/metk-rule-id";
@@ -36,7 +36,7 @@ export default function EditRulesetSidebar({ dialogId }: EditRulesetSidebarProps
     }, [ruleset, closeDialog, dialogId]);
 
     return (
-        <VStack className="w-fit h-full bg-surface-overlay p-2 gap-2">
+        <VStack className="w-fit h-full bg-surface p-2 gap-2">
             <Header />
             <RuleList />
             <HStack className="w-full h-fit gap-2">
@@ -71,7 +71,7 @@ function Header() {
             <DropdownMenuTrigger asChild>
                 <div className="h-full aspect-square" style={{ backgroundColor: tempData.color }} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-surface-overlay shadow-lg p-4">
+            <DropdownMenuContent align="center" side="right" sideOffset={8} className="w-fit h-fit bg-surface shadow-lg p-4">
                 <VStack className="custom-sketch-picker w-fit">
                     <style>{`.custom-sketch-picker label { color: var(--foreground) !important; }`}</style>
                     <SketchPicker color={tempData.color} onChange={(color) => setTempData(prev => ({ ...prev, color: color.hex }))} styles={customStyles} disableAlpha presetColors={[]} />
@@ -83,7 +83,7 @@ function Header() {
             onChange={(e) => setTempData(prev => ({ ...prev, name: e.target.value }))}
             onBlur={handleRename}
             onKeyDown={(e) => { if (e.key === "Enter") handleRename(); }}
-            className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-overlay-sunken"
+            className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-sunken"
         />
         <Button size="icon" variant="ghost" onClick={actions.addEmptyRule} className="h-full aspect-square">
             <Plus />
@@ -205,7 +205,7 @@ function RuleList() {
                                         <EllipsisVertical size={16} />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent side="right" className="bg-surface-overlay w-40 gap-2" onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenuContent side="right" className="bg-surface w-40 gap-2" onClick={(e) => e.stopPropagation()}>
                                     <DropdownMenuItem onClick={() => actions.duplicateRule(rule.id)} className="h-7 text-xs">
                                         <Copy className="size-4" />
                                         <LocalizedText message="dialog.editRuleset.action.duplicate" />

@@ -39,9 +39,9 @@ export default function TilemapEditorCanvas() {
 	};
 
 	return (
-		<div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden px-1 py-2 gap-2 bg-surface">
+		<div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden pb-frame-quarter bg-surface">
 			<ContextMenuWrapper item={TilemapEditorContextMenu}>
-				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm" />
+				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas rounded-md inset-shadow-panel border-t border-foreground/30" />
 			</ContextMenuWrapper>
 			{activeSession == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0">
 				<span className="text-sm">

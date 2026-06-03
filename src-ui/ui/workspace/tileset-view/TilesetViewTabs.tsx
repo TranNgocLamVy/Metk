@@ -36,14 +36,14 @@ export default function TilesetViewTabs() {
 	}, [])
 
 	return (
-		<HStack className="w-full h-fit" justify="start" align="center">
+		<HStack className="w-full h-fit pb-frame-half px-frame-quarter" justify="start" align="center">
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<Button variant={"ghost"} size={"icon"} asChild className="p-1.5">
+					<Button variant={"ghost"} size={"icon"} asChild className={`p-1.5 border border-foreground/30 border-x-0`}>
 						<Ellipsis />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent side="bottom">
+				<DropdownMenuContent side="top">
 					<DropdownMenuItem onClick={TilesetService.createTileset}>
 						<Plus />
 						<LocalizedText message="workspace.tilesetSelector.dropdown.new" />
@@ -58,8 +58,9 @@ export default function TilesetViewTabs() {
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar bg-surface-sunken w-full h-8">
-				{tilesetSessions.map((tilesetSession) => {
+			<div ref={ref} className="flex flex-row relative items-center overflow-y-scroll scroll-smooth no-scrollbar bg-surface-sunken w-full h-8">
+				<div className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none border-t border-foreground/30" />
+				{tilesetSessions.map((tilesetSession, index) => {
 					const isCurrent = activeSession?.id === tilesetSession.sessionId;
 					const openTilesetSession = () => {
 						if (isCurrent) return;
@@ -73,8 +74,9 @@ export default function TilesetViewTabs() {
 						<Button key={tilesetSession.sessionId}
 							variant={"empty"}
 							onClick={openTilesetSession} size={"sm"}
-							className={`pr-1 h-full border-none ${isCurrent ? "text-foreground bg-surface tab relative" : "text-muted-foreground hover:text-foreground bg-transparent"}`}>
-							<style>{`.tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: var(--foreground); }`}</style>
+							className={`pr-1 h-full border-none text-foreground relative cursor-pointer ${isCurrent ? "bg-surface" : "bg-transparent"}`}>
+							{index == 0 && <div className="absolute bottom-0 top-0 left-0 right-0 border-l pointer-events-none border-foreground/30" />}
+							{isCurrent && <div className="absolute bottom-0 top-0 left-0 right-0 border border-b-0 pointer-events-none border-foreground/30" />}
 							{tilesetSession.name}
 							<div className="hover:bg-surface-sunken p-1" onClick={closeTilesetSession}>
 								<X />

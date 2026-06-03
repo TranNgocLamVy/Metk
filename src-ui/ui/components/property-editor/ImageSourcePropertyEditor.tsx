@@ -183,7 +183,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
                         variant="outline"
                         size="xs"
                         disabled={disabled}
-                        className="text-2xs border-foreground/40 shrink-0"
+                        className="text-2xs border-foreground/30 shrink-0"
                         onClick={selectImage}
                     >
                         <LocalizedText message="form.tileset.image.browse" />

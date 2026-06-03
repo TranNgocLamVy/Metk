@@ -49,9 +49,9 @@ export default function WorkspaceConsole() {
 
     if (!isConsoleOpen) return null;
     return (
-        <div ref={consoleRef} className="w-full bg-transparent absolute bottom-0 pb-4 px-3" style={{ height: `${height}px` }} >
-            <div className="bg-surface-overlay flex flex-col w-full h-full shadow-md">
-                <div className="draggable-resize w-full h-2 cursor-row-resize z-10 bg-surface-overlay-sunken transition-colors shrink-0 flex justify-center items-center gap-0.5" onMouseDown={handleMouseDown}>
+        <div ref={consoleRef} className="w-full bg-transparent absolute bottom-0 pb-11 pointer-events-none px-3 z-10" style={{ height: `${height}px` }} >
+            <div className="bg-surface flex flex-col w-full h-full shadow-md pointer-events-auto">
+                <div className="draggable-resize w-full h-2 cursor-row-resize z-10 bg-surface-sunken transition-colors shrink-0 flex justify-center items-center gap-0.5" onMouseDown={handleMouseDown}>
                     <div className="size-[4px] bg-foreground/20 rounded-full" />
                     <div className="size-[4px] bg-foreground/20 rounded-full" />
                     <div className="size-[4px] bg-foreground/20 rounded-full" />

@@ -1,11 +1,11 @@
-import { RuleRequirement } from "@/shared/data-types/ruleset.data";
-import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
-import PixiImage from "@/ui/components/custom/PixiImage";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { VStack } from "@/ui/components/custom/stack/Stack";
-import { useCallback, WheelEvent } from "react";
-import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { RuleRequirement } from "@/shared/data-types/ruleset.data";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
+import PixiImage from "@/ui/components/custom/PixiImage";
+import { VStack } from "@/ui/components/custom/stack/Stack";
+import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
+import { ArrowRight, Check, CircleQuestionMark, SquareCheck, SquareDashed, SquareX } from "lucide-react";
+import { useCallback, WheelEvent } from "react";
 import { useEditRuleset } from "./ContextProvider";
 
 
@@ -75,7 +75,7 @@ function ConstraintsGrid() {
                     const firstOutput = ruleOutputs[0];
                     if (!firstOutput) {
                         return (
-                            <div key={index} className="aspect-square bg-surface-overlay relative p-2 flex items-center justify-center cursor-not-allowed">
+                            <div key={index} className="aspect-square bg-surface relative p-2 flex items-center justify-center cursor-not-allowed">
                                 <div className="w-full h-full" style={{ backgroundColor: currentRulesetColor }} />
                             </div>
                         );
@@ -83,7 +83,7 @@ function ConstraintsGrid() {
                     const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(firstOutput.tilesetIndex);
                     if (!tilesetId) {
                         return (
-                            <div key={index} className="aspect-square bg-surface-overlay relative p-2 flex items-center justify-center cursor-not-allowed">
+                            <div key={index} className="aspect-square bg-surface relative p-2 flex items-center justify-center cursor-not-allowed">
                                 <div className="w-full h-full" style={{ backgroundColor: currentRulesetColor }} />
                             </div>
                         );
@@ -91,14 +91,14 @@ function ConstraintsGrid() {
                     const textureManager = appKernel.editorFacade.textureManager;
                     const tilesetTexture = textureManager.getTileTexture(tilesetId, firstOutput.tileId);
                     return (
-                        <div key={index} className="aspect-square bg-surface-overlay relative p-2 flex items-center justify-center cursor-not-allowed">
+                        <div key={index} className="aspect-square bg-surface relative p-2 flex items-center justify-center cursor-not-allowed">
                             <PixiImage texture={tilesetTexture} />
                         </div>
                     );
                 }
 
                 return (
-                    <div key={index} onClick={() => setSelectedConstraintIndex(index)} className={`aspect-square bg-surface-overlay-sunken relative p-2 flex items-center justify-center ${isSelected ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent/50 hover:border-transparent"}`}
+                    <div key={index} onClick={() => setSelectedConstraintIndex(index)} className={`aspect-square bg-surface-sunken relative p-2 flex items-center justify-center ${isSelected ? "ring-2 ring-accent" : "border border-foreground/20 hover:ring-2 hover:ring-accent/50 hover:border-transparent"}`}
                     >
                         {firstConstraintColor && <div className="w-full h-full" style={{ backgroundColor: isEmpyOrAny ? "transparent" : firstConstraintColor }} />}
                         <div className="absolute">
@@ -115,7 +115,7 @@ function OutputList() {
     const { ruleset, ruleOutputs } = useEditRuleset();
 
     return (
-        <ScrollArea className='h-full w-full border border-foreground/20 bg-surface-overlay-sunken'>
+        <ScrollArea className='h-full w-full border border-foreground/20 bg-surface-sunken'>
             <div className="flex flex-wrap gap-2 p-2 w-full">
                 {ruleOutputs.map((output) => {
                     const tilesetId = ruleset.tilesetRefManager.getTilesetRefId(output.tilesetIndex);
@@ -159,7 +159,7 @@ function RequirementEditor() {
                         return (
                             <div
                                 key={requirement.requirement}
-                                className={`aspect-square bg-surface-overlay-sunken flex flex-col gap-1 items-center justify-center border border-foreground/20 cursor-pointer ${selected && "outline-2 outline-accent"}`}
+                                className={`aspect-square bg-surface-sunken flex flex-col gap-1 items-center justify-center border border-foreground/20 cursor-pointer ${selected && "outline-2 outline-accent"}`}
                                 onClick={() => actions.updateConstraint(requirement.requirement)}
                             >
                                 {requirement.icon}
@@ -173,7 +173,7 @@ function RequirementEditor() {
             <VStack className="gap-2">
                 <span className="text-base"><LocalizedText message="dialog.editRuleset.targets" /></span>
                 <div className="grid grid-cols-7 w-full gap-2">
-                    <div onClick={() => { if (needTarget) actions.toggleAllowEmpty() }} className={`bg-surface-overlay-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${allowEmpty && "outline-2 outline-accent"}`} >
+                    <div onClick={() => { if (needTarget) actions.toggleAllowEmpty() }} className={`bg-surface-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${allowEmpty && "outline-2 outline-accent"}`} >
                         <div className="size-8 aspect-square relative flex items-center justify-center border-2 border-foreground border-dashed">
                             {allowEmpty && (
                                 <div className="absolute">
@@ -189,7 +189,7 @@ function RequirementEditor() {
                         const selected = constraintTargets.includes(ruleset.id) && selectedConstraint.getRequirement() !== RuleRequirement.ANY;
                         return (
                             <div key={ruleset.id} onClick={() => { if (needTarget) actions.toggleTarget(ruleset.id) }}
-                                className={`bg-surface-overlay-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${selected && "outline-2 outline-accent"}`}
+                                className={`bg-surface-sunken flex flex-col cursor-pointer p-2 gap-2 items-center justify-center border border-foreground/20 ${selected && "outline-2 outline-accent"}`}
                             >
                                 <div className="size-8 aspect-square relative flex items-center justify-center" style={{ backgroundColor: ruleset.color }}>
                                     {selected && (

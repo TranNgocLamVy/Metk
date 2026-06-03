@@ -353,7 +353,7 @@
         },
         "rulesetManager": {
             "label": "Ruleset",
-            "dropdown": {
+            "menu": {
                 "new": "New Ruleset",
                 "edit": "Edit Ruleset",
                 "delete": "Delete Ruleset"

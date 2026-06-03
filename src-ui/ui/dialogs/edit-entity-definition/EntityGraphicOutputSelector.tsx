@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
-import { Application } from "pixi.js";
 import { Application as PixiApplication } from "@pixi/react";
 import { Plus } from "lucide-react";
+import { Application } from "pixi.js";
+import { useCallback, useEffect, useState } from "react";
 
 import { EntityGraphicType } from "@/shared/data-types/entity.data";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
@@ -70,7 +70,7 @@ export default function EntityGraphicOutputSelector() {
                             <Plus className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-48 bg-surface-overlay">
+                    <DropdownMenuContent align="start" className="w-48 bg-surface">
                         {tilesetList.length === 0 ? (
                             <DropdownMenuItem disabled className="h-7">
                                 <LocalizedText message="dialog.editEntity.noTileset" />
@@ -97,7 +97,7 @@ export default function EntityGraphicOutputSelector() {
                                     onClick={() => selectTileset(tilesetRef.id)}
                                     variant="empty"
                                     size="sm"
-                                    className={`rounded-none border-none h-8 text-foreground cursor-pointer ${isActive ? "bg-surface-overlay entity_tab relative" : "bg-transparent hover:bg-surface-overlay"}`}
+                                    className={`rounded-none border-none h-8 text-foreground cursor-pointer ${isActive ? "bg-surface entity_tab relative" : "bg-transparent hover:bg-surface"}`}
                                 >
                                     {tilesetRef.name}
                                 </Button>

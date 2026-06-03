@@ -36,7 +36,7 @@ export function SelectField(props: SelectFieldProps) {
                 <SelectTrigger size="sm" className="w-full bg-surface-sunken text-2xs">
                     <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-surface-overlay-raised">
+                <SelectContent className="bg-surface-raised">
                     {options.map((option) => (
                         <SelectItem className="text-foreground text-2xs" disabled={option.disabled ?? false} key={`${option.value}`} value={String(option.value)}>
                             <LocalizedText message={option.label} />

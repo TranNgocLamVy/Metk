@@ -64,7 +64,7 @@ export default function ToolBar() {
 	};
 
 	return (
-		<VStack className="w-fit h-fit px-1 pb-0 pt-2 bg-surface">
+		<VStack className="w-fit h-fit p-1 bg-surface">
 			<HStack className="w-full h-8 gap-1">
 				{groups.sort((a, b) => a.items[0].index - b.items[0].index).map((group, index) => {
 					return (

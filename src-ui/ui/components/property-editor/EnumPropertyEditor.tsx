@@ -45,7 +45,7 @@ export function EnumPropertyEditor({ property }: EnumEditorProps) {
                     <SelectValue />
                 </SelectTrigger>
 
-                <SelectContent className="bg-surface-overlay-raised">
+                <SelectContent className="bg-surface-raised">
                     {options.map((option) => (
                         <SelectItem
                             className="text-foreground"

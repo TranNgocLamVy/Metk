@@ -262,8 +262,8 @@ const GroupField = ({ field, value = {}, formValues, inheritedDisabled, onChange
     )
 
     return (
-        <div className={`relative mt-3 h-full rounded-md border border-foreground/40 p-3 pt-6 ${disabled ? "opacity-60" : ""}`}>
-            <label className="absolute -top-2.5 left-3 bg-surface-overlay px-1 text-xs font-medium text-foreground">
+        <div className={`relative mt-3 h-full rounded-md border border-foreground/30 p-3 pt-6 ${disabled ? "opacity-60" : ""}`}>
+            <label className="absolute -top-2.5 left-3 bg-surface px-1 text-xs font-medium text-foreground">
                 <LocalizedText message={label} />
             </label>
 

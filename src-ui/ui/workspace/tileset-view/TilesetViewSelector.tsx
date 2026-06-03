@@ -128,9 +128,12 @@ export default function TilesetViewSelector() {
 	})
 
 	return (
-		<VStack className="tilesetView h-full px-1 py-2 bg-surface relative">
-			<TilesetViewTabs />
+		<VStack className="tilesetView h-full bg-surface relative">
+			<div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
+				<div className="w-full h-full border border-t-0 border-foreground/30 z-10"/>
+			</div>
 			<TilesetViewCanvas />
+			<TilesetViewTabs />
 		</VStack>
 	);
 }

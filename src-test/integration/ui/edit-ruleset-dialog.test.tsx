@@ -314,7 +314,7 @@ describe("Edit ruleset dialog workflow", () => {
 
         const { container } = renderDialog();
 
-        const sidebar = screen.getByDisplayValue("Terrain Rules").closest(".bg-surface-overlay")!;
+        const sidebar = screen.getByDisplayValue("Terrain Rules").closest(".bg-surface")!;
         const addRuleButton = within(sidebar as HTMLElement).getAllByRole("button")[0];
         await user.click(addRuleButton);
 

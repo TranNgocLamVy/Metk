@@ -1,15 +1,15 @@
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
-import { DialogContent, Dialog, DialogTitle } from "@/ui/components/shadcn/dialog";
-import { useMemo } from "react";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
-import OutputSelector from "./OutputSelector";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
-import EditRulesetSidebar from "./Sidebar";
-import RuleEditor from "./RuleEditor";
+import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
+import { Dialog, DialogContent, DialogTitle } from "@/ui/components/shadcn/dialog";
+import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useMemo } from "react";
 import { EditRulesetContext, useRulesetController } from "./ContextProvider";
+import OutputSelector from "./OutputSelector";
+import RuleEditor from "./RuleEditor";
+import EditRulesetSidebar from "./Sidebar";
 
 interface EditRulesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -43,11 +43,11 @@ function EditRulesetDialogProvider({ clonedRuleset, dialogId }: { clonedRuleset:
                     <EditRulesetSidebar dialogId={dialogId} />
 
                     <HStack className="flex-1 gap-4">
-                        <HStack className="w-2/5 h-full p-2 gap-2 bg-surface-overlay">
+                        <HStack className="w-2/5 h-full p-2 gap-2 bg-surface">
                             <RuleEditor />
                         </HStack>
 
-                        <VStack className="w-3/5 h-full p-2 bg-surface-overlay">
+                        <VStack className="w-3/5 h-full p-2 bg-surface">
                             <OutputSelector />
                         </VStack>
                     </HStack>

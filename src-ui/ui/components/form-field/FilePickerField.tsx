@@ -69,7 +69,7 @@ export default function FilePickerField(props: FilePickerProps) {
 					className="w-full text-2xs h-6"
 					title={title}
 				/>
-				<Button variant="outline" size="xs" className="text-2xs border-foreground/40" onClick={selectFile}>
+				<Button variant="outline" size="xs" className="text-2xs border-foreground/30" onClick={selectFile}>
 					<LocalizedText message={"form.tileset.image.browse"} />
 				</Button>
 			</HStack>

@@ -6,7 +6,6 @@ import { useTilemapSessionEvent } from "@/ui/hooks/useTilemapSessionEvent.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import { useCallback, useEffect, useRef } from "react";
-import WorkspaceConsole from "../console/Console";
 import ToolBar from "../ToolBar";
 import TilemapEditorCanvas from "./TilemapEditorCanvas";
 import TilemapEditorTabs from "./TilemapEditorTabs";
@@ -150,11 +149,13 @@ export default function TilemapEditor() {
     })
 
     return (
-        <VStack className="tilemapeditor w-full h-full relative">
+        <VStack className="tilemapeditor w-full h-full px-frame-quarter pb-frame-quarter relative">
+            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
+				<div className="w-full h-full border border-t-0 border-foreground/30 z-10"/>
+			</div>
             <TilemapEditorTabs />
             <ToolBar />
             <TilemapEditorCanvas />
-            <WorkspaceConsole />
         </VStack>
     );
 }

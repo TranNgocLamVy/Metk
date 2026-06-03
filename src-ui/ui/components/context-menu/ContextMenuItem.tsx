@@ -39,7 +39,7 @@ export function ContextMenuItem({ item }: ContextMenuItemProps) {
 	}
 
 	if (item.type === "subMenu") {
-		const subMenusClassName = twMerge("w-70 bg-surface-overlay border-0", item.subMenusClassName);
+		const subMenusClassName = twMerge("w-70 bg-surface border-0", item.subMenusClassName);
 		const subMenus = typeof item.subMenus === "function" ? item.subMenus() : item.subMenus;
 		return (
 			<ContextMenuSub>

@@ -3,9 +3,9 @@ import { useMemo } from "react";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { EntityCollection } from "@/editor/model/entity/entity-collection";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
-import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { Dialog, DialogContent, DialogTitle } from "@/ui/components/shadcn/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 
@@ -67,7 +67,7 @@ function EditEntityDefinitionDialogProvider({
                     <EditEntityDefinitionSidebar dialogId={dialogId} />
 
                     <HStack className="flex-1 gap-4">
-                        <VStack className="w-full h-full p-2 bg-surface-overlay">
+                        <VStack className="w-full h-full p-2 bg-surface">
                             <EntityDefinitionGraphicSelector />
                         </VStack>
                     </HStack>

@@ -18,14 +18,14 @@ export default function EntityCollectionManagerTabs() {
     const { entityCollectionDisplayDatas, selectedEntityCollectionId: currentSelectedEntityCollectionId } = useEntityCollectionStore();
 
     return (
-        <HStack className="w-full pb-2" justify="start" align="center">
+        <HStack className="w-full" justify="start" align="center">
             <DropdownMenu>
                 <DropdownMenuTrigger>
-                    <Button variant={"ghost"} size={"icon"} asChild className="p-1.5">
+                    <Button variant={"ghost"} size={"icon"} asChild className="p-1.5 border border-foreground/30 border-x-0">
                         <Ellipsis />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" className="min-w-60">
+                <DropdownMenuContent side="top" className="min-w-60">
                     <DropdownMenuItem onClick={EntityCollectionService.createEntityCollection}>
                         <Plus />
                         <LocalizedText message="workspace.entityCollectionManager.dropdown.new" />
@@ -46,7 +46,8 @@ export default function EntityCollectionManagerTabs() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-            <div ref={ref} className="flex flex-row items-center overflow-y-scroll scroll-smooth no-scrollbar bg-surface-sunken w-full h-8">
+            <div ref={ref} className="flex flex-row relative items-center overflow-y-scroll scroll-smooth no-scrollbar bg-surface-sunken w-full h-8">
+                <div className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none border border-foreground/30" />
                 {entityCollectionDisplayDatas.map((collection) => {
                     const isCurrent = currentSelectedEntityCollectionId === collection.id;
 
@@ -59,15 +60,12 @@ export default function EntityCollectionManagerTabs() {
                                 if (isCurrent) return;
                                 EntityCollectionService.selectEntityCollection(collection.id);
                             }}
-                            className={`pr-2 h-full border-none ${isCurrent
-                                ? "text-foreground bg-surface tab relative"
-                                : "text-muted-foreground hover:text-foreground bg-transparent"
+                            className={`pr-2 h-full border-none text-foreground relative cursor-pointer ${isCurrent
+                                ? "bg-surface"
+                                : "bg-transparent"
                                 }`}
                         >
-                            <style>
-                                {`.tab::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: var(--foreground); }`}
-                            </style>
-
+                            {isCurrent && <div className="absolute bottom-0 top-0 left-0 right-0 border pointer-events-none border-foreground/30" />}
                             {collection.name}
                         </Button>
                     );

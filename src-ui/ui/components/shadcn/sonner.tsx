@@ -20,7 +20,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 			}}
 			style={
 				{
-					"--normal-bg": "var(--background-surface-overlay)",
+					"--normal-bg": "var(--background-surface)",
 					"--normal-text": "var(--foreground)",
 				} as React.CSSProperties
 			}
@@ -35,3 +35,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 export { Toaster };
+

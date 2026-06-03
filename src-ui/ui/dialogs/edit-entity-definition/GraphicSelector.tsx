@@ -21,7 +21,7 @@ export default function EntityDefinitionGraphicSelector() {
                     <SelectTrigger size="sm" className="w-full bg-surface-sunken text-xs">
                         <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-surface-overlay">
+                    <SelectContent className="bg-surface">
                         <SelectItem className="text-foreground text-xs" value={EntityGraphicType.Color}>
                             <LocalizedText message="dialog.editEntity.color" />
                         </SelectItem>

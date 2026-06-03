@@ -19,7 +19,7 @@ export default function LayerMenuBar() {
     }, [layerViews, selectedLayers])
 
     return (
-        <HStack className="bg-surface absolute bottom-1 w-full px-1 py-1 gap-0.5">
+        <HStack className="bg-surface w-full p-1 pt-0 gap-0.5">
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <QuickToolTip toolTip={"workspace.layerManager.menu.new.label"}>

@@ -21,7 +21,7 @@ export default function TilesetViewCanvas() {
 			if (!pixiApp) return;
 			const w = entry.contentRect.width;
 			const h = entry.contentRect.height;
-			pixiApp.renderer?.resize(w, h);
+			pixiApp.renderer?.resize(w - 1, h + 1);
 		},
 		[pixiApp]
 	);
@@ -38,9 +38,9 @@ export default function TilesetViewCanvas() {
 	};
 
 	return (
-		<div ref={containerRef} className="w-full h-full overflow-hidden pt-2 relative">
+		<div ref={containerRef} className="flex w-full h-full overflow-hidden pt-2 px-frame-quarter relative">
 			<ContextMenuWrapper item={TilesetViewContextMenu}>
-				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas shadow-sm" />
+				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas rounded-md inset-shadow-panel border-t border-foreground/30" />
 			</ContextMenuWrapper>
 			{activeSession == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0 pr-2">
 				<span className="text-sm">

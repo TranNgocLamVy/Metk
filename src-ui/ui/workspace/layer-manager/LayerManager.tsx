@@ -134,48 +134,45 @@ export default function LayerManager() {
 		if (activeSession) useLayerManagerStore.getState().setTargetParentLayer(null);
 	}, [activeSession]);
 
-	if (!activeSession) {
-		return (
-			<VStack className="w-full h-full px-1 py-2 bg-surface" justify="center" align="center">
-				<VStack className="w-full h-full bg-surface-base shadow-sm" justify="center" align="center">
-					<span className="text-sm">
-						<LocalizedText message="workspace.tilemapEditor.empty" />
-					</span>
-					<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
-						<LocalizedText message="workspace.tilemapEditor.open" />
-					</Button>
-				</VStack>
-			</VStack>
-		);
-	}
-
 	return (
-		<VStack className="w-full h-full relative overflow-hidden bg-surface">
+		<VStack className="w-full relative h-full bg-surface">
+			<div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
+				<div className="w-full h-full border border-t-0 border-foreground/30 z-10" />
+			</div>
 			<VStack
-				className="absolute inset w-full h-full px-1 py-2 bg-surface"
+				className="w-full h-full px-frame-quarter pb-frame-half pt-1 bg-surface relative"
 				onDrop={handleContainerDrop}
 				onDragOver={handleDragOver}
 				ref={layerManagerRef}
 				onPointerDownCapture={handleLayerManagerPointerDownCapture}
 				onBlurCapture={handleLayerManagerBlurCapture}
 			>
+				<LayerMenuBar />
 				<ContextMenu onOpenChange={onOpenChange}>
 					<ContextMenuTrigger asChild>
-						<ScrollArea className="w-full h-full shadow-sm bg-surface-base">
-							<div className="flex flex-col w-full min-h-full pb-10">
+						<ScrollArea className="w-full h-full min-h-0 shadow-sm bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
+							<div className="flex flex-col w-full h-full pb-20">
 								{layerViews.map((view) => (
 									<LayerNodeRow key={view.id} view={view} isSelected={selectedLayers.includes(view.id)} updatedLayerView={updateLayerView} />
 								))}
 							</div>
-							<div className="flex-1 min-h-[10px] h-full transition-colors" />
 						</ScrollArea>
 					</ContextMenuTrigger>
 					<ContextMenuContent className={LayerManagerContextMenu.className}>
 						<ContextMenuItemGroup groups={LayerManagerContextMenu.groups} />
 					</ContextMenuContent>
 				</ContextMenu>
+				{!activeSession && (
+					<VStack className="top-0 left-0 right-0 bottom-0 absolute" justify="center" align="center">
+						<span className="text-sm">
+							<LocalizedText message="workspace.tilemapEditor.empty" />
+						</span>
+						<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
+							<LocalizedText message="workspace.tilemapEditor.open" />
+						</Button>
+					</VStack>
+				)}
 			</VStack>
-			<LayerMenuBar />
 		</VStack>
 	);
 }

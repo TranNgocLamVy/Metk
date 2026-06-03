@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 
+import WorkspaceConsole from "@/ui/workspace/console/Console";
 import SecurityShield from "./SecurityShield";
 
 interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -32,6 +33,7 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 		<main id="main-container" {...props} ref={containerRef} className="w-full cursor-default h-dvh bg-surface-base">
 			<SecurityShield />
 			{children}
+            <WorkspaceConsole />
 		</main>
 	);
 }

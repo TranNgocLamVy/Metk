@@ -23,12 +23,12 @@ export default function MenuBarItem({ item }: MenuBarItemProps) {
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
     const label = typeof item.label === "function" ? item.label() : item.label;
-	const className = twMerge("w-96 bg-surface-overlay-sunken shadow-lg", item.className);
+	const className = twMerge("w-96 bg-surface-base shadow-xl", item.className);
 
 	return (
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false} >
 			<DropdownMenuTrigger disabled={disabled} asChild>
-				<Button size={"sm"} variant={"empty"} className="px-2 rounded-none h-8 hover:bg-surface-sunken" asChild>
+				<Button size={"xs"} variant={"empty"} className="px-2 rounded-none h-6 hover:bg-surface-sunken" asChild>
 					<p className="text-xs"><LocalizedText message={label} /></p>
 				</Button>
 			</DropdownMenuTrigger>
@@ -97,7 +97,7 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 	}
 
 	if (item.type === "subMenu") {
-		const subMenusClassName = twMerge("w-70", item.subMenusClassName);
+		const subMenusClassName = twMerge("w-70 bg-surface-base shadow-xl", item.subMenusClassName);
 		const subMenus = typeof item.subMenus === "function" ? item.subMenus() : item.subMenus;
 		return (
 			<DropdownMenuSub>

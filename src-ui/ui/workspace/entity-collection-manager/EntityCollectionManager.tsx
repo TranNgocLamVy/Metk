@@ -119,11 +119,13 @@ export default function EntityCollectionManager() {
     }, [currentSelectedEntityCollectionId]);
 
     return (
-        <VStack className="w-full h-full relative overflow-hidden bg-surface">
-            <VStack className="absolute inset w-full h-full px-1 py-2 bg-surface">
-                <EntityCollectionManagerTabs />
-
-                <ScrollArea className="flex w-full h-full no-scrollbar bg-surface-base rounded-lg shadow-sm">
+        <VStack className="w-full h-full relative bg-surface">
+            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
+                <div className="w-full h-full border border-t-0 border-foreground/30 z-10" />
+            </div>
+            <VStack className="w-full h-full px-frame-quarter pb-frame-half pt-1 bg-surface">
+                <EntityCollectionMenuBar />
+                <ScrollArea className="flex flex-1 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
                     {!activeEntityCollection ? (
                         <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
                             <LocalizedText message="workspace.entityCollectionManager.empty" />
@@ -133,7 +135,7 @@ export default function EntityCollectionManager() {
                             <LocalizedText message="workspace.entityCollectionManager.noEntities" />
                         </div>
                     ) : (
-                        <div className="flex flex-col w-full min-h-full pb-10">
+                        <div className="flex flex-col w-full min-h-full">
                             {entities.map((entity) => {
                                 const isSelected = selectedEntityId === entity.id;
 
@@ -159,12 +161,11 @@ export default function EntityCollectionManager() {
                             })}
                         </div>
                     )}
-
                     <ScrollBar className="w-2" />
                 </ScrollArea>
-            </VStack>
 
-            <EntityCollectionMenuBar />
+                <EntityCollectionManagerTabs />
+            </VStack>
         </VStack>
     );
 }
@@ -186,7 +187,7 @@ export function EntityDefinitionGraphic({ entityDefinition }: { entityDefinition
     } else if (entityDefinition.graphic.type === "tile") {
         const tileTexture = appKernel.textureManager.getTileTexture(entityDefinition.graphic.tilesetId, entityDefinition.graphic.tileId);
         return (
-            <div className="size-8 aspect-square bg-surface-overlay relative flex items-center justify-center cursor-not-allowed">
+            <div className="size-8 aspect-square bg-surface relative flex items-center justify-center cursor-not-allowed">
                 <PixiImage texture={tileTexture} />
             </div>
         );

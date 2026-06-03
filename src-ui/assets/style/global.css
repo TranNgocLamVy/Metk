@@ -16,10 +16,6 @@
 	--color-surface-sunken: var(--background-surface-sunken); /* Height level 1 */
 	--color-surface: var(--background-surface); /* Height level 2 */
 	--color-surface-raised: var(--background-surface-raised); /* Height level 3 */
-	
-	--color-surface-overlay-sunken: var(--background-surface-overlay-sunken); /* Height level 4 */
-	--color-surface-overlay: var(--background-surface-overlay); /* Height level 5 */
-	--color-surface-overlay-raised: var(--background-surface-overlay-raised); /* Height level 6 */
 
 	--color-canvas: var(--background-canvas);
 
@@ -42,6 +38,14 @@
 	--radius-2xl: calc(var(--radius) + 8px);
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
+
+	/* Shadow */
+	--inset-shadow-panel: inset 0 0 10px 0 rgba(0, 0, 0, 0.1);
+
+	/* Flexlayout frame size */
+	--spacing-frame: var(--frame-size);
+  	--spacing-frame-half: calc(var(--frame-size) / 2);
+  	--spacing-frame-quarter: calc(var(--frame-size) / 4);
 }
 
 @layer base {
@@ -61,16 +65,16 @@
 	font-family: "JetBrains Mono";
 
 	/* Background */
-	--background-base: #ffffff;
-	--background-surface-sunken: #e5e9f0;
-	--background-surface: #eceff4;
+	--background-base: #f0f0f0;
+	--background-surface-sunken: #a6a6a6;
+	--background-surface: #c0c0c0;
 	--background-surface-raised: #ffffff;
 
-	--background-surface-overlay-sunken: #e5e9f0;
-	--background-surface-overlay: #eceff4;
-	--background-surface-overlay-raised: #ffffff;
+	--background-surface-sunken: #a6a6a6;
+	--background-surface: #c0c0c0;
+	--background-surface-raised: #ffffff;
 
-	--background-canvas: #ffffff;
+	--background-canvas: #898989;
 
 	--foreground: oklch(0.145 0 0);
 
@@ -85,6 +89,11 @@
 
 	/* Radius */
 	--radius: 0rem;
+
+	/* Flexlayout frame size */
+	--frame-size: 16px;
+	--frame-size-half: calc(var(--frame-size) / 2);
+	--frame-size-quarter: calc(var(--frame-size) / 4);
 }
 
 .dark {
@@ -92,10 +101,6 @@
 	--background-surface-sunken: #3b4252;
 	--background-surface: #434c5e;
 	--background-surface-raised: #4c566a;
-
-	--background-surface-overlay-sunken: #3b4252;
-	--background-surface-overlay: #434c5e;
-	--background-surface-overlay-raised: #4c566a;
 
 	--background-canvas: #2e3440;
 

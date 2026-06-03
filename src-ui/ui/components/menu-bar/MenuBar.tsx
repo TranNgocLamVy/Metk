@@ -1,16 +1,15 @@
-import { HStack } from "@/ui/components/custom/stack/Stack";
 import { useTheme } from "@/app/providers/theme.provider";
-import { FileDropdownOptions } from "./dropdown/FileDropdownOptions";
-import { EditDropdownOptions } from "./dropdown/EditDropdownOptions";
-import { ViewDropdownOptions } from "./dropdown/ViewDropdownOptions";
-import { MapDropdownOptions } from "./dropdown/MapDropdownOptions";
-import { LayerDropdownOptions } from "./dropdown/LayerDropdownOptions";
-import { ProjectDropdownOptions } from "./dropdown/ProjectDropdownOptions";
-import { HelpDropdownOptions } from "./dropdown/HelpDropdownOptions";
-import { DebugDropdownOptions } from "./dropdown/DebugDropDownOptions";
-import MenuBarItem from "./MenuBarItem";
+import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from '@/ui/components/shadcn/button';
 import { SunMoon } from "lucide-react";
+import { DebugDropdownOptions } from "./dropdown/DebugDropDownOptions";
+import { EditDropdownOptions } from "./dropdown/EditDropdownOptions";
+import { FileDropdownOptions } from "./dropdown/FileDropdownOptions";
+import { HelpDropdownOptions } from "./dropdown/HelpDropdownOptions";
+import { LayerDropdownOptions } from "./dropdown/LayerDropdownOptions";
+import { MapDropdownOptions } from "./dropdown/MapDropdownOptions";
+import { ViewDropdownOptions } from "./dropdown/ViewDropdownOptions";
+import MenuBarItem from "./MenuBarItem";
 
 export default function MenuBar() {
 	const { theme, setTheme } = useTheme();
@@ -21,8 +20,8 @@ export default function MenuBar() {
 	};
 
 	return (
-		<HStack id="menu-bar" className="w-full h-fit overflow-hidden bg-surface fixed top-0 z-50">
-			<HStack className="text-foreground/70">
+		<HStack id="menu-bar" className="w-full h-fit overflow-hidden bg-surface-sunken shadow-lg fixed top-0">
+			<HStack className="text-foreground/70 h-fit">
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />
 				<MenuBarItem item={ViewDropdownOptions} />
@@ -34,8 +33,8 @@ export default function MenuBar() {
 			</HStack>
 
 			<HStack className="ml-auto">
-				<Button title="Change Theme" size={"icon-sm"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
-					<SunMoon className="size-4" />
+				<Button title="Change Theme" size={"icon-xs"} variant={"ghost"} className="rounded-none" onClick={toggleTheme}>
+					<SunMoon />
 				</Button>
 			</HStack>
 		</HStack>

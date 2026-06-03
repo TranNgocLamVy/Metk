@@ -78,7 +78,7 @@ export default function EditEntityDefinitionSidebar({ dialogId }: EditEntityDefi
     }, [actions, closeDialog, dialogId, entity, entityCollection, name, tilesetRefManager]);
 
     return (
-        <VStack className="w-72 h-full bg-surface-overlay p-2 gap-2">
+        <VStack className="w-72 h-full bg-surface p-2 gap-2">
             <VStack className="gap-2">
                 <label className="text-xs text-muted-foreground">
                     <LocalizedText message="dialog.editEntity.name" />
@@ -90,7 +90,7 @@ export default function EditEntityDefinitionSidebar({ dialogId }: EditEntityDefi
                     onKeyDown={(e) => {
                         if (e.key === "Enter") commitName();
                     }}
-                    className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-overlay-sunken"
+                    className="text-sm w-full border border-foreground/20 py-1 px-2 focus:outline-1 focus:outline-foreground bg-surface-sunken"
                 />
             </VStack>
 

@@ -22,7 +22,7 @@ export function RightPanel() {
     const { selectedTile } = useEditTileset();
 
     return (
-        <VStack className="w-1/4 h-full bg-surface-overlay p-2 shadow-sm">
+        <VStack className="w-1/4 h-full bg-surface p-2 shadow-sm">
             <VStack className="w-full h-full min-h-0 overflow-hidden bg-surface-base flex flex-col">
                 {!selectedTile && (
                     <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
@@ -54,7 +54,7 @@ function PropertyPanel({ selectedTile }: { selectedTile: Tile }) {
 
     return (
         <VStack className="w-full h-full">
-            <div className="flex h-8 items-center px-1 bg-surface-overlay">
+            <div className="flex h-8 items-center px-1 bg-surface">
                 <span className="text-xs font-medium text-foreground"><LocalizedText message={"Properties"} /></span>
             </div>
             {groups.length === 0 && (
@@ -102,7 +102,7 @@ function CollisionObjectPanel({ selectedTile }: { selectedTile: Tile }) {
 
     return (
         <VStack className="w-full h-full">
-            <div className="flex h-8 items-center px-1 bg-surface-overlay">
+            <div className="flex h-8 items-center px-1 bg-surface">
                 <span className="text-xs font-medium text-foreground"><LocalizedText message={"Collision Objects"} /></span>
             </div>
 
@@ -170,7 +170,7 @@ function ObjectCollisionMenuBar({ selectedTile }: { selectedTile: Tile }) {
     };
 
     return (
-        <HStack className="bg-surface-overlay w-full px-1 py-1 gap-0.5">
+        <HStack className="bg-surface w-full px-1 py-1 gap-0.5">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant={"ghost"} size={"icon-sm"} className="p-1.5">

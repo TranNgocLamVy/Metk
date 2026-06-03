@@ -9,7 +9,7 @@ import { useRulesetStore } from "@/ui/stores/ruleset.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 import { useCallback, useEffect } from "react";
 import { RulesetManagerContextMenu } from "./ContextMenu";
-import RulesetTab from "./RulesetTab";
+import RulesetMenuBar from "./RulesetMenubar";
 
 export default function RulesetManager() {
     const { activeWorkspace } = useWorkspaceStore();
@@ -45,14 +45,16 @@ export default function RulesetManager() {
     }, [currentSelectedRuleId]);
 
     return (
-        <VStack className="w-full h-full relative overflow-hidden bg-surface">
-            <VStack className="absolute inset w-full h-full px-1 py-2 bg-surface">
-                <RulesetTab />
-                <div className="w-full h-2 bg-surface" />
+        <VStack className="w-full h-full relative bg-surface">
+            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
+                <div className="w-full h-full border border-t-0 border-foreground/30 z-10" />
+            </div>
+            <VStack className="w-full h-full px-frame-quarter pb-frame-half bg-surface">
+                <RulesetMenuBar />
                 <ContextMenu>
-                    <ContextMenuTrigger className="w-full h-full">
-                        <ScrollArea className="w-full h-full no-scrollbar bg-surface-base rounded-lg shadow-sm">
-                            <div className="flex flex-col w-full min-h-full pb-10">
+                    <ContextMenuTrigger asChild>
+                        <ScrollArea className="w-full h-full min-h-0 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
+                            <div className="flex flex-col w-full h-full">
                                 {rulesetDisplayDatas.map((ruleset) => {
                                     const isSelected = currentSelectedRuleId === ruleset.id;
                                     return (
@@ -65,7 +67,6 @@ export default function RulesetManager() {
                                     )
                                 })}
                             </div>
-                            <div className="flex-1 min-h-[10px] h-full transition-colors" />
                             <ScrollBar className="w-2" />
                         </ScrollArea>
                     </ContextMenuTrigger>

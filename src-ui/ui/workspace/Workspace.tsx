@@ -80,7 +80,7 @@ export default function Workspace() {
 	return (
 		<HStack className="w-full h-full select-none">
 			<VStack className="w-full h-full bg-surface">
-				<VStack className="workspace w-full h-full px-1 relative">
+				<VStack className="workspace w-full h-full px-frame-quarter pt-frame-half relative">
 					<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
 					<div className="top-0 left-0 w-full h-full absolute pointer-events-none" />
 				</VStack>

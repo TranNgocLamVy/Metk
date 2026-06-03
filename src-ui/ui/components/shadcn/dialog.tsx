@@ -38,7 +38,7 @@ function DialogContent({
 	showCloseButton?: boolean;
 }) {
 	const dataClassName = "data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 focus:outline-none";
-	const className = "bg-surface-overlay grid gap-4 rounded-none p-4 text-foreground text-xs/relaxed duration-100 fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2";
+	const className = "bg-surface grid gap-4 rounded-none p-4 text-foreground text-xs/relaxed duration-100 fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2";
 	return (
 		<DialogPortal>
 			<DialogOverlay />
@@ -101,3 +101,4 @@ function DialogDescription({ className: customClassName, ...props }: React.Compo
 }
 
 export { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger };
+

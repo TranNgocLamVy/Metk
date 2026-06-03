@@ -15,7 +15,7 @@ export default function QuickToolTip({ children, toolTip, delayDuration }: Props
             <TooltipTrigger asChild>
                 {children}
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="w-fit text-xs bg-surface-overlay-sunken shadow-md"><LocalizedText message={toolTip} /></TooltipContent>
+            <TooltipContent side="bottom" className="w-fit text-xs bg-surface-sunken shadow-md"><LocalizedText message={toolTip} /></TooltipContent>
         </Tooltip>
     )
 }

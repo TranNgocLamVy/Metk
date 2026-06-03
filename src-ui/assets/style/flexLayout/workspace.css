@@ -53,7 +53,7 @@
 
 .workspace .flexlayout__mini_scrollbar_container {
 	background-color: var(--background-surface);
-	padding-left: 4px;
+	padding-left: var(--frame-size-quarter);
 }
 
 .workspace .flexlayout__tabset_tabbar_inner_tab_container {
@@ -66,7 +66,7 @@
 
 .workspace .flexlayout__tab_toolbar {
 	background-color: var(--background-surface);
-	width: 4px !important;
+	width: var(--frame-size-quarter) !important;
 	padding: 0px !important;
 }
 
@@ -79,7 +79,6 @@
 	height: 32px !important;
 	padding: 0px 14px !important;
 	cursor: grab;
-	color: var(--muted-foreground);
 }
 
 .workspace .flexlayout__tab_button:hover {
@@ -88,17 +87,43 @@
 
 .workspace .flexlayout__tab_button--selected {
     background-color: var(--background-surface);
-	color: var(--foreground);
+    color: var(--foreground);
+    position: relative;
+	overflow: visible !important;
+	z-index: 1;
 }
 
 .workspace .flexlayout__tab_button--selected::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: var(--foreground);
+    right: 0;
+    bottom: 0;
+    
+    border: 1px solid color-mix(in srgb, var(--foreground) 40%, transparent);
+	border-bottom: none;
+    pointer-events: none; 
+}
+
+.workspace .flexlayout__tabset_tabbar_inner {
+	position: relative;
+}
+
+.workspace .flexlayout__tabset_tabbar_inner::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 40%, transparent);
+    pointer-events: none; 
+}
+
+.workspace .flexlayout__tab_button--unselected {
+    color: var(--foreground);
 }
 
 .workspace .flexlayout__tab_button_content {
@@ -143,7 +168,7 @@
 .workspace .flexlayout__splitter_vert::after {
     content: "";
     position: absolute;
-    transform: translate(0, -100%);
+    transform: translate(0, calc(var(--spacing-frame-quarter) * -1));
 	
 	z-index: 100;
     width: 4px;

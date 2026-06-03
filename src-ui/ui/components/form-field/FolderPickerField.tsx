@@ -51,7 +51,7 @@ export default function FolderPickerField(props: FolderPickerProps) {
 				className="w-full text-2xs h-6"
 				title={value ?? ""}
 			/>
-			<Button variant="outline" size="xs" className="text-2xs border-foreground/40" onClick={selectFolder}>
+			<Button variant="outline" size="xs" className="text-2xs border-foreground/30" onClick={selectFolder}>
 				<LocalizedText message={"form.tileset.image.browse"} />
 			</Button>
 		</HStack>

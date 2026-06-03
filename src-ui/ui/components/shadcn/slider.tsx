@@ -27,7 +27,7 @@ function Slider({
             </SliderPrimitive.Track>
             <SliderPrimitive.Thumb
                 data-slot="slider-thumb"
-                className="block size-3 border border-foreground/40 bg-surface-raised outline-none transition-colors focus-visible:border-accent disabled:pointer-events-none disabled:opacity-50"
+                className="block size-3 border border-foreground/30 bg-surface-raised outline-none transition-colors focus-visible:border-accent disabled:pointer-events-none disabled:opacity-50"
             />
         </SliderPrimitive.Root>
     );

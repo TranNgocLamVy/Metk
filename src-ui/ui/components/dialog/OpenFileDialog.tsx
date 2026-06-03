@@ -44,7 +44,7 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
                         <span><LocalizedText message="dialog.openFile.tilemap" /></span>
                         {tilemaps.map((tilemap) => {
                             return (
-                                <div key={tilemap.id} onClick={() => onOpenTilemap(tilemap.id)} className="w-full h-fit p-2 hover:bg-surface-overlay-sunken cursor-pointer">
+                                <div key={tilemap.id} onClick={() => onOpenTilemap(tilemap.id)} className="w-full h-fit p-2 hover:bg-surface-sunken cursor-pointer">
                                     <span className="text-xs">{tilemap.name}</span>
                                 </div>
                             )
@@ -54,7 +54,7 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
                         <span><LocalizedText message="dialog.openFile.tileset" /></span>
                         {tilesets.map((tileset) => {
                             return (
-                                <div key={tileset.id} onClick={() => onOpenTileset(tileset.id)} className="w-full h-fit p-2 hover:bg-surface-overlay-sunken cursor-pointer">
+                                <div key={tileset.id} onClick={() => onOpenTileset(tileset.id)} className="w-full h-fit p-2 hover:bg-surface-sunken cursor-pointer">
                                     <span className="text-xs">{tileset.name}</span>
                                 </div>
                             )
