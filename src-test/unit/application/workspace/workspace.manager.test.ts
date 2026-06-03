@@ -11,14 +11,16 @@ const storageState = vi.hoisted(() => ({
 vi.mock("@/infrastructure/container", () => storageState);
 
 import { WorkspaceManager } from "@/application/workspace/workspace.manager";
-import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { WorkspaceStorageService } from "@/infrastructure/container";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { defaultWorkspaceData, WorkpsaceData } from "@/shared/data-types/workspace.data";
 import { Result } from "@/shared/types/result";
 
 const createEditorFacade = () => ({
     toolManager: {
         startTool: vi.fn(),
+        startToolFamily: vi.fn(),
+        getCurrentFamilyId: vi.fn(() => null),
         on: vi.fn(),
         off: vi.fn(),
     },
@@ -36,7 +38,7 @@ const createProject = () => ({
 
 const createStoredWorkspaceData = (): WorkpsaceData => ({
     ...defaultWorkspaceData,
-    toolState: { currentTool: "stamp" },
+    toolState: { currentToolFamily: "stamp" },
     savedPath: {
         exportPaths: [{ tilemapId: "tilemap-a", exportPath: "C:/exports/tilemap-a.tmx" }],
         tilemapDir: "C:/maps",
@@ -97,7 +99,7 @@ describe("WorkspaceManager", () => {
 
         expect(result.status).toBe(Result.Status.Success);
         expect(WorkspaceStorageService.load).toHaveBeenCalledWith("C:/Project/Metk/test-project/.metk/session.json");
-        expect(editorFacade.toolManager.startTool).toHaveBeenCalledWith("stamp");
+        expect(editorFacade.toolManager.startToolFamily).toHaveBeenCalledWith("stamp");
         expect(manager.currentWorkspace?.serialize()).toEqual(storedWorkspaceData);
         expect(WorkspaceStorageService.save).not.toHaveBeenCalled();
     });

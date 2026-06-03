@@ -134,9 +134,9 @@ const BrushGroup: MenuDropDownGroupType = [
 				{
 					type: "radio",
 					label: "workspace.tilemapEditor.contextMenu.currentTool",
-					value: () => appKernel.toolManager.getCurrentToolId()!,
+					value: () => appKernel.toolManager.getCurrentFamilyId()!,
 					onValueChange(value) {
-						appKernel.toolManager.startTool(value);
+						appKernel.toolManager.startToolFamily(value);
 					},
 					items: [
 						{

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const registryMock = vi.hoisted(() => ({
     commandRegistry: new Map(),
-    toolRegistry: [] as any[],
+    toolFamilies: [] as any[],
 }));
 
 vi.mock("@/application/commands/system-command.manager", () => ({
@@ -11,11 +11,7 @@ vi.mock("@/application/commands/system-command.manager", () => ({
     },
 }));
 
-vi.mock("@/graphics/tool/tool.manager", () => ({
-    ToolManager: {
-        TOOL_REGISTRY: registryMock.toolRegistry,
-    },
-}));
+vi.mock("@/graphics/tool/tool.manager", () => ({}));
 
 vi.mock("@/shared/utils/key.utils", () => ({
     KeyUtils: {
@@ -25,7 +21,6 @@ vi.mock("@/shared/utils/key.utils", () => ({
 
 import { KeybindingManager } from "@/application/input/keybinding.manager";
 import { SystemCommandManager } from "@/application/commands/system-command.manager";
-import { ToolManager } from "@/graphics/tool/tool.manager";
 import { KeyUtils } from "@/shared/utils/key.utils";
 
 const createKeyboardEvent = (target?: Element) => {
@@ -43,7 +38,10 @@ const createKeyboardEvent = (target?: Element) => {
 
 const createManager = () => {
     const commandManager = { execute: vi.fn() };
-    const toolManager = { startTool: vi.fn() };
+    const toolManager = {
+        getToolFamilies: vi.fn(() => registryMock.toolFamilies),
+        startToolFamily: vi.fn(),
+    };
     const manager = new KeybindingManager(commandManager as any, toolManager as any);
     return { manager, commandManager, toolManager };
 };
@@ -51,7 +49,7 @@ const createManager = () => {
 describe("KeybindingManager", () => {
     beforeEach(() => {
         SystemCommandManager.COMMAND_REGISTRY.clear();
-        ToolManager.TOOL_REGISTRY.length = 0;
+        registryMock.toolFamilies = [];
         vi.mocked(KeyUtils.getKeystrokeString).mockReset();
         Object.defineProperty(document, "activeElement", {
             configurable: true,
@@ -71,8 +69,8 @@ describe("KeybindingManager", () => {
             when: "projectOpened",
             constructor: class {},
         });
-        ToolManager.TOOL_REGISTRY = [
-            { id: "stamp", label: "Stamp", shortcuts: ["B"], constructor: class {} },
+        registryMock.toolFamilies = [
+            { id: "stamp", label: "Stamp", shortcuts: ["B"], tools: [] },
         ];
 
         const { manager } = createManager();
@@ -101,7 +99,7 @@ describe("KeybindingManager", () => {
 
         manager.handleKeyDown(createKeyboardEvent());
 
-        expect(toolManager.startTool).toHaveBeenCalledWith("stamp");
+        expect(toolManager.startToolFamily).toHaveBeenCalledWith("stamp");
     });
 
     it("ignores unknown shortcuts without consuming the event", () => {
@@ -113,7 +111,7 @@ describe("KeybindingManager", () => {
         manager.handleKeyDown(event);
 
         expect(commandManager.execute).not.toHaveBeenCalled();
-        expect(toolManager.startTool).not.toHaveBeenCalled();
+        expect(toolManager.startToolFamily).not.toHaveBeenCalled();
         expect(event.preventDefault).not.toHaveBeenCalled();
         expect(event.stopPropagation).not.toHaveBeenCalled();
     });
@@ -158,7 +156,7 @@ describe("KeybindingManager", () => {
         vi.mocked(KeyUtils.getKeystrokeString).mockReturnValue("Ctrl+S");
         manager.handleKeyDown(createKeyboardEvent());
 
-        expect(toolManager.startTool).toHaveBeenCalledWith("stamp");
+        expect(toolManager.startToolFamily).toHaveBeenCalledWith("stamp");
         expect(commandManager.execute).not.toHaveBeenCalled();
 
         manager.registerDefaults([{ key: "Ctrl+N", id: "workspace.new", type: "command" }]);

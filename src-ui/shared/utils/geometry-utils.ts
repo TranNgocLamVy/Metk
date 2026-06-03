@@ -4,17 +4,17 @@
 export class GeometryUtils {
     /**
      * Calculate line between two points or coordinates using Bresenham's algorithm
-     * @param start Coordinate or Position
-     * @param end Coordinate or Position
-     * @returns Position[] or Coordinate[]
+     * @param start Coordinate or Point2D
+     * @param end Coordinate or Point2D
+     * @returns Point2D[] or Coordinate[]
      */
-    public static calculateLine(start: Position, end: Position): Position[];
+    public static calculateLine(start: Point2D, end: Point2D): Point2D[];
     public static calculateLine(start: Coordinate, end: Coordinate): Coordinate[];
-    public static calculateLine(start: Coordinate | Position, end: Coordinate | Position): Coordinate[] | Position[] {
+    public static calculateLine(start: Coordinate | Point2D, end: Coordinate | Point2D): Coordinate[] | Point2D[] {
         const isPosition = 'x' in start;
 
-        let x0 = isPosition ? (start as Position).x : (start as Coordinate).col;
-        let y0 = isPosition ? (start as Position).y : (start as Coordinate).row;
+        let x0 = isPosition ? (start as Point2D).x : (start as Coordinate).col;
+        let y0 = isPosition ? (start as Point2D).y : (start as Coordinate).row;
 
         const x1 = 'x' in end ? end.x : end.col;
         const y1 = 'y' in end ? end.y : end.row;

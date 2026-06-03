@@ -1,58 +1,92 @@
 import { Fragment, useEffect } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { ToolbarItemDisplayData, useToolbarStore } from "@/ui/stores/toolbar.store";
+import { ToolBarGroupDisplayData, useToolbarStore } from "@/ui/stores/toolbar.store";
 
 import SVGIcon from "@/ui/components/custom/icons/SvgIcon";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
+import { Separator } from "../components/shadcn/separator";
 
 export default function ToolBar() {
-	const { tools, activeTool, setTools, setActiveTool } = useToolbarStore();
+	const {
+		groups,
+		activeFamilyId,
+		availableFamilyIds,
+
+		setGroups,
+		setActiveFamilyId,
+		setAvailableFamilyIds,
+	} = useToolbarStore();
 
 	useEffect(() => {
 		const toolManager = appKernel.toolManager;
-        const toolData: ToolbarItemDisplayData[] = [];
+		const toolGroup: ToolBarGroupDisplayData[] = [];
 
-        toolManager.getToolContexts().forEach((toolContext) => {
-            if (toolContext.displayOnToolbar) {
-                toolData.push({
-                    id: toolContext.id,
-                    icon: toolContext.displayOnToolbar.icon,
-                    tooltip: toolContext.displayOnToolbar.tooltip,
-                    shortcuts: toolContext.shortcuts,
-                    index: toolContext.displayOnToolbar.index ?? 1000
-                });
-            }
-        })
-		setTools(toolData.sort((a, b) => a.index - b.index));
-		setActiveTool(toolManager.getCurrentToolId())
+		const onToolChanged = (familyId: string | null) => setActiveFamilyId(familyId);
+		const onToolAvailabilityChanged = (nextAvailableFamilyIds: string[]) => setAvailableFamilyIds(nextAvailableFamilyIds);
+
+		toolManager.getToolGroups().forEach((group) => {
+			const groupData: ToolBarGroupDisplayData = {
+				id: group.id,
+				label: group.label,
+				items: group.families.map((toolFamily) => ({
+					id: toolFamily.id,
+					icon: toolFamily.icon,
+					label: toolFamily.label,
+					tooltip: toolFamily.description,
+					shortcuts: toolFamily.shortcuts,
+					index: toolFamily.priority ?? 1000
+				}))
+			};
+			toolGroup.push(groupData);
+		});
+
+		setGroups(toolGroup);
+		setActiveFamilyId(toolManager.getCurrentFamilyId())
+		setAvailableFamilyIds(toolManager.getAvailableFamilyIds());
+
+		toolManager.on("onToolChanged", onToolChanged);
+		toolManager.on("onToolAvailabilityChanged", onToolAvailabilityChanged);
 
 		return () => {
-			setTools([]);
+			toolManager.off("onToolChanged", onToolChanged);
+			toolManager.off("onToolAvailabilityChanged", onToolAvailabilityChanged);
+			setGroups([]);
+			setAvailableFamilyIds([]);
 		}
 	}, [])
 
-	const changeTool = (toolId: string) => {
+	const changeTool = (familyId: string) => {
 		const toolManager = appKernel.toolManager;
-		toolManager.startTool(toolId);
+		toolManager.startToolFamily(familyId);
 	};
 
 	return (
 		<VStack className="w-fit h-fit px-1 pb-0 pt-2 bg-surface">
-			<HStack className="w-full h-8 gap-0.5">
-				{tools.map((tool, index) => {
-					const isActive = activeTool === tool.id;
+			<HStack className="w-full h-8 gap-1">
+				{groups.sort((a, b) => a.items[0].index - b.items[0].index).map((group, index) => {
 					return (
-						<Fragment key={tool.id}>
-							<QuickToolTip toolTip={tool.tooltip ? tool.tooltip : ""}>
-								<Button onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`}>
-									<SVGIcon svgString={tool.icon} />
-								</Button>
-							</QuickToolTip>
+						<Fragment key={group.id}>
+							<HStack className="gap-0.5">
+								{group.items.map((tool, index) => {
+									const isActive = activeFamilyId === tool.id;
+									const isAvailable = availableFamilyIds.includes(tool.id);
+									return (
+										<Fragment key={tool.id}>
+											<QuickToolTip toolTip={tool.tooltip ? tool.tooltip : ""}>
+												<Button disabled={!isAvailable} onClick={() => changeTool(tool.id)} variant={"empty"} className={`outline-1 ${isActive ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"} ${isAvailable ? "" : "opacity-50"}`}>
+													{tool.icon ? <SVGIcon svgString={tool.icon} /> : null}
+												</Button>
+											</QuickToolTip>
+										</Fragment>
+									);
+								})}
+							</HStack>
+							{index < groups.length - 1 && <Separator orientation="vertical" />}
 						</Fragment>
-					);
+					)
 				})}
 			</HStack>
 		</VStack>

@@ -14,8 +14,8 @@ export class ToolSessionManager {
 
     public async load() {
         const toolManager = this.editorFacade.toolManager;
-        if (this.toolSessionData?.currentTool) {
-            toolManager.startTool(this.toolSessionData.currentTool);
+        if (this.toolSessionData?.currentToolFamily) {
+            toolManager.startToolFamily(this.toolSessionData.currentToolFamily);
         }
         toolManager.on("onToolChanged", this.bindOnToolChanged);
     }
@@ -25,8 +25,8 @@ export class ToolSessionManager {
     }
 
     public async onToolChange() {
-        const currentTool = this.editorFacade.toolManager.getCurrentToolId() ?? undefined;
-        this.updateToolState({ currentTool });
+        const currentToolFamilyId = this.editorFacade.toolManager.getCurrentFamilyId() ?? undefined;
+        this.updateToolState({ currentToolFamily: currentToolFamilyId });
         await this.editorFacade.workspaceManager.saveCurrentWorkspace();
     }
 

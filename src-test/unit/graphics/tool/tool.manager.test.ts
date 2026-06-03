@@ -16,26 +16,6 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({
     },
 }));
 
-vi.mock("@/graphics/tool/tool.decorator", () => ({
-    Tool: () => () => undefined,
-}));
-
-vi.mock("@/graphics/strategies/draw-tile.strategy", () => ({
-    DrawTileStrategy: class {
-        public canHandle = vi.fn((layerRenderer: any) => layerRenderer.layer?.id === "tile-root");
-    },
-}));
-
-vi.mock("@/graphics/strategies/draw-rule.strategy", () => ({
-    DrawRuleStrategy: class {
-        public canHandle = vi.fn(() => false);
-    },
-}));
-
-vi.mock("@/graphics/renderer/group-layer.renderer", () => ({
-    GroupLayerRenderer: class { },
-}));
-
 vi.mock("pixi.js", () => ({
     Sprite: class { },
     Container: class { },
@@ -50,10 +30,14 @@ vi.mock("pixi.js", () => ({
 
 import { ToolManager } from "@/graphics/tool/tool.manager";
 import { ITool } from "@/editor/interface/tool.interface";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { BUILTIN_TOOL_GROUPS } from "@/graphics/tool/builtin-tools";
+import { ToolGroupDefinition } from "@/graphics/tool/tool.definition";
 
 import {
     createEditorHarness,
+    createViewHarness,
     createTileLayerRenderer,
 } from "./tool-test-utils";
 
@@ -64,7 +48,6 @@ class FakeTool implements ITool {
     public onDisable = vi.fn();
     public attachView = vi.fn();
     public detach = vi.fn();
-    public setDrawStrategy = vi.fn();
     public setTargetLayerRenderer = vi.fn();
 
     constructor(public readonly editorFacade: any) {
@@ -81,10 +64,83 @@ class SecondFakeTool extends FakeTool {
     }
 }
 
+class HybridTileTool extends FakeTool {
+    public static override instances: HybridTileTool[] = [];
+
+    constructor(editorFacade: any) {
+        super(editorFacade);
+        HybridTileTool.instances.push(this);
+    }
+}
+
+class HybridRuleTool extends FakeTool {
+    public static override instances: HybridRuleTool[] = [];
+
+    constructor(editorFacade: any) {
+        super(editorFacade);
+        HybridRuleTool.instances.push(this);
+    }
+}
+
+const createToolGroups = (): ToolGroupDefinition[] => [
+    {
+        id: "tile-editing",
+        label: "Tile editing",
+        families: [
+            {
+                id: "fake.tool",
+                label: "Fake",
+                priority: 0,
+                tools: [
+                    {
+                        id: "fake.tool",
+                        constructor: FakeTool as any,
+                        canUse: (ctx) => ctx.layerKind === "tile",
+                    },
+                ],
+            },
+            {
+                id: "fake.second",
+                label: "Second fake",
+                priority: 1,
+                tools: [
+                    {
+                        id: "fake.second",
+                        constructor: SecondFakeTool as any,
+                        canUse: (ctx) => ctx.layerKind === "tile",
+                    },
+                ],
+            },
+            {
+                id: "fake.hybrid",
+                label: "Hybrid fake",
+                priority: 2,
+                tools: [
+                    {
+                        id: "fake.hybrid.tile",
+                        constructor: HybridTileTool as any,
+                        canUse: (ctx) => ctx.layerKind === "tile",
+                    },
+                    {
+                        id: "fake.hybrid.rule",
+                        constructor: HybridRuleTool as any,
+                        canUse: (ctx) => ctx.layerKind === "rule",
+                    },
+                ],
+            },
+        ],
+    },
+];
+
 const createToolManagerHarness = () => {
     const editor = createEditorHarness();
     const layer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
+    const ruleLayer = editor.tilemap.rootLayer.findLayer("rule-root") as RuleLayer;
     const layerRenderer = createTileLayerRenderer(layer, editor.tilemap);
+    const ruleLayerRenderer = {
+        ...createTileLayerRenderer(layer, editor.tilemap),
+        layer: ruleLayer,
+    };
     let selectedLayerListener: ((layerIds: string[]) => void) | null = null;
     const session = {
         ...editor.session,
@@ -99,10 +155,8 @@ const createToolManagerHarness = () => {
             findLayerRenderer: vi.fn((id: string) => id === "tile-root" ? layerRenderer : null),
         },
     };
-    const manager = new ToolManager();
+    const manager = new ToolManager(createToolGroups());
     manager.setEditorContext(editor.editorFacade);
-    manager.registerTool("fake.tool", FakeTool as any);
-    manager.registerTool("fake.second", SecondFakeTool as any);
 
     return {
         ...editor,
@@ -110,7 +164,9 @@ const createToolManagerHarness = () => {
         view,
         session,
         layer,
+        ruleLayer,
         layerRenderer,
+        ruleLayerRenderer,
         getSelectedLayerListener: () => selectedLayerListener,
     };
 };
@@ -118,93 +174,146 @@ const createToolManagerHarness = () => {
 describe("ToolManager", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        ToolManager.TOOL_REGISTRY = [];
         FakeTool.instances = [];
         SecondFakeTool.instances = [];
+        HybridTileTool.instances = [];
+        HybridRuleTool.instances = [];
     });
 
-    it("registers and starts tools, tracks the current tool id, and emits tool changes", () => {
-        const { manager, editorFacade } = createToolManagerHarness();
+    it("falls back to the first available family when a tile layer view becomes active", () => {
+        const { manager, view, editorFacade } = createToolManagerHarness();
         const changed = vi.fn();
         manager.on("onToolChanged", changed);
 
-        manager.startTool("fake.tool");
+        manager.setActiveView(view as any);
 
+        expect(manager.getCurrentFamilyId()).toBe("fake.tool");
         expect(manager.getCurrentToolId()).toBe("fake.tool");
         expect(FakeTool.instances).toHaveLength(1);
         expect(FakeTool.instances[0].editorFacade).toBe(editorFacade);
         expect(FakeTool.instances[0].onEnable).toHaveBeenCalledTimes(1);
-        expect(changed).toHaveBeenCalledWith("fake.tool");
+        expect(changed).toHaveBeenCalledWith("fake.tool", "fake.tool");
     });
 
-    it("clears the previous tool before starting a different tool", () => {
-        const { manager } = createToolManagerHarness();
+    it("switches concrete tools when another family is started", () => {
+        const { manager, view } = createToolManagerHarness();
         const changed = vi.fn();
         manager.on("onToolChanged", changed);
 
-        manager.startTool("fake.tool");
+        manager.setActiveView(view as any);
         const firstTool = FakeTool.instances[0];
-        manager.startTool("fake.second");
+        manager.startToolFamily("fake.second");
 
         expect(firstTool.detach).toHaveBeenCalledTimes(1);
         expect(firstTool.onDisable).toHaveBeenCalledTimes(1);
+        expect(manager.getCurrentFamilyId()).toBe("fake.second");
         expect(manager.getCurrentToolId()).toBe("fake.second");
-        expect(changed.mock.calls.map((call) => call[0])).toEqual(["fake.tool", null, "fake.second"]);
+        expect(changed.mock.calls.map((call) => call[0])).toEqual(["fake.tool", "fake.second"]);
     });
 
-    it("clears the active tool when starting an unknown tool id", () => {
-        const { manager } = createToolManagerHarness();
-        const changed = vi.fn();
-        manager.on("onToolChanged", changed);
+    it("does not clear the current tool when starting an unknown family", () => {
+        const { manager, view } = createToolManagerHarness();
+        manager.setActiveView(view as any);
+        const firstTool = FakeTool.instances[0];
 
-        manager.startTool("fake.tool");
-        manager.startTool("missing.tool");
+        const started = manager.startToolFamily("missing.tool");
 
-        expect(manager.getCurrentToolId()).toBeNull();
-        expect(FakeTool.instances[0].detach).toHaveBeenCalledTimes(1);
-        expect(changed.mock.calls.map((call) => call[0])).toEqual(["fake.tool", null]);
+        expect(started).toBe(false);
+        expect(manager.getCurrentFamilyId()).toBe("fake.tool");
+        expect(firstTool.detach).not.toHaveBeenCalled();
     });
 
     it("attaches the current tool to the active view and propagates the selected editable layer", () => {
         const { manager, view, layerRenderer } = createToolManagerHarness();
 
         manager.setActiveView(view as any);
-        manager.startTool("fake.tool");
 
         const tool = FakeTool.instances[0];
         expect(tool.attachView).toHaveBeenCalledWith(view);
         expect(view.session.on).toHaveBeenCalledWith("onSelectedLayersChanged", expect.any(Function));
         expect(tool.setTargetLayerRenderer).toHaveBeenCalledWith(layerRenderer);
-        expect(tool.setDrawStrategy).toHaveBeenCalledWith(expect.any(Object));
     });
 
-    it("updates the current tool when selected layers change and no editable renderer is available", () => {
-        const { manager, view, session, layer, getSelectedLayerListener } = createToolManagerHarness();
+    it("clears the current tool when selected layers change and no editable renderer is available", () => {
+        const { manager, view, session, getSelectedLayerListener } = createToolManagerHarness();
+        const changed = vi.fn();
+        manager.on("onToolChanged", changed);
         manager.setActiveView(view as any);
-        manager.startTool("fake.tool");
         const tool = FakeTool.instances[0];
 
-        layer.toggleLock(true);
+        session.layerState.selectedLayers = ["missing-layer"];
         getSelectedLayerListener()!(session.layerState.selectedLayers);
 
+        expect(tool.detach).toHaveBeenCalledTimes(1);
+        expect(tool.onDisable).toHaveBeenCalledTimes(1);
+        expect(manager.getCurrentFamilyId()).toBeNull();
+        expect(changed.mock.calls.map((call) => call[0])).toEqual(["fake.tool", null]);
     });
 
-    it("detaches the current tool and unregisters selected-layer listeners when active session changes", () => {
+    it("keeps the current family while switching concrete tools after selected layer kind changes", () => {
+        const { manager, view, session, ruleLayerRenderer, getSelectedLayerListener } = createToolManagerHarness();
+        (view.renderer.findLayerRenderer as any).mockImplementation((id: string) => {
+            if (id === "tile-root") return createTileLayerRenderer(session.tilemap.rootLayer.findLayer("tile-root") as TileLayer, session.tilemap);
+            if (id === "rule-root") return ruleLayerRenderer;
+            return null;
+        });
+
+        manager.setActiveView(view as any);
+        manager.startToolFamily("fake.hybrid");
+        const tileTool = HybridTileTool.instances[0];
+
+        session.layerState.selectedLayers = ["rule-root"];
+        getSelectedLayerListener()!(session.layerState.selectedLayers);
+
+        expect(manager.getCurrentFamilyId()).toBe("fake.hybrid");
+        expect(manager.getCurrentToolId()).toBe("fake.hybrid.rule");
+        expect(tileTool.detach).toHaveBeenCalledTimes(1);
+        expect(tileTool.onDisable).toHaveBeenCalledTimes(1);
+        expect(HybridRuleTool.instances).toHaveLength(1);
+        expect(HybridRuleTool.instances[0].setTargetLayerRenderer).toHaveBeenCalledWith(ruleLayerRenderer);
+    });
+
+    it("detaches the current tool and unregisters selected-layer listeners when active view changes", () => {
         const { manager, view } = createToolManagerHarness();
         manager.setActiveView(view as any);
-        manager.startTool("fake.tool");
         const tool = FakeTool.instances[0];
 
         manager.setActiveView(null);
 
         expect(view.session.off).toHaveBeenCalledWith("onSelectedLayersChanged", expect.any(Function));
         expect(tool.detach).toHaveBeenCalledTimes(1);
+        expect(tool.onDisable).toHaveBeenCalledTimes(1);
+        expect(manager.getCurrentToolId()).toBeNull();
+    });
+
+    it("removes the old active view listener and refreshes context from the new active view", () => {
+        const { manager, view, session, getSelectedLayerListener } = createToolManagerHarness();
+        const secondSession = {
+            ...session,
+            layerState: { selectedLayers: ["missing-layer"] },
+            on: vi.fn(),
+            off: vi.fn(),
+        };
+        const secondView = {
+            session: secondSession,
+            renderer: {
+                findLayerRenderer: vi.fn(() => null),
+            },
+        };
+
+        manager.setActiveView(view as any);
+        expect(getSelectedLayerListener()).not.toBeNull();
+
+        manager.setActiveView(secondView as any);
+
+        expect(view.session.off).toHaveBeenCalledWith("onSelectedLayersChanged", expect.any(Function));
+        expect(secondSession.on).toHaveBeenCalledWith("onSelectedLayersChanged", expect.any(Function));
+        expect(manager.getCurrentFamilyId()).toBeNull();
     });
 
     it("stops and resumes the current tool without changing the tracked tool id", () => {
         const { manager, view } = createToolManagerHarness();
         manager.setActiveView(view as any);
-        manager.startTool("fake.tool");
         const tool = FakeTool.instances[0];
 
         manager.stopTool();
@@ -217,17 +326,64 @@ describe("ToolManager", () => {
         expect(tool.attachView).toHaveBeenCalledTimes(2);
     });
 
-    it("returns defensive copies of decorated tool contexts", () => {
-        ToolManager.TOOL_REGISTRY = [{
-            id: "decorated.tool",
-            label: "Decorated",
-            constructor: FakeTool as any,
-        }];
-        const manager = new ToolManager();
+    it("emits available family ids when context changes", () => {
+        const { manager, view, session, getSelectedLayerListener } = createToolManagerHarness();
+        const availabilityChanged = vi.fn();
+        manager.on("onToolAvailabilityChanged", availabilityChanged);
 
-        const contexts = manager.getToolContexts();
-        contexts[0].id = "mutated";
+        manager.setActiveView(view as any);
+        session.layerState.selectedLayers = ["missing-layer"];
+        getSelectedLayerListener()!(session.layerState.selectedLayers);
 
-        expect(manager.getToolContexts()[0].id).toBe("decorated.tool");
+        expect(availabilityChanged.mock.calls.map((call) => call[0])).toEqual([
+            ["fake.tool", "fake.second", "fake.hybrid"],
+            [],
+        ]);
+    });
+
+    it.each([
+        ["tool.bucket", "tool.tile.bucket", "tool.rule.bucket"],
+        ["tool.line", "tool.tile.line", "tool.rule.line"],
+        ["tool.rectangle", "tool.tile.rectangle", "tool.rule.rectangle"],
+    ])("resolves %s to tile and rule concrete tools", (familyId, tileToolId, ruleToolId) => {
+        const editor = createEditorHarness();
+        const viewHarness = createViewHarness(editor.session);
+        const tileLayer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
+        const ruleLayer = editor.tilemap.rootLayer.findLayer("rule-root") as RuleLayer;
+        const tileRenderer = createTileLayerRenderer(tileLayer, editor.tilemap);
+        const ruleRenderer = { ...createTileLayerRenderer(tileLayer, editor.tilemap), layer: ruleLayer };
+        let selectedLayerListener: ((layerIds: string[]) => void) | null = null;
+        const session = {
+            ...editor.session,
+            on: vi.fn((eventName: string, listener: (layerIds: string[]) => void) => {
+                if (eventName === "onSelectedLayersChanged") selectedLayerListener = listener;
+            }),
+            off: vi.fn(),
+        };
+        const view = {
+            ...viewHarness.view,
+            session,
+            renderer: {
+                findLayerRenderer: vi.fn((id: string) => {
+                    if (id === "tile-root") return tileRenderer;
+                    if (id === "rule-root") return ruleRenderer;
+                    return null;
+                }),
+            },
+        };
+        const manager = new ToolManager(BUILTIN_TOOL_GROUPS);
+        manager.setEditorContext(editor.editorFacade);
+
+        manager.setActiveView(view as any);
+        manager.startToolFamily(familyId);
+
+        expect(manager.getCurrentFamilyId()).toBe(familyId);
+        expect(manager.getCurrentToolId()).toBe(tileToolId);
+
+        session.layerState.selectedLayers = ["rule-root"];
+        selectedLayerListener!(session.layerState.selectedLayers);
+
+        expect(manager.getCurrentFamilyId()).toBe(familyId);
+        expect(manager.getCurrentToolId()).toBe(ruleToolId);
     });
 });

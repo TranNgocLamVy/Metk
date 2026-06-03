@@ -1,17 +1,16 @@
 import "@/application/command-system/register-commands";
-import "@/graphics/tool/register-tool";
 
+import { SystemCommandManager } from "@/application/commands/system-command.manager";
 import { EditorFacade } from "@/application/editor.facade";
 import { KeybindingManager } from "@/application/input/keybinding.manager";
+import { LayoutManager } from "@/application/layout/layout.manager";
+import { ProjectManager } from "@/application/resources/project/project.manager";
 import { WorkspaceManager } from "@/application/workspace/workspace.manager";
+import { TextureManager } from "@/graphics/texture/texture.manager";
+import { ToolManager } from "@/graphics/tool/tool.manager";
 import { ProjectMetadataRepo } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 import { ActivationContext } from "../runtime/activation-context";
-import { LayoutManager } from "@/application/layout/layout.manager";
-import { ProjectManager } from "@/application/resources/project/project.manager";
-import { SystemCommandManager } from "@/application/commands/system-command.manager";
-import { ToolManager } from "@/graphics/tool/tool.manager";
-import { TextureManager } from "@/graphics/texture/texture.manager";
 
 
 export class AppKernel {

@@ -43,10 +43,12 @@ const mockState = vi.hoisted(() => {
     const toolManager = {
         ...createListenerRegistry(),
         setActiveSession: vi.fn(),
-        getToolContexts: vi.fn(() => []),
+        getToolFamilies: vi.fn(() => []),
+        getAvailableFamilyIds: vi.fn(() => []),
         getCurrentToolId: vi.fn(() => null),
+        getCurrentFamilyId: vi.fn(() => null),
         setActiveView: vi.fn(),
-        startTool: vi.fn(),
+        startToolFamily: vi.fn(),
     };
     const workspaceService = {
         openTilemapSession: vi.fn(),

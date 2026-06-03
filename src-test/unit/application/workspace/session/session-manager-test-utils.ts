@@ -50,7 +50,9 @@ export const createEditorFacadeHarness = () => {
     };
     const toolManager = {
         startTool: vi.fn(),
+        startToolFamily: vi.fn(),
         getCurrentToolId: vi.fn(() => null as string | null),
+        getCurrentFamilyId: vi.fn(() => null as string | null),
         on: vi.fn(),
         off: vi.fn(),
     };

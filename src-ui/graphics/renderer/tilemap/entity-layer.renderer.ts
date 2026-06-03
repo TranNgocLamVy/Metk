@@ -299,14 +299,14 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         this.syncEntityDisplays();
     }
 
-    public override posToCoord(pos: Position): Coordinate {
+    public override posToCoord(pos: Point2D): Coordinate {
         return {
             col: Math.floor(pos.x),
             row: Math.floor(pos.y),
         };
     }
 
-    public override coordToPos(coord: Coordinate): Position {
+    public override coordToPos(coord: Coordinate): Point2D {
         return {
             x: coord.col,
             y: coord.row,

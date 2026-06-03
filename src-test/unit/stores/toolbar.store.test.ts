@@ -10,24 +10,34 @@ describe("useToolbarStore", () => {
 
     it("initializes with no tools and no active tool", () => {
         expect(useToolbarStore.getState()).toMatchObject({
-            tools: [],
-            activeTool: null,
+            groups: [],
+            activeFamilyId: null,
+            availableFamilyIds: [],
         });
     });
 
-    it("sets toolbar tools", () => {
-        const tools = [{ id: "brush", icon: "Brush", tooltip: "Brush", index: 0, shortcuts: ["B"] }];
+    it("sets toolbar groups", () => {
+        const groups = [{
+            id: "drawing",
+            label: "Drawing",
+            items: [{ id: "brush", icon: "Brush", tooltip: "Brush", index: 0, shortcuts: ["B"] }],
+        }];
 
-        useToolbarStore.getState().setTools(tools);
+        useToolbarStore.getState().setGroups(groups);
 
-        expect(useToolbarStore.getState().tools).toBe(tools);
+        expect(useToolbarStore.getState().groups).toBe(groups);
     });
 
-    it("sets the active tool", () => {
-        useToolbarStore.getState().setActiveTool("brush");
-        expect(useToolbarStore.getState().activeTool).toBe("brush");
+    it("sets the active family", () => {
+        useToolbarStore.getState().setActiveFamilyId("brush");
+        expect(useToolbarStore.getState().activeFamilyId).toBe("brush");
 
-        useToolbarStore.getState().setActiveTool(null);
-        expect(useToolbarStore.getState().activeTool).toBeNull();
+        useToolbarStore.getState().setActiveFamilyId(null);
+        expect(useToolbarStore.getState().activeFamilyId).toBeNull();
+    });
+
+    it("sets available families", () => {
+        useToolbarStore.getState().setAvailableFamilyIds(["brush"]);
+        expect(useToolbarStore.getState().availableFamilyIds).toEqual(["brush"]);
     });
 });

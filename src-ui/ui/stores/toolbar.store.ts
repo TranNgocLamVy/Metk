@@ -1,31 +1,37 @@
 import { create } from "zustand";
 
-import { appKernel } from "@/application/bootstrap/app-kernel";
-
 export type ToolbarItemDisplayData = {
     id: string;
-    icon: string;
+    icon?: string;
+    label?: string;
     tooltip?: string;
     index: number;
-    shortcuts?: string[]
+    shortcuts?: string[];
+    disabled?: boolean;
+}
+
+export type ToolBarGroupDisplayData = {
+    id: string;
+    label: string;
+    items: ToolbarItemDisplayData[];
 }
 
 type ToolbarStore = {
-    tools: ToolbarItemDisplayData[];
-    activeTool: string | null;
+    groups: ToolBarGroupDisplayData[];
+    activeFamilyId: string | null;
+    availableFamilyIds: string[];
 
-    setTools: (tools: ToolbarItemDisplayData[]) => void;
-    setActiveTool: (activeTool: string | null) => void;
+    setGroups: (groups: ToolBarGroupDisplayData[]) => void;
+    setActiveFamilyId: (activeFamilyId: string | null) => void;
+    setAvailableFamilyIds: (availableFamilyIds: string[]) => void;
 }
 
 export const useToolbarStore = create<ToolbarStore>((set, get) => ({
-    tools: [],
-    activeTool: null,
+    groups: [],
+    activeFamilyId: null,
+    availableFamilyIds: [],
 
-    setActiveTool: (activeTool: string | null) => set({ activeTool }),
-    setTools: (tools: ToolbarItemDisplayData[]) => set({ tools }),
+    setGroups: (groups: ToolBarGroupDisplayData[]) => set({ groups }),
+    setActiveFamilyId: (activeFamilyId: string | null) => set({ activeFamilyId }),
+    setAvailableFamilyIds: (availableFamilyIds: string[]) => set({ availableFamilyIds }),
 }))
-
-appKernel.toolManager.on("onToolChanged", (toolId) => {
-    useToolbarStore.getState().setActiveTool(toolId);
-})

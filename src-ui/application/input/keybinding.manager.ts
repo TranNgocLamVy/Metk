@@ -1,10 +1,9 @@
 import { KeyUtils } from "@/shared/utils/key.utils";
 
 import { Keybinding, UserKeybindingOverride } from "@/editor/interface/keybinding.interface";
-import { ToolContext } from "@/graphics/tool/tool.decorator";
+import { ToolManager } from "@/graphics/tool/tool.manager";
 import { CommandContext } from "../commands/command.decorator";
 import { SystemCommandManager } from "../commands/system-command.manager";
-import { ToolManager } from "@/graphics/tool/tool.manager";
 
 export class KeybindingManager {
     private defaultKeyBinding: Keybinding[] = [];
@@ -32,10 +31,10 @@ export class KeybindingManager {
             })
         })
 
-        ToolManager.TOOL_REGISTRY.forEach((toolContext: ToolContext) => {
-            if (toolContext.shortcuts == undefined) return;
-            toolContext.shortcuts.forEach((s) => {
-                defaultKeyBinding.push({ key: s, id: toolContext.id, type: "tool", when: toolContext.when });
+        this.toolManager.getToolFamilies().forEach((toolFamily) => {
+            if (toolFamily.shortcuts == undefined) return;
+            toolFamily.shortcuts.forEach((s) => {
+                defaultKeyBinding.push({ key: s, id: toolFamily.id, type: "tool", when: "inWorkspace && !isModalOpen" });
             })
         })
 
@@ -82,7 +81,7 @@ export class KeybindingManager {
             if (binding.type == "command") {
                 this.commandManager.execute(binding.id);
             } else if (binding.type == "tool") {
-                this.toolManager.startTool(binding.id);
+                this.toolManager.startToolFamily(binding.id);
             }
         }
     }

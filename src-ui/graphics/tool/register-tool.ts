@@ -1,1 +1,0 @@
-import.meta.glob("./**/*.tool.ts", { eager: true });

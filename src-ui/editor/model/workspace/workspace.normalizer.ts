@@ -1,7 +1,7 @@
-import { defaultWorkspaceData, WorkpsaceData } from "@/shared/data-types/workspace.data";
-import { validate } from "@/shared/utils/validate.utils";
 import { TilemapSessionData } from "@/shared/data-types/tilemap-session.data";
 import { TilesetSessionData } from "@/shared/data-types/tileset-session.data";
+import { defaultWorkspaceData, WorkpsaceData } from "@/shared/data-types/workspace.data";
+import { validate } from "@/shared/utils/validate.utils";
 
 
 const nullableString = (value: unknown): string | null => {
@@ -84,7 +84,7 @@ export const normalizeWorkspaceData = (workspaceData: unknown): WorkpsaceData =>
             selectedEntityId: nullableString(entityCollection.selectedEntityId),
         },
         toolState: {
-            currentTool: nullableString(toolState.currentTool),
+            currentToolFamily: nullableString(toolState.currentToolFamily),
         },
         savedPath: {
             exportPaths: validate.array<unknown>({ value: savedPath.exportPaths, defaultValue: [] })

@@ -1,6 +1,5 @@
 import { vi } from "vitest";
 
-import { IDrawStrategy, DrawPayload } from "@/graphics/strategies/draw-strategy.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
@@ -8,6 +7,14 @@ import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { createTilemap } from "../../application/commands/layer/layer-command-test-utils";
 
 type Handler = (event: any) => void;
+
+type TestDrawPayload = {
+    key: string;
+    coordinate: Coordinate;
+    position: Point2D;
+    sprite: any;
+    [key: string]: any;
+};
 
 export const createSprite = () => ({
     destroyed: false,
@@ -47,7 +54,7 @@ export const createViewport = () => {
         off: removeHandler,
         addEventListener: addHandler,
         removeEventListener: removeHandler,
-        toLocal: vi.fn((point: Position) => ({ x: point.x, y: point.y })),
+        toLocal: vi.fn((point: Point2D) => ({ x: point.x, y: point.y })),
         plugins: {
             get: vi.fn((name: string) => name === "wheel" ? wheelPlugin : null),
         },
@@ -123,7 +130,7 @@ export const createTileLayerRenderer = (layer: TileLayer, tilemap: ReturnType<ty
     tilemap,
     width: 4,
     height: 4,
-    posToCoord: vi.fn((pos: Position) => ({
+    posToCoord: vi.fn((pos: Point2D) => ({
         col: Math.floor(pos.x / 16),
         row: Math.floor(pos.y / 16),
     })),
@@ -133,36 +140,13 @@ export const createTileLayerRenderer = (layer: TileLayer, tilemap: ReturnType<ty
     })),
 });
 
-export const createPayload = (coordinate: Coordinate): DrawPayload => ({
+export const createPayload = (coordinate: Coordinate): TestDrawPayload => ({
     key: `${coordinate.col},${coordinate.row}`,
     coordinate,
     position: { x: coordinate.col * 16, y: coordinate.row * 16 },
     sprite: createSprite() as any,
     tileId: coordinate.col + coordinate.row * 4 + 1,
     tilesetId: "tileset-a",
-});
-
-export const createDrawStrategy = (overrides: Partial<IDrawStrategy> = {}): IDrawStrategy => ({
-    canHandle: vi.fn(() => true),
-    getBrushSize: vi.fn(() => ({ width: 1, height: 1 })),
-    comparePosition: vi.fn((first: Position, second: Position, layerRenderer: any) => {
-        if (!first || !second) return false;
-        const firstCoordinate = layerRenderer.posToCoord(first);
-        const secondCoordinate = layerRenderer.posToCoord(second);
-        return firstCoordinate.col === secondCoordinate.col && firstCoordinate.row === secondCoordinate.row;
-    }),
-    getRefAt: vi.fn(() => null),
-    drawHoverPreview: vi.fn((_pos, _layer, _editor, _session, overlay) => {
-        const sprite = createSprite() as any;
-        overlay.addChild(sprite);
-        return [sprite];
-    }),
-    getPayload: vi.fn((pos: Position, layerRenderer: any) => {
-        const coordinate = layerRenderer.posToCoord(pos);
-        return [createPayload(coordinate)];
-    }),
-    commit: vi.fn(),
-    ...overrides,
 });
 
 export const pointer = (col: number, row: number, overrides: Partial<any> = {}) => ({

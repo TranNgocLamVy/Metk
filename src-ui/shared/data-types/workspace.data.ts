@@ -1,10 +1,10 @@
+import { EntityCollectionSessionManagerData } from "./entity-collection-session.data";
 import { RulesetSessionManagerData } from "./ruleset-session.data";
 import { TilemapSessionManagerData } from "./tilemap-session.data";
 import { TilesetSessionManagerData } from "./tileset-session.data";
-import { EntityCollectionSessionManagerData } from "./entity-collection-session.data";
 
 export type ToolStateData = {
-    currentTool: string | null;
+    currentToolFamily: string | null;
 };
 
 export type ExportPathData = {
@@ -51,7 +51,7 @@ export const defaultWorkspaceData: WorkpsaceData = {
         selectedEntityId: null,
     },
     toolState: {
-        currentTool: null,
+        currentToolFamily: null,
     },
     savedPath: {
         exportPaths: [],

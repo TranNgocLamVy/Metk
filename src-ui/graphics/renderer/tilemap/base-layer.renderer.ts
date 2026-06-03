@@ -30,11 +30,11 @@ export abstract class BaseLayerRenderer<T extends BaseLayer<any> = BaseLayer<any
         this.container.alpha = this.layer.opacity;
     }
 
-    public posToCoord(pos: Position): Coordinate {
+    public posToCoord(pos: Point2D): Coordinate {
         throw new Error("Method not implemented.");
     }
 
-    public coordToPos(coord: Coordinate): Position {
+    public coordToPos(coord: Coordinate): Point2D {
         throw new Error("Method not implemented.");
     }
 

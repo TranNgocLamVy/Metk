@@ -92,7 +92,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         }
     }
 
-    public override posToCoord(pos: Position): Coordinate {
+    public override posToCoord(pos: Point2D): Coordinate {
         switch (this.tilemap.orientation) {
             case "orthogonal":
                 const col = Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tileWidth) - this.layer.coordinate.col;
@@ -113,7 +113,7 @@ export class TileLayerRenderer extends BaseLayerRenderer<TileLayer> {
         }
     }
 
-    public override coordToPos(coord: Coordinate): Position {
+    public override coordToPos(coord: Coordinate): Point2D {
         switch (this.tilemap.orientation) {
             case "orthogonal":
                 const x = (coord.col + this.layer.coordinate.col) * this.tilemap.tileWidth + this.layer.offset.x;

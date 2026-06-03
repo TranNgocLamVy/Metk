@@ -15,7 +15,7 @@ import { Button } from "@/ui/components/shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/ui/components/shadcn/resizable";
 import { PropertyGroup } from "@/ui/workspace/properties-panel/PropertyGroup";
-import { Box, Dot, LineSquiggle, Plus, Trash2 } from "lucide-react";
+import { Boxes, Dot, LineSquiggle, Plus, Trash2 } from "lucide-react";
 import { useEditTileset } from "./ContextProvider";
 
 export function RightPanel() {
@@ -179,8 +179,8 @@ function ObjectCollisionMenuBar({ selectedTile }: { selectedTile: Tile }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="min-w-60">
                     <DropdownMenuItem onClick={() => addCollisionObject(createBoxCollision(selectedTile))}>
-                        <Box className="text-emerald-500" />
-                        <LocalizedText message="New Box Collision" />
+                        <Boxes className="text-emerald-500" />
+                        <LocalizedText message="New Boxes Collision" />
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => addCollisionObject(createPointCollision(selectedTile))}>
                         <Dot className="text-yellow-300" />
@@ -207,7 +207,7 @@ function createBoxCollision(tile: Tile): BoxCollision {
     return new BoxCollision({
         id: uuidv4(),
         kind: "box",
-        name: "Box Collision",
+        name: "Boxes Collision",
         x: Math.round((tileSize.width - width) / 2),
         y: Math.round((tileSize.height - height) / 2),
         width,

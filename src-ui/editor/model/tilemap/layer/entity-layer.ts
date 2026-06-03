@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { AddEntityData } from "@/application/commands/layer/add-entity.command";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { EntityInstance } from "@/editor/model/entity/entity-instance";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
@@ -9,7 +10,6 @@ import { validate } from "@/shared/utils/validate.utils";
 import { BaseObject, PropertyUpdateMeta } from "../../base-object";
 import { Tilemap } from "../tilemap";
 import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
-import { AddEntityData } from "@/application/commands/layer/add-entity.command";
 
 export interface EntityLayerEvents extends BaseLayerEvents {
     entitiesChanged: (entityIds: string[]) => void;
@@ -114,7 +114,7 @@ export class EntityLayer extends BaseLayer<EntityLayerEvents> {
         return this.entityCollectionRefManager.getEntityDefinitionByRef(entityRef);
     }
 
-    public getEntityAt(worldPosition: Position): EntityInstance | null {
+    public getEntityAt(worldPosition: Point2D): EntityInstance | null {
         const localPosition = {
             x: worldPosition.x - this.offset.x,
             y: worldPosition.y - this.offset.y,

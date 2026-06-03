@@ -68,15 +68,18 @@ const mockState = vi.hoisted(() => {
 
     const toolManager = {
         ...createListenerRegistry(),
-        currentToolId: "stamp",
-        toolContexts: [] as any[],
-        getToolContexts: vi.fn(() => toolManager.toolContexts),
-        getCurrentToolId: vi.fn(() => toolManager.currentToolId),
+        currentFamilyId: "stamp",
+        toolFamilies: [] as any[],
+        availableFamilyIds: [] as string[],
+        getToolFamilies: vi.fn(() => toolManager.toolFamilies),
+        getAvailableFamilyIds: vi.fn(() => toolManager.availableFamilyIds),
+        getCurrentToolId: vi.fn(() => toolManager.currentFamilyId),
+        getCurrentFamilyId: vi.fn(() => toolManager.currentFamilyId),
         setActiveSession: vi.fn(),
         setActiveView: vi.fn(),
-        startTool: vi.fn((toolId: string) => {
-            toolManager.currentToolId = toolId;
-            toolManager.emit("onToolChanged", toolId);
+        startToolFamily: vi.fn((familyId: string) => {
+            toolManager.currentFamilyId = familyId;
+            toolManager.emit("onToolChanged", familyId, familyId);
         }),
     };
 
@@ -375,11 +378,14 @@ describe("Metk integration workflows", () => {
         mockState.workspaceService.saveCurrentWorkspace.mockReset();
         mockState.routeProjectId = "project-alpha";
         mockState.navigate.mockClear();
-        mockState.appKernel.toolManager.currentToolId = "stamp";
-        mockState.appKernel.toolManager.toolContexts = [];
-        mockState.appKernel.toolManager.getToolContexts.mockClear();
+        mockState.appKernel.toolManager.currentFamilyId = "stamp";
+        mockState.appKernel.toolManager.toolFamilies = [];
+        mockState.appKernel.toolManager.availableFamilyIds = [];
+        mockState.appKernel.toolManager.getToolFamilies.mockClear();
+        mockState.appKernel.toolManager.getAvailableFamilyIds.mockClear();
         mockState.appKernel.toolManager.getCurrentToolId.mockClear();
-        mockState.appKernel.toolManager.startTool.mockClear();
+        mockState.appKernel.toolManager.getCurrentFamilyId.mockClear();
+        mockState.appKernel.toolManager.startToolFamily.mockClear();
     });
 
     it("loads the requested project and replaces the loading state with the workspace", async () => {
@@ -474,37 +480,34 @@ describe("Metk integration workflows", () => {
     it("changes the active toolbar tool after a toolbar button interaction", async () => {
         const user = userEvent.setup();
 
-        mockState.appKernel.toolManager.toolContexts = [
+        mockState.appKernel.toolManager.toolFamilies = [
             {
                 id: "stamp",
                 shortcuts: ["S"],
-                displayOnToolbar: {
-                    icon: '<svg role="img" aria-label="Stamp tool"></svg>',
-                    tooltip: "Stamp",
-                    index: 0,
-                },
+                icon: '<svg role="img" aria-label="Stamp tool"></svg>',
+                description: "Stamp",
+                priority: 0,
             },
             {
                 id: "eraser",
                 shortcuts: ["E"],
-                displayOnToolbar: {
-                    icon: '<svg role="img" aria-label="Eraser tool"></svg>',
-                    tooltip: "Eraser",
-                    index: 1,
-                },
+                icon: '<svg role="img" aria-label="Eraser tool"></svg>',
+                description: "Eraser",
+                priority: 1,
             },
         ];
+        mockState.appKernel.toolManager.availableFamilyIds = ["stamp", "eraser"];
 
         render(<ToolBar />);
 
         const eraserButton = await screen.findByRole("button", { name: "Eraser tool" });
 
-        expect(useToolbarStore.getState().activeTool).toBe("stamp");
+        expect(useToolbarStore.getState().activeFamilyId).toBe("stamp");
 
         await user.click(eraserButton);
 
-        expect(mockState.appKernel.toolManager.startTool).toHaveBeenCalledWith("eraser");
-        expect(useToolbarStore.getState().activeTool).toBe("eraser");
+        expect(mockState.appKernel.toolManager.startToolFamily).toHaveBeenCalledWith("eraser");
+        expect(useToolbarStore.getState().activeFamilyId).toBe("eraser");
         expect(eraserButton).toHaveClass("bg-accent");
     });
 

@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Box, Copy, Folder, Grid3x3, Image, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Boxes, Copy, Folder, Grid3x3, Image, Plus, Trash2 } from "lucide-react";
 
 import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
@@ -46,7 +46,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.entityLayer",
-					startIcon: <Box className="text-cyan-400" />,
+					startIcon: <Boxes className="text-cyan-400" />,
 					disabled: () => !isTilemapSessionOpen(),
 					onClick() { TilemapLayerService.createNewEntityLayer() },
 				},

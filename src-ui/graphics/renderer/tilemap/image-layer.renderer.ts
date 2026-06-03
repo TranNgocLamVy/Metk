@@ -147,14 +147,14 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         this.image.tint = tint;
     }
 
-    public override posToCoord(pos: Position): Coordinate {
+    public override posToCoord(pos: Point2D): Coordinate {
         return {
             col: Math.floor((pos.x - this.layer.offset.x) / this.tilemap.tileWidth),
             row: Math.floor((pos.y - this.layer.offset.y) / this.tilemap.tileHeight),
         };
     }
 
-    public override coordToPos(coord: Coordinate): Position {
+    public override coordToPos(coord: Coordinate): Point2D {
         return {
             x: coord.col * this.tilemap.tileWidth + this.layer.offset.x,
             y: coord.row * this.tilemap.tileHeight + this.layer.offset.y,

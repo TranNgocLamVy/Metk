@@ -151,11 +151,11 @@ import {
 } from "../../application/commands/layer/layer-command-test-utils";
 
 class ConcreteLayerRenderer extends BaseLayerRenderer<TileLayer> {
-    public posToCoord(pos: Position): Coordinate {
+    public posToCoord(pos: Point2D): Coordinate {
         return { col: pos.x, row: pos.y };
     }
 
-    public coordToPos(coord: Coordinate): Position {
+    public coordToPos(coord: Coordinate): Point2D {
         return { x: coord.col, y: coord.row };
     }
 }

@@ -15,7 +15,7 @@ export type TileLayout = {
     index: number;
 
     /**
-     * Position of the actual displayed tile image in the viewport's local space.
+     * Point2D of the actual displayed tile image in the viewport's local space.
      * For single-image tilesets, this is equal to the tile grid cell position.
      * For image-collection tilesets, this is the centered image position inside the cell.
      */

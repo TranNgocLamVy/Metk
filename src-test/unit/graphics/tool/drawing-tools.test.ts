@@ -4,10 +4,6 @@ vi.mock("@/application/editor.facade", () => ({
     EditorFacade: class { },
 }));
 
-vi.mock("@/graphics/tool/tool.decorator", () => ({
-    Tool: () => () => undefined,
-}));
-
 vi.mock("pixi.js", () => {
     class Point {
         constructor(public x = 0, public y = 0) { }
@@ -54,19 +50,24 @@ vi.mock("pixi.js", () => {
         Sprite,
         Graphics,
         Color,
-        Texture: { WHITE: { id: "white-texture" } },
+        Texture: { WHITE: { id: "white-texture", width: 16, height: 16 } },
     };
 });
 
-import { BucketTool } from "@/graphics/tool/bucket.tool";
-import { EraserTool } from "@/graphics/tool/eraser.tool";
-import { LineTool } from "@/graphics/tool/line.tool";
-import { RectangleTool } from "@/graphics/tool/rectangle.tool";
-import { StampTool } from "@/graphics/tool/stamp.tool";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
+import { RuleBucketTool } from "@/graphics/tool/rule/rule-bucket.tool";
+import { RuleEraserTool } from "@/graphics/tool/rule/rule-eraser.tool";
+import { RuleLineTool } from "@/graphics/tool/rule/rule-line.tool";
+import { RuleRectangleTool } from "@/graphics/tool/rule/rule-rectangle.tool";
+import { RuleStampTool } from "@/graphics/tool/rule/rule-stamp.tool";
+import { TileBucketTool } from "@/graphics/tool/tile/tile-bucket.tool";
+import { TileEraserTool } from "@/graphics/tool/tile/tile-eraser.tool";
+import { TileLineTool } from "@/graphics/tool/tile/tile-line.tool";
+import { TileRectangleTool } from "@/graphics/tool/tile/tile-rectangle.tool";
+import { TileStampTool } from "@/graphics/tool/tile/tile-stamp.tool";
 
 import {
-    createDrawStrategy,
     createEditorHarness,
     createTileLayerRenderer,
     createViewHarness,
@@ -76,238 +77,201 @@ import {
 const createDrawingHarness = () => {
     const editor = createEditorHarness();
     const view = createViewHarness(editor.session);
-    const layer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
-    const renderer = createTileLayerRenderer(layer, editor.tilemap);
+    const tileLayer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
+    const ruleLayer = editor.tilemap.rootLayer.findLayer("rule-root") as RuleLayer;
+    const tileRenderer = createTileLayerRenderer(tileLayer, editor.tilemap);
+    const ruleRenderer = {
+        ...createTileLayerRenderer(tileLayer, editor.tilemap),
+        layer: ruleLayer,
+    };
 
-    return { ...editor, ...view, layer, renderer };
+    (editor.editorFacade as any).textureManager = {
+        getTileTexture: vi.fn(() => ({ id: "tile-texture", width: 16, height: 16 })),
+        getErrorTexture: vi.fn(async () => ({ id: "error-texture", width: 16, height: 16 })),
+    };
+    (editor.editorFacade as any).getActiveTilesetSession = vi.fn(() => ({
+        selectionState: { selectedTilesSet: [1] },
+        tileset: {
+            getCoordinatesFromTile: vi.fn(() => ({ row: 0, col: 0 })),
+            getTileFromCoordinates: vi.fn(() => ({ id: 1, tileset: { id: "tileset-a" } })),
+        },
+    }));
+    (editor.editorFacade as any).currentWorkspace = {
+        ...((editor.editorFacade as any).currentWorkspace ?? {}),
+        rulesetSessionManager: {
+            getSelectedRuleId: vi.fn(() => "ruleset-a"),
+        },
+        tilemapSessionManager: {
+            getSessionByTilemapId: vi.fn(() => editor.session),
+            activeSession: editor.session,
+        },
+    };
+    (editor.editorFacade as any).currentProject = {
+        rulesetManager: {
+            getRulesetById: vi.fn(() => ({ id: "ruleset-a", color: "#22c55e" })),
+        },
+    };
+
+    return { ...editor, ...view, tileLayer, ruleLayer, tileRenderer, ruleRenderer };
 };
 
-describe("StampTool", () => {
+describe("layer-specific drawing tools", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    it("accumulates stamped payloads while dragging and commits them on pointer up", () => {
-        const { editorFacade, view, viewport, overlayerContainer, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new StampTool(editorFacade);
+    it("TileStampTool commits SetTilesCommand updates", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const tool = new TileStampTool(editorFacade);
         tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointerdown", pointer(0, 0));
-        viewport.emitPointer("pointermove", pointer(2, 0));
-        viewport.emitPointer("pointerup", pointer(2, 0));
-
-        expect(strategy.commit).toHaveBeenCalledTimes(1);
-        expect((strategy.commit as any).mock.calls[0][1].map((payload: any) => payload.key)).toEqual(["0,0", "1,0", "2,0"]);
-        expect(overlayerContainer.addChild).toHaveBeenCalled();
-    });
-
-    it("draws hover preview before dragging and removes listeners on detach", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new StampTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointermove", pointer(1, 1));
-        tool.detach();
-
-        expect(strategy.drawHoverPreview).toHaveBeenCalledTimes(1);
-        expect(viewport.off).toHaveBeenCalledWith("pointerdown", expect.any(Function));
-        expect(viewport.removeEventListener).toHaveBeenCalledWith("mouseleave", expect.any(Function));
-    });
-
-    it("does nothing when no draw strategy or target renderer is available", () => {
-        const { editorFacade, view, viewport } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new StampTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
+        tool.setTargetLayerRenderer(tileRenderer as any);
         tool.attachView(view as any);
 
         viewport.emitPointer("pointerdown", pointer(0, 0));
         viewport.emitPointer("pointerup", pointer(0, 0));
 
-        expect(strategy.getPayload).not.toHaveBeenCalled();
-        expect(strategy.commit).not.toHaveBeenCalled();
+        expect(tileLayer.getTileRefAt({ col: 0, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
     });
-});
 
-describe("LineTool", () => {
-    it("previews a line during drag and commits line payloads only when history is available", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new LineTool(editorFacade);
+    it("RuleStampTool commits SetRulesCommand updates", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        const tool = new RuleStampTool(editorFacade);
         tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
+        tool.setTargetLayerRenderer(ruleRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(1, 1));
+        viewport.emitPointer("pointerup", pointer(1, 1));
+
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 1 })?.rulesetId).toBe("ruleset-a");
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+    });
+
+    it("TileEraserTool only erases tile refs", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const tool = new TileEraserTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(tileRenderer as any);
+        tool.attachView(view as any);
+
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
+
+        viewport.emitPointer("pointerdown", pointer(1, 0));
+        viewport.emitPointer("pointerup", pointer(1, 0));
+
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toBeNull();
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+    });
+
+    it("RuleEraserTool only erases rule refs", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        const tool = new RuleEraserTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(ruleRenderer as any);
+        tool.attachView(view as any);
+
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })?.rulesetId).toBe("ruleset-a");
+
+        viewport.emitPointer("pointerdown", pointer(0, 0));
+        viewport.emitPointer("pointerup", pointer(0, 0));
+
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })).toBeNull();
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+    });
+
+    it("TileBucketTool fills contiguous matching tile refs", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const tool = new TileBucketTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(tileRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(0, 1));
+
+        expect(tileLayer.getTileRefAt({ col: 0, row: 1 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+    });
+
+    it("RuleBucketTool fills contiguous matching ruleset refs", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        const tool = new RuleBucketTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(ruleRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(1, 1));
+
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 1 })?.rulesetId).toBe("ruleset-a");
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+    });
+
+    it("TileLineTool commits tile updates along the calculated line", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const tool = new TileLineTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(tileRenderer as any);
         tool.attachView(view as any);
 
         viewport.emitPointer("pointerdown", pointer(0, 0));
-        viewport.emitPointer("pointermove", pointer(2, 0));
-        viewport.emitPointer("pointerup", pointer(2, 0));
+        viewport.emitPointer("pointermove", pointer(1, 0));
+        viewport.emitPointer("pointerup", pointer(1, 0));
 
-        expect(strategy.commit).toHaveBeenCalledTimes(1);
-        expect((strategy.commit as any).mock.calls[0][1].map((payload: any) => payload.key)).toEqual(["0,0", "1,0", "2,0"]);
+        expect(tileLayer.getTileRefAt({ col: 0, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
     });
 
-    it("does not commit a finished line when there is no history manager", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        (editorFacade.getCurrentHistoryManager as any).mockReturnValue(null);
-        const strategy = createDrawStrategy();
-        const tool = new LineTool(editorFacade);
+    it("RuleLineTool commits rule updates along the calculated line", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        const tool = new RuleLineTool(editorFacade);
         tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
+        tool.setTargetLayerRenderer(ruleRenderer as any);
         tool.attachView(view as any);
 
-        viewport.emitPointer("pointerdown", pointer(0, 0));
-        viewport.emitPointer("pointermove", pointer(2, 0));
-        viewport.emitPointer("pointerup", pointer(2, 0));
+        viewport.emitPointer("pointerdown", pointer(0, 1));
+        viewport.emitPointer("pointermove", pointer(1, 1));
+        viewport.emitPointer("pointerup", pointer(1, 1));
 
-        expect(strategy.commit).not.toHaveBeenCalled();
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 1 })?.rulesetId).toBe("ruleset-a");
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 1 })?.rulesetId).toBe("ruleset-a");
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
     });
-});
 
-describe("RectangleTool", () => {
-    it("commits rectangle payloads for the dragged bounds", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new RectangleTool(editorFacade);
+    it("TileRectangleTool commits filled rectangle tile updates", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const tool = new TileRectangleTool(editorFacade);
         tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
+        tool.setTargetLayerRenderer(tileRenderer as any);
         tool.attachView(view as any);
 
         viewport.emitPointer("pointerdown", pointer(0, 0));
         viewport.emitPointer("pointermove", pointer(1, 1));
         viewport.emitPointer("pointerup", pointer(1, 1));
 
-        expect(strategy.commit).toHaveBeenCalledTimes(1);
-        expect((strategy.commit as any).mock.calls[0][1].map((payload: any) => payload.key)).toEqual(["0,0", "0,1", "1,0", "1,1"]);
+        expect(tileLayer.getTileRefAt({ col: 0, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(tileLayer.getTileRefAt({ col: 0, row: 1 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(tileLayer.getTileRefAt({ col: 1, row: 1 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
     });
 
-    it("uses square bounds when shift is held while drawing", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new RectangleTool(editorFacade);
+    it("RuleRectangleTool commits filled rectangle rule updates", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        const tool = new RuleRectangleTool(editorFacade);
         tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
+        tool.setTargetLayerRenderer(ruleRenderer as any);
         tool.attachView(view as any);
 
-        viewport.emitPointer("pointerdown", pointer(0, 0, { shiftKey: true }));
-        viewport.emitPointer("pointermove", pointer(2, 1, { shiftKey: true }));
-        viewport.emitPointer("pointerup", pointer(2, 1, { shiftKey: true }));
-
-        expect((strategy.commit as any).mock.calls[0][1].map((payload: any) => payload.key)).toEqual([
-            "0,0", "0,1", "0,2",
-            "1,0", "1,1", "1,2",
-            "2,0", "2,1", "2,2",
-        ]);
-    });
-});
-
-describe("BucketTool", () => {
-    it("flood-fills contiguous empty cells and commits the generated payloads", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy({ getRefAt: vi.fn(() => null) });
-        const tool = new BucketTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointermove", pointer(0, 0));
         viewport.emitPointer("pointerdown", pointer(0, 0));
+        viewport.emitPointer("pointermove", pointer(1, 1));
+        viewport.emitPointer("pointerup", pointer(1, 1));
 
-        expect(strategy.commit).toHaveBeenCalledTimes(1);
-        expect((strategy.commit as any).mock.calls[0][1]).toHaveLength(16);
-    });
-
-    it("fills only the clicked cell when the target cell already has a reference", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy({ getRefAt: vi.fn(() => ({ tileId: 1, tilesetId: "tileset-a" })) });
-        const tool = new BucketTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointerdown", pointer(1, 1));
-
-        expect(strategy.commit).toHaveBeenCalledTimes(1);
-        expect((strategy.commit as any).mock.calls[0][1].map((payload: any) => payload.key)).toEqual(["1,1"]);
-    });
-
-    it("does not commit out-of-bound bucket payloads", () => {
-        const { editorFacade, view, viewport, renderer } = createDrawingHarness();
-        const strategy = createDrawStrategy();
-        const tool = new BucketTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointerdown", pointer(-1, 0));
-
-        expect(strategy.commit).not.toHaveBeenCalled();
-    });
-});
-
-describe("EraserTool", () => {
-    it("erases referenced cells immediately and records a batch command when the drag finishes", () => {
-        const { editorFacade, view, viewport, renderer, layer, historyManager } = createDrawingHarness();
-        const strategy = createDrawStrategy({ getRefAt: vi.fn(() => ({ tileId: 2, tilesetId: "tileset-a" })) });
-        const tool = new EraserTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        expect(layer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
-
-        viewport.emitPointer("pointerdown", pointer(1, 0));
-        viewport.emitPointer("pointerup", pointer(1, 0));
-
-        expect(layer.getTileRefAt({ col: 1, row: 0 })).toBeNull();
-        expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
-    });
-
-    it("reverses temporary erase commands when no history manager is available", () => {
-        const { editorFacade, view, viewport, renderer, layer } = createDrawingHarness();
-        (editorFacade.getCurrentHistoryManager as any).mockReturnValue(null);
-        const strategy = createDrawStrategy({ getRefAt: vi.fn(() => ({ tileId: 2, tilesetId: "tileset-a" })) });
-        const tool = new EraserTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointerdown", pointer(1, 0));
-        viewport.emitPointer("pointerup", pointer(1, 0));
-
-        expect(layer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
-    });
-
-    it("does not erase out-of-bound cells or empty cells", () => {
-        const { editorFacade, view, viewport, renderer, layer, historyManager } = createDrawingHarness();
-        const strategy = createDrawStrategy({ getRefAt: vi.fn(() => null) });
-        const tool = new EraserTool(editorFacade);
-        tool.onEnable();
-        tool.setDrawStrategy(strategy);
-        tool.setTargetLayerRenderer(renderer as any);
-        tool.attachView(view as any);
-
-        viewport.emitPointer("pointerdown", pointer(10, 10));
-        viewport.emitPointer("pointerup", pointer(10, 10));
-
-        expect(layer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
-        expect(historyManager.pushToUndoStack).not.toHaveBeenCalled();
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })?.rulesetId).toBe("ruleset-a");
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 0 })?.rulesetId).toBe("ruleset-a");
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 1 })?.rulesetId).toBe("ruleset-a");
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 1 })?.rulesetId).toBe("ruleset-a");
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
     });
 });

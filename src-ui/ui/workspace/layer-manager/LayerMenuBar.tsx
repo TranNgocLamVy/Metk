@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { Separator } from "@/ui/components/shadcn/separator";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { ArrowBigDown, ArrowBigUp, Box, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Boxes, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 export default function LayerMenuBar() {
     const { layerViews, selectedLayers } = useLayerManagerStore();
@@ -42,7 +42,7 @@ export default function LayerMenuBar() {
                         <LocalizedText message="workspace.layerManager.menu.new.imageLayer" />
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={TilemapLayerService.createNewEntityLayer}>
-                        <Box className="text-cyan-400" />
+                        <Boxes className="text-cyan-400" />
                         <LocalizedText message="workspace.layerManager.menu.new.entityLayer" />
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={TilemapLayerService.createNewGroupLayer}>
