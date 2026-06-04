@@ -9,7 +9,7 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 		startIcon: <Undo />,
 		disabled: () => {
 			const editorFacade = appKernel.editorFacade;
-			const historyManager = editorFacade.getCurrentHistoryManager();
+			const historyManager = editorFacade.getCurrentEditorSession()?.historyManager;
 			if (!historyManager) return true;
 			return !historyManager.canUndo;
 		},
@@ -21,7 +21,7 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 		startIcon: <Redo />,
 		disabled: () => {
 			const editorFacade = appKernel.editorFacade;
-			const historyManager = editorFacade.getCurrentHistoryManager();
+			const historyManager = editorFacade.getCurrentEditorSession()?.historyManager;
 			if (!historyManager) return true;
 			return !historyManager.canRedo;
 		},

@@ -4,8 +4,7 @@ import { GroupLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { EditorFacade } from "@/application/editor.facade";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 
 export class CreateGroupLayerCommand implements IUndoableCommand {
@@ -17,14 +16,12 @@ export class CreateGroupLayerCommand implements IUndoableCommand {
         private groupLayerData: GroupLayerData,
     ) { }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const targetLayer = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
+        const targetLayer = getLayerByObjectId(context, this.parentLayerObjectId);
         if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Parent layer not found");
 
         const parent = resolveLayerInsertionParent(targetLayer, tilemap.rootLayer);
@@ -40,14 +37,12 @@ export class CreateGroupLayerCommand implements IUndoableCommand {
         return Result.Success();
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public undo(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const groupLayer = getLayerByObjectId<GroupLayer>(editorFacade, this.groupLayerObjectId);
+        const groupLayer = getLayerByObjectId<GroupLayer>(context, this.groupLayerObjectId);
         if (!(groupLayer instanceof GroupLayer) || !isLayerInTilemap(tilemap, groupLayer)) return Result.Error("Group layer not found");
 
         groupLayer.removeFromParent();

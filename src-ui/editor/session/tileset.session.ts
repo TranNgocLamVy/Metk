@@ -1,23 +1,21 @@
-import { IBaseSession } from "@/editor/interface/base-session.interface";
+import { IViewSession } from "@/editor/interface/base-session.interface";
 import { SelectionState } from "@/shared/data-types/selection-state.data";
-import { ViewState } from "@/shared/data-types/view-state.data";
 import { TilesetSessionData } from "@/shared/data-types/tileset-session.data";
+import { ViewState } from "@/shared/data-types/view-state.data";
 
 import { EditorFacade } from "@/application/editor.facade";
 import EventEmitter from "eventemitter3";
 import { Tileset } from "../model/tileset/tileset";
-import { HistoryManager } from "@/application/resources/history/history.manager";
 
 interface TilesetSessionEvents {
 
 }
 
-export class TilesetSession extends EventEmitter<TilesetSessionEvents> implements IBaseSession {
+export class TilesetSession extends EventEmitter<TilesetSessionEvents> implements IViewSession {
     public readonly id: string;
     public readonly tileset: Tileset;
     public viewState: ViewState;
     public selectionState: SelectionState;
-    public historyManager: HistoryManager;
 
     constructor(tileset: Tileset, tilesetSessionData: TilesetSessionData, public readonly editorFacade: EditorFacade) {
         super();
@@ -26,7 +24,6 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
         this.viewState = tilesetSessionData.viewState ?? { x: null, y: null, zoom: 1 };
         this.selectionState = { selectedTilesSet: this.normalizeSelectedTileIds(tilesetSessionData.selectionState) } 
 
-        this.historyManager = new HistoryManager();
     }
 
     public async loadTilesetSession(): Promise<void> {

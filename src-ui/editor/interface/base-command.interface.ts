@@ -1,12 +1,17 @@
 import { Result } from "@/shared/types/result";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
 import { EditorFacade } from "@/application/editor.facade";
 
+export interface IUndoableCommandContext {
+    objectRegistry: EditorObjectRegistry;
+}
+
 export interface IUndoableCommand {
     readonly id: string;
-    execute(editorFacade: EditorFacade): Result;
-    undo(editorFacade: EditorFacade): Result;
-    redo?(editorFacade: EditorFacade): Result;
+    execute(context: IUndoableCommandContext): Result;
+    undo(context: IUndoableCommandContext): Result;
+    redo?(context: IUndoableCommandContext): Result;
     delete(): void;
 }
 

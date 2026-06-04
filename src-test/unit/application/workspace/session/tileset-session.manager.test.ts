@@ -68,6 +68,7 @@ describe("TilesetSessionManager", () => {
         const session = await manager.createTilesetSession(tileset);
 
         expect(session).not.toBeNull();
+        expect("historyManager" in session!).toBe(false);
         expect(manager.activeSession).toBe(session);
         expect(textureManager.retainTilesetGraphics).toHaveBeenCalledWith(tileset);
         expect(created).toHaveBeenCalledWith(session);

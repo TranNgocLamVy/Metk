@@ -1,5 +1,6 @@
 import { SetTilesCommand } from "@/application/commands/tile/set-tiles.command";
 import type { HistoryManager } from "@/application/resources/history/history.manager";
+import type { IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { TileLayerRenderer } from "@/graphics/renderer/tilemap/tile-layer.renderer";
 import { GridStrokeTool } from "@/graphics/tool/base/grid-stroke.tool";
@@ -12,6 +13,7 @@ export class TileEraserTool extends GridStrokeTool {
     private previewGraphics: Graphics | null = null;
     private eraseCoordinateSet: Set<string> = new Set();
     private activeHistoryManager: HistoryManager | null = null;
+    private activeCommandContext: IUndoableCommandContext | null = null;
     private originalWheelEvent: ((e: FederatedWheelEvent) => boolean) | null = null;
     private isEnabled = false;
     private isTransactionStarted = false;
@@ -93,8 +95,9 @@ export class TileEraserTool extends GridStrokeTool {
         if (!this.currentView || !this.isTargetLayerSupported(this.targetLayerRenderer)) return;
         if (this.targetLayerRenderer.layer.locked || !this.targetLayerRenderer.layer.visible) return;
 
-        const historyManager = this.editorFacade.getCurrentHistoryManager();
-        if (!historyManager) return;
+        const session = this.editorFacade.getActiveTilemapSession();
+        if (!session) return;
+        const historyManager = session.historyManager;
 
         const updates: { coordinate: Coordinate, tileId: null, tilesetId: null }[] = [];
         const erasedKeys: string[] = [];
@@ -113,10 +116,10 @@ export class TileEraserTool extends GridStrokeTool {
 
         if (updates.length === 0) return;
 
-        this.ensureStrokeTransactionStarted(historyManager);
+        this.ensureStrokeTransactionStarted(historyManager, session);
         const result = historyManager.execute(
             new SetTilesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, updates),
-            this.editorFacade,
+            session,
         );
 
         if (result.status === Result.Status.Success) {
@@ -135,11 +138,12 @@ export class TileEraserTool extends GridStrokeTool {
         return false;
     }
 
-    private ensureStrokeTransactionStarted(historyManager: HistoryManager): void {
+    private ensureStrokeTransactionStarted(historyManager: HistoryManager, context: IUndoableCommandContext): void {
         if (this.isTransactionStarted) return;
 
         historyManager.startTransaction();
         this.activeHistoryManager = historyManager;
+        this.activeCommandContext = context;
         this.isTransactionStarted = true;
     }
 
@@ -148,14 +152,18 @@ export class TileEraserTool extends GridStrokeTool {
 
         this.activeHistoryManager?.commitTransaction();
         this.activeHistoryManager = null;
+        this.activeCommandContext = null;
         this.isTransactionStarted = false;
     }
 
     private cancelRealtimeStrokeIfNeeded(): void {
         if (!this.isTransactionStarted) return;
 
-        this.activeHistoryManager?.cancelTransaction(this.editorFacade);
+        if (this.activeHistoryManager && this.activeCommandContext) {
+            this.activeHistoryManager.cancelTransaction(this.activeCommandContext);
+        }
         this.activeHistoryManager = null;
+        this.activeCommandContext = null;
         this.isTransactionStarted = false;
         this.eraseCoordinateSet.clear();
     }

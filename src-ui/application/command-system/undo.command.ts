@@ -12,9 +12,9 @@ import { Result } from "@/shared/types/result";
 })
 export class UndoCommand implements ISystemCommand {
     public execute(editorFacade: EditorFacade): Result {
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!historyManager) return Result.Cancel();
-        historyManager.undo(editorFacade);
+        const session = editorFacade.getCurrentEditorSession();
+        if (!session) return Result.Cancel();
+        session.historyManager.undo(session);
         return Result.Success();
     }
 }

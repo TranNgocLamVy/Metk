@@ -25,8 +25,9 @@ export class TileBucketTool extends PointerTool {
         const coordinates = this.collectFloodFill(start, original);
         if (coordinates.length === 0) return;
 
-        const historyManager = this.editorFacade.getCurrentHistoryManager();
-        if (!historyManager) return;
+        const session = this.editorFacade.getActiveTilemapSession();
+        if (!session) return;
+        const historyManager = session.historyManager;
 
         const updates = coordinates.map((coordinate) => ({
             coordinate,
@@ -37,7 +38,7 @@ export class TileBucketTool extends PointerTool {
         historyManager.startTransaction();
         historyManager.execute(
             new SetTilesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, updates),
-            this.editorFacade,
+            session,
         );
         historyManager.commitTransaction();
     }

@@ -58,6 +58,7 @@ const mockState = vi.hoisted(() => ({
         },
         editorFacade: {
             getActiveTilemapSession: vi.fn(() => null),
+            getCurrentEditorSession: vi.fn(() => null),
             getCurrentHistoryManager: vi.fn(() => null),
         },
         projectManager: {
@@ -140,6 +141,10 @@ const setActiveTilemapSession = () => {
     const session = {
         id: "session-overworld",
         isDirty: true,
+        historyManager: {
+            canUndo: true,
+            canRedo: true,
+        },
         layerState: { selectedLayers: ["ground"] },
         tilemap: {
             id: "overworld",
@@ -150,10 +155,8 @@ const setActiveTilemapSession = () => {
         },
     };
     mockState.appKernel.editorFacade.getActiveTilemapSession.mockReturnValue(session as any);
-    mockState.appKernel.editorFacade.getCurrentHistoryManager.mockReturnValue({
-        canUndo: true,
-        canRedo: true,
-    } as any);
+    mockState.appKernel.editorFacade.getCurrentEditorSession.mockReturnValue(session as any);
+    mockState.appKernel.editorFacade.getCurrentHistoryManager.mockReturnValue(session.historyManager as any);
     mockState.appKernel.workspaceManager.currentWorkspace = {
         tilemapSessionManager: {
             tilemapsSession: [session],
@@ -201,6 +204,7 @@ describe("Metk menu-driven integration workflows", () => {
         mockState.appKernel.projectManager.currentProject = null;
         mockState.appKernel.workspaceManager.currentWorkspace = null;
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset().mockReturnValue(null);
+        mockState.appKernel.editorFacade.getCurrentEditorSession.mockReset().mockReturnValue(null);
         mockState.appKernel.editorFacade.getCurrentHistoryManager.mockReset().mockReturnValue(null);
         mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.commandService.executeCommand.mockClear();

@@ -2,9 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
 
-import { EditorFacade } from "@/application/editor.facade";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
 import { IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 
@@ -19,12 +18,12 @@ export class MoveLayerCommand implements IUndoableCommand {
         private readonly newIndex: number
     ) { }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const rawParentLayer = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
-        const targetLayer = getLayerByObjectId(editorFacade, this.targetLayerObjectId);
+        const rawParentLayer = getLayerByObjectId(context, this.parentLayerObjectId);
+        const targetLayer = getLayerByObjectId(context, this.targetLayerObjectId);
 
         if (!rawParentLayer || !targetLayer || !isLayerInTilemap(tilemap, rawParentLayer) || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Target layer not found");
         if (targetLayer === tilemap.rootLayer) return Result.Error("Cannot move root layer");
@@ -48,12 +47,12 @@ export class MoveLayerCommand implements IUndoableCommand {
         return Result.Success();
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public undo(context: IUndoableCommandContext): Result {
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
         
-        const rawOldParentLayer = getLayerByObjectId(editorFacade, this.oldParentLayerObjectId);
-        const targetLayer = getLayerByObjectId(editorFacade, this.targetLayerObjectId);
+        const rawOldParentLayer = getLayerByObjectId(context, this.oldParentLayerObjectId);
+        const targetLayer = getLayerByObjectId(context, this.targetLayerObjectId);
 
         if (!targetLayer || !rawOldParentLayer || !isLayerInTilemap(tilemap, targetLayer) || !isLayerInTilemap(tilemap, rawOldParentLayer)) return Result.Error("Target layer not found");
 

@@ -1,4 +1,4 @@
-import { EditorFacade } from "@/application/editor.facade";
+import { IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { BaseObject } from "@/editor/model/base-object";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
@@ -7,13 +7,13 @@ import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
 
 export type LayerContainer = (GroupLayer | RootLayer) & IGroupLayer;
 
-export function getTilemapByObjectId(editorFacade: EditorFacade, tilemapObjectId: string): Tilemap | null {
-    const tilemap = editorFacade.objectRegistry?.get<BaseObject<any>>(tilemapObjectId) ?? null;
+export function getTilemapByObjectId(context: IUndoableCommandContext, tilemapObjectId: string): Tilemap | null {
+    const tilemap = context.objectRegistry.get<BaseObject<any>>(tilemapObjectId) ?? null;
     return tilemap instanceof Tilemap ? tilemap : null;
 }
 
-export function getLayerByObjectId<TLayer extends BaseLayer<any> = BaseLayer<any>>(editorFacade: EditorFacade, layerObjectId: string): TLayer | null {
-    const layer = editorFacade.objectRegistry?.get<BaseLayer<any>>(layerObjectId) ?? null;
+export function getLayerByObjectId<TLayer extends BaseLayer<any> = BaseLayer<any>>(context: IUndoableCommandContext, layerObjectId: string): TLayer | null {
+    const layer = context.objectRegistry.get<BaseLayer<any>>(layerObjectId) ?? null;
     return layer instanceof BaseLayer ? layer as TLayer : null;
 }
 

@@ -1,9 +1,10 @@
-import { IBaseSession } from "@/editor/interface/base-session.interface";
+import { IEditorSession } from "@/editor/interface/base-session.interface";
 import { LayerState, TilemapSessionData } from "@/shared/data-types/tilemap-session.data";
 import { ViewState } from "@/shared/data-types/view-state.data";
 
 import { EditorFacade } from "@/application/editor.facade";
 import { HistoryManager } from "@/application/resources/history/history.manager";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import EventEmitter from "eventemitter3";
 import { Tilemap } from "../model/tilemap/tilemap";
 import { Tileset } from "../model/tileset/tileset";
@@ -14,7 +15,7 @@ interface TilemapSessionEvents {
     onSelectedLayersChanged: (layerIds: string[]) => void;
 }
 
-export class TilemapSession extends EventEmitter<TilemapSessionEvents> implements IBaseSession {
+export class TilemapSession extends EventEmitter<TilemapSessionEvents> implements IEditorSession {
     public readonly id: string;
 
     public isDirty: boolean;
@@ -47,6 +48,15 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
         this.changeObserver = new TilemapChangeObserver(this, this.tilemap);
         this.changeObserver.bind();
+    }
+
+    public get objectRegistry(): EditorObjectRegistry {
+        // TODO: pass in using constructor instead of accessing editorFacade
+        const registry = this.editorFacade.currentProject?.objectRegistry;
+        if (!registry) {
+            throw new Error("TilemapSession objectRegistry is unavailable because there is no current project.");
+        }
+        return registry;
     }
 
     public async loadTilemapSession(): Promise<void> {

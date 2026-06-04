@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import type { PropertyUpdateMeta } from "@/editor/model/base-object";
 import { Result } from "@/shared/types/result";
 
@@ -15,22 +14,22 @@ export class UpdatePropertyCommand<TValue = unknown> implements IUndoableCommand
         public readonly newValue: TValue,
     ) {}
 
-    public execute(editorFacade: EditorFacade): Result {
-        return this.applyValue(editorFacade, this.newValue, {
+    public execute(context: IUndoableCommandContext): Result {
+        return this.applyValue(context, this.newValue, {
             origin: "commit",
             source: "UpdatePropertyCommand",
         });
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        return this.applyValue(editorFacade, this.oldValue, {
+    public undo(context: IUndoableCommandContext): Result {
+        return this.applyValue(context, this.oldValue, {
             origin: "undo",
             source: "UpdatePropertyCommand",
         });
     }
 
-    public redo(editorFacade: EditorFacade): Result {
-        return this.applyValue(editorFacade, this.newValue, {
+    public redo(context: IUndoableCommandContext): Result {
+        return this.applyValue(context, this.newValue, {
             origin: "redo",
             source: "UpdatePropertyCommand",
         });
@@ -40,8 +39,8 @@ export class UpdatePropertyCommand<TValue = unknown> implements IUndoableCommand
         // no resource cleanup needed
     }
 
-    private applyValue(editorFacade: EditorFacade, value: TValue, meta: PropertyUpdateMeta): Result {
-        const object = editorFacade.objectRegistry?.get(this.objectId);
+    private applyValue(context: IUndoableCommandContext, value: TValue, meta: PropertyUpdateMeta): Result {
+        const object = context.objectRegistry.get(this.objectId);
 
         if (!object) {
             return Result.Error(`Object not found: ${this.objectId}`);

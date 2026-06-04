@@ -80,6 +80,11 @@ const createEditorFacade = (overrides: {
     activeTilemapSession?: any;
     historyManager?: any;
 } = {}) => {
+    const currentEditorSession = overrides.activeTilemapSession ?? (
+        overrides.historyManager
+            ? { id: "editor-session", historyManager: overrides.historyManager, objectRegistry: {} }
+            : null
+    );
     const editorFacade = {
         currentProject: overrides.currentProject ?? null,
         currentWorkspace: overrides.currentWorkspace ?? null,
@@ -88,6 +93,7 @@ const createEditorFacade = (overrides: {
         },
         getActiveTilemapSession: vi.fn(() => overrides.activeTilemapSession ?? null),
         getCurrentHistoryManager: vi.fn(() => overrides.historyManager ?? null),
+        getCurrentEditorSession: vi.fn(() => currentEditorSession),
     };
     return editorFacade as unknown as EditorFacade & typeof editorFacade;
 };
@@ -230,12 +236,13 @@ describe("system command orchestration", () => {
                 redo: vi.fn(),
             };
             const editorFacade = createEditorFacade({ historyManager });
+            const session = editorFacade.getCurrentEditorSession();
 
             expect(new UndoCommand().execute(editorFacade)).toMatchObject({ status: "Success" });
             expect(new RedoCommand().execute(editorFacade)).toMatchObject({ status: "Success" });
 
-            expect(historyManager.undo).toHaveBeenCalledWith(editorFacade);
-            expect(historyManager.redo).toHaveBeenCalledWith(editorFacade);
+            expect(historyManager.undo).toHaveBeenCalledWith(session);
+            expect(historyManager.redo).toHaveBeenCalledWith(session);
         });
 
         it("cancels undo and redo when no history manager is active", () => {

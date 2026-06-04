@@ -134,6 +134,33 @@ describe("TilemapSession", () => {
         expect(markChanged).toHaveBeenNthCalledWith(2, false);
     });
 
+    it("exposes the current project object registry as its command context", () => {
+        const tilemap = createTilemap();
+        const objectRegistry = new EditorObjectRegistry();
+        objectRegistry.registerTree(tilemap);
+        const session = new TilemapSession(
+            tilemap,
+            { id: "session-1", tilemapId: "map-1" },
+            {
+                currentProject: { objectRegistry },
+                textureManager: { releaseTilesetGraphics: vi.fn() },
+            } as any,
+        );
+
+        expect(session.objectRegistry).toBe(objectRegistry);
+        expect(session.historyManager).toBeDefined();
+    });
+
+    it("throws when its command context is requested without a current project registry", () => {
+        const session = new TilemapSession(
+            createTilemap(),
+            { id: "session-1", tilemapId: "map-1" },
+            { currentProject: null, textureManager: { releaseTilesetGraphics: vi.fn() } } as any,
+        );
+
+        expect(() => session.objectRegistry).toThrow("TilemapSession objectRegistry is unavailable");
+    });
+
     it("serializes session state and releases retained tileset graphics on destroy", () => {
         const releaseTilesetGraphics = vi.fn();
         const session = new TilemapSession(

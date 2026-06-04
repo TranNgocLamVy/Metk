@@ -20,7 +20,7 @@ import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.co
 import { DuplicateLayerCommand } from "@/application/commands/layer/duplicate-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
 import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
@@ -41,8 +41,20 @@ const createServiceHarness = (selectedLayers: string[] = []) => {
     const tilemap = createTilemap();
     const objectRegistry = new EditorObjectRegistry();
     objectRegistry.registerTree(tilemap);
+    const executedCommands: IUndoableCommand[] = [];
+    const historyManager = {
+        startTransaction: vi.fn(),
+        execute: vi.fn((command: IUndoableCommand, context: IUndoableCommandContext) => {
+            executedCommands.push(command);
+            return command.execute(context);
+        }),
+        commitTransaction: vi.fn(),
+    };
     const session = {
+        id: "tilemap-session",
         tilemap,
+        objectRegistry,
+        historyManager,
         isDirty: false,
         layerState: { selectedLayers: [...selectedLayers] },
         markLayerChange: vi.fn(() => {
@@ -60,22 +72,12 @@ const createServiceHarness = (selectedLayers: string[] = []) => {
 
     const editorFacade = {
         getActiveTilemapSession: vi.fn(() => session),
-        getCurrentHistoryManager: vi.fn(),
+        getCurrentEditorSession: vi.fn(() => session),
+        getCurrentHistoryManager: vi.fn(() => historyManager),
         objectRegistry,
         currentWorkspace: { tilemapSessionManager },
     } as unknown as EditorFacade;
 
-    const executedCommands: IUndoableCommand[] = [];
-    const historyManager = {
-        startTransaction: vi.fn(),
-        execute: vi.fn((command: IUndoableCommand, facade: EditorFacade) => {
-            executedCommands.push(command);
-            return command.execute(facade);
-        }),
-        commitTransaction: vi.fn(),
-    };
-
-    (editorFacade.getCurrentHistoryManager as any).mockReturnValue(historyManager);
     kernelState.appKernel.editorFacade = editorFacade;
     kernelState.appKernel.workspaceManager.currentWorkspace = {
         tilemapSessionManager,

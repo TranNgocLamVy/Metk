@@ -25,9 +25,9 @@ export class DeleteCommand implements ISystemCommand {
 
     private deleteSelectedLayers(editorFacade: EditorFacade): Result {
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
 
-        if (!currentSession || !historyManager) return Result.Cancel();
+        if (!currentSession) return Result.Cancel();
+        const historyManager = currentSession.historyManager;
 
         const root = currentSession.tilemap.rootLayer;
         const selectedIds = [...currentSession.layerState.selectedLayers];
@@ -49,7 +49,7 @@ export class DeleteCommand implements ISystemCommand {
 
         layersToDelete.forEach((layer) => {
             const command = new DeleteLayerCommand(currentSession.tilemap.objectId, layer.objectId);
-            historyManager.execute(command, editorFacade);
+            historyManager.execute(command, currentSession);
         });
 
         historyManager.commitTransaction();

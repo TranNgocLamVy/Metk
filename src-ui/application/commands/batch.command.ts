@@ -2,8 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
 
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
-import { EditorFacade } from "../editor.facade";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 
 export class BatchCommand implements IUndoableCommand {
     public readonly id: string;
@@ -14,22 +13,22 @@ export class BatchCommand implements IUndoableCommand {
         this.commands = commands;
     }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const results = this.commands.map(cmd => cmd.execute(editorFacade))
+    public execute(context: IUndoableCommandContext): Result {
+        const results = this.commands.map(cmd => cmd.execute(context))
         const success = results.every(result => result.status === Result.Status.Success)
         const message = results.map(result => result.message).filter(msg => msg != undefined).join("\n")
         return success ? Result.Success() : Result.Error(message);
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const results = [...this.commands].reverse().map(cmd => cmd.undo(editorFacade));
+    public undo(context: IUndoableCommandContext): Result {
+        const results = [...this.commands].reverse().map(cmd => cmd.undo(context));
         const success = results.every(result => result.status === Result.Status.Success)
         const message = results.map(result => result.message).filter(msg => msg != undefined).join("\n")
         return success ? Result.Success() : Result.Error(message);
     }
 
-    public redo(editorFacade: EditorFacade): Result {
-        const results = this.commands.map(cmd => cmd.redo ? cmd.redo(editorFacade) : cmd.execute(editorFacade))
+    public redo(context: IUndoableCommandContext): Result {
+        const results = this.commands.map(cmd => cmd.redo ? cmd.redo(context) : cmd.execute(context))
         const success = results.every(result => result.status === Result.Status.Success)
         const message = results.map(result => result.message).filter(msg => msg != undefined).join("\n")
         return success ? Result.Success() : Result.Error(message);

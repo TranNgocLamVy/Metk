@@ -55,8 +55,9 @@ export class RuleStampTool extends GridStrokeTool {
         if (!this.isTargetLayerSupported(this.targetLayerRenderer)) return;
         if (this.targetLayerRenderer.layer.locked || !this.targetLayerRenderer.layer.visible) return;
 
-        const historyManager = this.editorFacade.getCurrentHistoryManager();
-        if (!historyManager || this.strokePayloads.size === 0) return;
+        const session = this.editorFacade.getActiveTilemapSession();
+        if (!session || this.strokePayloads.size === 0) return;
+        const historyManager = session.historyManager;
 
         const updates = Array.from(this.strokePayloads.values()).map((data) => ({
             coordinate: data.coordinate,
@@ -66,7 +67,7 @@ export class RuleStampTool extends GridStrokeTool {
         historyManager.startTransaction();
         historyManager.execute(
             new SetRulesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, updates),
-            this.editorFacade,
+            session,
         );
         historyManager.commitTransaction();
     }

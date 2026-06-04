@@ -42,8 +42,9 @@ export class EntityPlaceTool extends PointerTool {
         const definition = this.getEntityDefinition(selected);
         if (!definition) return;
 
-        const historyManager = this.editorFacade.getCurrentHistoryManager();
-        if (!historyManager) return;
+        const session = this.editorFacade.getActiveTilemapSession();
+        if (!session) return;
+        const historyManager = session.historyManager;
 
         const worldPosition = this.snapToPixel(this.getLocalPos(e));
 
@@ -59,7 +60,7 @@ export class EntityPlaceTool extends PointerTool {
                     fields: {},
                 },
             ),
-            this.editorFacade,
+            session,
         );
         historyManager.commitTransaction();
     }

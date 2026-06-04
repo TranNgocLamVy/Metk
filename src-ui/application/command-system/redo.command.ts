@@ -1,7 +1,7 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { SystemCommand } from "../commands/command.decorator";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
+import { SystemCommand } from "../commands/command.decorator";
 
 @SystemCommand({
     id: "workspace.tilemap.redo",
@@ -12,9 +12,9 @@ import { Result } from "@/shared/types/result";
 })
 export class RedoCommand implements ISystemCommand {
     public execute(editorFacade: EditorFacade): Result {
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!historyManager) return Result.Cancel();
-        historyManager.redo(editorFacade);
+        const session = editorFacade.getCurrentEditorSession();
+        if (!session) return Result.Cancel();
+        session.historyManager.redo(session);
         return Result.Success();
     }
 }

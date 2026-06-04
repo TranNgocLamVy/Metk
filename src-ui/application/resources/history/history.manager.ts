@@ -1,6 +1,5 @@
 import { BatchCommand } from "@/application/commands/batch.command";
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 
 export class HistoryManager {
@@ -17,8 +16,8 @@ export class HistoryManager {
         this.limit = limit;
     }
 
-    public execute(command: IUndoableCommand, editorFacade: EditorFacade): Result {
-        const result = command.execute(editorFacade);
+    public execute(command: IUndoableCommand, context: IUndoableCommandContext): Result {
+        const result = command.execute(context);
         if (result.status !== Result.Status.Success) return result;
 
         if (this.isTransactionActive) {
@@ -55,36 +54,36 @@ export class HistoryManager {
         if (hasCommands) this.notifyUI();
     }
 
-    public cancelTransaction(editorFacade: EditorFacade) {
+    public cancelTransaction(context: IUndoableCommandContext) {
         if (!this.isTransactionActive) return;
 
         const hasCommands = this.currentBatch.length > 0;
 
-        [...this.currentBatch].reverse().forEach(cmd => cmd.undo(editorFacade));
+        [...this.currentBatch].reverse().forEach(cmd => cmd.undo(context));
 
         this.isTransactionActive = false;
         this.currentBatch = [];
         if (hasCommands) this.notifyUI();
     }
 
-    public undo(editorFacade: EditorFacade) {
+    public undo(context: IUndoableCommandContext) {
         if (this.undoStack.length === 0) return;
 
         const cmd = this.undoStack.pop();
         if (cmd) {
-            cmd.undo(editorFacade);
+            cmd.undo(context);
             this.redoStack.push(cmd);
             this.notifyUI();
         }
     }
 
-    public redo(editorFacade: EditorFacade) {
+    public redo(context: IUndoableCommandContext) {
         if (this.redoStack.length === 0) return;
     
         const cmd = this.redoStack.pop();
     
         if (cmd) {
-            const result = cmd.redo ? cmd.redo(editorFacade) : cmd.execute(editorFacade);
+            const result = cmd.redo ? cmd.redo(context) : cmd.execute(context);
     
             if (result.status !== Result.Status.Success) {
                 this.redoStack.push(cmd);

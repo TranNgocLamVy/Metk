@@ -109,8 +109,9 @@ export class RuleRectangleTool extends PointerTool {
         if (!this.isTargetLayerSupported(this.targetLayerRenderer)) return;
         if (this.targetLayerRenderer.layer.locked || !this.targetLayerRenderer.layer.visible) return;
 
-        const historyManager = this.editorFacade.getCurrentHistoryManager();
-        if (!historyManager || this.previewPayloads.size === 0) return;
+        const session = this.editorFacade.getActiveTilemapSession();
+        if (!session || this.previewPayloads.size === 0) return;
+        const historyManager = session.historyManager;
 
         const updates = Array.from(this.previewPayloads.values()).map((payload) => ({
             coordinate: payload.coordinate,
@@ -120,7 +121,7 @@ export class RuleRectangleTool extends PointerTool {
         historyManager.startTransaction();
         historyManager.execute(
             new SetRulesCommand(this.targetLayerRenderer.tilemap.objectId, this.targetLayerRenderer.layer.objectId, updates),
-            this.editorFacade,
+            session,
         );
         historyManager.commitTransaction();
     }

@@ -149,7 +149,7 @@ describe("layer-specific drawing tools", () => {
     });
 
     it("TileEraserTool erases tile refs immediately and commits one transaction", () => {
-        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager, session } = createDrawingHarness();
         const tool = new TileEraserTool(editorFacade);
         tool.onEnable();
         tool.setTargetLayerRenderer(tileRenderer as any);
@@ -195,7 +195,7 @@ describe("layer-specific drawing tools", () => {
     });
 
     it("TileEraserTool groups realtime drag erases into one undoable stroke", () => {
-        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager, session } = createDrawingHarness();
         tileLayer.setTilesAt([
             { coordinate: { col: 0, row: 0 }, tileId: 1, tilesetId: "tileset-a" },
             { coordinate: { col: 1, row: 0 }, tileId: 2, tilesetId: "tileset-a" },
@@ -219,14 +219,14 @@ describe("layer-specific drawing tools", () => {
         expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
         expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
 
-        historyManager.undo(editorFacade);
+        historyManager.undo(session);
 
         expect(tileLayer.getTileRefAt({ col: 0, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
         expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
     });
 
     it("RuleEraserTool groups realtime drag erases into one undoable stroke", () => {
-        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager, session } = createDrawingHarness();
         ruleLayer.setRuleRefsAt([
             { coordinate: { col: 0, row: 0 }, rulesetId: "ruleset-a" },
             { coordinate: { col: 1, row: 0 }, rulesetId: "ruleset-a" },
@@ -250,7 +250,7 @@ describe("layer-specific drawing tools", () => {
         expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
         expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
 
-        historyManager.undo(editorFacade);
+        historyManager.undo(session);
 
         expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })?.rulesetId).toBe("ruleset-a");
         expect(ruleLayer.getRulesetRefAt({ col: 1, row: 0 })?.rulesetId).toBe("ruleset-a");

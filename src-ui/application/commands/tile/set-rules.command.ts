@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
@@ -17,11 +16,11 @@ export class SetRulesCommand implements IUndoableCommand {
         private updates: { coordinate: Coordinate, rulesetId: string | null }[]
     ) {}
 
-    public execute(editorFacade: EditorFacade): Result {
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const layer = getLayerByObjectId(editorFacade, this.layerObjectId)
+        const layer = getLayerByObjectId(context, this.layerObjectId)
         if (!layer || !isLayerInTilemap(tilemap, layer)) return Result.Error("Layer not found");
         if (!(layer instanceof RuleLayer)) return Result.Error("Layer is not a rule layer");
 
@@ -34,13 +33,13 @@ export class SetRulesCommand implements IUndoableCommand {
         return result
     }
 
-    public undo(editorFacade: EditorFacade): Result {
+    public undo(context: IUndoableCommandContext): Result {
         if (this.oldRules.length === 0) return Result.Cancel("No rule changed");
 
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const layer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        const layer = getLayerByObjectId(context, this.layerObjectId);
         if (!layer || !isLayerInTilemap(tilemap, layer)) return Result.Error("Layer not found");
         if (!(layer instanceof RuleLayer)) return Result.Error("Layer is not a rule layer");
 

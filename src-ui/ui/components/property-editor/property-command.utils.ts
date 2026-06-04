@@ -30,13 +30,13 @@ export function executeUpdatePropertyCommand<TValue>(
         clonePropertyValue(newValue),
     );
 
-    const historyManager = appKernel.editorFacade.getCurrentHistoryManager();
+    const session = appKernel.editorFacade.getCurrentEditorSession();
 
-    if (!historyManager) {
-        return command.execute(appKernel.editorFacade);
+    if (!session) {
+        return Result.Cancel("No active editor session");
     }
 
-    return historyManager.execute(command, appKernel.editorFacade);
+    return session.historyManager.execute(command, session);
 }
 
 export function clonePropertyValue<T>(value: T): T {

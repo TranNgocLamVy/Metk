@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-import { EditorFacade } from "@/application/editor.facade";
+import { IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
@@ -119,17 +119,16 @@ export const createLayerCommandHarness = (layers = createBaseLayers()) => {
     const tilemapSessionManager = {
         getSessionByTilemapId: vi.fn(() => session),
     };
-    const editorFacade = {
+    const editorFacade: IUndoableCommandContext = {
         objectRegistry,
-        currentWorkspace: { tilemapSessionManager },
-    } as unknown as EditorFacade;
+    };
 
     return { tilemap, root: tilemap.rootLayer, session, markLayerChange, emit, editorFacade, objectRegistry };
 };
 
 export const createNoSessionFacade = () => ({
     objectRegistry: new EditorObjectRegistry(),
-}) as unknown as EditorFacade;
+}) satisfies IUndoableCommandContext;
 
 export const layerIds = (parent: IGroupLayer): string[] => parent.layers.map((layer) => layer.id);
 

@@ -13,8 +13,9 @@ export class EntityDeleteTool extends PointerTool {
         const entity = this.targetLayerRenderer.layer.getEntityAt(this.getLocalPos(e));
         if (!entity) return;
 
-        const historyManager = this.editorFacade.getCurrentHistoryManager();
-        if (!historyManager) return;
+        const session = this.editorFacade.getActiveTilemapSession();
+        if (!session) return;
+        const historyManager = session.historyManager;
 
         historyManager.startTransaction();
         historyManager.execute(
@@ -23,7 +24,7 @@ export class EntityDeleteTool extends PointerTool {
                 this.targetLayerRenderer.layer.objectId,
                 [entity.id],
             ),
-            this.editorFacade,
+            session,
         );
         historyManager.commitTransaction();
     }

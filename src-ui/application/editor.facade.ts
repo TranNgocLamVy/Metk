@@ -1,16 +1,17 @@
 import { WorkspaceManager } from "@/application/workspace/workspace.manager";
+import { IEditorSession } from "@/editor/interface/base-session.interface";
+import { Project } from "@/editor/model/project/project";
+import { Workspace } from "@/editor/model/workspace/workspace";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { Workspace } from "@/editor/model/workspace/workspace";
-import { TilemapView } from "@/graphics/view/tilemap.view";
-import { ProjectManager } from "./resources/project/project.manager";
-import { Project } from "@/editor/model/project/project";
-import { ToolManager } from "@/graphics/tool/tool.manager";
 import { TextureManager } from "@/graphics/texture/texture.manager";
-import { HistoryManager } from "./resources/history/history.manager";
-import { ActivationContext } from "./runtime/activation-context";
+import { ToolManager } from "@/graphics/tool/tool.manager";
+import { TilemapView } from "@/graphics/view/tilemap.view";
 import { TilesetView } from "@/graphics/view/tileset.view";
+import { HistoryManager } from "./resources/history/history.manager";
+import { ProjectManager } from "./resources/project/project.manager";
+import { ActivationContext } from "./runtime/activation-context";
 
 export class EditorFacade {
     constructor(
@@ -62,10 +63,10 @@ export class EditorFacade {
     }
 
     public getCurrentHistoryManager(): HistoryManager | null {
-        const currentWorkspace = this.workspaceManager.currentWorkspace;
-        if (!currentWorkspace) return null;
-        const currentMapSession = currentWorkspace.tilemapSessionManager.activeSession;
-        if (!currentMapSession) return null;
-        return currentMapSession.historyManager;
+        return this.getCurrentEditorSession()?.historyManager ?? null;
+    }
+
+    public getCurrentEditorSession(): IEditorSession | null {
+        return this.getActiveTilemapSession();
     }
 }

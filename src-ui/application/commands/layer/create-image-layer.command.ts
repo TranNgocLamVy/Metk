@@ -1,13 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { EditorFacade } from "@/application/editor.facade";
 import {
     getLayerByObjectId,
     getTilemapByObjectId,
     isLayerInTilemap,
     resolveLayerInsertionParent,
 } from "@/application/commands/command-target.utils";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { ImageLayerData } from "@/shared/data-types/layer.data";
@@ -24,15 +23,13 @@ export class CreateImageLayerCommand implements IUndoableCommand {
         private imageLayerData: ImageLayerData,
     ) { }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
         const targetLayer = getLayerByObjectId(
-            editorFacade,
+            context,
             this.parentLayerObjectId,
         );
 
@@ -57,15 +54,13 @@ export class CreateImageLayerCommand implements IUndoableCommand {
         return Result.Success();
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public undo(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
         const imageLayer = getLayerByObjectId<ImageLayer>(
-            editorFacade,
+            context,
             this.imageLayerObjectId,
         );
 

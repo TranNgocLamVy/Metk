@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { SetTilesData, TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
@@ -20,11 +19,11 @@ export class SetTilesCommand implements IUndoableCommand {
         this.data = [...data];
     }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const layer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        const layer = getLayerByObjectId(context, this.layerObjectId);
         if (!layer || !isLayerInTilemap(tilemap, layer)) return Result.Error("Layer not found");
         if (!(layer instanceof TileLayer)) return Result.Error("Layer is not a tile layer");
 
@@ -35,13 +34,13 @@ export class SetTilesCommand implements IUndoableCommand {
         return result
     }
 
-    public undo(editorFacade: EditorFacade): Result {
+    public undo(context: IUndoableCommandContext): Result {
         if (this.oldData.length === 0) return Result.Cancel("No tile changed");
 
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const layer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        const layer = getLayerByObjectId(context, this.layerObjectId);
         if (!layer || !isLayerInTilemap(tilemap, layer)) return Result.Error("Layer not found");
         if (!(layer instanceof TileLayer)) return Result.Error("Layer is not a tile layer");
 

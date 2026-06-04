@@ -32,12 +32,12 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		startIcon: <Undo />,
 		disabled() {
 			const editorFacade = appKernel.editorFacade;
-			const historyManager = editorFacade.getCurrentHistoryManager();
-			return !historyManager?.canUndo;
+			return !editorFacade.getCurrentEditorSession()?.historyManager.canUndo;
 		},
 		onClick() {
 			const editorFacade = appKernel.editorFacade;
-			editorFacade.getCurrentHistoryManager()?.undo(editorFacade);
+			const session = editorFacade.getCurrentEditorSession();
+			session?.historyManager.undo(session);
 		},
 	},
 	{
@@ -46,12 +46,12 @@ const UndoRedoGroup: MenuDropDownGroupType = [
 		startIcon: <Redo />,
 		disabled() {
 			const editorFacade = appKernel.editorFacade;
-			const historyManager = editorFacade.getCurrentHistoryManager();
-			return !historyManager?.canRedo;
+			return !editorFacade.getCurrentEditorSession()?.historyManager.canRedo;
 		},
 		onClick() {
 			const editorFacade = appKernel.editorFacade;
-			editorFacade.getCurrentHistoryManager()?.redo(editorFacade);
+			const session = editorFacade.getCurrentEditorSession();
+			session?.historyManager.redo(session);
 		},
 	},
 ];

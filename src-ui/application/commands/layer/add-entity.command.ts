@@ -1,11 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { getLayerByObjectId, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
+import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
 import { EntityInstanceData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
-import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
 
 export type AddEntityData = Omit<EntityInstanceData, "id"> & {
     id?: string;
@@ -29,22 +28,22 @@ export class AddEntityCommand implements IUndoableCommand {
         };
     }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const layer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        const layer = getLayerByObjectId(context, this.layerObjectId);
         if (!layer || !isLayerInTilemap(tilemap, layer)) return Result.Error("Layer not found");
         if (!(layer instanceof EntityLayer)) return Result.Error("Layer is not an entity layer");
 
         return layer.addEntity(this.entityData);
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public undo(context: IUndoableCommandContext): Result {
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const layer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        const layer = getLayerByObjectId(context, this.layerObjectId);
         if (!layer || !isLayerInTilemap(tilemap, layer)) return Result.Error("Layer not found");
         if (!(layer instanceof EntityLayer)) return Result.Error("Layer is not an entity layer");
 

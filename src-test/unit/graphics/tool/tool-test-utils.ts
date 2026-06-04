@@ -93,7 +93,10 @@ export const createEditorHarness = () => {
     vi.spyOn(historyManager, "cancelTransaction");
     vi.spyOn(historyManager, "pushToUndoStack");
     const session = {
+        id: "tilemap-session",
         tilemap,
+        objectRegistry,
+        historyManager,
         layerState: { selectedLayers: ["tile-root"] },
         markAsDirty: vi.fn(),
         markLayerChange: vi.fn(),

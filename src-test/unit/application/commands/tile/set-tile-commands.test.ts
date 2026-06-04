@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { SetRulesCommand } from "@/application/commands/tile/set-rules.command";
 import { SetTilesCommand } from "@/application/commands/tile/set-tiles.command";
-import { EditorFacade } from "@/application/editor.facade";
+import { IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
@@ -110,10 +110,9 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
     const tilemapSessionManager = {
         getSessionByTilemapId: vi.fn(() => session),
     };
-    const editorFacade = {
+    const editorFacade: IUndoableCommandContext = {
         objectRegistry,
-        currentWorkspace: { tilemapSessionManager },
-    } as unknown as EditorFacade;
+    };
 
     return {
         tilemap,
@@ -126,7 +125,7 @@ const createCommandHarness = (layers: RootLayerData = [createTileLayerData(), cr
 
 const createNoSessionFacade = () => ({
     objectRegistry: new EditorObjectRegistry(),
-}) as unknown as EditorFacade;
+}) satisfies IUndoableCommandContext;
 
 describe("SetTilesCommand", () => {
     it("sets a single tile and undo restores the exact previous empty cell", () => {

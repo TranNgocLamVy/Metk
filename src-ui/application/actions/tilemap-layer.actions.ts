@@ -51,8 +51,8 @@ export async function createNewTileLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const root = currentSession.tilemap.rootLayer;
         const targetLayer = getSelectedParentLayer(currentSession.tilemap);
@@ -64,7 +64,7 @@ export async function createNewTileLayer() {
         const createTileLayerCommand = new CreateTileLayerCommand(currentSession.tilemap.objectId, parent.objectId, payload);
 
         historyManager.startTransaction();
-        historyManager.execute(createTileLayerCommand, editorFacade)
+        historyManager.execute(createTileLayerCommand, currentSession)
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().setEditingId(payload.id);
@@ -74,8 +74,8 @@ export async function createNewRuleLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const root = currentSession.tilemap.rootLayer;
         const targetLayer = getSelectedParentLayer(currentSession.tilemap);
@@ -87,7 +87,7 @@ export async function createNewRuleLayer() {
         const createRuleLayerCommand = new CreateRuleLayerCommand(currentSession.tilemap.objectId, parent.objectId, payload);
 
         historyManager.startTransaction();
-        historyManager.execute(createRuleLayerCommand, editorFacade)
+        historyManager.execute(createRuleLayerCommand, currentSession)
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().setEditingId(payload.id);
@@ -97,9 +97,8 @@ export async function createNewImageLayer() {
         const editorFacade = appKernel.editorFacade;
     
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-    
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const tilemap = currentSession.tilemap;
         const root = tilemap.rootLayer;
@@ -112,7 +111,7 @@ export async function createNewImageLayer() {
         const createImageLayerCommand = new CreateImageLayerCommand(tilemap.objectId, parent.objectId, payload);
     
         historyManager.startTransaction();
-        historyManager.execute(createImageLayerCommand, editorFacade);
+        historyManager.execute(createImageLayerCommand, currentSession);
         historyManager.commitTransaction();
     
         useLayerManagerStore.getState().setEditingId(payload.id);
@@ -122,9 +121,8 @@ export async function createNewEntityLayer() {
         const editorFacade = appKernel.editorFacade;
     
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-    
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
     
         const tilemap = currentSession.tilemap;
         const root = tilemap.rootLayer;
@@ -141,7 +139,7 @@ export async function createNewEntityLayer() {
         );
     
         historyManager.startTransaction();
-        historyManager.execute(createEntityLayerCommand, editorFacade);
+        historyManager.execute(createEntityLayerCommand, currentSession);
         historyManager.commitTransaction();
     
         useLayerManagerStore.getState().setEditingId(payload.id);
@@ -151,8 +149,8 @@ export async function createNewGroupLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const root = currentSession.tilemap.rootLayer;
         const targetLayer = getSelectedParentLayer(currentSession.tilemap);
@@ -164,7 +162,7 @@ export async function createNewGroupLayer() {
         const createGroupLayerCommand = new CreateGroupLayerCommand(currentSession.tilemap.objectId, parent.objectId, payload);
 
         historyManager.startTransaction();
-        historyManager.execute(createGroupLayerCommand, editorFacade)
+        historyManager.execute(createGroupLayerCommand, currentSession)
         historyManager.commitTransaction();
 
         useLayerManagerStore.getState().setEditingId(payload.id);
@@ -174,8 +172,8 @@ export async function duplicateLayer() {
        const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const selectedIds = currentSession.layerState.selectedLayers;
 
@@ -184,7 +182,7 @@ export async function duplicateLayer() {
             const layer = currentSession.tilemap.rootLayer.findLayer(id);
             if (!layer) return;
             const duplicateLayerCommand = new DuplicateLayerCommand(currentSession.tilemap.objectId, layer.objectId);
-            historyManager.execute(duplicateLayerCommand, editorFacade);
+            historyManager.execute(duplicateLayerCommand, currentSession);
         });
         historyManager.commitTransaction();
     }
@@ -193,8 +191,8 @@ export async function deleteLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = appKernel.editorFacade.getCurrentHistoryManager();
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const selectedIds = currentSession.layerState.selectedLayers;
 
@@ -203,7 +201,7 @@ export async function deleteLayer() {
             const layer = currentSession.tilemap.rootLayer.findLayer(id);
             if (!layer) return;
             const deleteLayerCommand = new DeleteLayerCommand(currentSession.tilemap.objectId, layer.objectId);
-            historyManager.execute(deleteLayerCommand, editorFacade);
+            historyManager.execute(deleteLayerCommand, currentSession);
         })
         historyManager.commitTransaction();
 
@@ -270,9 +268,8 @@ export function toggleVisibility(ids: string[], force?: boolean) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
         const root = currentSession.tilemap.rootLayer;
 
         historyManager.startTransaction();
@@ -285,7 +282,7 @@ export function toggleVisibility(ids: string[], force?: boolean) {
             const oldValue = property.getter();
             const newValue = force === undefined ? !oldValue : force;
             const toggleVisibilityCommand = new UpdatePropertyCommand(layer.objectId, "_visible", oldValue, newValue);
-            historyManager.execute(toggleVisibilityCommand, editorFacade);
+            historyManager.execute(toggleVisibilityCommand, currentSession);
         });
         historyManager.commitTransaction();
     }
@@ -307,7 +304,7 @@ export function toggleOpenGroupLayer(id: string, force?: boolean) {
         const oldValue = property.getter();
         const newValue = force === undefined ? !oldValue : force;
         const toggleOpenGroupLayerCommand = new UpdatePropertyCommand(targetLayer.objectId, "isOpen", oldValue, newValue);
-        toggleOpenGroupLayerCommand.execute(editorFacade);
+        toggleOpenGroupLayerCommand.execute(currentSession);
     }
 
 export function toggleSelectedLayersLock() {
@@ -332,9 +329,8 @@ export function toggleLock(ids: string[], force?: boolean) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
         const root = currentSession.tilemap.rootLayer;
 
         historyManager.startTransaction();
@@ -347,7 +343,7 @@ export function toggleLock(ids: string[], force?: boolean) {
             const oldValue = property.getter();
             const newValue = force === undefined ? !oldValue : force;
             const toggleLockCommand = new UpdatePropertyCommand(layer.objectId, "_locked", oldValue, newValue);
-            historyManager.execute(toggleLockCommand, editorFacade);
+            historyManager.execute(toggleLockCommand, currentSession);
         });
         historyManager.commitTransaction();
     }
@@ -356,9 +352,8 @@ export function moveLayers(draggedIds: string[], targetId: string, position: Dro
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
         const root = currentSession.tilemap.rootLayer;
 
         const targetLayer = root.id === targetId ? root : root.findLayer(targetId);
@@ -386,7 +381,7 @@ export function moveLayers(draggedIds: string[], targetId: string, position: Dro
             layersToMove.forEach(l => {
                 const insertIndex = getMoveCommandIndex(targetLayer, l, targetLayer.layers.length);
                 const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, targetLayer.objectId, l.objectId, insertIndex);
-                historyManager.execute(moveLayerCommand, editorFacade);
+                historyManager.execute(moveLayerCommand, currentSession);
             });
             historyManager.commitTransaction();
         } else {
@@ -399,7 +394,7 @@ export function moveLayers(draggedIds: string[], targetId: string, position: Dro
                         const desiredIndex = position === 'top' ? targetIndex : targetIndex + 1 + i;
                         const insertIndex = getMoveCommandIndex(parent, l, desiredIndex);
                         const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, parent.objectId, l.objectId, insertIndex);
-                        historyManager.execute(moveLayerCommand, editorFacade);
+                        historyManager.execute(moveLayerCommand, currentSession);
                     }
                 });
                 historyManager.commitTransaction();
@@ -411,9 +406,8 @@ export function moveLayersUp() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
         const root = currentSession.tilemap.rootLayer;
 
         const ids = currentSession.layerState.selectedLayers;
@@ -441,14 +435,14 @@ export function moveLayersUp() {
                     const grandParent = parent.parentLayer;
                     const parentIndex = grandParent.layers.indexOf(parent as any);
                     const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, grandParent.objectId, layer.objectId, parentIndex);
-                    historyManager.execute(moveLayerCommand, editorFacade);
+                    historyManager.execute(moveLayerCommand, currentSession);
                 }
             } else if (prevSibling instanceof GroupLayer) {
                 const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, prevSibling.objectId, layer.objectId, prevSibling.layers.length);
-                historyManager.execute(moveLayerCommand, editorFacade);
+                historyManager.execute(moveLayerCommand, currentSession);
             } else {
                 const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, parent.objectId, layer.objectId, index - 1);
-                historyManager.execute(moveLayerCommand, editorFacade);
+                historyManager.execute(moveLayerCommand, currentSession);
             }
         });
         historyManager.commitTransaction();
@@ -458,9 +452,8 @@ export function moveLayersDown() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
         const root = currentSession.tilemap.rootLayer;
 
         const ids = currentSession.layerState.selectedLayers;
@@ -488,14 +481,14 @@ export function moveLayersDown() {
                     const grandParent = parent.parentLayer;
                     const parentIndex = grandParent.layers.indexOf(parent as any);
                     const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, grandParent.objectId, layer.objectId, parentIndex + 1);
-                    historyManager.execute(moveLayerCommand, editorFacade);
+                    historyManager.execute(moveLayerCommand, currentSession);
                 }
             } else if (nextSibling instanceof GroupLayer) {
                 const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, nextSibling.objectId, layer.objectId, 0);
-                historyManager.execute(moveLayerCommand, editorFacade);
+                historyManager.execute(moveLayerCommand, currentSession);
             } else {
                 const moveLayerCommand = new MoveLayerCommand(currentSession.tilemap.objectId, parent.objectId, layer.objectId, index + 1);
-                historyManager.execute(moveLayerCommand, editorFacade);
+                historyManager.execute(moveLayerCommand, currentSession);
             }
         });
         historyManager.commitTransaction();
@@ -505,8 +498,8 @@ export function renameLayer(id: string, name: string, recordUndo: boolean = true
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
-        const historyManager = editorFacade.getCurrentHistoryManager();
-        if (!currentSession || !historyManager) return;
+        if (!currentSession) return;
+        const historyManager = currentSession.historyManager;
 
         const root = currentSession.tilemap.rootLayer;
         const layer = root.findLayer(id);
@@ -515,8 +508,8 @@ export function renameLayer(id: string, name: string, recordUndo: boolean = true
         const command = new UpdatePropertyCommand(layer.objectId, "name", layer.name, name);
 
         if (recordUndo) {
-            historyManager.execute(command, editorFacade);
+            historyManager.execute(command, currentSession);
         } else {
-            command.execute(editorFacade);
+            command.execute(currentSession);
         }
     }

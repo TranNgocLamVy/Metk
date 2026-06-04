@@ -3,8 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { RuleLayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { getLayerByObjectId, resolveLayerInsertionParent, getTilemapByObjectId, isLayerInTilemap } from "@/application/commands/command-target.utils";
@@ -18,14 +17,12 @@ export class CreateRuleLayerCommand implements IUndoableCommand {
         private ruleLayerData: RuleLayerData,
     ) { }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const targetLayer = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
+        const targetLayer = getLayerByObjectId(context, this.parentLayerObjectId);
         if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Parent layer not found");
 
         const parent = resolveLayerInsertionParent(targetLayer, tilemap.rootLayer);
@@ -41,14 +38,12 @@ export class CreateRuleLayerCommand implements IUndoableCommand {
         return Result.Success();
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public undo(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const ruleLayer = getLayerByObjectId<RuleLayer>(editorFacade, this.ruleLayerObjectId);
+        const ruleLayer = getLayerByObjectId<RuleLayer>(context, this.ruleLayerObjectId);
         if (!(ruleLayer instanceof RuleLayer) || !isLayerInTilemap(tilemap, ruleLayer)) return Result.Error("Rule layer not found");
 
         ruleLayer.removeFromParent();

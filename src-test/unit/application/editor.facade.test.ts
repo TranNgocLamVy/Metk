@@ -58,16 +58,20 @@ describe("EditorFacade", () => {
         expect(facade.getActiveTilesetView()).toBe(tilesetView);
     });
 
-    it("returns current history manager only when a tilemap session is active", () => {
+    it("returns the current editor session from the active tilemap session", () => {
         const historyManager = { id: "history" };
+        const objectRegistry = { id: "registry" };
+        const session = { id: "tilemap-session", historyManager, objectRegistry };
         expect(createFacade().getCurrentHistoryManager()).toBeNull();
+        expect(createFacade().getCurrentEditorSession()).toBeNull();
 
         const facade = createFacade({
             tilemapSessionManager: {
-                activeSession: { historyManager },
+                activeSession: session,
             },
         });
 
+        expect(facade.getCurrentEditorSession()).toBe(session);
         expect(facade.getCurrentHistoryManager()).toBe(historyManager);
     });
 });

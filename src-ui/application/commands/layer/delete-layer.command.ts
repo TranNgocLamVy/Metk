@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { getLayerByObjectId, getTilemapByObjectId, isLayerContainer, isLayerInTilemap } from "@/application/commands/command-target.utils";
-import { EditorFacade } from "@/application/editor.facade";
-import { IUndoableCommand } from "@/editor/interface/base-command.interface";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { LayerUtils } from "@/editor/model/tilemap/layer/layer.utils";
 import { LayerData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
@@ -18,14 +17,12 @@ export class DeleteLayerCommand implements IUndoableCommand {
         private readonly layerObjectId: string,
     ) { }
 
-    public execute(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public execute(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const targetLayer = getLayerByObjectId(editorFacade, this.layerObjectId);
+        const targetLayer = getLayerByObjectId(context, this.layerObjectId);
         if (!targetLayer || !isLayerInTilemap(tilemap, targetLayer)) return Result.Error("Target layer not found");
         if (targetLayer === tilemap.rootLayer) return Result.Error("Cannot delete root layer");
 
@@ -42,14 +39,12 @@ export class DeleteLayerCommand implements IUndoableCommand {
         return Result.Success();
     }
 
-    public undo(editorFacade: EditorFacade): Result {
-        const objectRegistry = editorFacade.objectRegistry;
-        if (!objectRegistry) return Result.Error("Object registry not found");
-
-        const tilemap = getTilemapByObjectId(editorFacade, this.tilemapObjectId);
+    public undo(context: IUndoableCommandContext): Result {
+        const objectRegistry = context.objectRegistry;
+        const tilemap = getTilemapByObjectId(context, this.tilemapObjectId);
         if (!tilemap) return Result.Error("Tilemap not found");
 
-        const parent = getLayerByObjectId(editorFacade, this.parentLayerObjectId);
+        const parent = getLayerByObjectId(context, this.parentLayerObjectId);
         if (!parent || !isLayerInTilemap(tilemap, parent) || !isLayerContainer(parent)) return Result.Error("Parent layer not found");
 
         const restoredLayer = LayerUtils.createLayerFromData(this.layerData, parent, tilemap, tilemap.objectId);
