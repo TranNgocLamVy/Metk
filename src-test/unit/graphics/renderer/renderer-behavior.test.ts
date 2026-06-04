@@ -18,6 +18,12 @@ const rendererMocks = vi.hoisted(() => {
         public listeners: Record<string, (...args: any[]) => void> = {};
         public addChild = vi.fn((child: any) => {
             this.children.push(child);
+            child.parent = this;
+            return child;
+        });
+        public removeChild = vi.fn((child: any) => {
+            this.children = this.children.filter((existing) => existing !== child);
+            child.parent = null;
             return child;
         });
         public removeChildren = vi.fn(() => {
@@ -39,12 +45,14 @@ const rendererMocks = vi.hoisted(() => {
     }
 
     class Sprite {
+        public parent: Container | null = null;
         public x = 0;
         public y = 0;
         public width = 0;
         public height = 0;
         public zIndex = 0;
         public tint: any = null;
+        public roundPixels = false;
         public position = {
             x: 0,
             y: 0,
@@ -55,6 +63,21 @@ const rendererMocks = vi.hoisted(() => {
         };
         public destroy = vi.fn();
         constructor(public texture?: any) {}
+    }
+
+    class TilingSprite extends Sprite {
+        public tilePosition = {
+            x: 0,
+            y: 0,
+            set: vi.fn((x: number, y: number) => {
+                this.tilePosition.x = x;
+                this.tilePosition.y = y;
+            }),
+        };
+
+        constructor(options: { texture?: any } = {}) {
+            super(options.texture);
+        }
     }
 
     class Graphics {
@@ -85,6 +108,15 @@ const rendererMocks = vi.hoisted(() => {
         public y = 0;
         public height = 12;
         public text: string;
+        public roundPixels = false;
+        public anchor = {
+            x: 0,
+            y: 0,
+            set: vi.fn((x: number, y: number) => {
+                this.anchor.x = x;
+                this.anchor.y = y;
+            }),
+        };
 
         constructor(options: { text?: string }) {
             this.text = options.text ?? "";
@@ -96,6 +128,7 @@ const rendererMocks = vi.hoisted(() => {
     return {
         Container,
         Sprite,
+        TilingSprite,
         Graphics,
         Text,
         Point,
@@ -105,8 +138,16 @@ const rendererMocks = vi.hoisted(() => {
             textureManager: {
                 on: vi.fn(),
                 off: vi.fn(),
+                getTileTexture: vi.fn(),
+                getErrorTexture: vi.fn(),
             },
             editorFacade: {
+                currentProject: {
+                    entityCollectionManager: {
+                        on: vi.fn(),
+                        off: vi.fn(),
+                    },
+                },
                 textureManager: {
                     getTileTexture: vi.fn(),
                     getErrorTexture: vi.fn(),
@@ -116,12 +157,27 @@ const rendererMocks = vi.hoisted(() => {
         workspaceService: {
             saveCurrentWorkspace: vi.fn(),
         },
+        fs: {
+            BaseDirectory: { AppData: "appData" },
+            exists: vi.fn(),
+            readFile: vi.fn(),
+            readTextFile: vi.fn(),
+            writeTextFile: vi.fn(),
+            writeFile: vi.fn(),
+            mkdir: vi.fn(),
+            remove: vi.fn(),
+            create: vi.fn(),
+        },
+        textureUtils: {
+            processTexture: vi.fn(),
+        },
     };
 });
 
 vi.mock("pixi.js", () => ({
     Container: rendererMocks.Container,
     Sprite: rendererMocks.Sprite,
+    TilingSprite: rendererMocks.TilingSprite,
     Graphics: rendererMocks.Graphics,
     Text: rendererMocks.Text,
     Point: rendererMocks.Point,
@@ -130,17 +186,25 @@ vi.mock("pixi.js", () => ({
 }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: rendererMocks.appKernel }));
 vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: rendererMocks.workspaceService }));
+vi.mock("@tauri-apps/plugin-fs", () => rendererMocks.fs);
+vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: rendererMocks.textureUtils }));
 
+import { EntityDefinition } from "@/editor/model/entity/entity-definition";
+import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
+import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
+import { EntityLayerRenderer } from "@/graphics/renderer/tilemap/entity-layer.renderer";
+import { ImageLayerRenderer } from "@/graphics/renderer/tilemap/image-layer.renderer";
 import { TilemapGridRenderer } from "@/graphics/renderer/tilemap/tilemap-grid.renderer";
 import { TilemapRenderer } from "@/graphics/renderer/tilemap/tilemap.renderer";
 import { TilesetGridRenderer } from "@/graphics/renderer/tileset/single-tileset-grid.renderer";
 import { TilesetSelectorRenderer } from "@/graphics/renderer/tileset/single-tileset-selector.renderer";
 import { TilesetRenderer } from "@/graphics/renderer/tileset/single-tileset.renderer";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { EntityLayerData, ImageLayerData } from "@/shared/data-types/layer.data";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 
 import {
@@ -161,8 +225,9 @@ class ConcreteLayerRenderer extends BaseLayerRenderer<TileLayer> {
 }
 
 const flushAsync = async () => {
-    await Promise.resolve();
-    await Promise.resolve();
+    for (let index = 0; index < 8; index++) {
+        await Promise.resolve();
+    }
 };
 
 const viewportStub = {} as any;
@@ -191,6 +256,46 @@ const createTileset = (overrides: Partial<ConstructorParameters<typeof SingleIma
     );
 };
 
+const createImageLayerData = (overrides: Partial<ImageLayerData> = {}): ImageLayerData => ({
+    id: "image-layer",
+    type: "image",
+    name: "Backdrop",
+    opacity: 1,
+    visible: true,
+    locked: false,
+    offsetx: 0,
+    offsety: 0,
+    parallaxx: 1,
+    parallaxy: 1,
+    tintcolor: "",
+    repeatx: false,
+    repeaty: false,
+    image: { source: "images/backdrop.png", width: 32, height: 24 },
+    ...overrides,
+});
+
+const createEntityLayerData = (overrides: Partial<EntityLayerData> = {}): EntityLayerData => ({
+    id: "entity-layer",
+    type: "entity",
+    name: "Entities",
+    opacity: 1,
+    visible: true,
+    locked: false,
+    offsetx: 2,
+    offsety: 3,
+    entities: [{
+        id: "entity-1",
+        name: "Spawn",
+        entityRef: {
+            entityCollectionId: "collection-a",
+            entityDefinitionId: "definition-a",
+        },
+        x: 12,
+        y: 14,
+    }],
+    ...overrides,
+});
+
 beforeEach(() => {
     vi.clearAllMocks();
     rendererMocks.appKernel.editorFacade.textureManager.getTileTexture.mockImplementation((tilesetId: string, tileId: number) => ({
@@ -199,6 +304,20 @@ beforeEach(() => {
         height: 16,
     }));
     rendererMocks.appKernel.editorFacade.textureManager.getErrorTexture.mockResolvedValue({ id: "error-texture", width: 16, height: 16 });
+    rendererMocks.appKernel.textureManager.getTileTexture.mockImplementation((tilesetId: string, tileId: number) => ({
+        id: `${tilesetId}:${tileId}`,
+        width: 16,
+        height: 16,
+    }));
+    rendererMocks.appKernel.textureManager.getErrorTexture.mockResolvedValue({ id: "error-texture", width: 16, height: 16 });
+    rendererMocks.fs.exists.mockResolvedValue(true);
+    rendererMocks.fs.readFile.mockResolvedValue(new Uint8Array([1, 2, 3]));
+    rendererMocks.textureUtils.processTexture.mockResolvedValue({
+        id: "image-texture",
+        width: 32,
+        height: 24,
+        destroy: vi.fn(),
+    });
 });
 
 describe("BaseLayerRenderer and TilemapRenderer", () => {
@@ -214,13 +333,26 @@ describe("BaseLayerRenderer and TilemapRenderer", () => {
 
         layer.toggleVisibility(false);
         layer.updateOpacity(0.25);
+        layer.rename("Renamed Ground");
 
         expect(renderer.container.visible).toBe(false);
         expect(renderer.container.alpha).toBe(0.25);
+        expect(renderer.container.label).toBe("Renamed Ground");
 
         renderer.destroy();
         expect(off).toHaveBeenCalledWith("updateProperty", expect.any(Function));
         expect(renderer.container.destroy).toHaveBeenCalledWith({ children: true, texture: false });
+    });
+
+    it("handles object-shaped updateProperty payloads when syncing base properties", () => {
+        const tilemap = createTilemap([createTileLayerData({ id: "ground", name: "Ground", visible: true })]);
+        const layer = tilemap.rootLayer.findLayer("ground") as TileLayer;
+        const renderer = new ConcreteLayerRenderer(layer, tilemap);
+
+        layer.visible = false;
+        (layer.eventEmitter as any).emit("updateProperty", { key: "visible", value: false });
+
+        expect(renderer.container.visible).toBe(false);
     });
 
     it("builds a tilemap renderer tree, traverses nested layers, draws the border, and destroys children", async () => {
@@ -254,6 +386,149 @@ describe("BaseLayerRenderer and TilemapRenderer", () => {
 
         expect(renderer.rootRenderer.container.destroy).toHaveBeenCalled();
         expect(renderer.container.destroy).toHaveBeenCalledWith({ children: true, texture: false });
+    });
+});
+
+describe("ImageLayerRenderer", () => {
+    const createViewport = () => ({
+        center: { x: 64, y: 32 },
+        left: 0,
+        top: 0,
+        right: 128,
+        bottom: 96,
+        on: vi.fn(),
+        off: vi.fn(),
+    });
+
+    it("updates transform and tint from layer properties without reloading the image", async () => {
+        const tilemap = createTilemap([createImageLayerData()]);
+        const layer = tilemap.rootLayer.findLayer("image-layer") as ImageLayer;
+        const viewport = createViewport();
+        const renderer = new ImageLayerRenderer({ layer, tilemap, viewport: viewport as any });
+        await flushAsync();
+
+        const sprite = renderer.container.children[0] as unknown as MockSprite;
+        expect(sprite.texture).toMatchObject({ id: "image-texture" });
+
+        layer.updateOffset(10, 20);
+        layer.updateTintColor("#ff00aa");
+        await flushAsync();
+
+        expect(sprite.x).toBe(10);
+        expect(sprite.y).toBe(20);
+        expect(sprite.tint).toBe(0xff00aa);
+        expect(rendererMocks.textureUtils.processTexture).toHaveBeenCalledTimes(1);
+    });
+
+    it("rebuilds image output for source/repeat changes and removes listeners on destroy", async () => {
+        const firstTexture = {
+            id: "image-texture-a",
+            width: 32,
+            height: 24,
+            destroy: vi.fn(),
+        };
+        const secondTexture = {
+            id: "image-texture-b",
+            width: 48,
+            height: 24,
+            destroy: vi.fn(),
+        };
+
+        rendererMocks.textureUtils.processTexture
+            .mockResolvedValueOnce(firstTexture)
+            .mockResolvedValueOnce(secondTexture);
+
+        const tilemap = createTilemap([createImageLayerData()]);
+        const layer = tilemap.rootLayer.findLayer("image-layer") as ImageLayer;
+        const viewport = createViewport();
+        const off = vi.spyOn(layer.eventEmitter, "off");
+        const renderer = new ImageLayerRenderer({ layer, tilemap, viewport: viewport as any });
+        await flushAsync();
+
+        layer.updateRepeat(true, false);
+        await flushAsync();
+
+        expect(renderer.container.children[0]).toBeInstanceOf(rendererMocks.TilingSprite);
+        expect(firstTexture.destroy).toHaveBeenCalledWith(true);
+
+        renderer.destroy();
+
+        expect(off).toHaveBeenCalledWith("imageChanged", expect.any(Function));
+        expect(viewport.off).toHaveBeenCalledWith("moved", expect.any(Function));
+        expect(viewport.off).toHaveBeenCalledWith("zoomed", expect.any(Function));
+        expect(viewport.off).toHaveBeenCalledWith("resize", expect.any(Function));
+        expect(secondTexture.destroy).toHaveBeenCalledWith(true);
+    });
+});
+
+describe("EntityLayerRenderer", () => {
+    const createDefinition = (overrides: Partial<ConstructorParameters<typeof EntityDefinition>[0]> = {}) => new EntityDefinition({
+        id: "definition-a",
+        name: "Actor",
+        width: 20,
+        height: 12,
+        pivotX: 4,
+        pivotY: 5,
+        graphic: { type: "color", color: "#0088ff" },
+        ...overrides,
+    });
+
+    it("renders initial entities and updates/removes displays from entity events", async () => {
+        const tilemap = createTilemap([createEntityLayerData()]);
+        const layer = tilemap.rootLayer.findLayer("entity-layer") as EntityLayer;
+        vi.spyOn(layer, "getEntityDefinition").mockReturnValue(createDefinition());
+
+        const renderer = new EntityLayerRenderer({ layer, tilemap, viewport: viewportStub });
+        await flushAsync();
+
+        const displays = (renderer as any).entityDisplays as Map<string, any>;
+        const record = displays.get("entity-1");
+        expect(record).toBeDefined();
+        expect(record.container.x).toBe(10);
+        expect(record.container.y).toBe(12);
+        expect(record.label.text).toBe("Spawn");
+
+        layer.getEntityById("entity-1")!.moveTo(30, 40);
+        await flushAsync();
+
+        expect(record.container.x).toBe(28);
+        expect(record.container.y).toBe(38);
+
+        layer.removeEntities(["entity-1"]);
+        await flushAsync();
+
+        expect(displays.has("entity-1")).toBe(false);
+        expect(record.container.destroy).toHaveBeenCalledWith({ children: true, texture: false });
+    });
+
+    it("rerenders matching tile-backed entities and unregisters manager listeners", async () => {
+        const tilemap = createTilemap([createEntityLayerData()]);
+        const layer = tilemap.rootLayer.findLayer("entity-layer") as EntityLayer;
+        vi.spyOn(layer, "getEntityDefinition").mockReturnValue(createDefinition({
+            graphic: { type: "tile", tilesetId: "tileset-a", tileId: 1 },
+        }));
+
+        const renderer = new EntityLayerRenderer({ layer, tilemap, viewport: viewportStub });
+        await flushAsync();
+
+        const displays = (renderer as any).entityDisplays as Map<string, any>;
+        const record = displays.get("entity-1");
+        expect(record.sprite.texture).toMatchObject({ id: "tileset-a:1" });
+
+        const reloadHandler = rendererMocks.appKernel.textureManager.on.mock.calls
+            .find(([eventName]) => eventName === "onTextureReloaded")![1];
+
+        rendererMocks.appKernel.textureManager.getTileTexture.mockReturnValueOnce({ id: "tileset-a:1:updated", width: 16, height: 16 });
+        reloadHandler("tileset-a");
+        await flushAsync();
+
+        expect(record.sprite.texture).toMatchObject({ id: "tileset-a:1:updated" });
+
+        renderer.destroy();
+
+        expect(rendererMocks.appKernel.textureManager.off).toHaveBeenCalledWith("onTextureReloaded", expect.any(Function));
+        expect(rendererMocks.appKernel.editorFacade.currentProject.entityCollectionManager.off)
+            .toHaveBeenCalledWith("onEntityCollectionUpdated", expect.any(Function));
     });
 });
 

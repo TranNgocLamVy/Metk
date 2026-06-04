@@ -39,8 +39,7 @@ export class TilemapChangeObserver {
     private bindObject(object: BaseObject<any>): void {
         const onUpdateProperty = (_key: string, _value: unknown, meta?: PropertyUpdateMeta) => {
             if (meta?.origin === "preview") return;
-
-            this.session.markLayerChange();
+            this.session.markAsDirty();
         };
 
         object.eventEmitter.on("updateProperty", onUpdateProperty);
@@ -51,7 +50,7 @@ export class TilemapChangeObserver {
 
     private bindLayerStructureEvents(layer: BaseLayer<any>): void {
         const refresh = () => {
-            this.session.markLayerChange();
+            this.session.markAsDirty();
             this.queueSelectedLayerReconciliation();
             this.bind();
         };
@@ -69,7 +68,7 @@ export class TilemapChangeObserver {
 
     private bindLayerContentEvents(layer: BaseLayer<any>): void {
         const markChanged = () => {
-            this.session.markLayerChange();
+            this.session.markAsDirty();
         };
 
         const eventEmitter = layer.eventEmitter as any;

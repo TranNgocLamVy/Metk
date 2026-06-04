@@ -1,12 +1,12 @@
 import { IBaseSession } from "@/editor/interface/base-session.interface";
-import { ViewState } from "@/shared/data-types/view-state.data";
 import { LayerState, TilemapSessionData } from "@/shared/data-types/tilemap-session.data";
+import { ViewState } from "@/shared/data-types/view-state.data";
 
 import { EditorFacade } from "@/application/editor.facade";
+import { HistoryManager } from "@/application/resources/history/history.manager";
 import EventEmitter from "eventemitter3";
 import { Tilemap } from "../model/tilemap/tilemap";
 import { Tileset } from "../model/tileset/tileset";
-import { HistoryManager } from "@/application/resources/history/history.manager";
 import { TilemapChangeObserver } from "./tilemap-change.observer";
 
 interface TilemapSessionEvents {
@@ -89,11 +89,6 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
     }
 
     public markAsDirty(): void {
-        this.isDirty = true;
-        this.emit("onMarkChange", this.isDirty);
-    }
-
-    public markLayerChange(): void {
         this.isDirty = true;
         this.emit("onMarkChange", this.isDirty);
     }

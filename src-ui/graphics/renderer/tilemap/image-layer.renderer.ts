@@ -7,7 +7,7 @@ import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 
 import { Viewport } from "pixi-viewport";
-import { BaseLayerRenderer } from "./base-layer.renderer";
+import { BaseLayerRenderer, LayerPropertyUpdate } from "./base-layer.renderer";
 
 type CreateImageLayerRendererContext = {
     layer: ImageLayer;
@@ -19,29 +19,54 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
     private viewport: Viewport;
     private image: Sprite | TilingSprite | null = null;
     private texture: Texture | null = null;
-    
-    private bindOnViewportChanged: () => void;
+    private ownsTexture = false;
+    private renderGeneration = 0;
+    private isDestroyed = false;
+    private suppressNextImageChanged = false;
+
+    private handleImageChanged = (): void => {
+        if (this.suppressNextImageChanged) {
+            this.suppressNextImageChanged = false;
+            return;
+        }
+
+        void this.renderImage();
+    };
+
+    private handleViewportChanged = (): void => {
+        this.updateTransform();
+    };
 
     constructor(context: CreateImageLayerRendererContext) {
         super(context.layer, context.tilemap);
 
         this.viewport = context.viewport;
-        
-        this.bindOnViewportChanged = this.updateViewTransform.bind(this);
 
-        this.layer.eventEmitter.on("imageChanged", this.bindOnViewportChanged);
-        this.viewport.on("moved", this.bindOnViewportChanged);
-        this.viewport.on("zoomed", this.bindOnViewportChanged);
-        this.viewport.on("resize", this.bindOnViewportChanged);
+        this.layer.eventEmitter.on("imageChanged", this.handleImageChanged);
+        this.viewport.on("moved", this.handleViewportChanged);
+        this.viewport.on("zoomed", this.handleViewportChanged);
+        this.viewport.on("resize", this.handleViewportChanged);
 
-        this.renderLayer();
+        void this.renderImage();
     }
 
-    private async renderLayer(): Promise<void> {
-        const texture = await this.getTexture();
-        if (!texture) return;
+    private async renderImage(): Promise<void> {
+        const generation = ++this.renderGeneration;
+        const textureResult = await this.getTexture();
 
-        this.image?.destroy();
+        if (
+            this.isDestroyed
+            || generation !== this.renderGeneration
+        ) {
+            if (textureResult?.owned) textureResult.texture.destroy(true);
+            return;
+        }
+
+        this.clearImage();
+
+        if (!textureResult) return;
+
+        const { texture, owned } = textureResult;
 
         if (this.layer.repeatX || this.layer.repeatY) {
             this.image = new TilingSprite({ texture });
@@ -49,26 +74,40 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
             this.image = new Sprite(texture);
         }
 
+        this.texture = texture;
+        this.ownsTexture = owned;
         this.container.addChild(this.image);
-        this.updateViewTransform();
+        this.updateTransform();
+        this.applyTint();
     }
 
-    private async getTexture(): Promise<Texture | null> {
+    private async getTexture(): Promise<{ texture: Texture; owned: boolean } | null> {
         const imageAbsPath = this.tilemap.tilemapPathSystem.getAbsPathFromRelPath(this.layer.imageSource.source);
 
-        const imageExists = await exists(imageAbsPath);
+        try {
+            const imageExists = await exists(imageAbsPath);
 
-        let texture: Texture | null = null;
-        if (!imageExists) {
-            texture = await appKernel.textureManager.getErrorTexture();
-        } else {
+            if (!imageExists) {
+                return {
+                    texture: await appKernel.textureManager.getErrorTexture(),
+                    owned: false,
+                };
+            }
+
             const fileBuffer = await readFile(imageAbsPath);
-            texture = await TextureUtils.processTexture(fileBuffer);
+            return {
+                texture: await TextureUtils.processTexture(fileBuffer),
+                owned: true,
+            };
+        } catch {
+            return {
+                texture: await appKernel.textureManager.getErrorTexture(),
+                owned: false,
+            };
         }
-        return texture;
     }
 
-    private updateViewTransform(): void {
+    private updateTransform(): void {
         if (!this.image) return;
 
         const parallaxX = this.layer.parallax.x ?? 1;
@@ -123,14 +162,25 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         }
     }
 
-    protected override updateProperties(): void {
-        super.updateProperties();
+    protected override updateProperties(update?: LayerPropertyUpdate): void {
+        super.updateProperties(update);
+
+        switch (update?.key) {
+            case "imageSource":
+            case "repeatX":
+            case "repeatY":
+                this.suppressNextImageChanged = true;
+                void this.renderImage();
+                break;
+            case "parallax":
+            case "tintcolor":
+                this.suppressNextImageChanged = true;
+                break;
+        }
 
         if (!this.image) return;
 
-        this.image.x = this.layer.offset.x;
-        this.image.y = this.layer.offset.y;
-
+        this.updateTransform();
         this.applyTint();
     }
 
@@ -162,14 +212,30 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
     }
 
     public override destroy(): void {
-        this.viewport.off("moved", this.bindOnViewportChanged);
-        this.viewport.off("zoomed", this.bindOnViewportChanged);
-        this.viewport.off("resize", this.bindOnViewportChanged);
+        this.isDestroyed = true;
+        this.renderGeneration++;
 
+        this.layer.eventEmitter.off("imageChanged", this.handleImageChanged);
+        this.viewport.off("moved", this.handleViewportChanged);
+        this.viewport.off("zoomed", this.handleViewportChanged);
+        this.viewport.off("resize", this.handleViewportChanged);
+
+        this.clearImage();
+
+        super.destroy();
+    }
+
+    private clearImage(): void {
+        this.image?.parent?.removeChild(this.image);
         this.image?.destroy();
         this.image = null;
 
-        super.destroy();
+        if (this.texture && this.ownsTexture) {
+            this.texture.destroy(true);
+        }
+
+        this.texture = null;
+        this.ownsTexture = false;
     }
 }
 

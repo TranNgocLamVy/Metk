@@ -1,6 +1,7 @@
 import { Color, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import type { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { EntityInstance } from "@/editor/model/entity/entity-instance";
 import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
@@ -35,29 +36,33 @@ const ENTITY_LABEL_OUTLINE_COLOR = 0x0f172a;
 
 export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
     private entityDisplays: Map<string, EntityDisplayRecord> = new Map();
+    private entityCollectionManager: EntityCollectionManager | null = null;
+    private isDestroyed = false;
 
-    private bindOnEntitiesChanged: (entityIds: string[]) => void;
-    private bindOnTextureReloaded: (tilesetId: string) => void;
-    private bindOnEntityCollectionUpdated: (entityCollectionId: string) => void;
+    private handleEntitiesChanged = (entityIds: string[]): void => {
+        void this.updateChangedEntities(entityIds);
+    };
+
+    private handleTextureReloaded = (tilesetId: string): void => {
+        if (!this.hasEntityUsingTileset(tilesetId)) return;
+
+        void this.renderLayer();
+    };
+
+    private handleEntityCollectionUpdated = (entityCollectionId: string): void => {
+        if (!this.hasEntityUsingCollection(entityCollectionId)) return;
+
+        void this.renderLayer();
+    };
 
     constructor(context: CreateEntityLayerRendererContext) {
         super(context.layer, context.tilemap);
 
-        this.bindOnEntitiesChanged = this.onEntitiesChanged.bind(this);
-        this.bindOnTextureReloaded = this.onTextureReloaded.bind(this);
-        this.bindOnEntityCollectionUpdated = this.onEntityCollectionUpdated.bind(this);
+        this.entityCollectionManager = appKernel.editorFacade.currentProject?.entityCollectionManager ?? null;
 
-        this.layer.eventEmitter.on("entitiesChanged", this.bindOnEntitiesChanged);
-
-        appKernel.textureManager.on(
-            "onTextureReloaded",
-            this.bindOnTextureReloaded,
-        );
-
-        appKernel.editorFacade.currentProject?.entityCollectionManager.on(
-            "onEntityCollectionUpdated",
-            this.bindOnEntityCollectionUpdated,
-        );
+        this.layer.eventEmitter.on("entitiesChanged", this.handleEntitiesChanged);
+        appKernel.textureManager.on("onTextureReloaded", this.handleTextureReloaded);
+        this.entityCollectionManager?.on("onEntityCollectionUpdated", this.handleEntityCollectionUpdated);
 
         void this.renderLayer();
     }
@@ -82,6 +87,8 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
     }
 
     private async syncEntityDisplay(entity: EntityInstance): Promise<void> {
+        if (this.isDestroyed) return;
+
         const definition = this.layer.getEntityDefinition(entity);
 
         if (!definition) {
@@ -188,7 +195,7 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
                 pixelLine: true,
             });
 
-        record.label.text = this.getEntityDisplayName(entity, definition);
+        record.label.text = entity.name || definition.name || entity.id;
         record.label.x = record.sprite.width / 2;
         record.label.y = 0;
         record.label.anchor.set(0.5, 1);
@@ -205,15 +212,6 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
             width: Math.max(1, width),
             height: Math.max(1, height),
         };
-    }
-
-    private getEntityDisplayName(
-        entity: EntityInstance,
-        definition: EntityDefinition,
-    ): string {
-        if (entity.name) return entity.name;
-        if (definition.name) return definition.name;
-        return entity.id;
     }
 
     private syncEntityDisplays(): void {
@@ -238,8 +236,10 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         });
     }
 
-    private async onEntitiesChanged(entityIds: string[]): Promise<void> {
+    private async updateChangedEntities(entityIds: string[]): Promise<void> {
         for (const entityId of entityIds) {
+            if (this.isDestroyed) return;
+
             const entity = this.layer.getEntityById(entityId);
 
             if (!entity) {
@@ -251,8 +251,8 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         }
     }
 
-    private onTextureReloaded(tilesetId: string): void {
-        const shouldRerender = this.layer.getAllEntities().some((entity) => {
+    private hasEntityUsingTileset(tilesetId: string): boolean {
+        return this.layer.getAllEntities().some((entity) => {
             const definition = this.layer.getEntityDefinition(entity);
 
             return (
@@ -260,20 +260,12 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
                 definition.graphic.tilesetId === tilesetId
             );
         });
-
-        if (!shouldRerender) return;
-
-        void this.renderLayer();
     }
 
-    private onEntityCollectionUpdated(entityCollectionId: string): void {
-        const shouldRerender = this.layer.getAllEntities().some((entity) => {
+    private hasEntityUsingCollection(entityCollectionId: string): boolean {
+        return this.layer.getAllEntities().some((entity) => {
             return entity.entityRef.entityCollectionId === entityCollectionId;
         });
-
-        if (!shouldRerender) return;
-
-        void this.renderLayer();
     }
 
     private removeEntityDisplay(entityId: string): void {
@@ -314,20 +306,11 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
     }
 
     public override destroy(): void {
-        this.layer.eventEmitter.off(
-            "entitiesChanged",
-            this.bindOnEntitiesChanged,
-        );
+        this.isDestroyed = true;
 
-        appKernel.textureManager.off(
-            "onTextureReloaded",
-            this.bindOnTextureReloaded,
-        );
-
-        appKernel.editorFacade.currentProject?.entityCollectionManager.off(
-            "onEntityCollectionUpdated",
-            this.bindOnEntityCollectionUpdated,
-        );
+        this.layer.eventEmitter.off("entitiesChanged", this.handleEntitiesChanged);
+        appKernel.textureManager.off("onTextureReloaded", this.handleTextureReloaded);
+        this.entityCollectionManager?.off("onEntityCollectionUpdated", this.handleEntityCollectionUpdated);
 
         this.entityDisplays.forEach((record, entityId) => {
             this.destroyEntityDisplay(entityId, record);

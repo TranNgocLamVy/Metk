@@ -28,7 +28,6 @@ export class RuleLayerRenderer extends BaseLayerRenderer<RuleLayer> {
         appKernel.textureManager.on("onTextureReloaded", this.bindOnTextureReloaded);
         this.layer.rulesetRefManager.rulesetManager.on("onRulesetUpdated", this.bindOnRulesetUpdated);
 
-        this.layer.reCalculateAllOutputs();
         this.renderLayer();
     }
 
