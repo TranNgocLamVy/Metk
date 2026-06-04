@@ -1,6 +1,6 @@
-import { SettingPage } from "./setting.types";
+import type { SettingKeyFromPages, SettingPage, SettingValueFromPages } from "./setting.types";
 
-export const defaultSettingPages: SettingPage[] = [
+export const defaultSettingPages = [
     {
         key: "general",
         label: "setting.general.label",
@@ -34,4 +34,8 @@ export const defaultSettingPages: SettingPage[] = [
             },
         ],
     },
-];
+] as const satisfies readonly SettingPage[];
+
+export type DefaultSettingPages = typeof defaultSettingPages;
+export type DefaultSettingKey = SettingKeyFromPages<DefaultSettingPages>;
+export type DefaultSettingValue<TKey extends DefaultSettingKey> = SettingValueFromPages<DefaultSettingPages, TKey>;

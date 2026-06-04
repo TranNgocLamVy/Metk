@@ -2,11 +2,24 @@ import EventEmitter from "eventemitter3";
 
 import { JsonStorageService } from "@/infrastructure/json-storage.service";
 import { Result } from "@/shared/types/result";
+import type { DefaultSettingPages } from "./default-settings";
 import { SettingRegistry } from "./setting.registry";
-import { NumberSettingDefinition, RegisteredSettingDefinition, SettingChangeEvent, SettingInspection, SettingValue, UserSettingsData } from "./setting.types";
+import {
+    NumberSettingDefinition,
+    RegisteredSettingDefinition,
+    RegisteredSettingDefinitionFromPages,
+    ResolvedSettingsFromPages,
+    SettingChangeEventFromPages,
+    SettingInspection,
+    SettingKeyFromPages,
+    SettingPage,
+    SettingValue,
+    SettingValueFromPages,
+    UserSettingsData,
+} from "./setting.types";
 
-type SettingManagerEvents = {
-    didChangeSetting: (event: SettingChangeEvent) => void;
+type SettingManagerEvents<TPages extends readonly SettingPage[]> = {
+    didChangeSetting: (event: SettingChangeEventFromPages<TPages>) => void;
 };
 
 const defaultUserSettingsData = (): UserSettingsData => ({
@@ -14,12 +27,12 @@ const defaultUserSettingsData = (): UserSettingsData => ({
     values: {},
 });
 
-export class SettingManager {
-    private readonly eventEmitter = new EventEmitter<SettingManagerEvents>();
+export class SettingManager<TPages extends readonly SettingPage[] = DefaultSettingPages> {
+    private readonly eventEmitter = new EventEmitter<SettingManagerEvents<TPages>>();
     private userSettings: UserSettingsData = defaultUserSettingsData();
 
     constructor(
-        private readonly registry: SettingRegistry,
+        private readonly registry: SettingRegistry<TPages>,
         private readonly storage: JsonStorageService<UserSettingsData>,
         private readonly filePath: string = "settings.json",
     ) { }
@@ -47,23 +60,29 @@ export class SettingManager {
         }
     }
 
-    public get<TValue extends SettingValue>(key: string): TValue {
+    public get<TKey extends SettingKeyFromPages<TPages>>(key: TKey): SettingValueFromPages<TPages, TKey> {
         const definition = this.registry.getDefinition(key);
         if (!definition) throw new Error(`Unknown setting key: ${key}`);
 
-        return this.resolveValue(definition) as TValue;
+        return this.resolveValue(definition) as SettingValueFromPages<TPages, TKey>;
     }
 
-    public getAllResolvedSettings(): Record<string, SettingValue> {
+    public getAllResolvedSettings(): ResolvedSettingsFromPages<TPages> {
         const resolvedSettings: Record<string, SettingValue> = {};
         for (const definition of this.registry.getAll()) {
             resolvedSettings[definition.fullKey] = this.resolveValue(definition);
         }
 
-        return resolvedSettings;
+        return resolvedSettings as ResolvedSettingsFromPages<TPages>;
     }
 
-    public inspect(key: string): SettingInspection {
+    public inspect<TKey extends SettingKeyFromPages<TPages>>(
+        key: TKey,
+    ): SettingInspection<
+        TKey,
+        SettingValueFromPages<TPages, TKey>,
+        RegisteredSettingDefinitionFromPages<TPages, TKey>
+    > {
         const definition = this.registry.getDefinition(key);
         if (!definition) {
             return {
@@ -72,25 +91,33 @@ export class SettingManager {
                 isConfigured: false,
                 source: "unknown",
                 error: `Unknown setting key: ${key}`,
-            };
+            } as SettingInspection<
+                TKey,
+                SettingValueFromPages<TPages, TKey>,
+                RegisteredSettingDefinitionFromPages<TPages, TKey>
+            >;
         }
 
-        const userValue = this.userSettings.values[key];
+        const userValue = this.userSettings.values[key] as SettingValueFromPages<TPages, TKey> | undefined;
         const hasUserValue = userValue !== undefined;
+        const defaultValue = definition.defaultValue as SettingValueFromPages<TPages, TKey>;
 
         return {
             key,
             exists: true,
             isConfigured: hasUserValue,
             source: hasUserValue ? "user" : "default",
-            definition,
-            defaultValue: definition.defaultValue,
+            definition: definition as unknown as RegisteredSettingDefinitionFromPages<TPages, TKey>,
+            defaultValue,
             userValue,
-            resolvedValue: hasUserValue ? userValue : definition.defaultValue,
+            resolvedValue: hasUserValue ? userValue : defaultValue,
         };
     }
 
-    public async update(key: string, value: SettingValue): Promise<Result> {
+    public async update<TKey extends SettingKeyFromPages<TPages>>(
+        key: TKey,
+        value: NoInfer<SettingValueFromPages<TPages, TKey>>,
+    ): Promise<Result> {
         const definition = this.registry.getDefinition(key);
         if (!definition) return Result.Error(`Unknown setting key: ${key}`);
 
@@ -118,13 +145,13 @@ export class SettingManager {
         }
 
         if (oldValue !== newValue) {
-            this.eventEmitter.emit("didChangeSetting", { key, oldValue, newValue, definition });
+            this.eventEmitter.emit("didChangeSetting", { key, oldValue, newValue, definition } as SettingChangeEventFromPages<TPages>);
         }
 
         return Result.Success();
     }
 
-    public async reset(key: string): Promise<Result> {
+    public async reset<TKey extends SettingKeyFromPages<TPages>>(key: TKey): Promise<Result> {
         const definition = this.registry.getDefinition(key);
         if (!definition) return Result.Error(`Unknown setting key: ${key}`);
 
@@ -142,17 +169,21 @@ export class SettingManager {
 
         const newValue = this.resolveValue(definition);
         if (oldValue !== newValue) {
-            this.eventEmitter.emit("didChangeSetting", { key, oldValue, newValue, definition });
+            this.eventEmitter.emit("didChangeSetting", { key, oldValue, newValue, definition } as SettingChangeEventFromPages<TPages>);
         }
 
         return Result.Success();
     }
 
-    public onDidChangeSetting(listener: (event: SettingChangeEvent) => void): () => void {
+    public onDidChangeSetting(listener: (event: SettingChangeEventFromPages<TPages>) => void): () => void {
         this.eventEmitter.on("didChangeSetting", listener);
         return () => this.eventEmitter.off("didChangeSetting", listener);
     }
 
+    private resolveValue<TKey extends SettingKeyFromPages<TPages>>(
+        definition: RegisteredSettingDefinitionFromPages<TPages, TKey>,
+    ): SettingValueFromPages<TPages, TKey>;
+    private resolveValue(definition: RegisteredSettingDefinition): SettingValue;
     private resolveValue(definition: RegisteredSettingDefinition): SettingValue {
         const userValue = this.userSettings.values[definition.fullKey];
         return userValue !== undefined ? userValue : definition.defaultValue;

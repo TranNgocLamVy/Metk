@@ -1,4 +1,5 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import type { DefaultSettingKey, DefaultSettingValue } from "@/application/settings/default-settings";
 import { SettingValue } from "@/application/settings/setting.types";
 import { create } from "zustand";
 
@@ -6,9 +7,9 @@ type SettingStoreState = {
     values: Record<string, SettingValue>;
     isLoaded: boolean;
     loadSettings: () => Promise<void>;
-    get: <TValue extends SettingValue>(key: string) => TValue;
-    update: (key: string, value: SettingValue) => Promise<void>;
-    reset: (key: string) => Promise<void>;
+    get: <TKey extends DefaultSettingKey>(key: TKey) => DefaultSettingValue<TKey>;
+    update: <TKey extends DefaultSettingKey>(key: TKey, value: NoInfer<DefaultSettingValue<TKey>>) => Promise<void>;
+    reset: (key: DefaultSettingKey) => Promise<void>;
     syncFromManager: () => void;
 };
 
@@ -24,16 +25,16 @@ export const useSettingStore = create<SettingStoreState>((set) => ({
             });
         }
     },
-    get: <TValue extends SettingValue>(key: string): TValue => {
-        return appKernel.settings.get<TValue>(key);
+    get: <TKey extends DefaultSettingKey>(key: TKey): DefaultSettingValue<TKey> => {
+        return appKernel.settings.get(key);
     },
-    update: async (key: string, value: SettingValue) => {
+    update: async <TKey extends DefaultSettingKey>(key: TKey, value: NoInfer<DefaultSettingValue<TKey>>) => {
         const result = await appKernel.settings.update(key, value);
         if (result.status === "Success") {
             set({ values: appKernel.settings.getAllResolvedSettings() });
         }
     },
-    reset: async (key: string) => {
+    reset: async (key: DefaultSettingKey) => {
         const result = await appKernel.settings.reset(key);
         if (result.status === "Success") {
             set({ values: appKernel.settings.getAllResolvedSettings() });

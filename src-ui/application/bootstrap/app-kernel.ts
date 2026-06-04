@@ -12,6 +12,7 @@ import { ProjectMetadataRepo, SettingStorageService } from "@/infrastructure/con
 import { Result } from "@/shared/types/result";
 import { ActivationContext } from "../runtime/activation-context";
 import { defaultSettingPages } from "../settings/default-settings";
+import type { DefaultSettingPages } from "../settings/default-settings";
 import { SettingManager } from "../settings/setting.manager";
 import { SettingRegistry } from "../settings/setting.registry";
 
@@ -27,8 +28,8 @@ export class AppKernel {
     public readonly activationContext: ActivationContext;
     public readonly keybindingManager: KeybindingManager;
     public readonly textureManager: TextureManager;
-    public readonly settingRegistry: SettingRegistry;
-    public readonly settings: SettingManager;
+    public readonly settingRegistry: SettingRegistry<DefaultSettingPages>;
+    public readonly settings: SettingManager<DefaultSettingPages>;
 
     public readonly editorFacade: EditorFacade;
 

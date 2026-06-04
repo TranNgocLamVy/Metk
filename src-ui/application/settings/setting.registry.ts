@@ -1,16 +1,19 @@
 import {
     RegisteredSettingDefinition,
+    ResolvedSettingsFromPages,
+    SettingKeyFromPages,
     SettingPage,
-    SettingValue,
 } from "./setting.types";
 
-export class SettingRegistry {
+export class SettingRegistry<TPages extends readonly SettingPage[]> {
     private readonly settings = new Map<string, RegisteredSettingDefinition>();
 
-    constructor(private readonly pages: SettingPage[]) {
+    constructor(private readonly pages: TPages) {
         this.registerPages(pages);
     }
 
+    public getDefinition(key: SettingKeyFromPages<TPages>): RegisteredSettingDefinition | undefined;
+    public getDefinition(key: string): RegisteredSettingDefinition | undefined;
     public getDefinition(key: string): RegisteredSettingDefinition | undefined {
         return this.settings.get(key);
     }
@@ -19,13 +22,15 @@ export class SettingRegistry {
         return this.settings.has(key);
     }
 
-    public getDefaultValue(key: string): SettingValue {
+    public getDefaultValue<TKey extends SettingKeyFromPages<TPages>>(
+        key: TKey,
+    ): ResolvedSettingsFromPages<TPages>[TKey] {
         const definition = this.settings.get(key);
         if (!definition) throw new Error(`Unknown setting key: ${key}`);
-        return definition.defaultValue;
+        return definition.defaultValue as ResolvedSettingsFromPages<TPages>[TKey];
     }
 
-    public getPages(): SettingPage[] {
+    public getPages(): TPages {
         return this.pages;
     }
 
@@ -33,7 +38,7 @@ export class SettingRegistry {
         return Array.from(this.settings.values());
     }
 
-    private registerPages(pages: SettingPage[]): void {
+    private registerPages(pages: readonly SettingPage[]): void {
         for (const page of pages) {
             for (const group of page.groups) {
                 for (const setting of group.settings) {

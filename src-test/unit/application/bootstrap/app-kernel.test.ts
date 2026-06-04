@@ -7,6 +7,10 @@ type KernelTestState = {
         load: ReturnType<typeof vi.fn>;
         save: ReturnType<typeof vi.fn>;
     };
+    settingStorageService: {
+        load: ReturnType<typeof vi.fn>;
+        save: ReturnType<typeof vi.fn>;
+    };
     projectManager: {
         load: ReturnType<typeof vi.fn>;
         serialize: ReturnType<typeof vi.fn>;
@@ -32,6 +36,10 @@ const loadKernelModule = async () => {
         projectMetadataRepo: {
             load: vi.fn(),
             save: vi.fn(),
+        },
+        settingStorageService: {
+            load: vi.fn(() => Promise.resolve(Result.Error("settings not found"))),
+            save: vi.fn(() => Promise.resolve(Result.Success())),
         },
         projectManager: {
             load: vi.fn(),
@@ -63,6 +71,7 @@ const loadKernelModule = async () => {
     vi.doMock("@/graphics/tool/register-tool", () => ({}));
     vi.doMock("@/infrastructure/container", () => ({
         ProjectMetadataRepo: state.projectMetadataRepo,
+        SettingStorageService: state.settingStorageService,
     }));
     vi.doMock("@/application/resources/project/project.manager", () => ({
         ProjectManager: vi.fn(function () {
