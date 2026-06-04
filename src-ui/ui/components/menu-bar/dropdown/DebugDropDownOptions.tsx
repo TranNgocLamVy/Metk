@@ -1,6 +1,5 @@
-import { appKernel } from "@/application/bootstrap/app-kernel";
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import i18n, { i18nService } from "@/app/providers/i18n";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
@@ -32,39 +31,21 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 			console.log(appKernel.projectManager.serialize());
 		}
 	},
-    {
-        type: "option",
-        label: "save project manager",
-        async onClick() {
-            await appKernel.saveProjectManager();
-        }
-    },
-    {
-        type: "option",
-        label: "print current project",
-        async onClick() {
-			console.log(appKernel.projectManager.currentProject);
-        }
-    },
-    {
-        type: "option",
-        label: "print current tilemap",
-        async onClick() {
-			console.log(appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager.activeSession?.tilemap);
-        }
-    },
-    {
-        type: "option",
-        label: "recalculate rule layer",
-        async onClick() {
-			const tilemap = appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager.activeSession?.tilemap;
-            tilemap?.rootLayer.getAllLayers().forEach((layer) => {
-                if (layer instanceof RuleLayer) {
-                    layer.reCalculateAllOutputs();
-                }
-            })
-        }
-    },
+	{
+		type: "option",
+		label: "Print setting",
+		onClick() {
+			console.log(appKernel.settings.get("general.view.showGrid"));
+		}
+	},
+	{
+		type: "option",
+		label: "Toggle setting",
+		onClick() {
+            const showGrid = appKernel.settings.get("general.view.showGrid");
+            appKernel.settings.update("general.view.showGrid", !showGrid);
+		}
+	},
 ];
 
 export const DebugDropdownOptions: MenuItemType = {

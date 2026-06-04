@@ -1,14 +1,15 @@
+import { UserSettingsData } from "@/application/settings/setting.types";
+import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
 import { ProjectData, ProjectMetadata } from "@/shared/data-types/project.data";
+import { RulesetData } from "@/shared/data-types/ruleset.data";
 import { TilemapData } from "@/shared/data-types/tilemap.data";
-import { TauriFileSystemProvider } from "./tauri-filesystem.provider";
-import { JsonStorageService } from "./json-storage.service";
-import { JsonSerializer } from "./json.serializer";
-import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { TilesetData } from "@/shared/data-types/tileset.data";
 import { WorkpsaceData } from "@/shared/data-types/workspace.data";
-import { RulesetData } from "@/shared/data-types/ruleset.data";
+import { BaseDirectory } from "@tauri-apps/plugin-fs";
 import { IJsonModel } from "flexlayout-react";
-import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
+import { JsonStorageService } from "./json-storage.service";
+import { JsonSerializer } from "./json.serializer";
+import { TauriFileSystemProvider } from "./tauri-filesystem.provider";
 
 export const TauriFileStorage = new TauriFileSystemProvider();
 
@@ -24,3 +25,4 @@ export const LayoutStorageService = new JsonStorageService<IJsonModel>(TauriFile
 export const RulesetStorageService = new JsonStorageService<RulesetData>(TauriFileStorage, new JsonSerializer<RulesetData>());
 export const EntityCollectionStorageService = new JsonStorageService<EntityCollectionData>(TauriFileStorage, new JsonSerializer<EntityCollectionData>(),
     );
+export const SettingStorageService = new JsonStorageService<UserSettingsData>(TauriFileStorage, new JsonSerializer<UserSettingsData>(), { baseDir: BaseDirectory.AppData });

@@ -8,9 +8,12 @@ import { ProjectManager } from "@/application/resources/project/project.manager"
 import { WorkspaceManager } from "@/application/workspace/workspace.manager";
 import { TextureManager } from "@/graphics/texture/texture.manager";
 import { ToolManager } from "@/graphics/tool/tool.manager";
-import { ProjectMetadataRepo } from "@/infrastructure/container";
+import { ProjectMetadataRepo, SettingStorageService } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 import { ActivationContext } from "../runtime/activation-context";
+import { defaultSettingPages } from "../settings/default-settings";
+import { SettingManager } from "../settings/setting.manager";
+import { SettingRegistry } from "../settings/setting.registry";
 
 
 export class AppKernel {
@@ -24,6 +27,8 @@ export class AppKernel {
     public readonly activationContext: ActivationContext;
     public readonly keybindingManager: KeybindingManager;
     public readonly textureManager: TextureManager;
+    public readonly settingRegistry: SettingRegistry;
+    public readonly settings: SettingManager;
 
     public readonly editorFacade: EditorFacade;
 
@@ -41,7 +46,10 @@ export class AppKernel {
 
         this.systemCommandManager = new SystemCommandManager(this.activationContext, this.editorFacade);
         this.keybindingManager = new KeybindingManager(this.systemCommandManager, this.toolManager);
-        
+
+        this.settingRegistry = new SettingRegistry(defaultSettingPages);
+        this.settings = new SettingManager(this.settingRegistry, SettingStorageService, "settings.json");
+
         // Set Context
         this.toolManager.setEditorContext(this.editorFacade);
         this.workspaceManager.setEditorContext(this.editorFacade);
@@ -68,6 +76,7 @@ export class AppKernel {
     public async load(): Promise<Result<AppKernel>> {
         if (this.isLoaded) return Result.Success(this);
 
+        await AppKernel.getIns().settings.load();
         const projectRepoResult = await ProjectMetadataRepo.load('projects.json');
 
         if (projectRepoResult.status !== Result.Status.Success) {
