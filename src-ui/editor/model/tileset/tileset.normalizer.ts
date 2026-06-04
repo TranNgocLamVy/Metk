@@ -3,6 +3,15 @@ import { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { TileData, TilesetData, TilesetType, TilesetTypeValues } from "@/shared/data-types/tileset.data";
 import { validate } from "@/shared/utils/validate.utils";
 
+const normalizeCloneFrom = (value: unknown): string | undefined => {
+    return typeof value === "string" && value.length > 0 ? value : undefined;
+};
+
+const cloneFromField = (value: unknown): { cloneFrom?: string } => {
+    const cloneFrom = normalizeCloneFrom(value);
+    return cloneFrom ? { cloneFrom } : {};
+};
+
 export const normalizeImageSourceData = (value: unknown): ImageSourceData | undefined => {
     const data = validate.object<Record<string, unknown>>({ value, defaultValue: {} });
     if (!("source" in data) && !("width" in data) && !("height" in data)) return undefined;
@@ -19,6 +28,7 @@ const normalizeCollisionObjectData = (value: unknown): CollisionObjectData | nul
         const data = validate.requiredObject({ value, field: "collision object" });
         const base = {
             id: validate.requiredString({ value: data.id, field: "collisionObject.id" }),
+            ...cloneFromField(data.cloneFrom),
             name: validate.string({ value: data.name, defaultValue: "Unnamed Collision Object" }),
             x: validate.number({ value: data.x, defaultValue: 0 }),
             y: validate.number({ value: data.y, defaultValue: 0 }),
@@ -65,6 +75,7 @@ export const normalizeTileData = (value: unknown): TileData | null => {
 
         return {
             id: validate.requiredNumber({ value: data.id, field: "tile.id", min: 0, integer: true }),
+            ...cloneFromField(data.cloneFrom),
             x: validate.number({ value: data.x, defaultValue: 0 }),
             y: validate.number({ value: data.y, defaultValue: 0 }),
             width: validate.number({ value: data.width, defaultValue: 0, min: 0 }),
@@ -86,6 +97,7 @@ export const normalizeTilesetData = (tilesetData: unknown): TilesetData => {
 
     return {
         id: validate.requiredString({ value: data.id, field: "tileset.id" }),
+        ...cloneFromField(data.cloneFrom),
         name: validate.string({ value: data.name, defaultValue: "Untitled Tileset" }),
         type: validate.enum({ value: data.type, values: TilesetTypeValues, defaultValue: TilesetType.SingleImage }),
         columns: validate.number({ value: data.columns, defaultValue: 16, min: 1, integer: true }),

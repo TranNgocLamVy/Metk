@@ -7,9 +7,11 @@ export abstract class CollisionObject {
     public y: number;
     public visible: boolean;
     public locked: boolean;
+    public readonly cloneFrom?: string;
 
     protected constructor(data: BaseCollisionData) {
         this.id = data.id;
+        this.cloneFrom = data.cloneFrom;
         this.name = data.name ?? "Unnamed Collision Object";
         this.x = data.x;
         this.y = data.y;
@@ -32,6 +34,8 @@ export abstract class CollisionObject {
     public abstract get kind(): CollisionObjectKind;
 
     public abstract clone(): CollisionObject;
+
+    public abstract deepClone(): CollisionObject;
 
     public abstract serialize(): CollisionObjectData;
 }

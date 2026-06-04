@@ -26,6 +26,7 @@ export const EntityFieldType = {
 
 export type EntityFieldData = {
     id: string;
+    cloneFrom?: string;
     name?: string;
     type: EntityFieldType;
     nullable?: boolean;
@@ -55,6 +56,7 @@ export type EntityGraphicData = EntityTileGraphicData | EntityColorGraphicData;
 
 export type EntityDefinitionData = {
     id: string;
+    cloneFrom?: string;
     name?: string;
     width: number;
     height: number;

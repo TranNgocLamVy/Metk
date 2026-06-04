@@ -23,7 +23,7 @@ export class EntityDefinition extends BaseObject<EntityDefinitionEvent> {
     public constructor(entityData: EntityDefinitionData) {
         const data = normalizeEntityDefinitionData(entityData);
 
-        super(`entity-definition:${data.id}`);
+        super(`entity-definition:${data.id}`, data.cloneFrom);
 
         this.id = data.id;
         this.name = data.name ?? data.id;
@@ -131,6 +131,7 @@ export class EntityDefinition extends BaseObject<EntityDefinitionEvent> {
     public serialize(): EntityDefinitionData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             name: this.name,
             width: this.width,
             height: this.height,

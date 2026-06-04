@@ -1,4 +1,5 @@
 import { PolygonCollisionData } from "@/shared/data-types/collision-object.data";
+import { v4 as uuidv4 } from "uuid";
 import { CollisionObject } from "./collision-object";
 
 export class PolygonCollision extends CollisionObject {
@@ -33,12 +34,21 @@ export class PolygonCollision extends CollisionObject {
     }
 
     public clone(): PolygonCollision {
+        return new PolygonCollision({
+            ...this.serialize(),
+            id: uuidv4(),
+            cloneFrom: this.id,
+        });
+    }
+
+    public deepClone(): PolygonCollision {
         return new PolygonCollision(this.serialize());
     }
 
     public serialize(): PolygonCollisionData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             kind: "polygon",
             name: this.name,
             x: this.x,

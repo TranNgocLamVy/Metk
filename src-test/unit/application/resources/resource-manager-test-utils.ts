@@ -1,5 +1,6 @@
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { EntityCollectionData, EntityCollectionMetadata } from "@/shared/data-types/entity-collection.data";
 import { ProjectData, ProjectMetadata } from "@/shared/data-types/project.data";
 import { RulesetData, RulesetMetadata } from "@/shared/data-types/ruleset.data";
 import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
@@ -48,6 +49,23 @@ export const createRulesetMetadata = (id = "ruleset-a", overrides: Partial<Rules
     name: `${id} metadata`,
     color: "#ffffff",
     rulesetRelPath: `rulesets/${id}.json`,
+    ...overrides,
+});
+
+export const createEntityCollectionData = (id = "entity-collection-a", overrides: Partial<EntityCollectionData> = {}): EntityCollectionData => ({
+    id,
+    name: `${id} name`,
+    entities: [],
+    tilesets: { refs: [], nextIndex: 0 },
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-02T00:00:00.000Z",
+    ...overrides,
+});
+
+export const createEntityCollectionMetadata = (id = "entity-collection-a", overrides: Partial<EntityCollectionMetadata> = {}): EntityCollectionMetadata => ({
+    id,
+    name: `${id} metadata`,
+    entityCollectionRelPath: `entity-collections/${id}.json`,
     ...overrides,
 });
 

@@ -11,6 +11,7 @@ import { Console } from "@/ui/notifications/console-gateway";
 import EventEmitter from "eventemitter3";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
+import { cloneRulesetData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
 
 export interface RulesetManagerEvent {
     onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
@@ -257,7 +258,17 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
     public cloneRuleset(id: string): Ruleset | null {
         const ruleset = this.loadedRulesets.get(id);
         if (!ruleset) return null;
-        const rulesetData = ruleset.serialize();
+        const rulesetData = cloneRulesetData(ruleset.serialize());
+        const rulesetPathSystem = new FilePathSystem(rulesetData.id, this.projectPathSystem, ruleset.rulesetPathSystem.relPath);
+        const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
+        const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);
+        return new Ruleset(rulesetData, rulesetPathSystem, tilesetRefManager, rulesetRefManager);
+    }
+
+    public deepCloneRuleset(id: string): Ruleset | null {
+        const ruleset = this.loadedRulesets.get(id);
+        if (!ruleset) return null;
+        const rulesetData = deepCloneResourceData(ruleset.serialize());
         const rulesetPathSystem = new FilePathSystem(rulesetData.id, this.projectPathSystem, ruleset.rulesetPathSystem.relPath);
         const tilesetRefManager = new TilesetRefManager(this.tilesetManager, rulesetPathSystem);
         const rulesetRefManager = new RulesetRefManager(this, rulesetPathSystem);

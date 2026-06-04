@@ -21,6 +21,7 @@ export type RuleOutputData = {
 
 export type RuleData = {
     id: string;
+    cloneFrom?: string;
     constraints: string;
     outputs: string;
 };
@@ -33,6 +34,7 @@ export type RulesetRefData = {
 
 export type RulesetData = {
     id: string;
+    cloneFrom?: string;
     name: string;
     color: string;
     size: number;

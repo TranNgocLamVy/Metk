@@ -246,7 +246,7 @@ describe("Edit ruleset dialog workflow", () => {
         const user = userEvent.setup({ pointerEventsCheck: 0 });
         const clonedRuleset = new FakeRuleset();
         const rulesetManager = {
-            cloneRuleset: vi.fn(() => clonedRuleset),
+            deepCloneRuleset: vi.fn(() => clonedRuleset),
             updateRuleset: vi.fn(),
             saveRuleset: vi.fn(),
         };
@@ -259,7 +259,7 @@ describe("Edit ruleset dialog workflow", () => {
 
         renderDialog();
 
-        expect(rulesetManager.cloneRuleset).toHaveBeenCalledWith("ruleset-a");
+        expect(rulesetManager.deepCloneRuleset).toHaveBeenCalledWith("ruleset-a");
         expect(screen.getByDisplayValue("Terrain Rules")).toBeVisible();
         expect(screen.getByText("1")).toBeVisible();
         expect(screen.getByText("2")).toBeVisible();
@@ -277,7 +277,7 @@ describe("Edit ruleset dialog workflow", () => {
         const clonedRuleset = new FakeRuleset();
         editRulesetMocks.appKernel.editorFacade.currentProject = {
             rulesetManager: {
-                cloneRuleset: vi.fn(() => clonedRuleset),
+                deepCloneRuleset: vi.fn(() => clonedRuleset),
                 updateRuleset: vi.fn(),
                 saveRuleset: vi.fn(),
             },
@@ -303,7 +303,7 @@ describe("Edit ruleset dialog workflow", () => {
         const clonedRuleset = new FakeRuleset();
         editRulesetMocks.appKernel.editorFacade.currentProject = {
             rulesetManager: {
-                cloneRuleset: vi.fn(() => clonedRuleset),
+                deepCloneRuleset: vi.fn(() => clonedRuleset),
                 updateRuleset: vi.fn(),
                 saveRuleset: vi.fn(),
             },
@@ -335,7 +335,7 @@ describe("Edit ruleset dialog workflow", () => {
         const user = userEvent.setup({ pointerEventsCheck: 0 });
         const clonedRuleset = new FakeRuleset();
         const rulesetManager = {
-            cloneRuleset: vi.fn(() => clonedRuleset),
+            deepCloneRuleset: vi.fn(() => clonedRuleset),
             updateRuleset: vi.fn(),
             saveRuleset: vi.fn().mockResolvedValue(undefined),
         };
@@ -373,7 +373,7 @@ describe("Edit ruleset dialog workflow", () => {
         const user = userEvent.setup({ pointerEventsCheck: 0 });
         const clonedRuleset = new FakeRuleset();
         const rulesetManager = {
-            cloneRuleset: vi.fn(() => clonedRuleset),
+            deepCloneRuleset: vi.fn(() => clonedRuleset),
             updateRuleset: vi.fn(),
             saveRuleset: vi.fn().mockResolvedValue(undefined),
         };
@@ -415,7 +415,7 @@ describe("Edit ruleset dialog workflow", () => {
         const user = userEvent.setup({ pointerEventsCheck: 0 });
         const closeDialog = vi.fn();
         const rulesetManager = {
-            cloneRuleset: vi.fn(() => new FakeRuleset()),
+            deepCloneRuleset: vi.fn(() => new FakeRuleset()),
             updateRuleset: vi.fn(),
             saveRuleset: vi.fn(),
         };
@@ -439,7 +439,7 @@ describe("Edit ruleset dialog workflow", () => {
     it("renders no dialog when the ruleset cannot be cloned", () => {
         editRulesetMocks.appKernel.editorFacade.currentProject = {
             rulesetManager: {
-                cloneRuleset: vi.fn(() => null),
+                deepCloneRuleset: vi.fn(() => null),
             },
         };
 

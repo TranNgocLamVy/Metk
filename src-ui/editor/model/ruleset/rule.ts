@@ -20,7 +20,7 @@ export class Rule extends BaseObject<RuleEvent> {
         public readonly rulesetRefManager: RulesetRefManager,
         objectIdScope: string = "ruleset:unknown",
     ) {
-        super(`${objectIdScope}:rule:${data.id}`);
+        super(`${objectIdScope}:rule:${data.id}`, data.cloneFrom);
         this.id = data.id;
         this.constraints = this.processConstraints(data.constraints);
         this.outputs = this.processOutputs(data.outputs);
@@ -132,6 +132,7 @@ export class Rule extends BaseObject<RuleEvent> {
     public serialize(): RuleData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             constraints: this.constraints.map((constraint) => constraint.serialize()).join(","),
             outputs: this.outputs.map((output) => output.serialize()).join(","),
         }

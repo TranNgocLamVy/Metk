@@ -12,6 +12,7 @@ import { Console } from "@/ui/notifications/console-gateway";
 import { normalizeEntityCollectionData } from "@/editor/model/entity/entity.normalizer";
 import { TilesetManager } from "../tileset/tileset.manager";
 import { TilesetRefManager } from "../references/tileset-ref.manager";
+import { cloneEntityCollectionData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
 
 export interface EntityCollectionManagerEvent {
     onEntityCollectionManagerUpdated: (entityCollections: EntityCollectionMetadata[]) => void;
@@ -356,7 +357,28 @@ export class EntityCollectionManager extends EventEmitter<EntityCollectionManage
         const entityCollection = this.loadedEntityCollections.get(entityCollectionId);
         if (!entityCollection) return null;
 
-        const entityCollectionData = entityCollection.serialize();
+        const entityCollectionData = cloneEntityCollectionData(entityCollection.serialize());
+
+        const entityCollectionPathSystem = new FilePathSystem(
+            entityCollectionData.id,
+            this.projectPathSystem,
+            entityCollection.entityCollectionPathSystem.relPath,
+        );
+        const tilesetRefManager = new TilesetRefManager(
+            this.tilesetManager,
+            entityCollectionPathSystem,
+        );
+
+        const cloneRegistry = new EditorObjectRegistry();
+
+        return new EntityCollection(entityCollectionData, entityCollectionPathSystem, tilesetRefManager, cloneRegistry);
+    }
+
+    public deepCloneEntityCollection(entityCollectionId: string): EntityCollection | null {
+        const entityCollection = this.loadedEntityCollections.get(entityCollectionId);
+        if (!entityCollection) return null;
+
+        const entityCollectionData = deepCloneResourceData(entityCollection.serialize());
 
         const entityCollectionPathSystem = new FilePathSystem(
             entityCollectionData.id,

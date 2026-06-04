@@ -101,6 +101,7 @@ export class ImageCollectionTileset extends Tileset {
     public serialize(): TilesetData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             name: this.name,
             type: TilesetType.ImageCollection,
             columns: this.columns,

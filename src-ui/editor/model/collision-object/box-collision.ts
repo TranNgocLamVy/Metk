@@ -1,4 +1,5 @@
 import { BoxCollisionData } from "@/shared/data-types/collision-object.data";
+import { v4 as uuidv4 } from "uuid";
 import { CollisionObject } from "./collision-object";
 
 export class BoxCollision extends CollisionObject {
@@ -22,12 +23,21 @@ export class BoxCollision extends CollisionObject {
     }
 
     public clone(): BoxCollision {
+        return new BoxCollision({
+            ...this.serialize(),
+            id: uuidv4(),
+            cloneFrom: this.id,
+        });
+    }
+
+    public deepClone(): BoxCollision {
         return new BoxCollision(this.serialize());
     }
 
     public serialize(): BoxCollisionData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             kind: "box",
             name: this.name,
             x: this.x,

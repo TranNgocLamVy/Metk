@@ -3,6 +3,7 @@ import { TilesetRefData } from "./tileset.data";
 
 export type EntityCollectionData = {
     id: string;
+    cloneFrom?: string;
     name: string;
     entities: EntityDefinitionData[];
     tilesets: {

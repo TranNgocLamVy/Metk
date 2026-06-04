@@ -393,7 +393,7 @@ describe("Metk dialog and form integration workflows", () => {
         }, tilesetPathSystem, new EditorObjectRegistry());
         mockState.appKernel.editorFacade.currentProject = {
             tilesetManager: {
-                cloneTileset: vi.fn(() => clonedTileset),
+                deepCloneTileset: vi.fn(() => clonedTileset),
             },
         };
         openEditTilesetDialog({
@@ -404,7 +404,7 @@ describe("Metk dialog and form integration workflows", () => {
 
         const dialog = screen.getByRole("dialog", { name: "Edit Tileset" });
         expect(within(dialog).getByDisplayValue("Terrain Tiles")).toBeVisible();
-        expect(mockState.appKernel.editorFacade.currentProject.tilesetManager.cloneTileset).toHaveBeenCalledWith("terrain");
+        expect(mockState.appKernel.editorFacade.currentProject.tilesetManager.deepCloneTileset).toHaveBeenCalledWith("terrain");
 
         await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 

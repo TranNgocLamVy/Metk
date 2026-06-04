@@ -28,7 +28,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         public readonly rulesetRefManager: RulesetRefManager,
 
     ) {
-        super(`ruleset:${data.id}`);
+        super(`ruleset:${data.id}`, data.cloneFrom);
 
         this.id = data.id;
         this.name = data.name;
@@ -169,6 +169,7 @@ export class Ruleset extends BaseObject<RulesetEvent> {
     public serialize(): RulesetData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             name: this.name,
             color: this.color,
             size: this.size,

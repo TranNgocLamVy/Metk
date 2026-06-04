@@ -84,7 +84,7 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
         protected readonly objectRegistry: EditorObjectRegistry,
         type: TilesetType,
     ) {
-        super(`tileset:${tilesetData.id}`);
+        super(`tileset:${tilesetData.id}`, tilesetData.cloneFrom);
 
         this.id = tilesetData.id;
         this.name = tilesetData.name;
@@ -250,7 +250,7 @@ export class Tile extends BaseObject<TileEvent> {
     ) {
         const data = normalizeTileData(tileData);
         if (!data) throw new Error("Invalid tile data");
-        super(`${tileset.objectId}:tile:${data.id}`);
+        super(`${tileset.objectId}:tile:${data.id}`, data.cloneFrom);
 
         this.id = data.id;
         this.imageSource = data.image ? new ImageSource(data.image) : null;
@@ -294,6 +294,7 @@ export class Tile extends BaseObject<TileEvent> {
     public serialize(): TileData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             image: this.imageSource ? this.imageSource.serialize() : undefined,
             collisionObjects: this.collisionObjects.length > 0 ? this.collisionObjects.map((object) => object.serialize()) : undefined,
         };

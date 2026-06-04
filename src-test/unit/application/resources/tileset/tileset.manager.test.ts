@@ -208,4 +208,68 @@ describe("TilesetManager", () => {
         ]);
         expect(TilesetStorageService.load).not.toHaveBeenCalled();
     });
+
+    it("deep-clones a loaded tileset as an unregistered temporary copy preserving root and child ids", async () => {
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new TilesetManager(createProjectPathSystem(), objectRegistry);
+        const addResult = await manager.addTileset(createTilesetData("tileset-a", {
+            tiles: [{
+                id: 3,
+                collisionObjects: [{
+                    id: "collision-a",
+                    kind: "box",
+                    name: "Collision A",
+                    x: 1,
+                    y: 2,
+                    width: 3,
+                    height: 4,
+                }],
+            }],
+        }), "C:/Project/Metk/test-project/tilesets/tileset-a.json");
+        const loadedTileset = addResult.data!;
+
+        const clone = manager.deepCloneTileset("tileset-a");
+
+        expect(clone).not.toBeNull();
+        expect(clone).not.toBe(loadedTileset);
+        expect(clone?.id).toBe("tileset-a");
+        expect(clone?.objectId).toBe("tileset:tileset-a");
+        expect(clone?.getTileFromId(3)?.objectId).toBe("tileset:tileset-a:tile:3");
+        expect(clone?.serialize()).toEqual(loadedTileset.serialize());
+        expect(objectRegistry.get(clone!.objectId)).toBe(loadedTileset);
+        expect(manager.deepCloneTileset("missing-tileset")).toBeNull();
+    });
+
+    it("clones a loaded tileset with new ids, cloneFrom metadata, and registry-safe objectIds", async () => {
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new TilesetManager(createProjectPathSystem(), objectRegistry);
+        await manager.addTileset(createTilesetData("tileset-a", {
+            tiles: [{
+                id: 3,
+                collisionObjects: [{
+                    id: "collision-a",
+                    kind: "box",
+                    name: "Collision A",
+                    x: 1,
+                    y: 2,
+                    width: 3,
+                    height: 4,
+                }],
+            }],
+        }), "C:/Project/Metk/test-project/tilesets/tileset-a.json");
+
+        const clone = manager.cloneTileset("tileset-a");
+        const clonedData = clone!.serialize();
+
+        expect(clone).not.toBeNull();
+        expect(clonedData.id).not.toBe("tileset-a");
+        expect(clonedData.cloneFrom).toBe("tileset-a");
+        expect(clonedData.tiles[0].id).not.toBe(3);
+        expect(clonedData.tiles[0].cloneFrom).toBe("3");
+        expect(clonedData.tiles[0].collisionObjects?.[0].id).not.toBe("collision-a");
+        expect(clonedData.tiles[0].collisionObjects?.[0].cloneFrom).toBe("collision-a");
+        expect(clone!.objectId).toBe(`tileset:${clonedData.id}`);
+        expect(clone!.getTileFromId(clonedData.tiles[0].id)?.objectId).toBe(`tileset:${clonedData.id}:tile:${clonedData.tiles[0].id}`);
+        expect(() => objectRegistry.registerTree(clone!)).not.toThrow();
+    });
 });

@@ -15,6 +15,7 @@ export type TilesetType = typeof TilesetType[keyof typeof TilesetType];
 
 export type TileData = {
     id: number;
+    cloneFrom?: string;
     x?: number;
     y?: number;
     width?: number;
@@ -25,6 +26,7 @@ export type TileData = {
 
 export type TilesetData = {
     id: string;
+    cloneFrom?: string;
     name: string;
     type?: TilesetType;
     columns: number;

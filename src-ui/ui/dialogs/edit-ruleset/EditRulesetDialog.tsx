@@ -22,7 +22,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
         const currentProject = editorFacade.currentProject;
         if (!currentProject) return null;
         const rulesetManager = currentProject.rulesetManager;
-        return rulesetManager.cloneRuleset(rulesetId);
+        return rulesetManager.deepCloneRuleset(rulesetId);
     }, [rulesetId]);
 
     if (!ruleset) return null;

@@ -33,7 +33,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
         public readonly tilesetRefManager: TilesetRefManager,
         private readonly objectRegistry: EditorObjectRegistry,
     ) {
-        super(`entity-collection:${data.id}`);
+        super(`entity-collection:${data.id}`, data.cloneFrom);
 
         this.id = data.id;
         this.name = data.name;
@@ -175,6 +175,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
     public serialize(): EntityCollectionData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             name: this.name,
             entities: this.entities.map((entity) => entity.serialize()),
             tilesets: this.tilesetRefManager.serialize(),

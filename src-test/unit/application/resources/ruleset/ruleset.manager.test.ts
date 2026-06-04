@@ -259,7 +259,7 @@ describe("RulesetManager", () => {
         expect(manager.serialize()).toEqual([createRulesetMetadata("ruleset-a")]);
     });
 
-    it("clones a loaded ruleset without registering the temporary clone and returns null when cloning an unloaded ruleset", async () => {
+    it("deep-clones a loaded ruleset without registering the temporary clone and returns null when deep-cloning an unloaded ruleset", async () => {
         const objectRegistry = new EditorObjectRegistry();
         const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), objectRegistry);
         manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
@@ -268,14 +268,37 @@ describe("RulesetManager", () => {
         }), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
         const loadedRuleset = manager.getRulesetById("ruleset-a")!;
 
-        const clone = manager.cloneRuleset("ruleset-a");
+        const clone = manager.deepCloneRuleset("ruleset-a");
 
         expect(clone).not.toBeNull();
         expect(clone).not.toBe(loadedRuleset);
         expect(clone?.serialize()).toEqual(loadedRuleset.serialize());
         expect(objectRegistry.get(clone!.objectId)).toBe(loadedRuleset);
         expect(objectRegistry.get(clone!.getRule("rule-a")!.objectId)).toBe(loadedRuleset.getRule("rule-a"));
-        expect(manager.cloneRuleset("missing-ruleset")).toBeNull();
+        expect(manager.deepCloneRuleset("missing-ruleset")).toBeNull();
+    });
+
+    it("clones a loaded ruleset with new ids, cloneFrom metadata, and registry-safe objectIds", async () => {
+        const objectRegistry = new EditorObjectRegistry();
+        const manager = new RulesetManager(createTilesetManager() as any, createProjectPathSystem(), objectRegistry);
+        manager.addRulesetMetadata(createRulesetMetadata("ruleset-a"));
+        await manager.addRuleset(createRulesetData("ruleset-a", {
+            rulesets: { refs: [{ id: "ruleset-a", index: 0, name: "Self" }], nextIndex: 1 },
+            rules: [{ id: "rule-a", constraints: "", outputs: "" }],
+        }), "C:/Project/Metk/test-project/rulesets/ruleset-a.json");
+
+        const clone = manager.cloneRuleset("ruleset-a");
+        const clonedData = clone!.serialize();
+
+        expect(clone).not.toBeNull();
+        expect(clonedData.id).not.toBe("ruleset-a");
+        expect(clonedData.cloneFrom).toBe("ruleset-a");
+        expect(clonedData.rules[0].id).not.toBe("rule-a");
+        expect(clonedData.rules[0].cloneFrom).toBe("rule-a");
+        expect(clonedData.rulesets.refs[0].id).toBe(clonedData.id);
+        expect(clone!.objectId).toBe(`ruleset:${clonedData.id}`);
+        expect(clone!.getRule(clonedData.rules[0].id)?.objectId).toBe(`ruleset:${clonedData.id}:rule:${clonedData.rules[0].id}`);
+        expect(() => objectRegistry.registerTree(clone!)).not.toThrow();
     });
 
     it("saves only loaded rulesets affected by removed tileset references", async () => {

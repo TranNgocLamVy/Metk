@@ -23,7 +23,7 @@ export abstract class BaseObject<T extends BaseObjectEvents = BaseObjectEvents> 
     public readonly objectId: string;
     private _destroyed: boolean = false;
 
-    constructor(objectId: string) {
+    constructor(objectId: string, public readonly cloneFrom?: string) {
         initializeProperties(this);
         this.objectId = objectId;
     }

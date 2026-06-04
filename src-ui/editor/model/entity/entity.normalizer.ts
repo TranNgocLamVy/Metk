@@ -19,6 +19,15 @@ const normalizeId = (value: unknown): string => {
     return typeof value === "string" && value.trim().length > 0 ? value : uuidv4();
 };
 
+const normalizeCloneFrom = (value: unknown): string | undefined => {
+    return typeof value === "string" && value.length > 0 ? value : undefined;
+};
+
+const cloneFromField = (value: unknown): { cloneFrom?: string } => {
+    const cloneFrom = normalizeCloneFrom(value);
+    return cloneFrom ? { cloneFrom } : {};
+};
+
 const normalizeStringArray = (value: unknown): string[] => {
     return validate.array<unknown>({ value, defaultValue: [] }).filter((item): item is string => typeof item === "string");
 };
@@ -42,6 +51,7 @@ export const normalizeEntityFieldData = (value: unknown): EntityFieldData | null
         const id = normalizeId(data.id);
         return {
             id,
+            ...cloneFromField(data.cloneFrom),
             name: validate.string({ value: data.name, defaultValue: id }),
             type: validate.enum({ value: data.type, values: EntityFieldTypeValues, defaultValue: EntityFieldType.String }),
             nullable: validate.boolean({ value: data.nullable, defaultValue: false }),
@@ -98,6 +108,7 @@ export const normalizeEntityDefinitionData = (value: unknown): EntityDefinitionD
 
     return {
         id,
+        ...cloneFromField(data.cloneFrom),
         name: validate.string({ value: data.name, defaultValue: id }),
         width: validate.number({
             value: data.width,
@@ -134,6 +145,7 @@ export const normalizeEntityCollectionData = (value: unknown): EntityCollectionD
 
     return {
         id,
+        ...cloneFromField(data.cloneFrom),
         name: validate.string({ value: data.name, defaultValue: id }),
         entities,
         tilesets: {

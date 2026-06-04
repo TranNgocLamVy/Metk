@@ -9,6 +9,7 @@ export const CollisionObjectKind = {
 
 export type BaseCollisionData = {
     id: string;
+    cloneFrom?: string;
     kind: CollisionObjectKind;
     name?: string;
     x: number;

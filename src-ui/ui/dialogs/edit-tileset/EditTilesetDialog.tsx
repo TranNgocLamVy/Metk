@@ -33,7 +33,7 @@ export function EditTilesetDialog({ dialogId, tilesetId, tileset }: EditTilesetD
         const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return null;
 
-        return currentProject.tilesetManager.cloneTileset(sourceTilesetId);
+        return currentProject.tilesetManager.deepCloneTileset(sourceTilesetId);
     }, [sourceTilesetId]);
 
     useEffect(() => {

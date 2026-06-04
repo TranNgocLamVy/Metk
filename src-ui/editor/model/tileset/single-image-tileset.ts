@@ -101,6 +101,7 @@ export class SingleImageTileset extends Tileset {
     public serialize(): TilesetData {
         return {
             id: this.id,
+            ...(this.cloneFrom ? { cloneFrom: this.cloneFrom } : {}),
             name: this.name,
             type: TilesetType.SingleImage,
             columns: this.columns,

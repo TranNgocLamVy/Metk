@@ -8,6 +8,7 @@ import { TilesetData, TilesetMetadata } from "@/shared/data-types/tileset.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
 import { normalizeTilesetData } from "@/editor/model/tileset/tileset.normalizer";
+import { cloneTilesetData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -208,7 +209,23 @@ export class TilesetManager {
         const tileset = this.loadedTilesets.get(id);
         if (!tileset) return null;
 
-        const tilesetData = tileset.serialize();
+        const tilesetData = cloneTilesetData(tileset.serialize());
+        const tilesetPathSystem = new FilePathSystem(
+            tilesetData.id,
+            this.projectPathSystem,
+            tileset.tilesetPathSystem.relPath,
+        );
+
+        const cloneRegistry = new EditorObjectRegistry();
+
+        return TilesetFactory.create(tilesetData, tilesetPathSystem, cloneRegistry);
+    }
+
+    public deepCloneTileset(id: string): Tileset | null {
+        const tileset = this.loadedTilesets.get(id);
+        if (!tileset) return null;
+
+        const tilesetData = deepCloneResourceData(tileset.serialize());
         const tilesetPathSystem = new FilePathSystem(
             tilesetData.id,
             this.projectPathSystem,
