@@ -1,4 +1,4 @@
-import {  IJsonModel, IJsonRowNode } from "flexlayout-react";
+import { IJsonModel, IJsonRowNode } from "flexlayout-react";
 
 const workspaceRowNode: IJsonRowNode = {
     type: "row",
@@ -13,6 +13,7 @@ const workspaceRowNode: IJsonRowNode = {
                     children: [
                         {
                             type: "tab",
+                            id: "tilesetView",
                             name: "Tilesets",
                             minHeight: 200,
                             minWidth: 300,
@@ -21,6 +22,7 @@ const workspaceRowNode: IJsonRowNode = {
                         },
                         {
                             type: "tab",
+                            id: "rulesetManager",
                             name: "Rulesets",
                             minHeight: 200,
                             minWidth: 300,
@@ -29,6 +31,7 @@ const workspaceRowNode: IJsonRowNode = {
                         },
                         {
                             type: "tab",
+                            id: "entityCollectionManager",
                             name: "Entity Collections",
                             minHeight: 200,
                             minWidth: 300,
@@ -43,6 +46,7 @@ const workspaceRowNode: IJsonRowNode = {
                     children: [
                         {
                             type: "tab",
+                            id: "layerManager",
                             name: "Layers",
                             minHeight: 200,
                             minWidth: 300,
@@ -55,6 +59,7 @@ const workspaceRowNode: IJsonRowNode = {
         },
         {
             type: "tabset",
+            id: "mainEditorTabset",
             weight: 80,
             enableDrag: false,
             enableDrop: false,
@@ -63,6 +68,7 @@ const workspaceRowNode: IJsonRowNode = {
             children: [
                 {
                     type: "tab",
+                    id: "tilemapEditor",
                     name: "TilemapEditor",
                     component: "tilemapEditor",
                     enableClose: false,
@@ -77,6 +83,7 @@ const workspaceRowNode: IJsonRowNode = {
             children: [
                 {
                     type: "tab",
+                    id: "properties",
                     name: "Properties",
                     minHeight: 200,
                     minWidth: 280,

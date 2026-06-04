@@ -5,7 +5,13 @@ import { LayoutStorageService } from "@/infrastructure/container";
 import { workspaceLayout } from "@/shared/constant/workspaceJsonModel";
 import EventEmitter from "eventemitter3";
 import { Project } from "@/editor/model/project/project";
-import { validate } from "@/shared/utils/validate.utils";
+import {
+    buildPanelRegistry,
+    getKnownPanelIds,
+    hydratePersistedLayoutModel,
+    normalizePersistedLayoutModel,
+    serializeLayoutModel,
+} from "./layout-persistence";
 
 interface LayoutManagerEvents {
     onLayoutLoaded: (layout: IJsonModel) => void;
@@ -24,21 +30,24 @@ export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
     public async loadLayout(project: Project): Promise<Result<IJsonModel>> {
         this.project = project;
         const layoutAbsPath = project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "layout.json"));
+        const panelRegistry = buildPanelRegistry(workspaceLayout);
+        const knownPanelIds = getKnownPanelIds(panelRegistry);
 
         const layoutExist = await LayoutStorageService.exists(layoutAbsPath);
         if (!layoutExist) {
-            this.layoutData = workspaceLayout;
+            this.layoutData = hydratePersistedLayoutModel(null, workspaceLayout, panelRegistry);
             await this.performSaveLayout();
         } else {
             const loadResult = await LayoutStorageService.load(layoutAbsPath);
             if (loadResult.status === Result.Status.Success) {
-                this.layoutData = validate.object<IJsonModel>({ value: loadResult.data, defaultValue: workspaceLayout });
+                const normalizedLayout = normalizePersistedLayoutModel(loadResult.data, knownPanelIds);
+                this.layoutData = hydratePersistedLayoutModel(normalizedLayout, workspaceLayout, panelRegistry);
             } else {
-                this.layoutData = workspaceLayout;
+                this.layoutData = hydratePersistedLayoutModel(null, workspaceLayout, panelRegistry);
                 await this.performSaveLayout();
             }
         }
-        if (!this.layoutData) this.layoutData = workspaceLayout;
+        if (!this.layoutData) this.layoutData = hydratePersistedLayoutModel(null, workspaceLayout, panelRegistry);
         this.emit("onLayoutLoaded", this.layoutData);
         return Result.Success(this.layoutData);
     }
@@ -62,7 +71,15 @@ export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
         if (!this.project || !this.layoutData) return Result.Cancel();
 
         const layoutAbsPath = this.project.projectPathSystem.getAbsPathFromRelPath(PathUtils.join(".metk", "layout.json"));
-        return await LayoutStorageService.save(layoutAbsPath, this.layoutData);
+        const panelRegistry = buildPanelRegistry(workspaceLayout);
+        const knownPanelIds = getKnownPanelIds(panelRegistry);
+        const serializedLayout = serializeLayoutModel(this.layoutData, { knownTabIds: knownPanelIds });
+        const fallbackLayout = serializeLayoutModel(workspaceLayout, { knownTabIds: knownPanelIds });
+        const normalizedLayout = normalizePersistedLayoutModel(serializedLayout, knownPanelIds)
+            ?? normalizePersistedLayoutModel(fallbackLayout, knownPanelIds)
+            ?? fallbackLayout;
+
+        return await LayoutStorageService.save(layoutAbsPath, normalizedLayout);
     }
 
     public unloadLayout(): void {
