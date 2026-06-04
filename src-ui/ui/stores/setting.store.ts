@@ -1,6 +1,6 @@
+import { appKernel } from "@/application/bootstrap/app-kernel";
+import { SettingValue } from "@/application/settings/setting.types";
 import { create } from "zustand";
-
-import { settingManager, SettingValue } from "@/application/settings";
 
 type SettingStoreState = {
     values: Record<string, SettingValue>;
@@ -13,37 +13,37 @@ type SettingStoreState = {
 };
 
 export const useSettingStore = create<SettingStoreState>((set) => ({
-    values: settingManager.getAllResolvedSettings(),
+    values: appKernel.settings.getAllResolvedSettings(),
     isLoaded: false,
     loadSettings: async () => {
-        const result = await settingManager.load();
+        const result = await appKernel.settings.load();
         if (result.status === "Success") {
             set({
-                values: settingManager.getAllResolvedSettings(),
+                values: appKernel.settings.getAllResolvedSettings(),
                 isLoaded: true,
             });
         }
     },
     get: <TValue extends SettingValue>(key: string): TValue => {
-        return settingManager.get<TValue>(key);
+        return appKernel.settings.get<TValue>(key);
     },
     update: async (key: string, value: SettingValue) => {
-        const result = await settingManager.update(key, value);
+        const result = await appKernel.settings.update(key, value);
         if (result.status === "Success") {
-            set({ values: settingManager.getAllResolvedSettings() });
+            set({ values: appKernel.settings.getAllResolvedSettings() });
         }
     },
     reset: async (key: string) => {
-        const result = await settingManager.reset(key);
+        const result = await appKernel.settings.reset(key);
         if (result.status === "Success") {
-            set({ values: settingManager.getAllResolvedSettings() });
+            set({ values: appKernel.settings.getAllResolvedSettings() });
         }
     },
     syncFromManager: () => {
-        set({ values: settingManager.getAllResolvedSettings() });
+        set({ values: appKernel.settings.getAllResolvedSettings() });
     },
 }));
 
-settingManager.onDidChangeSetting(() => {
+appKernel.settings.onDidChangeSetting(() => {
     useSettingStore.getState().syncFromManager();
 });
