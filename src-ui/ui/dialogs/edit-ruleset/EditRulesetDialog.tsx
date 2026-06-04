@@ -5,11 +5,12 @@ import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { Dialog, DialogContent, DialogTitle } from "@/ui/components/shadcn/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EditRulesetContext, useRulesetController } from "./ContextProvider";
 import OutputSelector from "./OutputSelector";
 import RuleEditor from "./RuleEditor";
 import EditRulesetSidebar from "./Sidebar";
+import { EditRulesetSession } from "./graphics/edit-ruleset.session";
 
 interface EditRulesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -34,6 +35,29 @@ function EditRulesetDialogProvider({ clonedRuleset, dialogId }: { clonedRuleset:
     const { closeDialog } = useDialogStore();
 
     const controller = useRulesetController(clonedRuleset);
+
+    const [editSession] = useState(() => {
+        return new EditRulesetSession(
+            dialogId,
+            clonedRuleset,
+            appKernel.editorFacade,
+            controller.triggerUpdate,
+        );
+    });
+    
+    useEffect(() => {
+        const editorFacade = appKernel.editorFacade;
+    
+        editorFacade.pushFocusedEditorSession(editSession);
+        editorFacade.activationContext.setFlag("undoableDialogOpen", true, dialogId);
+    
+        return () => {
+            editorFacade.removeFocusedEditorSession(editSession.id);
+            editorFacade.activationContext.setFlag("undoableDialogOpen", false, dialogId);
+            editSession.destroy();
+        };
+    }, [dialogId, editSession]);
+
 
     return (
         <EditRulesetContext.Provider value={controller}>

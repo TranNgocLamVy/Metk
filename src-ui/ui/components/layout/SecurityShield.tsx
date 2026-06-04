@@ -15,10 +15,7 @@ export default function SecurityShield() {
 			if (disableKeybind.includes(keybind)) {
 				e.preventDefault();
 				return false;
-			} else if (e.key == "Tab") {
-                e.preventDefault();
-				return false;
-            }
+			}
 		};
 
 		const disableConsole = () => {

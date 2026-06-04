@@ -8,7 +8,7 @@ import { SystemCommand } from "../commands/command.decorator";
     name: "Redo",
     description: "",
     shortcuts: ["Ctrl+Y"],
-    when: "tilmapSessionOpened && !isModalOpen",
+    when: "tilmapSessionOpened && !isModalOpen || undoableDialogOpen",
 })
 export class RedoCommand implements ISystemCommand {
     public execute(editorFacade: EditorFacade): Result {

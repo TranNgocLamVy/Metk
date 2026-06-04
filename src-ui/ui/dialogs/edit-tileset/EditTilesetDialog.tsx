@@ -1,20 +1,21 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { HStack } from "@/ui/components/custom/stack/Stack";
+import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import {
     Dialog,
     DialogContent,
     DialogTitle,
 } from "@/ui/components/shadcn/dialog";
 
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { EditTilesetContext, useTilesetController } from "./ContextProvider";
 import { LeftPanel } from "./LeftPanel";
-import { RightPanel } from "./RightPanel";
-import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { MiddlePanel } from "./MiddlePanel";
+import { RightPanel } from "./RightPanel";
+import { EditTilesetSession } from "./graphics/edit-tileset.session";
 
 interface EditTilesetDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -46,15 +47,34 @@ export function EditTilesetDialog({ dialogId, tilesetId, tileset }: EditTilesetD
     if (!clonedTileset) return null;
 
     return (
-        <EditTilesetDialogContainer
-            dialogId={dialogId}
-            clonedTileset={clonedTileset}
-        />
+        <EditTilesetDialogContainer dialogId={dialogId} clonedTileset={clonedTileset} />
     );
 }
 
 function EditTilesetDialogContainer({ dialogId, clonedTileset }: { dialogId: string; clonedTileset: Tileset }) {
     const controller = useTilesetController(clonedTileset, dialogId);
+
+    const [editSession] = useState(() => {
+            return new EditTilesetSession(
+                dialogId,
+                clonedTileset,
+                appKernel.editorFacade,
+                controller.triggerUpdate,
+            );
+        });
+        
+        useEffect(() => {
+            const editorFacade = appKernel.editorFacade;
+        
+            editorFacade.pushFocusedEditorSession(editSession);
+            editorFacade.activationContext.setFlag("undoableDialogOpen", true, dialogId);
+        
+            return () => {
+                editorFacade.removeFocusedEditorSession(editSession.id);
+                editorFacade.activationContext.setFlag("undoableDialogOpen", false, dialogId);
+                editSession.destroy();
+            };
+        }, [dialogId, editSession]);
 
     return (
         <EditTilesetContext.Provider value={controller}>

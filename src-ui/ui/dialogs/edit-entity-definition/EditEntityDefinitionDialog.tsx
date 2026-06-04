@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { EntityCollection } from "@/editor/model/entity/entity-collection";
@@ -12,6 +12,7 @@ import { useDialogStore } from "@/ui/stores/dialog.store";
 import { EditEntityDefinitionContext, useEntityDefinitionController } from "./ContextProvider";
 import EntityDefinitionGraphicSelector from "./GraphicSelector";
 import EditEntityDefinitionSidebar from "./Sidebar";
+import { EditEntityDefinitionSession } from "./graphics/edit-entity-definition.session";
 
 interface EditEntityDefinitionDialogProps extends BaseDialogProps {
     dialogId: string;
@@ -39,25 +40,36 @@ export function EditEntityDefinitionDialog({ dialogId, entityCollectionId, entit
     if (!dialogData) return null;
 
     return (
-        <EditEntityDefinitionDialogProvider
-            dialogId={dialogId}
-            entityCollection={dialogData.entityCollection}
-            clonedEntity={dialogData.clonedEntity}
-        />
+        <EditEntityDefinitionDialogProvider dialogId={dialogId} entityCollection={dialogData.entityCollection} clonedEntity={dialogData.clonedEntity} />
     );
 }
 
-function EditEntityDefinitionDialogProvider({
-    dialogId,
-    entityCollection,
-    clonedEntity,
-}: {
-    dialogId: string;
-    entityCollection: EntityCollection;
-    clonedEntity: EntityDefinition;
-}) {
+function EditEntityDefinitionDialogProvider({ dialogId, entityCollection, clonedEntity }: { dialogId: string; entityCollection: EntityCollection; clonedEntity: EntityDefinition }) {
     const { closeDialog } = useDialogStore();
+
     const controller = useEntityDefinitionController(clonedEntity, entityCollection);
+
+    const [editSession] = useState(() => {
+        return new EditEntityDefinitionSession(
+            dialogId,
+            clonedEntity,
+            appKernel.editorFacade,
+            controller.triggerUpdate,
+        );
+    });
+
+    useEffect(() => {
+        const editorFacade = appKernel.editorFacade;
+
+        editorFacade.pushFocusedEditorSession(editSession);
+        editorFacade.activationContext.setFlag("undoableDialogOpen", true, dialogId);
+
+        return () => {
+            editorFacade.removeFocusedEditorSession(editSession.id);
+            editorFacade.activationContext.setFlag("undoableDialogOpen", false, dialogId);
+            editSession.destroy();
+        };
+    }, [dialogId, editSession]);
 
     return (
         <EditEntityDefinitionContext.Provider value={controller}>

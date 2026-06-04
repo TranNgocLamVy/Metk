@@ -14,6 +14,7 @@ import { ProjectManager } from "./resources/project/project.manager";
 import { ActivationContext } from "./runtime/activation-context";
 
 export class EditorFacade {
+    private focusedEditorSessionStack: IEditorSession[] = [];
     constructor(
         public readonly projectManager: ProjectManager,
         public readonly workspaceManager: WorkspaceManager,
@@ -66,7 +67,18 @@ export class EditorFacade {
         return this.getCurrentEditorSession()?.historyManager ?? null;
     }
 
+    public pushFocusedEditorSession(session: IEditorSession): void {
+        this.focusedEditorSessionStack = this.focusedEditorSessionStack.filter(s => s.id !== session.id);
+        this.focusedEditorSessionStack.push(session);
+    }
+    
+    public removeFocusedEditorSession(sessionId: string): void {
+        this.focusedEditorSessionStack = this.focusedEditorSessionStack.filter(s => s.id !== sessionId);
+    }
+
     public getCurrentEditorSession(): IEditorSession | null {
+        const focused = this.focusedEditorSessionStack.at(-1);
+        if (focused) return focused;
         return this.getActiveTilemapSession();
     }
 }

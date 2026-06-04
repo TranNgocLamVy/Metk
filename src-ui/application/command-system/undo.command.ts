@@ -1,14 +1,14 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { SystemCommand } from "../commands/command.decorator";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
+import { SystemCommand } from "../commands/command.decorator";
 
 @SystemCommand({
     id: "workspace.tilemap.undo",
     name: "Undo",
     description: "",
     shortcuts: ["Ctrl+Z"],
-    when: "tilmapSessionOpened && !isModalOpen",
+    when: "tilmapSessionOpened && !isModalOpen || undoableDialogOpen",
 })
 export class UndoCommand implements ISystemCommand {
     public execute(editorFacade: EditorFacade): Result {

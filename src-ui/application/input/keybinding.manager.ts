@@ -10,12 +10,7 @@ export class KeybindingManager {
     private userOverrides: Map<string, Keybinding> = new Map();
     private lookupTable: Map<string, Keybinding> = new Map();
 
-    private static activeContexts: Set<string> = new Set();
-    
-    private flags: Map<string, Set<string>> = new Map();
-    private values: Map<string, string | number | boolean> = new Map();
-
-    private bindOnKeyDown: (e: KeyboardEvent) => void
+    private bindOnKeyDown: (e: KeyboardEvent) => void;
 
     constructor(
         private commandManager: SystemCommandManager,
@@ -49,8 +44,8 @@ export class KeybindingManager {
 
     public applyUserOverrides(overrides: UserKeybindingOverride[]) {
         this.userOverrides.clear();
-        overrides.forEach(o => {
-            this.userOverrides.set(o.key, o);
+        overrides.forEach((override) => {
+            this.userOverrides.set(override.key, override);
         });
         this.rebuildLookupTable();
     }
@@ -66,41 +61,101 @@ export class KeybindingManager {
     }
 
     public handleKeyDown(e: KeyboardEvent) {
-        if (this.isEditableElement(document.activeElement)) {
+        const keystroke = KeyUtils.getKeystrokeString(e);
+        const binding = this.lookupTable.get(keystroke);
+
+        if (!binding) return;
+
+        const target = this.getEventTargetElement(e);
+
+        if (this.shouldLetEditableElementHandleShortcut(target, binding)) {
             return;
         }
 
-        const keystroke = KeyUtils.getKeystrokeString(e);
-        
-        if (this.lookupTable.has(keystroke)) {
-            const binding = this.lookupTable.get(keystroke);
-            if (!binding) return;
+        if (binding.type === "command") {
+            if (!this.commandManager.canExecute(binding.id)) {
+                return;
+            }
 
             e.preventDefault();
             e.stopPropagation();
-            if (binding.type == "command") {
-                this.commandManager.execute(binding.id);
-            } else if (binding.type == "tool") {
-                this.toolManager.startToolFamily(binding.id);
-            }
+
+            this.commandManager.execute(binding.id);
+            return;
         }
+
+        if (binding.type === "tool") {
+            if (this.isEditableElement(target)) {
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            this.toolManager.startToolFamily(binding.id);
+        }
+    }
+
+    private getEventTargetElement(e: KeyboardEvent): Element | null {
+        if (e.target instanceof Element) {
+            return e.target;
+        }
+
+        return document.activeElement;
+    }
+
+    private shouldLetEditableElementHandleShortcut(target: Element | null, binding: Keybinding): boolean {
+        if (!this.isEditableElement(target)) {
+            return false;
+        }
+
+        if (binding.type !== "command") {
+            return true;
+        }
+
+        return !this.isAppShortcutAllowed(target, binding.id);
     }
 
     private isEditableElement(el: Element | null): boolean {
         if (!el) return false;
 
         const tagName = el.tagName.toUpperCase();
-        const isInput = tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
-        const isContentEditable = el.getAttribute('contenteditable') === 'true';
+
+        const isInput =
+            tagName === "INPUT" ||
+            tagName === "TEXTAREA" ||
+            tagName === "SELECT";
+
+        const isContentEditable =
+            el.getAttribute("contenteditable") === "true";
 
         return isInput || isContentEditable;
     }
 
+    private isAppShortcutAllowed(target: Element | null, commandId: string): boolean {
+        if (!target) return false;
+
+        const shortcutScope = target.closest("[data-app-shortcuts]");
+        if (!shortcutScope) return false;
+
+        const value = shortcutScope.getAttribute("data-app-shortcuts");
+        if (!value) return false;
+
+        if (value === "all") return true;
+
+        return value
+            .split(/\s+/)
+            .filter(Boolean)
+            .includes(commandId);
+    }
+
     public getShortcuts(commandId: string): string[] | undefined {
-        const shortcuts: string[] = []
+        const shortcuts: string[] = [];
+
         this.lookupTable.forEach((value, key) => {
-            if (value.id === commandId) shortcuts.push(key)
-        })
-        return shortcuts
+            if (value.id === commandId) shortcuts.push(key);
+        });
+
+        return shortcuts;
     }
 }
