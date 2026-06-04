@@ -1,3 +1,4 @@
+import { UserSettingsData } from "@/application/settings/setting.types";
 import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
 import { ProjectData, ProjectMetadata } from "@/shared/data-types/project.data";
 import { RulesetData } from "@/shared/data-types/ruleset.data";
@@ -22,3 +23,4 @@ export const WorkspaceStorageService = new JsonStorageService<WorkpsaceData>(Tau
 export const LayoutStorageService = new JsonStorageService<unknown>(TauriFileStorage, new JsonSerializer<unknown>());
 export const RulesetStorageService = new JsonStorageService<RulesetData>(TauriFileStorage, new JsonSerializer<RulesetData>());
 export const EntityCollectionStorageService = new JsonStorageService<EntityCollectionData>(TauriFileStorage, new JsonSerializer<EntityCollectionData>());
+export const SettingStorageService = new JsonStorageService<UserSettingsData>(TauriFileStorage, new JsonSerializer<UserSettingsData>(), { baseDir: BaseDirectory.AppData });

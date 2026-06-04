@@ -1,6 +1,7 @@
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import ContextMenuItemGroup from "@/ui/components/context-menu/ContextMenuItemGroup";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
 import { ScrollArea, ScrollBar } from "@/ui/components/shadcn/scroll-area";
 import { useRulesetManagerEvent } from "@/ui/hooks/useRulesetManagerEvent.hook";
@@ -45,10 +46,7 @@ export default function RulesetManager() {
     }, [currentSelectedRuleId]);
 
     return (
-        <VStack className="w-full h-full relative bg-surface">
-            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-                <div className="w-full h-full border border-t-0 border-foreground/30 z-10" />
-            </div>
+        <PanelContainer className="ruleset-manager">
             <VStack className="w-full h-full px-frame-quarter pb-frame-half bg-surface">
                 <RulesetMenuBar />
                 <ContextMenu>
@@ -75,7 +73,6 @@ export default function RulesetManager() {
                     </ContextMenuContent>
                 </ContextMenu>
             </VStack>
-        </VStack>
-
+        </PanelContainer>
     )
 }

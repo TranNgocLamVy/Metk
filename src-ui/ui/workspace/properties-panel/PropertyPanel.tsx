@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { BaseObject, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { groupProperties } from "@/editor/properties/group-properties.utils";
-import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useProjectStore } from "@/ui/stores/project.store";
 import { usePropertyStore } from "@/ui/stores/property.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
 
 import { VStack } from "@/ui/components/custom/stack/Stack";
+import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
 import { PropertyGroup } from "./PropertyGroup";
 
@@ -89,14 +90,13 @@ export default function PropertyPanel() {
     }, [activeProject, onObjectDeleted, onObjectAdded]);
 
     return (
-        <VStack className="w-full h-full relative px-frame-quarter pb-frame-half pt-2 inset bg-surface">
-            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-				<div className="w-full h-full border border-t-0 border-foreground/30 z-10"/>
-			</div>
-            <VStack className="w-full h-full bg-surface-base min-h-0 rounded-md inset-shadow-panel border-1 border-foreground/30">
+        <PanelContainer className="property-panel">
+            <VStack className="w-full h-full px-frame-quarter pb-frame-half pt-2">
+                <VStack className="w-full h-full bg-surface-base">
                 {object && <PropertiesList object={object} />}
+                </VStack>
             </VStack>
-        </VStack>
+        </PanelContainer>
     );
 }
 
@@ -108,7 +108,7 @@ function PropertiesList({ object }: PropertiesListProps) {
     const groups = groupProperties(object.properties);
 
     return (
-        <ScrollArea className="w-full h-full rounded-md">
+        <ScrollArea className="w-full min-h-0 h-full">
             <VStack className="pb-20">
                 {groups.map((group, index) => {
                     const groupIndex = groups.slice(0, index).reduce((acc, curr) => acc + curr.properties.length, 0);

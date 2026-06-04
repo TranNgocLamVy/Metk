@@ -91,7 +91,7 @@
 	--radius: 0rem;
 
 	/* Flexlayout frame size */
-	--frame-size: 16px;
+	--frame-size: 20px;
 	--frame-size-half: calc(var(--frame-size) / 2);
 	--frame-size-quarter: calc(var(--frame-size) / 4);
 }

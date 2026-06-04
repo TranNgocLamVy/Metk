@@ -10,6 +10,7 @@ import { DialogZLevel } from "@/shared/types/dialog";
 import ContextMenuItemGroup from "@/ui/components/context-menu/ContextMenuItemGroup";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { VStack } from "@/ui/components/custom/stack/Stack";
+import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { Button } from "@/ui/components/shadcn/button";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
@@ -135,10 +136,7 @@ export default function LayerManager() {
 	}, [activeSession]);
 
 	return (
-		<VStack className="w-full relative h-full bg-surface">
-			<div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-				<div className="w-full h-full border border-t-0 border-foreground/30 z-10" />
-			</div>
+		<PanelContainer className="layer-manager">
 			<VStack
 				className="w-full h-full px-frame-quarter pb-frame-half pt-1 bg-surface relative"
 				onDrop={handleContainerDrop}
@@ -173,6 +171,7 @@ export default function LayerManager() {
 					</VStack>
 				)}
 			</VStack>
-		</VStack>
+		</PanelContainer>
+
 	);
 }

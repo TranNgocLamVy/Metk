@@ -11,7 +11,7 @@ export default function ContextBar() {
     const lastError = errors[errors.length - 1];
 
     return (
-        <HStack align="center" className="w-full h-8 bg-surface-base px-2">
+        <HStack id="context-bar" align="center" className="w-full h-8 bg-surface-base px-2 fixed bottom-0">
             <HStack align="center" className="gap-1 w-fit">
                 <HStack className="w-fit gap-1">
                     <Button variant={"ghost"} className="h-6 w-fit shrink-0 [&_svg:not([class*='size-'])]:size-3" onClick={() => toggleWithType("log")}>

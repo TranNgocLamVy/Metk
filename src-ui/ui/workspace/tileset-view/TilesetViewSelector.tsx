@@ -1,5 +1,5 @@
 import { TilesetView } from "@/graphics/view/tileset.view";
-import { VStack } from "@/ui/components/custom/stack/Stack";
+import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { useTilesetSessionEvent } from "@/ui/hooks/useTilesetSessionEvent.hook";
 import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
@@ -128,12 +128,9 @@ export default function TilesetViewSelector() {
 	})
 
 	return (
-		<VStack className="tilesetView h-full bg-surface relative">
-			<div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-				<div className="w-full h-full border border-t-0 border-foreground/30 z-10"/>
-			</div>
+		<PanelContainer className="tileset-selector">
 			<TilesetViewCanvas />
 			<TilesetViewTabs />
-		</VStack>
+		</PanelContainer>
 	);
 }

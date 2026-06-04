@@ -10,7 +10,6 @@ import { useLayoutStore } from "@/ui/stores/layout.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 
-import ContextBar from "./ContextBar";
 import EntityCollectionManager from "./entity-collection-manager/EntityCollectionManager";
 import LayerManager from "./layer-manager/LayerManager";
 import PropertyPanel from "./properties-panel/PropertyPanel";
@@ -84,7 +83,6 @@ export default function Workspace() {
 					<Layout ref={layoutRef} model={model} factory={factory} onRenderTab={onRenderTab} onModelChange={onModelChange} />
 					<div className="top-0 left-0 w-full h-full absolute pointer-events-none" />
 				</VStack>
-				<ContextBar />
 			</VStack>
 		</HStack>
 	);

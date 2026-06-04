@@ -11,6 +11,7 @@ import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import PixiImage from "@/ui/components/custom/PixiImage";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
+import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { ScrollArea, ScrollBar } from "@/ui/components/shadcn/scroll-area";
 import EntityCollectionManagerTabs from "./EntityCollectionManagerTabs";
 import EntityCollectionMenuBar from "./EntityCollectionMenuBar";
@@ -119,10 +120,7 @@ export default function EntityCollectionManager() {
     }, [currentSelectedEntityCollectionId]);
 
     return (
-        <VStack className="w-full h-full relative bg-surface">
-            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-                <div className="w-full h-full border border-t-0 border-foreground/30 z-10" />
-            </div>
+        <PanelContainer className="entity-collection-manager">
             <VStack className="w-full h-full px-frame-quarter pb-frame-half pt-1 bg-surface">
                 <EntityCollectionMenuBar />
                 <ScrollArea className="flex flex-1 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
@@ -166,7 +164,7 @@ export default function EntityCollectionManager() {
 
                 <EntityCollectionManagerTabs />
             </VStack>
-        </VStack>
+        </PanelContainer>
     );
 }
 
