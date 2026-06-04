@@ -3,7 +3,7 @@ import { TilesetRefManager } from "@/application/resources/references/tileset-re
 import { FilePathSystem } from "@/infrastructure/project-path-system";
 import { RulesetRefData } from "@/shared/data-types/layer.data";
 import { RuleData, RulesetData } from "@/shared/data-types/ruleset.data";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
 import { v4 as uuidv4 } from "uuid";
 import { BaseObject, BaseObjectEvents } from "../base-object";

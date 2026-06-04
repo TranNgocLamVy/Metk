@@ -92,24 +92,18 @@ vi.mock("react-i18next", () => ({
     }),
 }));
 
-vi.mock("@/shared/services/workspace.service", () => ({
-    WorkspaceService: mockState.workspaceService,
+vi.mock("@/application/actions/workspace.actions", () => mockState.workspaceService);
+
+vi.mock("@/application/actions/tilemap.actions", () => ({
+    createTilemap: vi.fn(),
 }));
 
-vi.mock("@/shared/services/tilemap.service", () => ({
-    TilemapService: {
-        createTilemap: vi.fn(),
-    },
+vi.mock("@/application/actions/ruleset.actions", () => ({
+    createRuleset: vi.fn(),
+    deleteRulesetFile: vi.fn(),
 }));
 
-vi.mock("@/shared/services/ruleset.service", () => ({
-    RulesetService: {
-        createRuleset: vi.fn(),
-        deleteRuleset: vi.fn(),
-    },
-}));
-
-vi.mock("@/shared/services/dialog.service", () => ({
+vi.mock("@/ui/dialogs/dialog-gateway", () => ({
     DialogService: {
         openEditRulesetDialog: vi.fn(),
     },
@@ -165,8 +159,7 @@ vi.mock("flexlayout-react", () => {
     };
 });
 
-vi.mock("@/shared/services/tilemap-layer.service", () => ({
-    TilemapLayerService: {
+vi.mock("@/application/actions/tilemap-layer.actions", () => ({
         selectLayer: vi.fn((id: string, multi: boolean) => {
             const session = mockState.appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager.activeSession;
             if (!session) return;
@@ -193,6 +186,8 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
         toggleLock: vi.fn(),
         createNewTileLayer: vi.fn(),
         createNewRuleLayer: vi.fn(),
+        createNewImageLayer: vi.fn(),
+        createNewEntityLayer: vi.fn(),
         createNewGroupLayer: vi.fn(),
         moveLayersUp: vi.fn(),
         moveLayersDown: vi.fn(),
@@ -200,7 +195,6 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
         deleteLayer: vi.fn(),
         moveLayers: vi.fn(),
         renameLayer: vi.fn(),
-    },
 }));
 
 import { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
@@ -214,7 +208,7 @@ import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset"
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 import { useLayoutStore } from "@/ui/stores/layout.store";
@@ -450,9 +444,9 @@ const setWorkspaceFixture = () => {
     mockState.appKernel.projectManager.currentProject = project;
     mockState.appKernel.editorFacade.currentProject = project;
     mockState.appKernel.editorFacade.getActiveTilemapSession.mockImplementation(() => tilemapSessionManager.activeSession);
-    (WorkspaceService.openTilemapSession as any).mockImplementation(async (sessionId: string) => tilemapSessionManager.openSession(sessionId));
-    (WorkspaceService.openTilesetSession as any).mockImplementation(async (sessionId: string) => tilesetSessionManager.openSession(sessionId));
-    (WorkspaceService.selectRuleset as any).mockImplementation(async (rulesetId: string | null) => {
+    (WorkspaceActions.openTilemapSession as any).mockImplementation(async (sessionId: string) => tilemapSessionManager.openSession(sessionId));
+    (WorkspaceActions.openTilesetSession as any).mockImplementation(async (sessionId: string) => tilesetSessionManager.openSession(sessionId));
+    (WorkspaceActions.selectRuleset as any).mockImplementation(async (rulesetId: string | null) => {
         rulesetSessionManager.setSelectedRuleId(rulesetId);
     });
 
@@ -535,7 +529,7 @@ describe("Metk UI integration workflows", () => {
         await waitFor(() => {
             expect(useTilemapSessionStore.getState().activeSession?.id).toBe(dungeon.id);
         });
-        expect(WorkspaceService.openTilemapSession).toHaveBeenCalledWith(dungeon.id);
+        expect(WorkspaceActions.openTilemapSession).toHaveBeenCalledWith(dungeon.id);
         expect(dungeonTab).toHaveClass("bg-surface");
         expect(screen.getByRole("button", { name: /Overworld/ })).toHaveClass("text-muted-foreground");
     });
@@ -552,7 +546,7 @@ describe("Metk UI integration workflows", () => {
         await waitFor(() => {
             expect(useTilesetSessionStore.getState().activeSession?.id).toBe(dungeonTiles.id);
         });
-        expect(WorkspaceService.openTilesetSession).toHaveBeenCalledWith(dungeonTiles.id);
+        expect(WorkspaceActions.openTilesetSession).toHaveBeenCalledWith(dungeonTiles.id);
         expect(dungeonTilesTab).toHaveClass("bg-surface");
         expect(screen.getByRole("button", { name: /Terrain Tiles/ })).toHaveClass("text-muted-foreground");
     });
@@ -600,7 +594,7 @@ describe("Metk UI integration workflows", () => {
 
         await user.click(screen.getByText("Water Rules"));
 
-        expect(WorkspaceService.selectRuleset).toHaveBeenCalledWith("water");
+        expect(WorkspaceActions.selectRuleset).toHaveBeenCalledWith("water");
         expect(useRulesetStore.getState().currentSelectedRuleId).toBe("water");
 
         act(() => {

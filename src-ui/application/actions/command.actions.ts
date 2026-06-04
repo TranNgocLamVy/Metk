@@ -9,7 +9,6 @@ export type CommandId =
     | "workspace.tilemap.export.tmx"
     | "workspace.toggleConsole";
 
-// 2. Create a clean, exported Facade function
-export const executeCommand = (id: CommandId) => {
+export function executeCommand(id: CommandId): void {
     appKernel.systemCommandManager.execute(id);
-};
+}

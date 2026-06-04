@@ -10,7 +10,7 @@ import { TilesetRefManager } from "@/application/resources/references/tileset-re
 
 import { EntityDefinition } from "./entity-definition";
 import { normalizeEntityCollectionData, normalizeEntityDefinitionData } from "./entity.normalizer";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 
 export interface EntityCollectionEvent extends BaseObjectEvents {
     update: (collection: EntityCollection) => void;

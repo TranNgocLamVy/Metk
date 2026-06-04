@@ -1,9 +1,9 @@
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/types/form-dialog";
-import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "../types/confirmation-dialog";
-import { DialogZLevel } from "../types/dialog";
+import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "@/shared/types/confirmation-dialog";
+import { DialogZLevel } from "@/shared/types/dialog";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { Result } from "../types/result";
+import { Result } from "@/shared/types/result";
 
 
 export class DialogService {

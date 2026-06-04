@@ -1,7 +1,7 @@
 import { Copy, Pen, Plus, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 
-import { EntityCollectionService } from "@/shared/services/entity-collection.service";
+import * as EntityCollectionActions from "@/application/actions/entity-collection.actions";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
@@ -16,17 +16,17 @@ export default function EntityCollectionMenuBar() {
 
     const onEditEntity = useCallback(() => {
         if (!currentSelectedEntityCollectionId || !selectedEntityId) return;
-        EntityCollectionService.editEntity(currentSelectedEntityCollectionId, selectedEntityId);
+        EntityCollectionActions.editEntity(currentSelectedEntityCollectionId, selectedEntityId);
     }, [currentSelectedEntityCollectionId, selectedEntityId]);
 
     const onDeleteEntity = useCallback(() => {
         if (!currentSelectedEntityCollectionId || !selectedEntityId) return;
-        EntityCollectionService.deleteEntity(currentSelectedEntityCollectionId, selectedEntityId);
+        EntityCollectionActions.deleteEntity(currentSelectedEntityCollectionId, selectedEntityId);
     }, [currentSelectedEntityCollectionId, selectedEntityId]);
 
     const onCloneEntity = useCallback(() => {
         if (!currentSelectedEntityCollectionId || !selectedEntityId) return;
-        EntityCollectionService.cloneEntity(currentSelectedEntityCollectionId, selectedEntityId);
+        EntityCollectionActions.cloneEntity(currentSelectedEntityCollectionId, selectedEntityId);
     }, [currentSelectedEntityCollectionId, selectedEntityId]);
 
     return (
@@ -36,7 +36,7 @@ export default function EntityCollectionMenuBar() {
                     variant="ghost"
                     size="icon-sm"
                     disabled={!currentSelectedEntityCollectionId}
-                    onClick={EntityCollectionService.createEntity}
+                    onClick={EntityCollectionActions.createEntity}
                 >
                     <Plus />
                 </Button>

@@ -1,4 +1,4 @@
-import i18n from "@/shared/services/i18n.service";
+import i18n from "@/app/providers/i18n";
 import { ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 

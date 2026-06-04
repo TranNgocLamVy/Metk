@@ -185,7 +185,7 @@ vi.mock("pixi.js", () => ({
     Texture: rendererMocks.Texture,
 }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: rendererMocks.appKernel }));
-vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: rendererMocks.workspaceService }));
+vi.mock("@/application/actions/workspace.actions", () => rendererMocks.workspaceService);
 vi.mock("@tauri-apps/plugin-fs", () => rendererMocks.fs);
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: rendererMocks.textureUtils }));
 

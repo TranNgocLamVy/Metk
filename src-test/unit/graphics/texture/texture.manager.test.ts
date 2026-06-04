@@ -51,7 +51,7 @@ vi.mock("pixi.js", () => ({
 }));
 vi.mock("@tauri-apps/plugin-fs", () => textureMocks.fs);
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: textureMocks.textureUtils }));
-vi.mock("@/shared/services/console.service", () => ({ Console: textureMocks.console }));
+vi.mock("@/ui/notifications/console-gateway", () => ({ Console: textureMocks.console }));
 
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";

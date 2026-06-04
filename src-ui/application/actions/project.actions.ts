@@ -1,19 +1,17 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { FileDialogUtils } from "../utils/file-dialog.utils";
-import { Result } from "../types/result";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { Result } from "@/shared/types/result";
 import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
-import { defaultProjectData } from "../data-types/project.data";
+import { defaultProjectData } from "@/shared/data-types/project.data";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { DialogService } from "./dialog.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
-import { PathUtils } from "../utils/path.utils";
-import { createProjectForm } from "../constant/form/create-project.form";
-import { Console } from "./console.service";
+import { PathUtils } from "@/shared/utils/path.utils";
+import { createProjectForm } from "@/shared/constant/form/create-project.form";
+import { Console } from "@/ui/notifications/console-gateway";
 import { Project } from "@/editor/model/project/project";
 
-export class ProjectService {
-
-    public static async importProject(): Promise<void> {
+export async function importProject(): Promise<void> {
         const projectAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Project", extensions: ["json"] }] });
         if (!projectAbsPath) return;
         const projectDataResult = await ProjectStorageService.load(projectAbsPath);
@@ -37,9 +35,9 @@ export class ProjectService {
         const openProject = await DialogService.openPermissionDialog({ title: "Project opened successfully", description: "Do you want to open this project?" })
 
         if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
-    }
+}
 
-    public static async createProject(): Promise<void> {
+export async function createProject(): Promise<void> {
         const form = await DialogService.openFormDialog(createProjectForm());
 
         if (!form) return;
@@ -81,9 +79,9 @@ export class ProjectService {
         const openProject = await DialogService.openPermissionDialog({ title: "Project created successfully", description: "Do you want to open the project?" })
 
         if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
-    }
+}
 
-    public static async removeProject(projectId: string): Promise<void> {
+export async function removeProject(projectId: string): Promise<void> {
         const confirm = await DialogService.openPermissionDialog({
             title: "Remove Project", // TODO: i18n
             description: "Are you sure you want to remove this project?"
@@ -94,5 +92,4 @@ export class ProjectService {
         const projectManager = appKernel.projectManager;
         projectManager.removeProjectMetadata(projectId);
         await appKernel.saveProjectManager();
-    }
 }

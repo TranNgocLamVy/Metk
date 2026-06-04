@@ -4,7 +4,7 @@ import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
-import { TilemapService } from "@/shared/services/tilemap.service";
+import * as TilemapActions from "@/application/actions/tilemap.actions";
 import { DialogZLevel } from "@/shared/types/dialog";
 import ContextMenuWrapper from "@/ui/components/context-menu/ContextMenuWrapper";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
@@ -51,7 +51,7 @@ export default function TilemapEditorCanvas() {
 					<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
 						<LocalizedText message="workspace.tilemapEditor.open" />
 					</Button>
-					<Button variant={"link"} onClick={TilemapService.createTilemap}>
+					<Button variant={"link"} onClick={TilemapActions.createTilemap}>
 						<LocalizedText message="workspace.tilemapEditor.create" />
 					</Button>
 				</HStack>

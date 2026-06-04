@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { Result } from "@/shared/types/result";
 import LoadingOverlay from "@/ui/components/layout/LoadingOverlay";
 import { useAppcore } from "@/ui/stores/appcore.store";
@@ -17,7 +17,7 @@ export default function WorkspacePage() {
 
 	const loadProject = useCallback(async (id: string) => {
 		try {
-			const result = await WorkspaceService.loadProjectWorkspace(id);
+			const result = await WorkspaceActions.loadProjectWorkspace(id);
 			if (result.status !== Result.Status.Success) navigate("/");
 		} finally {
 			setIsLoading(false);
@@ -28,7 +28,7 @@ export default function WorkspacePage() {
 		if (!isAppcoreLoaded) return;
 		loadProject(projectId!);
 		return () => {
-			WorkspaceService.unloadProjectWorkspace();
+			WorkspaceActions.unloadProjectWorkspace();
 		}
 	}, [projectId, isAppcoreLoaded]);
 

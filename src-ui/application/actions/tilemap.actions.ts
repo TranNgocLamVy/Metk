@@ -1,19 +1,18 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { extractTilemapId, normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
 import { TilemapStorageService } from "@/infrastructure/container";
-import i18n from "@/shared/services/i18n.service";
+import i18n from "@/app/providers/i18n";
 import { v4 as uuidv4 } from "uuid";
-import { createTilemapForm } from "../constant/form/create-tilemap.form";
-import { CreateTilemapPayload, TilemapData, TilemapOrientation } from "../data-types/tilemap.data";
-import { Result } from "../types/result";
-import { FileDialogUtils } from "../utils/file-dialog.utils";
-import { PathUtils } from "../utils/path.utils";
-import { Console } from "./console.service";
-import { DialogService } from "./dialog.service";
-import { WorkspaceService } from "./workspace.service";
+import { createTilemapForm } from "@/shared/constant/form/create-tilemap.form";
+import { CreateTilemapPayload, TilemapData, TilemapOrientation } from "@/shared/data-types/tilemap.data";
+import { Result } from "@/shared/types/result";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { PathUtils } from "@/shared/utils/path.utils";
+import { Console } from "@/ui/notifications/console-gateway";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import { closeTilemapSession, createTilemapSession, saveCurrentWorkspace } from "@/application/actions/workspace.actions";
 
-export class TilemapService {
-    public static async createTilemap(): Promise<void> {
+export async function createTilemap(): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -60,13 +59,13 @@ export class TilemapService {
         await currentProject.tilemapManager.addTilemap(tilemapData, tilemapAbsPath);
         await editorFacade.projectManager.saveCurrrentProject();
 
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-        WorkspaceService.createTilemapSession(tilemapData.id);
+        await saveCurrentWorkspace({ waitForTimeout: false });
+        createTilemapSession(tilemapData.id);
 
         Console.success({ message: "message.tilemap.createSuccess" });
-    }
+}
 
-    public static async importTilemap(refTilemapId?: string): Promise<Result> {
+export async function importTilemap(refTilemapId?: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -114,14 +113,14 @@ export class TilemapService {
 
         await editorFacade.projectManager.saveCurrrentProject();
 
-        WorkspaceService.createTilemapSession(addTilemapResult.data.id);
+        createTilemapSession(addTilemapResult.data.id);
 
         Console.success({ message: "message.tilemap.importSuccess" });
 
         return Result.Success();
-    }
+}
 
-    public static async removeTilemap(tilemapId: string): Promise<Result> {
+export async function removeTilemapFromProject(tilemapId: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
 
@@ -140,14 +139,14 @@ export class TilemapService {
 
         const tilemapSession = editorFacade.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
         if (tilemapSession) {
-            await WorkspaceService.closeTilemapSession(tilemapSession.id);
-            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            await closeTilemapSession(tilemapSession.id);
+            await saveCurrentWorkspace({ waitForTimeout: false });
         }
 
         return removeResult;
-    }
+}
 
-    public static async deleteTilemap(tilemapId: string): Promise<void> {
+export async function deleteTilemapFile(tilemapId: string): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
 
@@ -166,9 +165,7 @@ export class TilemapService {
 
         const tilemapSession = editorFacade.currentWorkspace?.tilemapSessionManager.getSessionByTilemapId(tilemapId);
         if (tilemapSession) {
-            await WorkspaceService.closeTilemapSession(tilemapSession.id, true);
-            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            await closeTilemapSession(tilemapSession.id, true);
+            await saveCurrentWorkspace({ waitForTimeout: false });
         }
-
-    }
 }

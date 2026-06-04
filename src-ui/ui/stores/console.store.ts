@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ErrorMessage, LogMessage } from "@/shared/services/console.service";
+import { ErrorMessage, LogMessage } from "@/ui/notifications/console-gateway";
 
 type ConsoleType = "log" | "error";
 

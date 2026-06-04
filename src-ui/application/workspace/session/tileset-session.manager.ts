@@ -5,7 +5,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { TilesetSession } from "@/editor/session/tileset.session";
 import { Tileset } from "@/editor/model/tileset/tileset";
 import { TilesetManager } from "@/application/resources/tileset/tileset.manager";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { TilesetView } from "@/graphics/view/tileset.view";
 
 export type TilesetSessionManagerEvent = {

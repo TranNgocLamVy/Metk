@@ -1,6 +1,6 @@
 import { DragEvent, FocusEvent, useCallback, useEffect, useRef } from "react";
 
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
 import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
@@ -121,7 +121,7 @@ export default function LayerManager() {
 
 		const { ids } = JSON.parse(data);
 		if (Array.isArray(ids) && ids.length > 0) {
-			TilemapLayerService.moveLayers(ids, root.id, "inside");
+			TilemapLayerActions.moveLayers(ids, root.id, "inside");
 		}
 	}, [activeSession])
 

@@ -1,7 +1,7 @@
 import { Result } from "@/shared/types/result";
 import { ActivationContext } from "../runtime/activation-context";
 import { EditorFacade } from "../editor.facade";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { CommandContext } from "@/application/commands/command.decorator";
 import { ISystemCommandConstructor } from "@/editor/interface/base-command.interface";
 

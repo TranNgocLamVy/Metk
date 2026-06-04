@@ -1,7 +1,7 @@
 import { FolderPlus, SquareArrowOutUpRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import { ProjectService } from "@/shared/services/project.service";
+import * as ProjectActions from "@/application/actions/project.actions";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { useContextScope } from "../hooks/useContextScope.hook";
@@ -23,12 +23,12 @@ export default function HomePage() {
 
 				<h2 className="mt-6 font-semibold text-foreground"><LocalizedText message="home.start" /></h2>
 				<VStack align="start" className="w-40 h-fit">
-					<Button variant={"link"} onClick={ProjectService.importProject}>
+					<Button variant={"link"} onClick={ProjectActions.importProject}>
 						<SquareArrowOutUpRight />
 						<LocalizedText message="home.importProject" />
 					</Button>
 
-					<Button variant={"link"} onClick={ProjectService.createProject}>
+					<Button variant={"link"} onClick={ProjectActions.createProject}>
 						<FolderPlus />
 						<LocalizedText message="home.newProject" />
 					</Button>
@@ -41,7 +41,7 @@ export default function HomePage() {
 									{project.name}
 								</Button>
 								<h3 className="text-xs text-foreground cursor-default">{project.directory}</h3>
-								<Button size={"icon-xs"} variant={"ghost"} onClick={() => ProjectService.removeProject(project.id)} className="ml-auto">
+								<Button size={"icon-xs"} variant={"ghost"} onClick={() => ProjectActions.removeProject(project.id)} className="ml-auto">
 									<X className="text-foreground/50 hover:text-foreground hidden group-hover:block" />
 								</Button>
 							</HStack>

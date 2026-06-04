@@ -145,13 +145,9 @@ const mockState = vi.hoisted(() => {
 
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: mockState.appKernel }));
 
-vi.mock("@/shared/services/project.service", () => ({
-    ProjectService: mockState.projectService,
-}));
+vi.mock("@/application/actions/project.actions", () => mockState.projectService);
 
-vi.mock("@/shared/services/workspace.service", () => ({
-    WorkspaceService: mockState.workspaceService,
-}));
+vi.mock("@/application/actions/workspace.actions", () => mockState.workspaceService);
 
 vi.mock("react-router", () => ({
     useNavigate: () => mockState.navigate,
@@ -168,8 +164,7 @@ vi.mock("react-i18next", () => ({
     }),
 }));
 
-vi.mock("@/shared/services/tilemap-layer.service", () => ({
-    TilemapLayerService: {
+vi.mock("@/application/actions/tilemap-layer.actions", () => ({
         selectLayer: vi.fn((id: string, multi: boolean) => {
             const currentSession = mockState.appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager.activeSession;
             if (!currentSession) return;
@@ -190,13 +185,14 @@ vi.mock("@/shared/services/tilemap-layer.service", () => ({
         toggleOpenGroupLayer: vi.fn(),
         createNewTileLayer: vi.fn(),
         createNewRuleLayer: vi.fn(),
+        createNewImageLayer: vi.fn(),
+        createNewEntityLayer: vi.fn(),
         createNewGroupLayer: vi.fn(),
         moveLayersUp: vi.fn(),
         moveLayersDown: vi.fn(),
         duplicateLayer: vi.fn(),
         deleteLayer: vi.fn(),
         moveLayers: vi.fn(),
-    },
 }));
 
 vi.mock("@/ui/workspace/Workspace", () => ({

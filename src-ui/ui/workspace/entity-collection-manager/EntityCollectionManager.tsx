@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { EntityCollectionService } from "@/shared/services/entity-collection.service";
+import * as EntityCollectionActions from "@/application/actions/entity-collection.actions";
 import { useEntityCollectionManagerEvent } from "@/ui/hooks/useEntityCollectionManagerEvent.hook";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 import { useProjectStore } from "@/ui/stores/project.store";
@@ -110,12 +110,12 @@ export default function EntityCollectionManager() {
     const entities = activeEntityCollection?.getAllEntityDefinitions() ?? [];
 
     const onSelectEntity = useCallback((entityId: string) => {
-        EntityCollectionService.selectEntity(entityId);
+        EntityCollectionActions.selectEntity(entityId);
     }, []);
 
     const onEditEntity = useCallback((entityId: string) => {
         if (!currentSelectedEntityCollectionId) return;
-        EntityCollectionService.editEntity(currentSelectedEntityCollectionId, entityId);
+        EntityCollectionActions.editEntity(currentSelectedEntityCollectionId, entityId);
     }, [currentSelectedEntityCollectionId]);
 
     return (

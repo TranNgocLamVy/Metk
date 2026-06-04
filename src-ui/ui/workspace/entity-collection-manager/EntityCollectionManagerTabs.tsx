@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import { EntityCollectionService } from "@/shared/services/entity-collection.service";
+import * as EntityCollectionActions from "@/application/actions/entity-collection.actions";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 
@@ -26,7 +26,7 @@ export default function EntityCollectionManagerTabs() {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="min-w-60">
-                    <DropdownMenuItem onClick={EntityCollectionService.createEntityCollection}>
+                    <DropdownMenuItem onClick={EntityCollectionActions.createEntityCollection}>
                         <Plus />
                         <LocalizedText message="workspace.entityCollectionManager.dropdown.new" />
                     </DropdownMenuItem>
@@ -38,7 +38,7 @@ export default function EntityCollectionManagerTabs() {
                         disabled={!currentSelectedEntityCollectionId}
                         onClick={() => {
                             if (!currentSelectedEntityCollectionId) return;
-                            EntityCollectionService.deleteEntityCollection(currentSelectedEntityCollectionId);
+                            EntityCollectionActions.deleteEntityCollection(currentSelectedEntityCollectionId);
                         }}
                     >
                         <Trash2 className="text-destructive" />
@@ -58,7 +58,7 @@ export default function EntityCollectionManagerTabs() {
                             size="sm"
                             onClick={() => {
                                 if (isCurrent) return;
-                                EntityCollectionService.selectEntityCollection(collection.id);
+                                EntityCollectionActions.selectEntityCollection(collection.id);
                             }}
                             className={`pr-2 h-full border-none text-foreground relative cursor-pointer ${isCurrent
                                 ? "bg-surface"

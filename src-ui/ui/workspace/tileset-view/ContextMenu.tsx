@@ -1,7 +1,7 @@
 import { Grid3x3, Info, Pen, Plus, Trash2 } from "lucide-react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilesetService } from "@/shared/services/tileset.service";
+import * as TilesetActions from "@/application/actions/tileset.actions";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { usePropertyStore } from "@/ui/stores/property.store";
@@ -12,7 +12,7 @@ const Group1: MenuDropDownGroupType = [
         label: "workspace.tilesetSelector.contextMenu.new",
         startIcon: <Plus className="stroke-1" />,
         onClick() {
-            TilesetService.createTileset();
+            TilesetActions.createTileset();
         }
     },
     {
@@ -72,7 +72,7 @@ const Group3: MenuDropDownGroupType = [
             const editorFacade = appKernel.editorFacade;
             const currentTilesetSession = editorFacade.getActiveTilesetSession();
             if (!currentTilesetSession) return;
-            TilesetService.deleteTileset(currentTilesetSession.tileset.id); 
+            TilesetActions.deleteTilesetFile(currentTilesetSession.tileset.id);
         }
     },
 ];

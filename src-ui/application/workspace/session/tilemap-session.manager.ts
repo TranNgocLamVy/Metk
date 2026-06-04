@@ -5,7 +5,7 @@ import { TilemapSession } from "@/editor/session/tilemap.session";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { TilemapManager } from "@/application/resources/tilemap/tilemap.manager";
 import { Result } from "@/shared/types/result";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 
 export type TilemapSessionManagerEvent = {

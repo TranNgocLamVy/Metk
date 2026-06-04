@@ -8,8 +8,8 @@ import { UpdatePropertyCommand } from "@/application/commands/update-property.co
 import { DropPosition, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
-import { WorkspaceService } from "./workspace.service";
-import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData, defaultEntityLayerData, } from "../data-types/layer.data";
+import { saveCurrentWorkspace } from "@/application/actions/workspace.actions";
+import { defaultGroupLayerData, defaultImageLayerData, defaultRuleLayerData, defaultTileLayerData, defaultEntityLayerData, } from "@/shared/data-types/layer.data";
 import { CreateRuleLayerCommand } from "@/application/commands/layer/create-rule-layer.command";
 import { BaseLayer, IGroupLayer } from "@/editor/model/tilemap/layer/base-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
@@ -36,8 +36,7 @@ const getMoveCommandIndex = (parent: IGroupLayer, layer: BaseLayer, desiredIndex
     return currentIndex < desiredIndex ? desiredIndex - 1 : desiredIndex;
 };
 
-export class TilemapLayerService {
-    public static getSelectedParentLayer(tilemap: Tilemap): IGroupLayer | null {
+export function getSelectedParentLayer(tilemap: Tilemap): IGroupLayer | null {
         const selectedIds = Array.from(useLayerManagerStore.getState().selectedLayers).reverse();
         
         for (const id of selectedIds) {
@@ -48,7 +47,7 @@ export class TilemapLayerService {
         return null;        
     }
     
-    public static async createNewTileLayer() {
+export async function createNewTileLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -56,8 +55,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-        console.log(root);
-        const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
+        const targetLayer = getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -72,7 +70,7 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
-    public static async createNewRuleLayer() {
+export async function createNewRuleLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -80,7 +78,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-        const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
+        const targetLayer = getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -95,7 +93,7 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
-    public static async createNewImageLayer() {
+export async function createNewImageLayer() {
         const editorFacade = appKernel.editorFacade;
     
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -105,7 +103,7 @@ export class TilemapLayerService {
 
         const tilemap = currentSession.tilemap;
         const root = tilemap.rootLayer;
-        const targetLayer = this.getSelectedParentLayer(tilemap);
+        const targetLayer = getSelectedParentLayer(tilemap);
     
         const parent = targetLayer instanceof GroupLayer ? targetLayer : targetLayer?.parentLayer ? targetLayer.parentLayer : root;
     
@@ -120,7 +118,7 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
-    public static async createNewEntityLayer() {
+export async function createNewEntityLayer() {
         const editorFacade = appKernel.editorFacade;
     
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -130,7 +128,7 @@ export class TilemapLayerService {
     
         const tilemap = currentSession.tilemap;
         const root = tilemap.rootLayer;
-        const targetLayer = this.getSelectedParentLayer(tilemap);
+        const targetLayer = getSelectedParentLayer(tilemap);
     
         const parent = targetLayer instanceof GroupLayer ? targetLayer : targetLayer?.parentLayer ? targetLayer.parentLayer : root;
     
@@ -149,7 +147,7 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
-    public static async createNewGroupLayer() {
+export async function createNewGroupLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -157,7 +155,7 @@ export class TilemapLayerService {
         if (!currentSession || !historyManager) return;
 
         const root = currentSession.tilemap.rootLayer;
-        const targetLayer = this.getSelectedParentLayer(currentSession.tilemap);
+        const targetLayer = getSelectedParentLayer(currentSession.tilemap);
 
         const parent = targetLayer instanceof GroupLayer ? targetLayer : (targetLayer?.parentLayer ? targetLayer.parentLayer : root);
 
@@ -172,7 +170,7 @@ export class TilemapLayerService {
         useLayerManagerStore.getState().setEditingId(payload.id);
     }
 
-    public static async duplicateLayer() {
+export async function duplicateLayer() {
        const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -191,7 +189,7 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
     }
 
-    public static async deleteLayer() {
+export async function deleteLayer() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -214,7 +212,7 @@ export class TilemapLayerService {
         currentSession.updateLayerState({ selectedLayers: layers.filter(id => selectedLayers.includes(id)) });
     }
 
-    public static selectLayer(id: string, multi: boolean) {
+export function selectLayer(id: string, multi: boolean) {
         const tilemapSessionManager = appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return;
         const currentSession = tilemapSessionManager.activeSession;
@@ -227,10 +225,10 @@ export class TilemapLayerService {
             selectedLayers.push(id);
         }
         currentSession.updateLayerState({ selectedLayers });
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static selectAllLayers() {
+export function selectAllLayers() {
         const tilemapSessionManager = appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return;
         const currentSession = tilemapSessionManager.activeSession;
@@ -238,37 +236,37 @@ export class TilemapLayerService {
         const root = currentSession.tilemap.rootLayer;
         const selectedLayers = Array.from(root.getAllIds());
         currentSession.updateLayerState({ selectedLayers });
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static deselectAllLayers() {
+export function deselectAllLayers() {
         const tilemapSessionManager = appKernel.workspaceManager.currentWorkspace?.tilemapSessionManager;
         if (!tilemapSessionManager) return;
         const currentSession = tilemapSessionManager.activeSession;
         if (!currentSession) return;
         currentSession.updateLayerState({ selectedLayers: [] });
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static toggleSelectedLayersVisibility() {
+export function toggleSelectedLayersVisibility() {
         const editorFacade = appKernel.editorFacade;
         const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return;
         const selectedIds = currentSession.layerState.selectedLayers;
-        this.toggleVisibility(selectedIds);
+        toggleVisibility(selectedIds);
     }
 
-    public static toggleNonSelectedLayersVisibility() {
+export function toggleNonSelectedLayersVisibility() {
         const editorFacade = appKernel.editorFacade;
         const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return;
         const root = currentSession.tilemap.rootLayer;
         const selectedIds = currentSession.layerState.selectedLayers;
         const nonSelectedIds = Array.from(root.getAllIds()).filter(id => !selectedIds.includes(id));
-        this.toggleVisibility(nonSelectedIds);
+        toggleVisibility(nonSelectedIds);
     }
 
-    public static toggleVisibility(ids: string[], force?: boolean) {
+export function toggleVisibility(ids: string[], force?: boolean) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -292,7 +290,7 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
     }
 
-    public static toggleOpenGroupLayer(id: string, force?: boolean) {
+export function toggleOpenGroupLayer(id: string, force?: boolean) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -312,25 +310,25 @@ export class TilemapLayerService {
         toggleOpenGroupLayerCommand.execute(editorFacade);
     }
 
-    public static toggleSelectedLayersLock() {
+export function toggleSelectedLayersLock() {
         const editorFacade = appKernel.editorFacade;
         const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return;
         const selectedIds = currentSession.layerState.selectedLayers;
-        this.toggleLock(selectedIds);
+        toggleLock(selectedIds);
     }
 
-    public static toggleNonSelectedLayersLock() {
+export function toggleNonSelectedLayersLock() {
         const editorFacade = appKernel.editorFacade;
         const currentSession = editorFacade.getActiveTilemapSession();
         if (!currentSession) return;
         const root = currentSession.tilemap.rootLayer;
         const selectedIds = currentSession.layerState.selectedLayers;
         const nonSelectedIds = Array.from(root.getAllIds()).filter(id => !selectedIds.includes(id));
-        this.toggleLock(nonSelectedIds);
+        toggleLock(nonSelectedIds);
     }
 
-    public static toggleLock(ids: string[], force?: boolean) {
+export function toggleLock(ids: string[], force?: boolean) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -354,7 +352,7 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
     }
 
-    public static moveLayers(draggedIds: string[], targetId: string, position: DropPosition) {
+export function moveLayers(draggedIds: string[], targetId: string, position: DropPosition) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -409,7 +407,7 @@ export class TilemapLayerService {
         }
     }
 
-    public static moveLayersUp() {
+export function moveLayersUp() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -456,7 +454,7 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
     }
 
-    public static moveLayersDown() {
+export function moveLayersDown() {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -503,7 +501,7 @@ export class TilemapLayerService {
         historyManager.commitTransaction();
     }
 
-    public static renameLayer(id: string, name: string, recordUndo: boolean = true) {
+export function renameLayer(id: string, name: string, recordUndo: boolean = true) {
         const editorFacade = appKernel.editorFacade;
 
         const currentSession = editorFacade.getActiveTilemapSession();
@@ -522,4 +520,3 @@ export class TilemapLayerService {
             command.execute(editorFacade);
         }
     }
-}

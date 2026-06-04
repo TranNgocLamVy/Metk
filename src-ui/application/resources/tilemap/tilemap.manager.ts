@@ -7,7 +7,7 @@ import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path
 import { TilemapStorageService } from "@/infrastructure/container";
 import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { RulesetManager } from "../ruleset/ruleset.manager";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
@@ -105,8 +105,8 @@ export class TilemapManager {
                 actions: [{
                     label: "global.action.tilemap.import", variant: "outline",
                     onClick: async () => {
-                        const { TilemapService } = await import("@/shared/services/tilemap.service");
-                        return await TilemapService.importTilemap(id)
+                        const TilemapActions = await import("@/application/actions/tilemap.actions");
+                        return await TilemapActions.importTilemap(id)
                     }
                 }]
             }, customId);
@@ -125,15 +125,15 @@ export class TilemapManager {
                     {
                         label: "global.action.tilemap.import", variant: "outline",
                         onClick: async () => {
-                            const { TilemapService } = await import("@/shared/services/tilemap.service");
-                            return await TilemapService.importTilemap(id);
+                            const TilemapActions = await import("@/application/actions/tilemap.actions");
+                            return await TilemapActions.importTilemap(id);
                         }
                     },
                     {
                         label: "global.action.tilemap.remove", variant: "destructive",
                         onClick: async () => {
-                            const { TilemapService } = await import("@/shared/services/tilemap.service");
-                            return await TilemapService.removeTilemap(id);
+                            const TilemapActions = await import("@/application/actions/tilemap.actions");
+                            return await TilemapActions.removeTilemapFromProject(id);
                         }
                     },
                 ]

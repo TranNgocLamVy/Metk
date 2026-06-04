@@ -7,7 +7,7 @@ import { WorkspaceStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
 import EventEmitter from "eventemitter3";
 import { Project } from "@/editor/model/project/project";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 
 type WorkspaceManagerEvent = {
     onWorkspaceLoaded: (workspace: Workspace) => void;

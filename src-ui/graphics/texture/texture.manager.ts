@@ -2,7 +2,7 @@ import errorTexture from "@/assets/sprites/Missing_texture.png";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { exists, readFile } from "@tauri-apps/plugin-fs";
@@ -144,11 +144,9 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
                         label: "global.action.texture.import",
                         variant: "outline",
                         onClick: async () => {
-                            const { TextureService } = await import(
-                                "@/shared/services/texture.service"
-                            );
+                            const TextureActions = await import("@/application/actions/texture.actions");
 
-                            return await TextureService.importTexture(
+                            return await TextureActions.importTexture(
                                 tileset.id,
                             );
                         },

@@ -1,13 +1,13 @@
 import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
 
-import { ProjectService } from "@/shared/services/project.service";
-import { TilemapService } from "@/shared/services/tilemap.service";
-import { TilesetService } from "@/shared/services/tileset.service";
-import { RulesetService } from "@/shared/services/ruleset.service";
+import * as ProjectActions from "@/application/actions/project.actions";
+import * as TilemapActions from "@/application/actions/tilemap.actions";
+import * as TilesetActions from "@/application/actions/tileset.actions";
+import * as RulesetActions from "@/application/actions/ruleset.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { executeCommand } from "@/shared/services/command.service";
+import { executeCommand } from "@/application/actions/command.actions";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -21,7 +21,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					label: "menu.file.action.new.project",
 					startIcon: <FolderPlus />,
                     onClick() {
-                        ProjectService.createProject();
+                        ProjectActions.createProject();
                     },
 				},
 			],
@@ -32,7 +32,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					startIcon: <SquarePlus />,
 					disabled: () => !(appKernel.projectManager.currentProject != null),
                     onClick() {
-						TilemapService.createTilemap();
+						TilemapActions.createTilemap();
 					},
 				},
 				{
@@ -41,7 +41,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					startIcon: <Grid2x2Plus />,
 					disabled: () => !(appKernel.projectManager.currentProject != null),
                     onClick() {
-						TilesetService.createTileset();
+						TilesetActions.createTileset();
 					},
 				},
 				{
@@ -50,7 +50,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 					startIcon: <Grid2x2Plus />,
 					disabled: () => !(appKernel.projectManager.currentProject != null),
                     onClick() {
-						RulesetService.createRuleset();
+						RulesetActions.createRuleset();
 					},
 				},
 			],

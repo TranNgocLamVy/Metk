@@ -168,7 +168,7 @@ describe("TilemapSession", () => {
                 textureManager: { releaseTilesetGraphics: vi.fn() },
             } as any,
         );
-        const markLayerChange = vi.spyOn(session, "markLayerChange");
+        const markAsDirty = vi.spyOn(session, "markAsDirty");
         const layer = tilemap.rootLayer.findLayer("tile-layer")!;
         const command = new UpdatePropertyCommand(layer.objectId, "name", layer.name, "Committed");
 
@@ -177,7 +177,7 @@ describe("TilemapSession", () => {
         command.redo({ objectRegistry } as any);
         layer.rename("External");
 
-        expect(markLayerChange).toHaveBeenCalledTimes(4);
+        expect(markAsDirty).toHaveBeenCalledTimes(4);
     });
 
     it("does not mark layer changes for preview property updates", () => {
@@ -187,7 +187,7 @@ describe("TilemapSession", () => {
             { id: "session-1", tilemapId: "map-1" },
             { textureManager: { releaseTilesetGraphics: vi.fn() } } as any,
         );
-        const markLayerChange = vi.spyOn(session, "markLayerChange");
+        const markAsDirty = vi.spyOn(session, "markAsDirty");
         const layer = tilemap.rootLayer.findLayer("tile-layer")!;
 
         layer.updateOpacity(0.5, {
@@ -195,7 +195,7 @@ describe("TilemapSession", () => {
             source: "TilemapSession.test",
         });
 
-        expect(markLayerChange).not.toHaveBeenCalled();
+        expect(markAsDirty).not.toHaveBeenCalled();
         expect(session.isDirty).toBeFalsy();
     });
 
@@ -206,7 +206,7 @@ describe("TilemapSession", () => {
             { id: "session-1", tilemapId: "map-1" },
             { textureManager: { releaseTilesetGraphics: vi.fn() } } as any,
         );
-        const markLayerChange = vi.spyOn(session, "markLayerChange");
+        const markAsDirty = vi.spyOn(session, "markAsDirty");
         const tileLayer = tilemap.rootLayer.findLayer("tile-layer") as TileLayer;
         const ruleLayer = tilemap.rootLayer.findLayer("rule-layer") as RuleLayer;
 
@@ -217,7 +217,7 @@ describe("TilemapSession", () => {
             { coordinate: { col: 0, row: 0 }, rulesetId: "ruleset-a" },
         ]);
 
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markAsDirty).toHaveBeenCalledTimes(2);
     });
 
     it("refreshes subscriptions when layers are added, removed, or reordered", () => {
@@ -227,7 +227,7 @@ describe("TilemapSession", () => {
             { id: "session-1", tilemapId: "map-1" },
             { textureManager: { releaseTilesetGraphics: vi.fn() } } as any,
         );
-        const markLayerChange = vi.spyOn(session, "markLayerChange");
+        const markAsDirty = vi.spyOn(session, "markAsDirty");
         const newLayer = new TileLayer(
             {
                 id: "added-layer",
@@ -250,19 +250,19 @@ describe("TilemapSession", () => {
         );
 
         tilemap.rootLayer.pushLayer(newLayer);
-        expect(markLayerChange).toHaveBeenCalledTimes(1);
+        expect(markAsDirty).toHaveBeenCalledTimes(1);
 
         newLayer.rename("Added Renamed");
-        expect(markLayerChange).toHaveBeenCalledTimes(2);
+        expect(markAsDirty).toHaveBeenCalledTimes(2);
 
         tilemap.rootLayer.moveChild("added-layer", -1);
-        expect(markLayerChange).toHaveBeenCalledTimes(3);
+        expect(markAsDirty).toHaveBeenCalledTimes(3);
 
         tilemap.rootLayer.removeLayer("added-layer");
-        expect(markLayerChange).toHaveBeenCalledTimes(4);
+        expect(markAsDirty).toHaveBeenCalledTimes(4);
 
         newLayer.rename("Removed Renamed");
-        expect(markLayerChange).toHaveBeenCalledTimes(4);
+        expect(markAsDirty).toHaveBeenCalledTimes(4);
     });
 
     it("marks layer changes when layer commands create, delete, and move layers", async () => {
@@ -277,7 +277,7 @@ describe("TilemapSession", () => {
                 textureManager: { releaseTilesetGraphics: vi.fn() },
             } as any,
         );
-        const markLayerChange = vi.spyOn(session, "markLayerChange");
+        const markAsDirty = vi.spyOn(session, "markAsDirty");
         const editorFacade = { objectRegistry } as any;
         const createCommand = new CreateTileLayerCommand(
             tilemap.objectId,
@@ -286,7 +286,7 @@ describe("TilemapSession", () => {
         );
 
         expect(createCommand.execute(editorFacade).status).toBe("Success");
-        expect(markLayerChange).toHaveBeenCalledTimes(1);
+        expect(markAsDirty).toHaveBeenCalledTimes(1);
 
         const moveCommand = new MoveLayerCommand(
             tilemap.objectId,
@@ -296,7 +296,7 @@ describe("TilemapSession", () => {
         );
 
         expect(moveCommand.execute(editorFacade).status).toBe("Success");
-        expect(markLayerChange).toHaveBeenCalledTimes(3);
+        expect(markAsDirty).toHaveBeenCalledTimes(3);
 
         const deleteCommand = new DeleteLayerCommand(
             tilemap.objectId,
@@ -304,7 +304,7 @@ describe("TilemapSession", () => {
         );
 
         expect(deleteCommand.execute(editorFacade).status).toBe("Success");
-        expect(markLayerChange).toHaveBeenCalledTimes(4);
+        expect(markAsDirty).toHaveBeenCalledTimes(4);
         await flushMicrotasks();
     });
 
@@ -388,13 +388,13 @@ describe("TilemapSession", () => {
             { id: "session-1", tilemapId: "map-1" },
             { textureManager: { releaseTilesetGraphics } } as any,
         );
-        const markLayerChange = vi.spyOn(session, "markLayerChange");
+        const markAsDirty = vi.spyOn(session, "markAsDirty");
         const layer = tilemap.rootLayer.findLayer("tile-layer")!;
 
         session.destroy();
         layer.rename("After Destroy");
 
-        expect(markLayerChange).not.toHaveBeenCalled();
+        expect(markAsDirty).not.toHaveBeenCalled();
         expect(releaseTilesetGraphics).toHaveBeenCalledWith("tileset-a");
     });
 });

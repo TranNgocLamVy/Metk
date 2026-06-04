@@ -1,6 +1,6 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
-import i18n, { i18nService } from "@/shared/services/i18n.service";
+import i18n, { i18nService } from "@/app/providers/i18n";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [

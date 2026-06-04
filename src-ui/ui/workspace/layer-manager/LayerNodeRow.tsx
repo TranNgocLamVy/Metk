@@ -2,7 +2,7 @@ import { Boxes, ChevronDown, ChevronRight, Eye, EyeOff, Folder, FolderOpen, Grid
 import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
 import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { PropertyUpdateMeta } from "@/editor/model/base-object";
@@ -50,7 +50,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 	const handleClick = (e: MouseEvent) => {
 		e.stopPropagation();
 		setObjectId(layer.objectId);
-		TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+		TilemapLayerActions.selectLayer(layer.id, e.ctrlKey || e.metaKey);
 	};
 
 	const handleDoubleClick = (e: MouseEvent) => {
@@ -64,7 +64,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 		let idsToDrag = [layer.id];
 
 		if (!isSelected) {
-			TilemapLayerService.selectLayer(layer.id, false);
+			TilemapLayerActions.selectLayer(layer.id, false);
 			idsToDrag = [layer.id];
 		} else {
 			idsToDrag = Array.from(selectedLayers);
@@ -112,7 +112,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 		try {
 			const { ids } = JSON.parse(data); // Expect array of IDs
 			if (Array.isArray(ids) && ids.length > 0 && dragOverPos) {
-				TilemapLayerService.moveLayers(ids, layer.id, dragOverPos);
+				TilemapLayerActions.moveLayers(ids, layer.id, dragOverPos);
 			}
 		} catch (err) {
 			console.error("Drop error:", err);
@@ -121,7 +121,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 
 	const onContextMenu = (e: MouseEvent) => {
 		if (!selectedLayers.includes(layer.id)) {
-			TilemapLayerService.selectLayer(layer.id, e.ctrlKey || e.metaKey);
+			TilemapLayerActions.selectLayer(layer.id, e.ctrlKey || e.metaKey);
 		}
 	};
 
@@ -155,7 +155,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle() }}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
-					<div className="w-4 cursor-pointer" onClick={(e) => { e.stopPropagation(); TilemapLayerService.toggleOpenGroupLayer(layer.id) }}>
+					<div className="w-4 cursor-pointer" onClick={(e) => { e.stopPropagation(); TilemapLayerActions.toggleOpenGroupLayer(layer.id) }}>
 						{(layer as GroupLayer).isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
 					</div>
 				) : (
@@ -177,7 +177,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 					onClick={(e) => {
 						e.stopPropagation();
 						e.preventDefault();
-						TilemapLayerService.toggleVisibility([layer.id]);
+						TilemapLayerActions.toggleVisibility([layer.id]);
 					}}>
 					{layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
 				</Button>
@@ -188,7 +188,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 					onClick={(e) => {
 						e.stopPropagation();
 						e.preventDefault();
-						TilemapLayerService.toggleLock([layer.id]);
+						TilemapLayerActions.toggleLock([layer.id]);
 					}}>
 					{layer.locked ? <LockKeyhole size={16} /> : <LockOpen size={16} />}
 				</Button>
@@ -220,7 +220,7 @@ export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: Rena
 
 	const handleRename = () => {
 		if (tempName.trim()) {
-			TilemapLayerService.renameLayer(layerId, tempName, isRenameByUIRef.current);
+			TilemapLayerActions.renameLayer(layerId, tempName, isRenameByUIRef.current);
 		}
 		isRenameByUIRef.current = false;
 		store.setEditingId(null);

@@ -1,5 +1,5 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
 import { ArrowDown, ArrowDownToLine, ArrowUp, ArrowUpToLine, Columns3Cog, Copy, Eye, Folder, Grid2X2, Group, Image, Layers, Layers2, Lock, Scan, Scissors, Shapes, Trash2, Ungroup } from "lucide-react";
 
 const isTilemapSessionOpen = (): boolean => {
@@ -27,14 +27,14 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 					label: "menu.layer.action.newLayer.tileLayer",
 					startIcon: <Grid2X2 />,
 					disabled: () => numSelectedLayers() == 0,
-					onClick: () => TilemapLayerService.createNewTileLayer()
+					onClick: () => TilemapLayerActions.createNewTileLayer()
 				},
 				{
 					type: "option",
 					label: "menu.layer.action.newLayer.ruleLayer",
 					startIcon: <Grid2X2 />,
 					disabled: () => numSelectedLayers() == 0,
-					onClick: () => TilemapLayerService.createNewRuleLayer()
+					onClick: () => TilemapLayerActions.createNewRuleLayer()
 				},
 				{
 					type: "option",
@@ -58,7 +58,7 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 					label: "menu.layer.action.newLayer.groupLayer",
 					startIcon: <Folder />,
 					disabled: () => !isTilemapSessionOpen(),
-					onClick: () => TilemapLayerService.createNewGroupLayer()
+					onClick: () => TilemapLayerActions.createNewGroupLayer()
 				},
 			],
 			[
@@ -107,7 +107,7 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 		label: "menu.layer.action.duplicateLayer",
 		startIcon: <Layers2 />,
 		disabled: () => numSelectedLayers() == 0,
-		onClick: () => TilemapLayerService.duplicateLayer(),
+		onClick: () => TilemapLayerActions.duplicateLayer(),
 	},
 	{
 		type: "option",
@@ -130,7 +130,7 @@ const LayerDropdownOptionGroup1: MenuDropDownGroupType = [
 		label: "menu.layer.action.deleteLayer",
 		startIcon: <Trash2 />,
 		disabled: () => numSelectedLayers() == 0,
-		onClick: () => TilemapLayerService.deleteLayer(),
+		onClick: () => TilemapLayerActions.deleteLayer(),
 	},
 ];
 
@@ -140,21 +140,21 @@ const LayerDropdownOptionGroup2: MenuDropDownGroupType = [
 		label: "menu.layer.action.selectAllLayers",
 		startIcon: <Scan />,
 		disabled: () => !isTilemapSessionOpen(),
-		onClick: () => TilemapLayerService.selectAllLayers(),
+		onClick: () => TilemapLayerActions.selectAllLayers(),
 	},
 	{
 		type: "option",
 		label: "menu.layer.action.raiseLayer",
 		startIcon: <ArrowUp />,
 		disabled: () => numSelectedLayers() != 1,
-		onClick: () => TilemapLayerService.moveLayersUp(),
+		onClick: () => TilemapLayerActions.moveLayersUp(),
 	},
 	{
 		type: "option",
 		label: "menu.layer.action.lowerLayer",
 		startIcon: <ArrowDown />,
 		disabled: () => numSelectedLayers() != 1,
-		onClick: () => TilemapLayerService.moveLayersDown(),
+		onClick: () => TilemapLayerActions.moveLayersDown(),
 	},
 ];
 
@@ -164,28 +164,28 @@ const LayerDropdownOptionGroup3: MenuDropDownGroupType = [
 		label: "menu.layer.action.showHideLayer",
 		startIcon: <Eye />,
 		disabled: () => numSelectedLayers() == 0,
-		onClick: () => TilemapLayerService.toggleSelectedLayersVisibility(),
+		onClick: () => TilemapLayerActions.toggleSelectedLayersVisibility(),
 	},
 	{
 		type: "option",
 		label: "menu.layer.action.lockUnlockLayer",
 		startIcon: <Lock />,
 		disabled: () => numSelectedLayers() == 0,
-		onClick: () => TilemapLayerService.toggleSelectedLayersLock(),
+		onClick: () => TilemapLayerActions.toggleSelectedLayersLock(),
 	},
 	{
 		type: "option",
 		label: "menu.layer.action.showHideOtherLayers",
 		startIcon: <Eye />,
 		disabled: () => !isTilemapSessionOpen(),
-		onClick: () => TilemapLayerService.toggleNonSelectedLayersVisibility(),
+		onClick: () => TilemapLayerActions.toggleNonSelectedLayersVisibility(),
 	},
 	{
 		type: "option",
 		label: "menu.layer.action.lockUnlockOtherLayers",
 		startIcon: <Lock />,
 		disabled: () => !isTilemapSessionOpen(),
-		onClick: () => TilemapLayerService.toggleNonSelectedLayersLock(),
+		onClick: () => TilemapLayerActions.toggleNonSelectedLayersLock(),
 	},
 ]
 

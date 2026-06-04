@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, Boxes, Copy, Folder, Grid3x3, Image, Plus, Trash2 } from "lucide-react";
 
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 
 const isTilemapSessionOpen = (): boolean => {
@@ -27,28 +27,28 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					label: "workspace.layerManager.contextMenu.new.tileLayer",
 					startIcon: <Grid3x3 className="text-emerald-500" />,
 					disabled: () => !isTilemapSessionOpen(),
-					onClick() { TilemapLayerService.createNewTileLayer() },
+					onClick() { TilemapLayerActions.createNewTileLayer() },
 				},
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.ruleLayer",
 					startIcon: <Grid3x3 className="text-yellow-300" />,
 					disabled: () => !isTilemapSessionOpen(),
-					onClick() { TilemapLayerService.createNewRuleLayer() },
+					onClick() { TilemapLayerActions.createNewRuleLayer() },
 				},
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.groupLayer",
 					startIcon: <Folder className="text-blue-500" />,
 					disabled: () => !isTilemapSessionOpen(),
-					onClick() { TilemapLayerService.createNewGroupLayer() },
+					onClick() { TilemapLayerActions.createNewGroupLayer() },
 				},
 				{
 					type: "option",
 					label: "workspace.layerManager.contextMenu.new.entityLayer",
 					startIcon: <Boxes className="text-cyan-400" />,
 					disabled: () => !isTilemapSessionOpen(),
-					onClick() { TilemapLayerService.createNewEntityLayer() },
+					onClick() { TilemapLayerActions.createNewEntityLayer() },
 				},
 				{
 					type: "option",
@@ -56,7 +56,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 					startIcon: <Image className="text-purple-400" />,
 					disabled: () => !isTilemapSessionOpen(),
 					onClick() {
-						TilemapLayerService.createNewImageLayer();
+						TilemapLayerActions.createNewImageLayer();
 					},
 				},
 			],
@@ -89,7 +89,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		startIcon: <Copy />,
 		disabled: () => numSelectedLayers() == 0,
 		onClick() {
-            TilemapLayerService.duplicateLayer();
+            TilemapLayerActions.duplicateLayer();
         },
 	},
 ];
@@ -98,13 +98,13 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 	{
 		type: "option",
 		label: "workspace.layerManager.contextMenu.selectAll",
-		onClick() { TilemapLayerService.selectAllLayers() },
+		onClick() { TilemapLayerActions.selectAllLayers() },
 	},
     {
 		type: "option",
 		label: "workspace.layerManager.contextMenu.unselectAll",
         disabled: () => numSelectedLayers() == 0,
-		onClick() { TilemapLayerService.deselectAllLayers() },
+		onClick() { TilemapLayerActions.deselectAllLayers() },
 	},
 	{
 		type: "option",
@@ -112,7 +112,7 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 		startIcon: <ArrowUp />,
 		disabled: () => numSelectedLayers() != 1,
 		onClick() {
-            TilemapLayerService.moveLayersUp();
+            TilemapLayerActions.moveLayersUp();
         },
 	},
 	{
@@ -121,7 +121,7 @@ const MoveLayerActionGroup: MenuDropDownGroupType = [
 		startIcon: <ArrowDown />,
 		disabled: () => numSelectedLayers() != 1,
 		onClick() {
-            TilemapLayerService.moveLayersDown();
+            TilemapLayerActions.moveLayersDown();
         },
 	},
 ];
@@ -132,7 +132,7 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 		label: "workspace.layerManager.contextMenu.showHide",
         disabled: () => numSelectedLayers() == 0,
 		onClick() {
-            TilemapLayerService.toggleSelectedLayersVisibility();
+            TilemapLayerActions.toggleSelectedLayersVisibility();
         },
 	},
 	{
@@ -140,7 +140,7 @@ const PropertiesActionGroup: MenuDropDownGroupType = [
 		label: "workspace.layerManager.contextMenu.lockUnlock",
         disabled: () => numSelectedLayers() == 0,
 		onClick() {
-            TilemapLayerService.toggleSelectedLayersLock();
+            TilemapLayerActions.toggleSelectedLayersLock();
         },
 	},
 ];
@@ -153,7 +153,7 @@ const DeleteActionGroup: MenuDropDownGroupType = [
 		variant: "destructive",
         disabled: () => numSelectedLayers() == 0,
 		onClick() {
-            TilemapLayerService.deleteLayer();
+            TilemapLayerActions.deleteLayer();
         },
 	}
 ];

@@ -3,7 +3,7 @@ import { Tileset } from "@/editor/model/tileset/tileset";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { TilesetStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { TilesetData, TilesetMetadata } from "@/shared/data-types/tileset.data";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
@@ -84,8 +84,8 @@ export class TilesetManager {
                 actions: [{
                     label: "global.action.tileset.import", variant: "outline",
                     onClick: async () => {
-                        const { TilesetService } = await import("@/shared/services/tileset.service");
-                        return await TilesetService.importTileset(id);
+                        const TilesetActions = await import("@/application/actions/tileset.actions");
+                        return await TilesetActions.importTileset(id);
                     }
                 }]
             }, customId);
@@ -104,15 +104,15 @@ export class TilesetManager {
                     {
                         label: "global.action.tileset.import", variant: "outline",
                         onClick: async () => {
-                            const { TilesetService } = await import("@/shared/services/tileset.service");
-                            return await TilesetService.importTileset(id);
+                            const TilesetActions = await import("@/application/actions/tileset.actions");
+                            return await TilesetActions.importTileset(id);
                         }
                     },
                     {
                         label: "global.action.tileset.remove", variant: "destructive",
                         onClick: async () => {
-                            const { TilesetService } = await import("@/shared/services/tileset.service");
-                            return await TilesetService.removeTileset(id);
+                            const TilesetActions = await import("@/application/actions/tileset.actions");
+                            return await TilesetActions.removeTilesetFromProject(id);
                         }
                     },
                 ]

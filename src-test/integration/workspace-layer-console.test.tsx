@@ -19,6 +19,8 @@ const workspaceUiMocks = vi.hoisted(() => ({
         renameLayer: vi.fn(),
         createNewTileLayer: vi.fn(),
         createNewRuleLayer: vi.fn(),
+        createNewImageLayer: vi.fn(),
+        createNewEntityLayer: vi.fn(),
         createNewGroupLayer: vi.fn(),
         moveLayersUp: vi.fn(),
         moveLayersDown: vi.fn(),
@@ -29,7 +31,7 @@ const workspaceUiMocks = vi.hoisted(() => ({
 
 vi.mock("uuid", () => ({ v4: workspaceUiMocks.uuid }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: workspaceUiMocks.appKernel }));
-vi.mock("@/shared/services/tilemap-layer.service", () => ({ TilemapLayerService: workspaceUiMocks.layerService }));
+vi.mock("@/application/actions/tilemap-layer.actions", () => workspaceUiMocks.layerService);
 vi.mock("react-i18next", () => ({
     initReactI18next: {
         type: "3rdParty",

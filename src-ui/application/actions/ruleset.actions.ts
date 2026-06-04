@@ -4,18 +4,16 @@ import { Result } from "@/shared/types/result";
 import { CreateRulesetPayload, RulesetData } from "@/shared/data-types/ruleset.data";
 import { RulesetStorageService } from "@/infrastructure/container";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { FileDialogUtils } from "../utils/file-dialog.utils";
-import { DialogService } from "./dialog.service";
-import { createRulesetForm } from "../constant/form/create-ruleset.form";
-import { WorkspaceService } from "./workspace.service";
-import i18n from "@/shared/services/i18n.service";
-import { Console } from "./console.service";
-import { PathUtils } from "../utils/path.utils";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import { createRulesetForm } from "@/shared/constant/form/create-ruleset.form";
+import { saveCurrentWorkspace } from "@/application/actions/workspace.actions";
+import i18n from "@/app/providers/i18n";
+import { Console } from "@/ui/notifications/console-gateway";
+import { PathUtils } from "@/shared/utils/path.utils";
 import { extractRulesetId, normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
 
-export class RulesetService {
-
-    public static async createRuleset(): Promise<void> {
+export async function createRuleset(): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -59,12 +57,12 @@ export class RulesetService {
         await currentProject.rulesetManager.addRuleset(rulesetData, rulesetAbsPath);
 
         await editorFacade.projectManager.saveCurrrentProject();
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await saveCurrentWorkspace({ waitForTimeout: false });
 
         Console.success({ message: "message.ruleset.createSuccess" });
-    }
+}
 
-    public static async importRuleset(refRulesetId?: string): Promise<Result> {
+export async function importRuleset(refRulesetId?: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -115,9 +113,9 @@ export class RulesetService {
         Console.success({ message: "message.ruleset.importSuccess" });
 
         return Result.Success();
-    }
+}
 
-    public static async removeRuleset(rulesetId: string): Promise<Result> {
+export async function removeRulesetFromProject(rulesetId: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
 
@@ -144,14 +142,15 @@ export class RulesetService {
         if (removeResult.status == Result.Status.Success && rulesetSessionManager) {
             const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
             if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
-            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            await saveCurrentWorkspace({ waitForTimeout: false });
         }
 
         return removeResult
-    }
+}
 
-    public static async deleteRuleset(rulesetId: string): Promise<void> {
-        const currentProject = appKernel.editorFacade.currentProject;
+export async function deleteRulesetFile(rulesetId: string): Promise<void> {
+        const editorFacade = appKernel.editorFacade;
+        const currentProject = editorFacade.currentProject;
         if (!currentProject) return;
         const rulesetManager = currentProject.rulesetManager;
 
@@ -176,13 +175,12 @@ export class RulesetService {
             return;
         }
 
-        await appKernel.projectManager.saveCurrrentProject();
+        await editorFacade.projectManager.saveCurrrentProject();
 
-        const rulesetSessionManager = appKernel.workspaceManager.currentWorkspace?.rulesetSessionManager;
+        const rulesetSessionManager = editorFacade.currentWorkspace?.rulesetSessionManager;
         if (rulesetSessionManager) {
             const selectedRuleId = rulesetSessionManager.getSelectedRuleId();
             if (selectedRuleId === rulesetId) rulesetSessionManager.setSelectedRuleId(null);
-            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            await saveCurrentWorkspace({ waitForTimeout: false });
         }
-    }
 }

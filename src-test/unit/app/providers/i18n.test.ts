@@ -7,7 +7,7 @@ vi.mock("react-i18next", () => ({
     },
 }));
 
-import i18n, { i18nService } from "@/shared/services/i18n.service";
+import i18n, { i18nService } from "@/app/providers/i18n";
 
 describe("i18nService", () => {
     beforeEach(async () => {

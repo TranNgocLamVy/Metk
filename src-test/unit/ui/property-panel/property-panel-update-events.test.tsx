@@ -27,7 +27,7 @@ const propertyPanelMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: propertyPanelMocks.appKernel }));
-vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: propertyPanelMocks.workspaceService }));
+vi.mock("@/application/actions/workspace.actions", () => propertyPanelMocks.workspaceService);
 
 import PropertyPanel from "@/ui/workspace/properties-panel/PropertyPanel";
 import { useProjectStore } from "@/ui/stores/project.store";

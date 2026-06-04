@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { Console } from "@/shared/services/console.service";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import { Console } from "@/ui/notifications/console-gateway";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { Result } from "@/shared/types/result";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
@@ -65,7 +65,7 @@ export default function EditEntityDefinitionSidebar({ dialogId }: EditEntityDefi
         }
 
         await editorFacade.projectManager.saveCurrrentProject();
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await WorkspaceActions.saveCurrentWorkspace({ waitForTimeout: false });
 
         Console.success({
             message: {

@@ -8,7 +8,7 @@ import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { EntityCollectionData, EntityCollectionMetadata } from "@/shared/data-types/entity-collection.data";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Result } from "@/shared/types/result";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { normalizeEntityCollectionData } from "@/editor/model/entity/entity.normalizer";
 import { TilesetManager } from "../tileset/tileset.manager";
 import { TilesetRefManager } from "../references/tileset-ref.manager";

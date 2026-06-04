@@ -1,5 +1,5 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { RulesetService } from "@/shared/services/ruleset.service";
+import * as RulesetActions from "@/application/actions/ruleset.actions";
 import { usePropertyStore } from "@/ui/stores/property.store";
 import { Info, Plus } from "lucide-react";
 
@@ -9,7 +9,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 		label: "workspace.rulesetManager.contextMenu.new",
 		startIcon: <Plus />,
 		onClick() {
-			RulesetService.createRuleset();
+			RulesetActions.createRuleset();
 		}
 	},
 	{

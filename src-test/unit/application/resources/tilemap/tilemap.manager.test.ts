@@ -9,7 +9,7 @@ const storageState = vi.hoisted(() => ({
 }));
 
 vi.mock("@/infrastructure/container", () => storageState);
-vi.mock("@/shared/services/console.service", () => ({
+vi.mock("@/ui/notifications/console-gateway", () => ({
     Console: {
         log: vi.fn(),
         success: vi.fn(),

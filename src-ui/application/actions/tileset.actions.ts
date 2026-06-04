@@ -5,19 +5,18 @@ import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 
 import { extractTilesetId } from "@/editor/model/tileset/tileset.normalizer";
 import { TilesetStorageService } from "@/infrastructure/container";
-import i18n from "@/shared/services/i18n.service";
+import i18n from "@/app/providers/i18n";
 import { readFile } from "@tauri-apps/plugin-fs";
-import { createTilesetForm } from "../constant/form/create-tileset.form";
-import { Result } from "../types/result";
-import { FileDialogUtils } from "../utils/file-dialog.utils";
-import { PathUtils } from "../utils/path.utils";
-import { TextureUtils } from "../utils/texture.utils";
-import { Console } from "./console.service";
-import { DialogService } from "./dialog.service";
-import { WorkspaceService } from "./workspace.service";
+import { createTilesetForm } from "@/shared/constant/form/create-tileset.form";
+import { Result } from "@/shared/types/result";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { PathUtils } from "@/shared/utils/path.utils";
+import { TextureUtils } from "@/shared/utils/texture.utils";
+import { Console } from "@/ui/notifications/console-gateway";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import { closeTilesetSession, createTilesetSession, saveCurrentWorkspace } from "@/application/actions/workspace.actions";
 
-export class TilesetService {
-    public static async createTileset(): Promise<void> {
+export async function createTileset(): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -44,7 +43,7 @@ export class TilesetService {
 
             const textureAbsDir = PathUtils.dirname(textureAbsPath);
             currentWorkspace.savedPathManager.setTextureDir(textureAbsDir);
-            tilesetData = await TilesetService.createSingleImageTilesetData({
+            tilesetData = await createSingleImageTilesetData({
                 name: form.tileset.name,
                 tilesetAbsDir,
                 textureAbsPath,
@@ -52,7 +51,7 @@ export class TilesetService {
                 tileHeight: form.image.setting.tile.tileHeight,
             })
         } else {
-            tilesetData = await TilesetService.createImageCollectionTilesetData({
+            tilesetData = await createImageCollectionTilesetData({
                 name: form.tileset.name,
                 tilesetAbsDir,
             })
@@ -70,13 +69,13 @@ export class TilesetService {
         await currentProject.tilesetManager.addTileset(tilesetData, tilesetAbsPath);
         await editorFacade.projectManager.saveCurrrentProject();
 
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-        await WorkspaceService.createTilesetSession(tilesetData.id);
+        await saveCurrentWorkspace({ waitForTimeout: false });
+        await createTilesetSession(tilesetData.id);
 
         Console.success({ message: "message.tileset.createSuccess" });
-    }
+}
 
-    private static async createSingleImageTilesetData(args: { name: string; tilesetAbsDir: string; textureAbsPath: string; tileWidth: number; tileHeight: number }): Promise<TilesetData> {
+async function createSingleImageTilesetData(args: { name: string; tilesetAbsDir: string; textureAbsPath: string; tileWidth: number; tileHeight: number }): Promise<TilesetData> {
         const fileBuffer = await readFile(args.textureAbsPath);
         const image = await TextureUtils.processImage(fileBuffer);
 
@@ -98,9 +97,9 @@ export class TilesetService {
             tileWidth: args.tileWidth,
             tileHeight: args.tileHeight,
         };
-    }
+}
 
-    private static async createImageCollectionTilesetData(args: { name: string; tilesetAbsDir: string }): Promise<TilesetData> {
+async function createImageCollectionTilesetData(args: { name: string; tilesetAbsDir: string }): Promise<TilesetData> {
         return {
             id: uuidv4(),
             name: args.name,
@@ -111,9 +110,9 @@ export class TilesetService {
             tileHeight: 1,
             tiles: [],
         };
-    }
+}
 
-    public static async importTileset(refTilesetId?: string): Promise<Result> {
+export async function importTileset(refTilesetId?: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -161,14 +160,14 @@ export class TilesetService {
 
         await editorFacade.projectManager.saveCurrrentProject();
 
-        WorkspaceService.createTilesetSession(addTilesetResult.data.id);
+        createTilesetSession(addTilesetResult.data.id);
 
         Console.success({ message: { key: "message.tileset.importSuccess", options: { name: addTilesetResult.data.name } } });
 
         return Result.Success();
-    }
+}
 
-    public static async removeTileset(tilesetId: string): Promise<Result> {
+export async function removeTilesetFromProject(tilesetId: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
 
@@ -195,14 +194,14 @@ export class TilesetService {
 
         const tilesetSession = editorFacade.currentWorkspace?.tilesetSessionManager.getSessionByTilesetId(tilesetId);
         if (tilesetSession) {
-            await WorkspaceService.closeTilesetSession(tilesetSession.id);
-            await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            await closeTilesetSession(tilesetSession.id);
+            await saveCurrentWorkspace({ waitForTimeout: false });
         }
 
         return removeResult;
-    }
+}
 
-    public static async deleteTileset(tilesetId: string): Promise<void> {
+export async function deleteTilesetFile(tilesetId: string): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -230,6 +229,5 @@ export class TilesetService {
         await editorFacade.projectManager.saveCurrrentProject();
 
         const tilesetSession = currentWorkspace.tilesetSessionManager.getSessionByTilesetId(tilesetId);
-        if (tilesetSession) await WorkspaceService.closeTilesetSession(tilesetSession.id);
+        if (tilesetSession) await closeTilesetSession(tilesetSession.id);
     }
-}

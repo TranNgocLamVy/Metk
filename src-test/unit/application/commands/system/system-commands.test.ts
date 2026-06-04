@@ -10,7 +10,7 @@ import { UndoCommand } from "@/application/command-system/undo.command";
 import { EditorFacade } from "@/application/editor.facade";
 import { ExportStorageService } from "@/infrastructure/export-storage.service";
 import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";
@@ -54,7 +54,7 @@ vi.mock("@/infrastructure/export-storage.service", () => ({
     }),
 }));
 
-vi.mock("@/shared/services/console.service", () => ({
+vi.mock("@/ui/notifications/console-gateway", () => ({
     Console: {
         success: mockState.consoleSuccess,
         error: mockState.consoleError,

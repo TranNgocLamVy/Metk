@@ -1,5 +1,5 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
@@ -20,12 +20,12 @@ export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
     const tilesets = currentProject.tilesetManager.serialize();
 
     const onOpenTilemap = (tilemapId: string) => {
-        WorkspaceService.createTilemapSession(tilemapId);
+        WorkspaceActions.createTilemapSession(tilemapId);
         closeDialog(dialogId);
     }
 
     const onOpenTileset = (tilesetId: string) => {
-        WorkspaceService.createTilesetSession(tilesetId);
+        WorkspaceActions.createTilesetSession(tilesetId);
     }
 
     const onOpenChange = (open: boolean) => {

@@ -1,5 +1,5 @@
-import { DialogService } from "@/shared/services/dialog.service";
-import { RulesetService } from "@/shared/services/ruleset.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import * as RulesetActions from "@/application/actions/ruleset.actions";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -17,13 +17,13 @@ export default function RulesetMenuBar() {
 
     const onDeleteRule = useCallback(() => {
         if (!currentSelectedRuleId) return;
-        RulesetService.deleteRuleset(currentSelectedRuleId);
+        RulesetActions.deleteRulesetFile(currentSelectedRuleId);
     }, [currentSelectedRuleId])
 
     return (
         <HStack className="bg-surface w-full p-1 gap-0.5">
             <QuickToolTip toolTip={"workspace.rulesetManager.menu.new"}>
-                <Button variant={"ghost"} size={"icon-sm"} onClick={RulesetService.createRuleset}>
+                <Button variant={"ghost"} size={"icon-sm"} onClick={RulesetActions.createRuleset}>
                     <Plus />
                 </Button>
             </QuickToolTip>

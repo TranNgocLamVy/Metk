@@ -1,5 +1,5 @@
-import { DialogService } from "@/shared/services/dialog.service";
-import { RulesetService } from "@/shared/services/ruleset.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import * as RulesetActions from "@/application/actions/ruleset.actions";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -18,7 +18,7 @@ export default function RulesetTab() {
 
     const onDeleteRule = useCallback(() => {
         if (!currentSelectedRuleId) return;
-        RulesetService.deleteRuleset(currentSelectedRuleId);
+        RulesetActions.deleteRulesetFile(currentSelectedRuleId);
     }, [currentSelectedRuleId])
 
     return (
@@ -30,7 +30,7 @@ export default function RulesetTab() {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent side="bottom">
-					<DropdownMenuItem onClick={RulesetService.createRuleset}>
+					<DropdownMenuItem onClick={RulesetActions.createRuleset}>
 						<Plus />
 						<LocalizedText message="workspace.rulesetManager.dropdown.new" />
 					</DropdownMenuItem>

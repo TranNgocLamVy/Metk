@@ -1,16 +1,15 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { Result } from "../types/result";
-import { FileDialogUtils } from "../utils/file-dialog.utils";
+import { Result } from "@/shared/types/result";
+import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { readFile } from "@tauri-apps/plugin-fs";
-import { TextureUtils } from "../utils/texture.utils";
+import { TextureUtils } from "@/shared/utils/texture.utils";
 import { Texture } from "pixi.js";
-import { PathUtils } from "../utils/path.utils";
-import { Console } from "./console.service";
-import { DialogService } from "./dialog.service";
+import { PathUtils } from "@/shared/utils/path.utils";
+import { Console } from "@/ui/notifications/console-gateway";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 
-export class TextureService {
-    public static async importTexture(tilesetId: string): Promise<Result> {
+export async function importTexture(tilesetId: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -57,5 +56,4 @@ export class TextureService {
         Console.success({ message: "message.texture.importSuccess" })
 
         return Result.Success();
-    }
 }

@@ -1,13 +1,13 @@
 import { Ellipsis, Pen, Plus, Trash2, X } from "lucide-react";
 import { useCallback, useRef } from "react";
 
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
 import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { DialogService } from "@/shared/services/dialog.service";
-import { TilesetService } from "@/shared/services/tileset.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import * as TilesetActions from "@/application/actions/tileset.actions";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -32,7 +32,7 @@ export default function TilesetViewTabs() {
 		const tilesetSession = appKernel.editorFacade.getActiveTilesetSession();
 		if (!tilesetSession) return;
 		const selectedTilesetId = tilesetSession.tileset.id;
-		TilesetService.deleteTileset(selectedTilesetId);
+		TilesetActions.deleteTilesetFile(selectedTilesetId);
 	}, [])
 
 	return (
@@ -44,7 +44,7 @@ export default function TilesetViewTabs() {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent side="top">
-					<DropdownMenuItem onClick={TilesetService.createTileset}>
+					<DropdownMenuItem onClick={TilesetActions.createTileset}>
 						<Plus />
 						<LocalizedText message="workspace.tilesetSelector.dropdown.new" />
 					</DropdownMenuItem>
@@ -64,11 +64,11 @@ export default function TilesetViewTabs() {
 					const isCurrent = activeSession?.id === tilesetSession.sessionId;
 					const openTilesetSession = () => {
 						if (isCurrent) return;
-						WorkspaceService.openTilesetSession(tilesetSession.sessionId);
+						WorkspaceActions.openTilesetSession(tilesetSession.sessionId);
 					};
 					const closeTilesetSession = (e: any) => {
 						e.stopPropagation();
-						WorkspaceService.closeTilesetSession(tilesetSession.sessionId);
+						WorkspaceActions.closeTilesetSession(tilesetSession.sessionId);
 					};
 					return (
 						<Button key={tilesetSession.sessionId}

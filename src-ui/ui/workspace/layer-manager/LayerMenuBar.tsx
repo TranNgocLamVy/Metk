@@ -1,4 +1,4 @@
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
@@ -29,45 +29,45 @@ export default function LayerMenuBar() {
                     </QuickToolTip>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top">
-                    <DropdownMenuItem onClick={TilemapLayerService.createNewTileLayer}>
+                    <DropdownMenuItem onClick={TilemapLayerActions.createNewTileLayer}>
                         <Grid3x3 className="text-emerald-500" />
                         <LocalizedText message="workspace.layerManager.menu.new.tileLayer" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={TilemapLayerService.createNewRuleLayer}>
+                    <DropdownMenuItem onClick={TilemapLayerActions.createNewRuleLayer}>
                         <Grid3x3 className="text-yellow-300" />
                         <LocalizedText message="workspace.layerManager.menu.new.ruleLayer" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={TilemapLayerService.createNewImageLayer}>
+                    <DropdownMenuItem onClick={TilemapLayerActions.createNewImageLayer}>
                         <Image className="text-fuchsia-500" />
                         <LocalizedText message="workspace.layerManager.menu.new.imageLayer" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={TilemapLayerService.createNewEntityLayer}>
+                    <DropdownMenuItem onClick={TilemapLayerActions.createNewEntityLayer}>
                         <Boxes className="text-cyan-400" />
                         <LocalizedText message="workspace.layerManager.menu.new.entityLayer" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={TilemapLayerService.createNewGroupLayer}>
+                    <DropdownMenuItem onClick={TilemapLayerActions.createNewGroupLayer}>
                         <Folder className="text-blue-500" />
                         <LocalizedText message="workspace.layerManager.menu.new.groupLayer" />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
             <QuickToolTip toolTip={"workspace.layerManager.menu.raiseLayer"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer || !singleSelected} onClick={TilemapLayerService.moveLayersUp}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer || !singleSelected} onClick={TilemapLayerActions.moveLayersUp}>
                     <ArrowBigUp />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.layerManager.menu.lowerLayer"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer || !singleSelected} onClick={TilemapLayerService.moveLayersDown}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer || !singleSelected} onClick={TilemapLayerActions.moveLayersDown}>
                     <ArrowBigDown />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.layerManager.menu.duplicate"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={TilemapLayerService.duplicateLayer}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={TilemapLayerActions.duplicateLayer}>
                     <Copy />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.layerManager.menu.delete"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} className="text-destructive" onClick={TilemapLayerService.deleteLayer}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} className="text-destructive" onClick={TilemapLayerActions.deleteLayer}>
                     <Trash2 />
                 </Button>
             </QuickToolTip>
@@ -75,12 +75,12 @@ export default function LayerMenuBar() {
                 <Separator orientation="vertical" className="bg-foreground/20 h-4" />
             </VStack>
             <QuickToolTip toolTip={"workspace.layerManager.menu.showHideSelected"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerService.toggleVisibility(selectedLayers)}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerActions.toggleVisibility(selectedLayers)}>
                     <Eye />
                 </Button>
             </QuickToolTip>
             <QuickToolTip toolTip={"workspace.layerManager.menu.lockUnlockSelected"}>
-                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerService.toggleLock(selectedLayers)}>
+                <Button variant={"ghost"} size={"icon-sm"} disabled={!hasSelectedLayer} onClick={() => TilemapLayerActions.toggleLock(selectedLayers)}>
                     <Lock />
                 </Button>
             </QuickToolTip>

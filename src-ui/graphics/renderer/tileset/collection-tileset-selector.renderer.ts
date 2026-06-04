@@ -7,7 +7,7 @@ import {
 } from "pixi.js";
 
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 import {
     CollectionTileLayout,
@@ -104,7 +104,7 @@ export class CollectionTilesetSelectorRenderer {
             selectedTilesSet,
         });
 
-        WorkspaceService.saveCurrentWorkspace({
+        WorkspaceActions.saveCurrentWorkspace({
             waitForTimeout: false,
         });
     }
@@ -118,7 +118,7 @@ export class CollectionTilesetSelectorRenderer {
 
         this.graphics.clear();
 
-        WorkspaceService.saveCurrentWorkspace({
+        WorkspaceActions.saveCurrentWorkspace({
             waitForTimeout: false,
         });
     }

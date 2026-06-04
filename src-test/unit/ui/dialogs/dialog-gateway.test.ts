@@ -25,7 +25,7 @@ const dialogMocks = vi.hoisted(() => {
 vi.mock("uuid", () => ({ v4: dialogMocks.uuid }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: dialogMocks.appKernel }));
 
-import { DialogService } from "@/shared/services/dialog.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { DialogZLevel } from "@/shared/types/dialog";
 import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { DIALOG_TYPES } from "@/ui/components/dialog/dialogRegistry";
@@ -50,9 +50,7 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({
     appKernel: mockState.appKernel,
 }));
 
-vi.mock("@/shared/services/workspace.service", () => ({
-    WorkspaceService: mockState.workspaceService,
-}));
+vi.mock("@/application/actions/workspace.actions", () => mockState.workspaceService);
 
 vi.mock("react-i18next", () => ({
     initReactI18next: {
@@ -311,7 +309,7 @@ describe("Metk dialog and form integration workflows", () => {
 
         await user.click(screen.getByText("Dungeon"));
 
-        expect(WorkspaceService.createTilemapSession).toHaveBeenCalledWith("dungeon");
+        expect(WorkspaceActions.createTilemapSession).toHaveBeenCalledWith("dungeon");
         expect(useDialogStore.getState().dialogs).toEqual([]);
     });
 
@@ -331,8 +329,8 @@ describe("Metk dialog and form integration workflows", () => {
 
         await user.click(screen.getByRole("button", { name: "Close" }));
 
-        expect(WorkspaceService.createTilemapSession).not.toHaveBeenCalled();
-        expect(WorkspaceService.createTilesetSession).not.toHaveBeenCalled();
+        expect(WorkspaceActions.createTilemapSession).not.toHaveBeenCalled();
+        expect(WorkspaceActions.createTilesetSession).not.toHaveBeenCalled();
         expect(useDialogStore.getState().dialogs).toEqual([]);
     });
 

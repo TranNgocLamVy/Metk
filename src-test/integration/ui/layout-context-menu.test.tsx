@@ -37,8 +37,8 @@ const uiMocks = vi.hoisted(() => {
     };
 });
 
-vi.mock("@/shared/services/i18n.service", () => ({ default: uiMocks.i18n }));
-vi.mock("@/shared/services/tilemap-layer.service", () => ({ TilemapLayerService: uiMocks.layerService }));
+vi.mock("@/app/providers/i18n", () => ({ default: uiMocks.i18n }));
+vi.mock("@/application/actions/tilemap-layer.actions", () => uiMocks.layerService);
 vi.mock("react-i18next", () => ({
     initReactI18next: {
         type: "3rdParty",

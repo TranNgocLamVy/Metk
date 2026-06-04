@@ -3,7 +3,7 @@ import { Application, Container } from "pixi.js";
 
 import { IBaseView } from "@/editor/interface/base-session.interface";
 import { TilemapSession } from "@/editor/session/tilemap.session";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 import { TilemapGridRenderer } from "../renderer/tilemap/tilemap-grid.renderer";
 import { TilemapRenderer } from "../renderer/tilemap/tilemap.renderer";
@@ -69,14 +69,14 @@ export class TilemapView implements IBaseView {
                 x: this.viewport.center.x,
                 y: this.viewport.center.y,
             });
-            WorkspaceService.saveCurrentWorkspace();
+            WorkspaceActions.saveCurrentWorkspace();
         });
 
         this.viewport.on("zoomed-end", () => {
             this.session.updateViewState({
                 zoom: this.viewport.scaled
             });
-            WorkspaceService.saveCurrentWorkspace();
+            WorkspaceActions.saveCurrentWorkspace();
         });
 
         this.viewport.on("drag-start", () => {

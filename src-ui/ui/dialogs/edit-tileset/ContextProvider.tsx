@@ -4,7 +4,7 @@ import { readFile } from "@tauri-apps/plugin-fs";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";

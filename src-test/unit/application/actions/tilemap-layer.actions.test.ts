@@ -24,8 +24,8 @@ import { IUndoableCommand } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 import {
     createTilemap,
@@ -100,7 +100,7 @@ const expectSingleTransaction = (
     expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
 };
 
-describe("TilemapLayerService.getSelectedParentLayer", () => {
+describe("TilemapLayerActions.getSelectedParentLayer", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
@@ -110,14 +110,14 @@ describe("TilemapLayerService.getSelectedParentLayer", () => {
         const { tilemap } = createServiceHarness();
         useLayerManagerStore.getState().setSelectedLayer(["group-a", "tile-root", "group-b"]);
 
-        expect(TilemapLayerService.getSelectedParentLayer(tilemap)?.id).toBe("group-b");
+        expect(TilemapLayerActions.getSelectedParentLayer(tilemap)?.id).toBe("group-b");
     });
 
     it("returns null when the current store selection has no group layers", () => {
         const { tilemap } = createServiceHarness();
         useLayerManagerStore.getState().setSelectedLayer(["tile-a", "tile-root"]);
 
-        expect(TilemapLayerService.getSelectedParentLayer(tilemap)).toBeNull();
+        expect(TilemapLayerActions.getSelectedParentLayer(tilemap)).toBeNull();
     });
 });
 
@@ -132,7 +132,7 @@ describe("TilemapLayerService layer creation", () => {
         const group = requireGroupLayer(root, "group-a");
         useLayerManagerStore.getState().setSelectedLayer(["group-a"]);
 
-        await TilemapLayerService.createNewTileLayer();
+        await TilemapLayerActions.createNewTileLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(CreateTileLayerCommand);
@@ -151,7 +151,7 @@ describe("TilemapLayerService layer creation", () => {
         const { root, historyManager } = createServiceHarness();
         useLayerManagerStore.getState().setSelectedLayer(["group-a"]);
 
-        await TilemapLayerService.createNewRuleLayer();
+        await TilemapLayerActions.createNewRuleLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(CreateRuleLayerCommand);
@@ -168,7 +168,7 @@ describe("TilemapLayerService layer creation", () => {
         const { root, historyManager } = createServiceHarness();
         useLayerManagerStore.getState().setSelectedLayer(["tile-root"]);
 
-        await TilemapLayerService.createNewGroupLayer();
+        await TilemapLayerActions.createNewGroupLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(CreateGroupLayerCommand);
@@ -188,7 +188,7 @@ describe("TilemapLayerService duplicate and delete workflows", () => {
         const { root, historyManager } = createServiceHarness(["tile-a", "tile-root"]);
         const group = requireGroupLayer(root, "group-a");
 
-        await TilemapLayerService.duplicateLayer();
+        await TilemapLayerActions.duplicateLayer();
 
         expectSingleTransaction(historyManager, 2);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(DuplicateLayerCommand);
@@ -203,7 +203,7 @@ describe("TilemapLayerService duplicate and delete workflows", () => {
         const { root, session, historyManager } = createServiceHarness(["tile-a", "missing-layer"]);
         const group = requireGroupLayer(root, "group-a");
 
-        await TilemapLayerService.deleteLayer();
+        await TilemapLayerActions.deleteLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(DeleteLayerCommand);
@@ -218,33 +218,33 @@ describe("TilemapLayerService selection workflows", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
-        vi.spyOn(WorkspaceService, "saveCurrentWorkspace").mockResolvedValue(undefined);
+        vi.spyOn(WorkspaceActions, "saveCurrentWorkspace").mockResolvedValue(undefined);
     });
 
     it("selects one layer, toggles multi-selection, and saves workspace state", () => {
         const { session } = createServiceHarness(["tile-root"]);
 
-        TilemapLayerService.selectLayer("tile-a", false);
+        TilemapLayerActions.selectLayer("tile-a", false);
         expect(session.layerState.selectedLayers).toEqual(["tile-a"]);
 
-        TilemapLayerService.selectLayer("group-a", true);
+        TilemapLayerActions.selectLayer("group-a", true);
         expect(session.layerState.selectedLayers).toEqual(["tile-a", "group-a"]);
 
-        TilemapLayerService.selectLayer("tile-a", true);
+        TilemapLayerActions.selectLayer("tile-a", true);
         expect(session.layerState.selectedLayers).toEqual(["group-a"]);
-        expect(WorkspaceService.saveCurrentWorkspace).toHaveBeenCalledTimes(3);
-        expect(WorkspaceService.saveCurrentWorkspace).toHaveBeenLastCalledWith({ waitForTimeout: false });
+        expect(WorkspaceActions.saveCurrentWorkspace).toHaveBeenCalledTimes(3);
+        expect(WorkspaceActions.saveCurrentWorkspace).toHaveBeenLastCalledWith({ waitForTimeout: false });
     });
 
     it("selects all layers and clears all selection using the active session", () => {
         const { root, session } = createServiceHarness(["tile-root"]);
 
-        TilemapLayerService.selectAllLayers();
+        TilemapLayerActions.selectAllLayers();
         expect(session.layerState.selectedLayers).toEqual(Array.from(root.getAllIds()));
 
-        TilemapLayerService.deselectAllLayers();
+        TilemapLayerActions.deselectAllLayers();
         expect(session.layerState.selectedLayers).toEqual([]);
-        expect(WorkspaceService.saveCurrentWorkspace).toHaveBeenCalledTimes(2);
+        expect(WorkspaceActions.saveCurrentWorkspace).toHaveBeenCalledTimes(2);
     });
 });
 
@@ -257,7 +257,7 @@ describe("TilemapLayerService visibility workflows", () => {
     it("toggles selected layers visibility through history", () => {
         const { root, historyManager } = createServiceHarness(["tile-root"]);
 
-        TilemapLayerService.toggleSelectedLayersVisibility();
+        TilemapLayerActions.toggleSelectedLayersVisibility();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(UpdatePropertyCommand);
@@ -268,7 +268,7 @@ describe("TilemapLayerService visibility workflows", () => {
     it("toggles non-selected layers visibility and leaves selected layers untouched", () => {
         const { root, historyManager } = createServiceHarness(["tile-root"]);
 
-        TilemapLayerService.toggleNonSelectedLayersVisibility();
+        TilemapLayerActions.toggleNonSelectedLayersVisibility();
 
         expectSingleTransaction(historyManager, root.getAllIds().size - 1);
         expect(root.findLayer("tile-root")?.visible).toBe(true);
@@ -278,7 +278,7 @@ describe("TilemapLayerService visibility workflows", () => {
     it("toggles explicit layer ids while ignoring missing ids", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.toggleVisibility(["tile-root", "missing-layer"], false);
+        TilemapLayerActions.toggleVisibility(["tile-root", "missing-layer"], false);
 
         expectSingleTransaction(historyManager, 1);
         expect(root.findLayer("tile-root")?.visible).toBe(false);
@@ -290,12 +290,12 @@ describe("TilemapLayerService visibility workflows", () => {
         const child = root.findLayer("tile-a")!;
         const childVisibleProperty = child.properties.get("_visible")!;
 
-        TilemapLayerService.toggleVisibility(["group-a"], false);
+        TilemapLayerActions.toggleVisibility(["group-a"], false);
         expect(group.visible).toBe(false);
         expect(child.visible).toBe(false);
         expect(childVisibleProperty.getter()).toBe(true);
 
-        TilemapLayerService.toggleVisibility(["tile-a"]);
+        TilemapLayerActions.toggleVisibility(["tile-a"]);
 
         expect(child.visible).toBe(false);
         expect(childVisibleProperty.getter()).toBe(false);
@@ -311,7 +311,7 @@ describe("TilemapLayerService lock workflows", () => {
     it("toggles selected layers lock through history", () => {
         const { root, historyManager } = createServiceHarness(["tile-root"]);
 
-        TilemapLayerService.toggleSelectedLayersLock();
+        TilemapLayerActions.toggleSelectedLayersLock();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(UpdatePropertyCommand);
@@ -322,7 +322,7 @@ describe("TilemapLayerService lock workflows", () => {
     it("toggles non-selected layers lock and leaves selected layers untouched", () => {
         const { root, historyManager } = createServiceHarness(["tile-root"]);
 
-        TilemapLayerService.toggleNonSelectedLayersLock();
+        TilemapLayerActions.toggleNonSelectedLayersLock();
 
         expectSingleTransaction(historyManager, root.getAllIds().size - 1);
         expect(root.findLayer("tile-root")?.locked).toBe(false);
@@ -332,7 +332,7 @@ describe("TilemapLayerService lock workflows", () => {
     it("toggles explicit layer ids while ignoring missing ids", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.toggleLock(["tile-root", "missing-layer"], true);
+        TilemapLayerActions.toggleLock(["tile-root", "missing-layer"], true);
 
         expectSingleTransaction(historyManager, 1);
         expect(root.findLayer("tile-root")?.locked).toBe(true);
@@ -344,19 +344,19 @@ describe("TilemapLayerService lock workflows", () => {
         const child = root.findLayer("tile-a")!;
         const childLockedProperty = child.properties.get("_locked")!;
 
-        TilemapLayerService.toggleLock(["group-a"], true);
+        TilemapLayerActions.toggleLock(["group-a"], true);
         expect(group.locked).toBe(true);
         expect(child.locked).toBe(true);
         expect(childLockedProperty.getter()).toBe(false);
 
-        TilemapLayerService.toggleLock(["tile-a"]);
+        TilemapLayerActions.toggleLock(["tile-a"]);
 
         expect(child.locked).toBe(true);
         expect(childLockedProperty.getter()).toBe(true);
     });
 });
 
-describe("TilemapLayerService.toggleOpenGroupLayer", () => {
+describe("TilemapLayerActions.toggleOpenGroupLayer", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
@@ -366,7 +366,7 @@ describe("TilemapLayerService.toggleOpenGroupLayer", () => {
         const { root, historyManager } = createServiceHarness();
         const group = requireGroupLayer(root, "group-a");
 
-        TilemapLayerService.toggleOpenGroupLayer("group-a", true);
+        TilemapLayerActions.toggleOpenGroupLayer("group-a", true);
 
         expect(group.isOpen).toBe(true);
         expect(group.properties.get("isOpen")?.getter()).toBe(true);
@@ -378,15 +378,15 @@ describe("TilemapLayerService.toggleOpenGroupLayer", () => {
         const { root, historyManager } = createServiceHarness();
         const before = root.serialize();
 
-        TilemapLayerService.toggleOpenGroupLayer("tile-root", true);
-        TilemapLayerService.toggleOpenGroupLayer("missing-layer", true);
+        TilemapLayerActions.toggleOpenGroupLayer("tile-root", true);
+        TilemapLayerActions.toggleOpenGroupLayer("missing-layer", true);
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.execute).not.toHaveBeenCalled();
     });
 });
 
-describe("TilemapLayerService.moveLayers", () => {
+describe("TilemapLayerActions.moveLayers", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
@@ -396,7 +396,7 @@ describe("TilemapLayerService.moveLayers", () => {
         const { root, historyManager } = createServiceHarness();
         const group = requireGroupLayer(root, "group-a");
 
-        TilemapLayerService.moveLayers(["tile-root"], "group-a", "inside");
+        TilemapLayerActions.moveLayers(["tile-root"], "group-a", "inside");
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(MoveLayerCommand);
@@ -406,12 +406,12 @@ describe("TilemapLayerService.moveLayers", () => {
 
     it("moves dragged layers above and below a target in the target parent", () => {
         const topHarness = createServiceHarness();
-        TilemapLayerService.moveLayers(["tile-root"], "group-b", "top");
+        TilemapLayerActions.moveLayers(["tile-root"], "group-b", "top");
         expectSingleTransaction(topHarness.historyManager, 1);
         expect(layerIds(topHarness.root)).toEqual(["group-a", "tile-root", "group-b", "rule-root"]);
 
         const bottomHarness = createServiceHarness();
-        TilemapLayerService.moveLayers(["rule-root"], "group-b", "bottom");
+        TilemapLayerActions.moveLayers(["rule-root"], "group-b", "bottom");
         expectSingleTransaction(bottomHarness.historyManager, 1);
         expect(layerIds(bottomHarness.root)).toEqual(["group-a", "group-b", "rule-root", "tile-root"]);
     });
@@ -419,7 +419,7 @@ describe("TilemapLayerService.moveLayers", () => {
     it("moves a same-parent layer downward without overshooting the target", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.moveLayers(["group-a"], "group-b", "bottom");
+        TilemapLayerActions.moveLayers(["group-a"], "group-b", "bottom");
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-b", "group-a", "tile-root", "rule-root"]);
@@ -428,7 +428,7 @@ describe("TilemapLayerService.moveLayers", () => {
     it("moves a same-parent layer upward to the correct target position", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.moveLayers(["tile-root"], "group-a", "top");
+        TilemapLayerActions.moveLayers(["tile-root"], "group-a", "top");
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["tile-root", "group-a", "group-b", "rule-root"]);
@@ -437,7 +437,7 @@ describe("TilemapLayerService.moveLayers", () => {
     it("moves multiple sibling layers below a target while preserving their visual order", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.moveLayers(["group-b", "group-a"], "tile-root", "bottom");
+        TilemapLayerActions.moveLayers(["group-b", "group-a"], "tile-root", "bottom");
 
         expectSingleTransaction(historyManager, 2);
         expect(layerIds(root)).toEqual(["tile-root", "group-a", "group-b", "rule-root"]);
@@ -446,7 +446,7 @@ describe("TilemapLayerService.moveLayers", () => {
     it("moves multiple sibling layers above a target while preserving their visual order", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.moveLayers(["rule-root", "tile-root"], "group-a", "top");
+        TilemapLayerActions.moveLayers(["rule-root", "tile-root"], "group-a", "top");
 
         expectSingleTransaction(historyManager, 2);
         expect(layerIds(root)).toEqual(["tile-root", "rule-root", "group-a", "group-b"]);
@@ -456,7 +456,7 @@ describe("TilemapLayerService.moveLayers", () => {
         const { root, historyManager } = createServiceHarness();
         const group = requireGroupLayer(root, "group-a");
 
-        TilemapLayerService.moveLayers(["rule-root", "tile-root"], "group-a", "inside");
+        TilemapLayerActions.moveLayers(["rule-root", "tile-root"], "group-a", "inside");
 
         expectSingleTransaction(historyManager, 2);
         expect(layerIds(group)).toEqual(["group-child", "tile-a", "tile-root", "rule-root"]);
@@ -468,7 +468,7 @@ describe("TilemapLayerService.moveLayers", () => {
         const { root, historyManager } = createServiceHarness();
         const group = requireGroupLayer(root, "group-a");
 
-        TilemapLayerService.moveLayers(["group-a", "tile-a"], "group-b", "bottom");
+        TilemapLayerActions.moveLayers(["group-a", "tile-a"], "group-b", "bottom");
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-b", "group-a", "tile-root", "rule-root"]);
@@ -480,7 +480,7 @@ describe("TilemapLayerService.moveLayers", () => {
         const { root, historyManager } = createServiceHarness();
         const before = root.serialize();
 
-        TilemapLayerService.moveLayers(["group-a"], "group-a", "inside");
+        TilemapLayerActions.moveLayers(["group-a"], "group-a", "inside");
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.startTransaction).not.toHaveBeenCalled();
@@ -491,7 +491,7 @@ describe("TilemapLayerService.moveLayers", () => {
         const { root, historyManager } = createServiceHarness();
         const before = root.serialize();
 
-        TilemapLayerService.moveLayers(["group-a"], "group-child", "inside");
+        TilemapLayerActions.moveLayers(["group-a"], "group-child", "inside");
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.startTransaction).not.toHaveBeenCalled();
@@ -501,21 +501,21 @@ describe("TilemapLayerService.moveLayers", () => {
     it("ignores missing dragged layers and missing targets without opening invalid transactions", () => {
         const missingDragHarness = createServiceHarness();
 
-        TilemapLayerService.moveLayers(["missing-layer"], "group-a", "inside");
+        TilemapLayerActions.moveLayers(["missing-layer"], "group-a", "inside");
 
         expect(missingDragHarness.historyManager.startTransaction).not.toHaveBeenCalled();
         expect(missingDragHarness.historyManager.execute).not.toHaveBeenCalled();
 
         const missingTargetHarness = createServiceHarness();
 
-        TilemapLayerService.moveLayers(["tile-root"], "missing-target", "inside");
+        TilemapLayerActions.moveLayers(["tile-root"], "missing-target", "inside");
 
         expect(missingTargetHarness.historyManager.startTransaction).not.toHaveBeenCalled();
         expect(missingTargetHarness.historyManager.execute).not.toHaveBeenCalled();
     });
 });
 
-describe("TilemapLayerService.moveLayersUp", () => {
+describe("TilemapLayerActions.moveLayersUp", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
@@ -524,7 +524,7 @@ describe("TilemapLayerService.moveLayersUp", () => {
     it("moves a selected layer above a normal sibling", () => {
         const { root, historyManager } = createServiceHarness(["rule-root"]);
 
-        TilemapLayerService.moveLayersUp();
+        TilemapLayerActions.moveLayersUp();
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-a", "group-b", "rule-root", "tile-root"]);
@@ -534,7 +534,7 @@ describe("TilemapLayerService.moveLayersUp", () => {
         const { root, historyManager } = createServiceHarness(["tile-root"]);
         const group = requireGroupLayer(root, "group-b");
 
-        TilemapLayerService.moveLayersUp();
+        TilemapLayerActions.moveLayersUp();
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-a", "group-b", "rule-root"]);
@@ -544,7 +544,7 @@ describe("TilemapLayerService.moveLayersUp", () => {
     it("moves the first child in a group out above its parent", () => {
         const { root, historyManager } = createServiceHarness(["group-child"]);
 
-        TilemapLayerService.moveLayersUp();
+        TilemapLayerActions.moveLayersUp();
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-child", "group-a", "group-b", "tile-root", "rule-root"]);
@@ -555,7 +555,7 @@ describe("TilemapLayerService.moveLayersUp", () => {
         const { root, historyManager } = createServiceHarness(["group-a"]);
         const before = root.serialize();
 
-        TilemapLayerService.moveLayersUp();
+        TilemapLayerActions.moveLayersUp();
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.execute).not.toHaveBeenCalled();
@@ -565,14 +565,14 @@ describe("TilemapLayerService.moveLayersUp", () => {
         const { root, historyManager } = createServiceHarness(["tile-a", "tile-root"]);
         const before = root.serialize();
 
-        TilemapLayerService.moveLayersUp();
+        TilemapLayerActions.moveLayersUp();
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.startTransaction).not.toHaveBeenCalled();
     });
 });
 
-describe("TilemapLayerService.moveLayersDown", () => {
+describe("TilemapLayerActions.moveLayersDown", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
@@ -581,7 +581,7 @@ describe("TilemapLayerService.moveLayersDown", () => {
     it("moves a selected layer below a normal sibling", () => {
         const { root, historyManager } = createServiceHarness(["group-b"]);
 
-        TilemapLayerService.moveLayersDown();
+        TilemapLayerActions.moveLayersDown();
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-a", "tile-root", "group-b", "rule-root"]);
@@ -591,7 +591,7 @@ describe("TilemapLayerService.moveLayersDown", () => {
         const { root, historyManager } = createServiceHarness(["group-a"]);
         const group = requireGroupLayer(root, "group-b");
 
-        TilemapLayerService.moveLayersDown();
+        TilemapLayerActions.moveLayersDown();
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-b", "tile-root", "rule-root"]);
@@ -601,7 +601,7 @@ describe("TilemapLayerService.moveLayersDown", () => {
     it("moves the last child in a group out below its parent", () => {
         const { root, historyManager } = createServiceHarness(["tile-a"]);
 
-        TilemapLayerService.moveLayersDown();
+        TilemapLayerActions.moveLayersDown();
 
         expectSingleTransaction(historyManager, 1);
         expect(layerIds(root)).toEqual(["group-a", "tile-a", "group-b", "tile-root", "rule-root"]);
@@ -612,14 +612,14 @@ describe("TilemapLayerService.moveLayersDown", () => {
         const { root, historyManager } = createServiceHarness(["rule-root"]);
         const before = root.serialize();
 
-        TilemapLayerService.moveLayersDown();
+        TilemapLayerActions.moveLayersDown();
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.execute).not.toHaveBeenCalled();
     });
 });
 
-describe("TilemapLayerService.renameLayer", () => {
+describe("TilemapLayerActions.renameLayer", () => {
     beforeEach(() => {
         resetLayerManagerStore();
         vi.restoreAllMocks();
@@ -628,7 +628,7 @@ describe("TilemapLayerService.renameLayer", () => {
     it("records rename through history when undo recording is enabled", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.renameLayer("tile-root", "Collision", true);
+        TilemapLayerActions.renameLayer("tile-root", "Collision", true);
 
         expect(historyManager.execute).toHaveBeenCalledTimes(1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(UpdatePropertyCommand);
@@ -640,7 +640,7 @@ describe("TilemapLayerService.renameLayer", () => {
     it("renames directly without history when undo recording is disabled", () => {
         const { root, historyManager } = createServiceHarness();
 
-        TilemapLayerService.renameLayer("tile-root", "Draft Name", false);
+        TilemapLayerActions.renameLayer("tile-root", "Draft Name", false);
 
         expect(historyManager.execute).not.toHaveBeenCalled();
         expect(root.findLayer("tile-root")?.name).toBe("Draft Name");
@@ -650,7 +650,7 @@ describe("TilemapLayerService.renameLayer", () => {
         const { root, historyManager } = createServiceHarness();
         const before = root.serialize();
 
-        TilemapLayerService.renameLayer("missing-layer", "Draft Name", false);
+        TilemapLayerActions.renameLayer("missing-layer", "Draft Name", false);
 
         expect(root.serialize()).toEqual(before);
         expect(historyManager.execute).not.toHaveBeenCalled();

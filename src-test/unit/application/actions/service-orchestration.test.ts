@@ -81,7 +81,7 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: serviceMocks.a
 vi.mock("@/shared/utils/file-dialog.utils", () => ({ FileDialogUtils: serviceMocks.fileDialogs }));
 vi.mock("@/infrastructure/container", () => serviceMocks.storage);
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: serviceMocks.textureUtils }));
-vi.mock("@/shared/services/console.service", () => ({ Console: serviceMocks.console }));
+vi.mock("@/ui/notifications/console-gateway", () => ({ Console: serviceMocks.console }));
 vi.mock("react-i18next", () => ({
     initReactI18next: {
         type: "3rdParty",
@@ -93,13 +93,13 @@ vi.mock("react-i18next", () => ({
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { DialogService } from "@/shared/services/dialog.service";
-import { ProjectService } from "@/shared/services/project.service";
-import { RulesetService } from "@/shared/services/ruleset.service";
-import { TextureService } from "@/shared/services/texture.service";
-import { TilemapService } from "@/shared/services/tilemap.service";
-import { TilesetService } from "@/shared/services/tileset.service";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import * as ProjectActions from "@/application/actions/project.actions";
+import * as RulesetActions from "@/application/actions/ruleset.actions";
+import * as TextureActions from "@/application/actions/texture.actions";
+import * as TilemapActions from "@/application/actions/tilemap.actions";
+import * as TilesetActions from "@/application/actions/tileset.actions";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { Result } from "@/shared/types/result";
 import { useNavigationStore } from "@/ui/stores/navigation.store";
 
@@ -241,7 +241,7 @@ describe("WorkspaceService orchestration", () => {
             return Result.Success(workspace);
         });
 
-        const result = await WorkspaceService.loadProjectWorkspace("project-a");
+        const result = await WorkspaceActions.loadProjectWorkspace("project-a");
 
         expect(result.status).toBe(Result.Status.Success);
         expect(serviceMocks.appKernel.projectManager.setAndLoadProject).toHaveBeenCalledWith("project-a");
@@ -253,7 +253,7 @@ describe("WorkspaceService orchestration", () => {
     it("returns an error result and does not load layout when project loading fails", async () => {
         serviceMocks.appKernel.projectManager.setAndLoadProject.mockResolvedValue(Result.Error("load-failed"));
 
-        const result = await WorkspaceService.loadProjectWorkspace("missing-project");
+        const result = await WorkspaceActions.loadProjectWorkspace("missing-project");
 
         expect(result.status).toBe(Result.Status.Error);
         expect(serviceMocks.appKernel.layoutManager.loadLayout).not.toHaveBeenCalled();
@@ -266,7 +266,7 @@ describe("WorkspaceService orchestration", () => {
         workspace.tilemapSessionManager.getSession.mockReturnValue(tilemapSession);
         vi.spyOn(DialogService, "openSaveDialog").mockResolvedValue("save");
 
-        await WorkspaceService.closeTilemapSession("tilemap-session");
+        await WorkspaceActions.closeTilemapSession("tilemap-session");
 
         expect(project.tilemapManager.saveTilemap).toHaveBeenCalledWith("tilemap-a");
         expect(workspace.tilemapSessionManager.closeTilemapSession).toHaveBeenCalledWith("tilemap-session");
@@ -278,7 +278,7 @@ describe("WorkspaceService orchestration", () => {
         workspace.tilemapSessionManager.getSession.mockReturnValue({ id: "tilemap-session", isDirty: true, tilemap: { id: "tilemap-a" } });
         vi.spyOn(DialogService, "openSaveDialog").mockResolvedValue("cancel");
 
-        await WorkspaceService.closeTilemapSession("tilemap-session");
+        await WorkspaceActions.closeTilemapSession("tilemap-session");
 
         expect(project.tilemapManager.saveTilemap).not.toHaveBeenCalled();
         expect(workspace.tilemapSessionManager.closeTilemapSession).not.toHaveBeenCalled();
@@ -292,7 +292,7 @@ describe("ProjectService orchestration", () => {
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/projects/metk/.metk/project.json");
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(true);
 
-        await ProjectService.importProject();
+        await ProjectActions.importProject();
 
         expect(serviceMocks.storage.ProjectStorageService.load).toHaveBeenCalledWith("C:/projects/metk/.metk/project.json");
         expect(serviceMocks.appKernel.projectManager.addProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ id: "project-a" }));
@@ -303,7 +303,7 @@ describe("ProjectService orchestration", () => {
     it("does not import a project when file selection is cancelled", async () => {
         serviceMocks.fileDialogs.open.mockResolvedValue(null);
 
-        await ProjectService.importProject();
+        await ProjectActions.importProject();
 
         expect(serviceMocks.storage.ProjectStorageService.load).not.toHaveBeenCalled();
         expect(serviceMocks.appKernel.projectManager.addProjectMetadata).not.toHaveBeenCalled();
@@ -315,7 +315,7 @@ describe("ProjectService orchestration", () => {
         vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({ name: "New Project", destination: "C:/projects" } as any);
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(false);
 
-        await ProjectService.createProject();
+        await ProjectActions.createProject();
 
         expect(serviceMocks.storage.TauriFileStorage.mkdir).toHaveBeenNthCalledWith(1, "C:/projects/New Project");
         expect(serviceMocks.storage.TauriFileStorage.mkdir).toHaveBeenNthCalledWith(2, "C:/projects/New Project/.metk");
@@ -330,12 +330,12 @@ describe("ProjectService orchestration", () => {
     it("removes project metadata only after confirmation", async () => {
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValueOnce(false);
 
-        await ProjectService.removeProject("project-a");
+        await ProjectActions.removeProject("project-a");
 
         expect(serviceMocks.appKernel.projectManager.removeProjectMetadata).not.toHaveBeenCalled();
 
         vi.mocked(DialogService.openPermissionDialog).mockResolvedValueOnce(true);
-        await ProjectService.removeProject("project-a");
+        await ProjectActions.removeProject("project-a");
 
         expect(serviceMocks.appKernel.projectManager.removeProjectMetadata).toHaveBeenCalledWith("project-a");
         expect(serviceMocks.appKernel.saveProjectManager).toHaveBeenCalled();
@@ -354,7 +354,7 @@ describe("TilemapService orchestration", () => {
         } as any);
         serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/tilemaps/overworld.tm.json");
 
-        await TilemapService.createTilemap();
+        await TilemapActions.createTilemap();
 
         expect(workspace.savedPathManager.setTilemapDir).toHaveBeenCalledWith("C:/project/tilemaps");
         expect(serviceMocks.storage.TilemapStorageService.save).toHaveBeenCalledWith(
@@ -372,7 +372,7 @@ describe("TilemapService orchestration", () => {
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/tilemaps/imported.tm.json");
         serviceMocks.storage.TilemapStorageService.load.mockResolvedValue(Result.Success({ id: "other-id", name: "Imported" }));
 
-        const result = await TilemapService.importTilemap("expected-id");
+        const result = await TilemapActions.importTilemap("expected-id");
 
         expect(result.status).toBe(Result.Status.Cancel);
         expect(project.tilemapManager.addTilemap).not.toHaveBeenCalled();
@@ -386,7 +386,7 @@ describe("TilemapService orchestration", () => {
         workspace.tilemapSessionManager.getSessionByTilemapId.mockReturnValue({ id: "tilemap-session" });
         workspace.tilemapSessionManager.getSession.mockReturnValue({ id: "tilemap-session", isDirty: false, tilemap: { id: "tilemap-a" } });
 
-        const result = await TilemapService.removeTilemap("tilemap-a");
+        const result = await TilemapActions.removeTilemapFromProject("tilemap-a");
 
         expect(result.status).toBe(Result.Status.Success);
         expect(project.tilemapManager.removeTilemapMetadata).toHaveBeenCalledWith("tilemap-a");
@@ -408,7 +408,7 @@ describe("TilesetService orchestration", () => {
         serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/tilesets/terrain.ts.json");
         serviceMocks.textureUtils.processImage.mockResolvedValue({ width: 64, height: 32 });
 
-        await TilesetService.createTileset();
+        await TilesetActions.createTileset();
 
         expect(serviceMocks.readFile).toHaveBeenCalledWith("C:/project/textures/terrain.png");
         expect(serviceMocks.textureUtils.processImage).toHaveBeenCalledWith(new Uint8Array([1, 2, 3]));
@@ -434,7 +434,7 @@ describe("TilesetService orchestration", () => {
         workspace.tilesetSessionManager.getSessionByTilesetId.mockReturnValue({ id: "tileset-session" });
         workspace.tilesetSessionManager.getSession.mockReturnValue({ id: "tileset-session", isDirty: false, tileset: { id: "tileset-a" } });
 
-        const result = await TilesetService.removeTileset("tileset-a");
+        const result = await TilesetActions.removeTilesetFromProject("tileset-a");
 
         expect(result.status).toBe(Result.Status.Success);
         expect(project.tilemapManager.removeTilesetRef).toHaveBeenCalledWith("tileset-a");
@@ -450,7 +450,7 @@ describe("RulesetService orchestration", () => {
         vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({ ruleset: { name: "Terrain Rules", color: "#22cc88" } } as any);
         serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/rulesets/terrain.rs.json");
 
-        await RulesetService.createRuleset();
+        await RulesetActions.createRuleset();
 
         expect(workspace.savedPathManager.setRulesetDir).toHaveBeenCalledWith("C:/project/rulesets");
         expect(serviceMocks.storage.RulesetStorageService.save).toHaveBeenCalledWith(
@@ -468,7 +468,7 @@ describe("RulesetService orchestration", () => {
         project.rulesetManager.removeRuleset.mockResolvedValue(Result.Success({ removed: true }));
         workspace.rulesetSessionManager.getSelectedRuleId.mockReturnValue("ruleset-a");
 
-        const result = await RulesetService.removeRuleset("ruleset-a");
+        const result = await RulesetActions.removeRulesetFromProject("ruleset-a");
 
         expect(result.status).toBe(Result.Status.Success);
         expect(project.tilemapManager.removeRulesetRef).toHaveBeenCalledWith("ruleset-a");
@@ -481,7 +481,7 @@ describe("RulesetService orchestration", () => {
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/rulesets/bad.rs.json");
         serviceMocks.storage.RulesetStorageService.load.mockResolvedValue(Result.Error("bad-json"));
 
-        const result = await RulesetService.importRuleset();
+        const result = await RulesetActions.importRuleset();
 
         expect(result.status).toBe(Result.Status.Error);
         expect(serviceMocks.console.error).toHaveBeenCalledWith(expect.objectContaining({ message: "message.ruleset.importFail" }));
@@ -498,7 +498,7 @@ describe("TextureService orchestration", () => {
         serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 32, height: 32 });
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(false);
 
-        const result = await TextureService.importTexture("tileset-a");
+        const result = await TextureActions.importTexture("tileset-a");
 
         expect(result.status).toBe(Result.Status.Success);
         expect(workspace.savedPathManager.setTextureDir).toHaveBeenCalledWith("C:/project/textures");
@@ -521,7 +521,7 @@ describe("TextureService orchestration", () => {
         serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 64, height: 64 });
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(false);
 
-        const result = await TextureService.importTexture("tileset-a");
+        const result = await TextureActions.importTexture("tileset-a");
 
         expect(result.status).toBe(Result.Status.Cancel);
         expect(DialogService.openPermissionDialog).toHaveBeenCalledWith({
@@ -537,7 +537,7 @@ describe("TextureService orchestration", () => {
         serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/bad.png");
         serviceMocks.textureUtils.processTexture.mockRejectedValue(new Error("decode failed"));
 
-        const result = await TextureService.importTexture("tileset-a");
+        const result = await TextureActions.importTexture("tileset-a");
 
         expect(result.status).toBe(Result.Status.Error);
         expect(result.message).toEqual({ key: "message.texture.importFail" });

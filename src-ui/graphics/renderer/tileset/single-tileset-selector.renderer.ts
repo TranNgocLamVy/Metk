@@ -3,7 +3,7 @@ import { Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tile } from "@/editor/model/tileset/tileset";
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { usePropertyStore } from "@/ui/stores/property.store";
 
 export type CreateTilesetViewSelectorContext = {
@@ -179,7 +179,7 @@ export class TilesetSelectorRenderer {
         this.drawRectShape();
 
         this.tilesetSession.updateSelectionState({ selectedTilesSet: Array.from(this.selectedTilesSet) });
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        WorkspaceActions.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
     public clearSelection() {
@@ -255,7 +255,7 @@ export class TilesetSelectorRenderer {
             this.topLeft = null;
 
             this.tilesetSession.updateSelectionState({ selectedTilesSet: [] });
-            WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+            WorkspaceActions.saveCurrentWorkspace({ waitForTimeout: false });
         }
 
         if (this.selectedTilesSet.size === 0 && this.previewTilesSet.size === 0) {
@@ -295,7 +295,7 @@ export class TilesetSelectorRenderer {
 
         const mappedSelectedTiles = Array.from(this.selectedTilesSet);
         this.tilesetSession.updateSelectionState({ selectedTilesSet: mappedSelectedTiles });
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        WorkspaceActions.saveCurrentWorkspace({ waitForTimeout: false });
     }
 
     private updatePreviewRect() {

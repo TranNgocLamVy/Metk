@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { Fragment, useRef } from "react";
 
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 
@@ -25,12 +25,12 @@ export default function TilemapEditorTabs() {
                     
 					const openTilemapSession = () => {
 						if (isCurrent) return;
-						WorkspaceService.openTilemapSession(session.sessionId);
+						WorkspaceActions.openTilemapSession(session.sessionId);
 					};
                     
 					const closeTilemapSession = async (e: any) => {
 						e.stopPropagation();
-						WorkspaceService.closeTilemapSession(session.sessionId);
+						WorkspaceActions.closeTilemapSession(session.sessionId);
 					};
                     
 					return (

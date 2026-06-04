@@ -134,14 +134,14 @@ vi.mock("@/graphics/renderer/tilemap/tilemap.renderer", () => ({ TilemapRenderer
 vi.mock("@/graphics/renderer/tileset/single-tileset-grid.renderer", () => ({ TilesetGridRenderer: viewMocks.MockTilesetGridRenderer }));
 vi.mock("@/graphics/renderer/tileset/single-tileset.renderer", () => ({ TilesetRenderer: viewMocks.MockTilesetRenderer }));
 vi.mock("@/graphics/renderer/tileset/single-tileset-selector.renderer", () => ({ TilesetSelectorRenderer: viewMocks.MockTilesetSelectorRenderer }));
-vi.mock("@/shared/services/workspace.service", () => ({ WorkspaceService: viewMocks.workspaceService }));
+vi.mock("@/application/actions/workspace.actions", () => viewMocks.workspaceService);
 
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { SingleImageTilesetView } from "@/graphics/view/single-tileset.view";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 type MockViewport = InstanceType<typeof viewMocks.MockViewport>;
 
@@ -250,7 +250,7 @@ describe("TilemapView", () => {
 
         expect(view.session.updateViewState).toHaveBeenCalledWith({ x: 80, y: 96 });
         expect(view.session.updateViewState).toHaveBeenCalledWith({ zoom: 1.75 });
-        expect(WorkspaceService.saveCurrentWorkspace).toHaveBeenCalledTimes(2);
+        expect(WorkspaceActions.saveCurrentWorkspace).toHaveBeenCalledTimes(2);
     });
 
     it("resizes the viewport and reapplies saved state when the renderer resizes", () => {
@@ -332,7 +332,7 @@ describe("TilesetView", () => {
 
         expect(view.session.updateViewState).toHaveBeenCalledWith({ x: 80, y: 96 });
         expect(view.session.updateViewState).toHaveBeenCalledWith({ zoom: 1.75 });
-        expect(WorkspaceService.saveCurrentWorkspace).toHaveBeenCalledTimes(2);
+        expect(WorkspaceActions.saveCurrentWorkspace).toHaveBeenCalledTimes(2);
 
         const resizeHandler = app.renderer.on.mock.calls.find(([eventName]) => eventName === "resize")![1];
         resizeHandler();

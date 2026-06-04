@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { BaseObject, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { groupProperties } from "@/editor/properties/group-properties.utils";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useProjectStore } from "@/ui/stores/project.store";
 import { usePropertyStore } from "@/ui/stores/property.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
@@ -31,7 +31,7 @@ export default function PropertyPanel() {
     useEffect(() => {
         if (!activeWorkspace) return;
         activeWorkspace.propertyPanelManager.selectObject(object?.objectId ?? null);
-        WorkspaceService.saveCurrentWorkspace();
+        WorkspaceActions.saveCurrentWorkspace();
     }, [object, activeWorkspace]);
 
     useEffect(() => {

@@ -4,7 +4,7 @@ import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { save } from "@tauri-apps/plugin-dialog";
 
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { SystemCommand } from "../commands/command.decorator";
 import { ExportStorageService } from "@/infrastructure/export-storage.service";
 

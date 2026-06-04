@@ -1,4 +1,4 @@
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import ContextMenuItemGroup from "@/ui/components/context-menu/ContextMenuItemGroup";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
@@ -36,10 +36,10 @@ export default function RulesetManager() {
 
     const onSelectRule = useCallback((rulesetId: string) => {
         if (currentSelectedRuleId === rulesetId) {
-            WorkspaceService.selectRuleset(null);
+            WorkspaceActions.selectRuleset(null);
             setCurrentSelectedRuleId(null);
         } else {
-            WorkspaceService.selectRuleset(rulesetId);
+            WorkspaceActions.selectRuleset(rulesetId);
             setCurrentSelectedRuleId(rulesetId);
         }
     }, [currentSelectedRuleId]);

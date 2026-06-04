@@ -1,7 +1,7 @@
 import { EditorFacade } from "@/application/editor.facade";
 import { SystemCommand } from "../commands/command.decorator";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
 
 @SystemCommand({

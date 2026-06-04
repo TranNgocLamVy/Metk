@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import i18n from "@/shared/services/i18n.service";
+import i18n from "@/app/providers/i18n";
 import { Spinner } from "@/ui/components/shadcn/spinner";
 
 export const LanguageLoadingOverlay: React.FC = () => {

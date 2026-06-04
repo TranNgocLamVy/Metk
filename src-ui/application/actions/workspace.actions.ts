@@ -1,11 +1,10 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 
-import { Result } from "../types/result";
-import { DialogService } from "./dialog.service";
-import { Console } from "./console.service";
+import { Result } from "@/shared/types/result";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import { Console } from "@/ui/notifications/console-gateway";
 
-export class WorkspaceService {
-    public static async loadProjectWorkspace(projectId: string): Promise<Result> {
+export async function loadProjectWorkspace(projectId: string): Promise<Result> {
         const projectManager = appKernel.projectManager;
 
         const loadProjectResult = await projectManager.setAndLoadProject(projectId);
@@ -30,26 +29,26 @@ export class WorkspaceService {
 
         const tilesetSessionManager = workspace.tilesetSessionManager;
         const currentTilesetSessionId = tilesetSessionManager.tilesetSessionManagerData.currentTilesetSessionId;
-        if (currentTilesetSessionId) await WorkspaceService.openTilesetSession(currentTilesetSessionId);
+        if (currentTilesetSessionId) await openTilesetSession(currentTilesetSessionId);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false }); // Can be remove
+        saveCurrentWorkspace({ waitForTimeout: false }); // Can be remove
 
         return Result.Success();
-    }
+}
 
-    public static async unloadProjectWorkspace(): Promise<void> {
+export async function unloadProjectWorkspace(): Promise<void> {
         appKernel.projectManager.unLoadProject();
         appKernel.workspaceManager.unloadWorkspace();
         appKernel.layoutManager.unloadLayout();
-    }
+}
 
-    public static async saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
+export async function saveCurrentWorkspace({ waitForTimeout = true }: { waitForTimeout?: boolean } = {}): Promise<void> {
         await appKernel.workspaceManager.saveCurrentWorkspace(waitForTimeout);
-    }
+}
 
 
     //================ tileset ================
-    public static async createTilesetSession(tilesetId: string): Promise<void> {
+export async function createTilesetSession(tilesetId: string): Promise<void> {
         const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
@@ -66,20 +65,20 @@ export class WorkspaceService {
 
         const tilesetSessionManager = workspace.tilesetSessionManager;
         await tilesetSessionManager.createTilesetSession(tileset);
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
+}
 
-    public static async openTilesetSession(sessionId: string): Promise<void> {
+export async function openTilesetSession(sessionId: string): Promise<void> {
         const workspace = appKernel.workspaceManager.currentWorkspace;
         if (!workspace) return;
 
         const tilesetSessionManager = workspace.tilesetSessionManager;
         tilesetSessionManager.openTilesetSession(sessionId);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
+}
 
-    public static async closeTilesetSession(sessionId: string): Promise<void> {
+export async function closeTilesetSession(sessionId: string): Promise<void> {
         const workspace = appKernel.workspaceManager.currentWorkspace;
         if (!workspace) return;
 
@@ -91,14 +90,14 @@ export class WorkspaceService {
         tilesetSessionManager.closeTilesetSession(sessionId);
 
         const lastSessionId = tilesetSessionManager.getLastTilesetSessionId();
-        if (lastSessionId) await WorkspaceService.openTilesetSession(lastSessionId);
+        if (lastSessionId) await openTilesetSession(lastSessionId);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
+}
 
 
     //================ tilemap ================
-    public static async createTilemapSession(tilemapId: string) {
+export async function createTilemapSession(tilemapId: string): Promise<void> {
         const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return;
 
@@ -113,20 +112,20 @@ export class WorkspaceService {
         const tilemapSessionManager = workspace.tilemapSessionManager;
         await tilemapSessionManager.createTilemapSession(tilemap);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
+}
 
-    public static async openTilemapSession(sessionId: string): Promise<void> {
+export async function openTilemapSession(sessionId: string): Promise<void> {
         const workspace = appKernel.workspaceManager.currentWorkspace;
         if (!workspace) return;
 
         const tilemapSessionManager = workspace.tilemapSessionManager;
         tilemapSessionManager.openTilemapSession(sessionId);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
+}
 
-    public static async closeTilemapSession(sessionId: string, force?: boolean): Promise<void> {
+export async function closeTilemapSession(sessionId: string, force?: boolean): Promise<void> {
         const currentProject = appKernel.editorFacade.currentProject;
         const currentWorkspace = appKernel.workspaceManager.currentWorkspace;
         if (!currentProject || !currentWorkspace) return;
@@ -149,17 +148,16 @@ export class WorkspaceService {
         }
         tilemapSessionManager.closeTilemapSession(sessionId);
 
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
+}
 
 
     //================ ruleset ================
-    public static async selectRuleset(rulesetId: string | null): Promise<void> {
+export async function selectRuleset(rulesetId: string | null): Promise<void> {
         const currentProject = appKernel.editorFacade.currentProject;
         const rulesetSessionManager = appKernel.workspaceManager.currentWorkspace?.rulesetSessionManager;
         if (!currentProject || !rulesetSessionManager) return;
         if (rulesetId) await currentProject.rulesetManager.loadRuleset(rulesetId);
         rulesetSessionManager.setSelectedRuleId(rulesetId);
-        WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
-    }
+        saveCurrentWorkspace({ waitForTimeout: false });
 }

@@ -7,7 +7,7 @@ import { RulesetStorageService } from "@/infrastructure/container";
 import { TilesetRefManager } from "../references/tileset-ref.manager";
 import { RulesetRefManager } from "../references/ruleset-ref.manager";
 import { PathUtils } from "@/shared/utils/path.utils";
-import { Console } from "@/shared/services/console.service";
+import { Console } from "@/ui/notifications/console-gateway";
 import EventEmitter from "eventemitter3";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
@@ -109,8 +109,8 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
                 actions: [{
                     label: "global.action.ruleset.import", variant: "outline",
                     onClick: async () => {
-                        const { RulesetService } = await import("@/shared/services/ruleset.service");
-                        return await RulesetService.importRuleset(id);
+                        const RulesetActions = await import("@/application/actions/ruleset.actions");
+                        return await RulesetActions.importRuleset(id);
                     }
                 }]
             }, customId);
@@ -129,15 +129,15 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
                     {
                         label: "global.action.ruleset.import", variant: "outline",
                         onClick: async () => {
-                            const { RulesetService } = await import("@/shared/services/ruleset.service");
-                            return await RulesetService.importRuleset(id);
+                            const RulesetActions = await import("@/application/actions/ruleset.actions");
+                            return await RulesetActions.importRuleset(id);
                         }
                     },
                     {
                         label: "global.action.ruleset.remove", variant: "destructive",
                         onClick: async () => {
-                            const { RulesetService } = await import("@/shared/services/ruleset.service");
-                            return await RulesetService.removeRuleset(id);
+                            const RulesetActions = await import("@/application/actions/ruleset.actions");
+                            return await RulesetActions.removeRulesetFromProject(id);
                         }
                     },
                 ]

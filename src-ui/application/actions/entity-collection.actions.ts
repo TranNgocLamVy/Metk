@@ -5,19 +5,17 @@ import { EntityCollectionStorageService } from "@/infrastructure/container";
 import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
 import { Result } from "@/shared/types/result";
 import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
-import { PathUtils } from "@/shared/utils/path.utils";
-import { DialogService } from "@/shared/services/dialog.service";
-import { Console } from "@/shared/services/console.service";
-import i18n from "@/shared/services/i18n.service";
+import { DialogService } from "@/ui/dialogs/dialog-gateway";
+import { Console } from "@/ui/notifications/console-gateway";
+import i18n from "@/app/providers/i18n";
 import { createEntityCollectionForm } from "@/shared/constant/form/create-entity-collection.form";
-import { WorkspaceService } from "./workspace.service";
+import { saveCurrentWorkspace } from "@/application/actions/workspace.actions";
 import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
 import { normalizeEntityCollectionData } from "@/editor/model/entity/entity.normalizer";
 import { EntityCollection } from "@/editor/model/entity/entity-collection";
 import { EntityDefinitionData } from "@/shared/data-types/entity.data";
 
-export class EntityCollectionService {
-    private static readonly defaultEntityData: Omit<EntityDefinitionData, "id"> = {
+const defaultEntityData: Omit<EntityDefinitionData, "id"> = {
         name: "New Entity",
         width: 1,
         height: 1,
@@ -32,7 +30,7 @@ export class EntityCollectionService {
         fields: [],
     };
 
-    public static async createEntityCollection(): Promise<void> {
+export async function createEntityCollection(): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -104,14 +102,14 @@ export class EntityCollectionService {
         }
 
         await editorFacade.projectManager.saveCurrrentProject();
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await saveCurrentWorkspace({ waitForTimeout: false });
 
-        await EntityCollectionService.selectEntityCollection(entityCollectionData.id);
+        await selectEntityCollection(entityCollectionData.id);
 
         Console.success({ message: "message.entityCollection.createSuccess" });
     }
 
-    public static async selectEntityCollection(entityCollectionId: string | null): Promise<void> {
+export async function selectEntityCollection(entityCollectionId: string | null): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -143,20 +141,20 @@ export class EntityCollectionService {
             currentWorkspace.entityCollectionSessionManager.resetSelectedEntityId();
         }
 
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static async selectEntity(entityId: string | null): Promise<void> {
+export async function selectEntity(entityId: string | null): Promise<void> {
         const currentWorkspace = appKernel.editorFacade.currentWorkspace;
         if (!currentWorkspace) return;
 
         useEntityCollectionStore.getState().setSelectedEntityId(entityId);
         currentWorkspace.entityCollectionSessionManager.setSelectedEntityId(entityId);
 
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static async deleteEntityCollection(entityCollectionId: string): Promise<void> {
+export async function deleteEntityCollection(entityCollectionId: string): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
 
@@ -185,14 +183,14 @@ export class EntityCollectionService {
             useEntityCollectionStore.getState().selectedEntityCollectionId;
 
         if (currentSelectedId === entityCollectionId) {
-            await EntityCollectionService.selectEntityCollection(null);
+            await selectEntityCollection(null);
         }
 
         await editorFacade.projectManager.saveCurrrentProject();
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await saveCurrentWorkspace({ waitForTimeout: false });
     }
 
-    public static async createEntity(): Promise<void> {
+export async function createEntity(): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
@@ -208,19 +206,19 @@ export class EntityCollectionService {
             return;
         }
 
-        const entityCollection = await EntityCollectionService.loadEntityCollection(entityCollectionId);
+        const entityCollection = await loadEntityCollection(entityCollectionId);
         if (!entityCollection) {
             Console.error({ message: "message.entityCollection.entityCreateFail" });
             return;
         }
 
-        const entity = entityCollection.addEntityDefinition(EntityCollectionService.defaultEntityData);
+        const entity = entityCollection.addEntityDefinition(defaultEntityData);
 
         currentProject.entityCollectionManager.notifyEntityCollectionUpdated(entityCollectionId);
 
-        await EntityCollectionService.selectEntity(entity.id);
+        await selectEntity(entity.id);
 
-        const saved = await EntityCollectionService.saveEntityCollectionChanges(entityCollectionId);
+        const saved = await saveEntityCollectionChanges(entityCollectionId);
         if (!saved) return;
 
         Console.success({
@@ -233,14 +231,14 @@ export class EntityCollectionService {
         await DialogService.openEditEntityDefinitionDialog(entityCollectionId, entity.id);
     }
 
-    public static async editEntity(entityCollectionId?: string, entityId?: string): Promise<void> {
-        const resolvedIds = EntityCollectionService.resolveEntityIds(entityCollectionId, entityId);
+export async function editEntity(entityCollectionId?: string, entityId?: string): Promise<void> {
+        const resolvedIds = resolveEntityIds(entityCollectionId, entityId);
         if (!resolvedIds) {
             Console.error({ message: "message.entityCollection.entityEditFail" });
             return;
         }
 
-        const entityCollection = await EntityCollectionService.loadEntityCollection(resolvedIds.entityCollectionId);
+        const entityCollection = await loadEntityCollection(resolvedIds.entityCollectionId);
         if (!entityCollection) {
             Console.error({ message: "message.entityCollection.entityEditFail" });
             return;
@@ -261,20 +259,20 @@ export class EntityCollectionService {
         await DialogService.openEditEntityDefinitionDialog(resolvedIds.entityCollectionId, resolvedIds.entityId);
     }
 
-    public static async deleteEntity(entityCollectionId?: string, entityId?: string): Promise<void> {
+export async function deleteEntity(entityCollectionId?: string, entityId?: string): Promise<void> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
         const currentWorkspace = editorFacade.currentWorkspace;
 
         if (!currentProject || !currentWorkspace) return;
 
-        const resolvedIds = EntityCollectionService.resolveEntityIds(entityCollectionId, entityId);
+        const resolvedIds = resolveEntityIds(entityCollectionId, entityId);
         if (!resolvedIds) {
             Console.error({ message: "message.entityCollection.entityDeleteFail" });
             return;
         }
 
-        const entityCollection = await EntityCollectionService.loadEntityCollection(resolvedIds.entityCollectionId);
+        const entityCollection = await loadEntityCollection(resolvedIds.entityCollectionId);
         if (!entityCollection) {
             Console.error({ message: "message.entityCollection.entityDeleteFail" });
             return;
@@ -308,10 +306,10 @@ export class EntityCollectionService {
         currentProject.entityCollectionManager.notifyEntityCollectionUpdated(resolvedIds.entityCollectionId);
 
         if (useEntityCollectionStore.getState().selectedEntityId === resolvedIds.entityId) {
-            await EntityCollectionService.selectEntity(null);
+            await selectEntity(null);
         }
 
-        const saved = await EntityCollectionService.saveEntityCollectionChanges(resolvedIds.entityCollectionId);
+        const saved = await saveEntityCollectionChanges(resolvedIds.entityCollectionId);
         if (!saved) return;
 
         Console.success({
@@ -322,18 +320,18 @@ export class EntityCollectionService {
         });
     }
 
-    public static async cloneEntity(entityCollectionId?: string, entityId?: string): Promise<void> {
+export async function cloneEntity(entityCollectionId?: string, entityId?: string): Promise<void> {
         const currentProject = appKernel.editorFacade.currentProject;
 
         if (!currentProject) return;
 
-        const resolvedIds = EntityCollectionService.resolveEntityIds(entityCollectionId, entityId);
+        const resolvedIds = resolveEntityIds(entityCollectionId, entityId);
         if (!resolvedIds) {
             Console.error({ message: "message.entityCollection.entityCloneFail" });
             return;
         }
 
-        const entityCollection = await EntityCollectionService.loadEntityCollection(resolvedIds.entityCollectionId);
+        const entityCollection = await loadEntityCollection(resolvedIds.entityCollectionId);
         if (!entityCollection) {
             Console.error({ message: "message.entityCollection.entityCloneFail" });
             return;
@@ -353,9 +351,9 @@ export class EntityCollectionService {
 
         currentProject.entityCollectionManager.notifyEntityCollectionUpdated(resolvedIds.entityCollectionId);
 
-        await EntityCollectionService.selectEntity(clonedEntity.id);
+        await selectEntity(clonedEntity.id);
 
-        const saved = await EntityCollectionService.saveEntityCollectionChanges(resolvedIds.entityCollectionId);
+        const saved = await saveEntityCollectionChanges(resolvedIds.entityCollectionId);
         if (!saved) return;
 
         Console.success({
@@ -368,7 +366,7 @@ export class EntityCollectionService {
         await DialogService.openEditEntityDefinitionDialog(resolvedIds.entityCollectionId, clonedEntity.id);
     }
 
-    private static resolveEntityIds(entityCollectionId?: string, entityId?: string): { entityCollectionId: string; entityId: string } | null {
+function resolveEntityIds(entityCollectionId?: string, entityId?: string): { entityCollectionId: string; entityId: string } | null {
         const state = useEntityCollectionStore.getState();
         const resolvedEntityCollectionId = entityCollectionId ?? state.selectedEntityCollectionId;
         const resolvedEntityId = entityId ?? state.selectedEntityId;
@@ -381,7 +379,7 @@ export class EntityCollectionService {
         };
     }
 
-    private static async loadEntityCollection(entityCollectionId: string): Promise<EntityCollection | null> {
+async function loadEntityCollection(entityCollectionId: string): Promise<EntityCollection | null> {
         const currentProject = appKernel.editorFacade.currentProject;
         if (!currentProject) return null;
 
@@ -401,7 +399,7 @@ export class EntityCollectionService {
         return loadResult.data;
     }
 
-    private static async saveEntityCollectionChanges(entityCollectionId: string): Promise<boolean> {
+async function saveEntityCollectionChanges(entityCollectionId: string): Promise<boolean> {
         const editorFacade = appKernel.editorFacade;
         const currentProject = editorFacade.currentProject;
 
@@ -417,8 +415,7 @@ export class EntityCollectionService {
         }
 
         await editorFacade.projectManager.saveCurrrentProject();
-        await WorkspaceService.saveCurrentWorkspace({ waitForTimeout: false });
+        await saveCurrentWorkspace({ waitForTimeout: false });
 
         return true;
     }
-}

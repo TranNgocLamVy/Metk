@@ -7,10 +7,10 @@ import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import { usePropertyStore } from "@/ui/stores/property.store";
-import { ProjectService } from "@/shared/services/project.service";
-import { TilemapService } from "@/shared/services/tilemap.service";
-import { TilemapLayerService } from "@/shared/services/tilemap-layer.service";
-import { executeCommand } from "@/shared/services/command.service";
+import * as ProjectActions from "@/application/actions/project.actions";
+import * as TilemapActions from "@/application/actions/tilemap.actions";
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
+import { executeCommand } from "@/application/actions/command.actions";
 
 type ResettableStore<T> = {
     getInitialState: () => T;
@@ -39,6 +39,8 @@ const mockState = vi.hoisted(() => ({
     layerService: {
         createNewTileLayer: vi.fn(),
         createNewRuleLayer: vi.fn(),
+        createNewImageLayer: vi.fn(),
+        createNewEntityLayer: vi.fn(),
         createNewGroupLayer: vi.fn(),
         duplicateLayer: vi.fn(),
         deleteLayer: vi.fn(),
@@ -80,29 +82,19 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({
     appKernel: mockState.appKernel,
 }));
 
-vi.mock("@/shared/services/command.service", () => ({
+vi.mock("@/application/actions/command.actions", () => ({
     executeCommand: mockState.commandService.executeCommand,
 }));
 
-vi.mock("@/shared/services/project.service", () => ({
-    ProjectService: mockState.projectService,
-}));
+vi.mock("@/application/actions/project.actions", () => mockState.projectService);
 
-vi.mock("@/shared/services/tilemap.service", () => ({
-    TilemapService: mockState.tilemapService,
-}));
+vi.mock("@/application/actions/tilemap.actions", () => mockState.tilemapService);
 
-vi.mock("@/shared/services/tileset.service", () => ({
-    TilesetService: mockState.tilesetService,
-}));
+vi.mock("@/application/actions/tileset.actions", () => mockState.tilesetService);
 
-vi.mock("@/shared/services/ruleset.service", () => ({
-    RulesetService: mockState.rulesetService,
-}));
+vi.mock("@/application/actions/ruleset.actions", () => mockState.rulesetService);
 
-vi.mock("@/shared/services/tilemap-layer.service", () => ({
-    TilemapLayerService: mockState.layerService,
-}));
+vi.mock("@/application/actions/tilemap-layer.actions", () => mockState.layerService);
 
 vi.mock("react-i18next", () => ({
     initReactI18next: {
@@ -114,7 +106,7 @@ vi.mock("react-i18next", () => ({
     }),
 }));
 
-vi.mock("@/shared/services/i18n.service", () => ({
+vi.mock("@/app/providers/i18n", () => ({
     default: { language: "en" },
     i18nService: {
         changeLanguage: vi.fn(),
@@ -235,12 +227,12 @@ describe("Metk menu-driven integration workflows", () => {
         await openMenu(user, "menu.file.label");
         await user.keyboard("{ArrowDown}{ArrowRight}{Enter}");
 
-        expect(ProjectService.createProject).toHaveBeenCalledTimes(1);
+        expect(ProjectActions.createProject).toHaveBeenCalledTimes(1);
 
         await openMenu(user, "menu.file.label");
         await user.keyboard("{ArrowDown}{ArrowRight}{ArrowDown}{Enter}");
 
-        expect(TilemapService.createTilemap).toHaveBeenCalledTimes(1);
+        expect(TilemapActions.createTilemap).toHaveBeenCalledTimes(1);
 
         await openMenu(user, "menu.file.label");
         await clickMenuItem(user, "menu.file.action.save");
@@ -271,12 +263,12 @@ describe("Metk menu-driven integration workflows", () => {
         await openMenu(user, "menu.layer.label");
         await user.keyboard("{ArrowDown}{ArrowRight}{Enter}");
 
-        expect(TilemapLayerService.createNewTileLayer).toHaveBeenCalledTimes(1);
+        expect(TilemapLayerActions.createNewTileLayer).toHaveBeenCalledTimes(1);
 
         await openMenu(user, "menu.layer.label");
         await user.keyboard("{ArrowDown}{ArrowRight}{ArrowDown}{ArrowDown}{Enter}");
 
-        expect(TilemapLayerService.createNewGroupLayer).toHaveBeenCalledTimes(1);
+        expect(TilemapLayerActions.createNewGroupLayer).toHaveBeenCalledTimes(1);
 
         await openMenu(user, "menu.layer.label");
         await clickMenuItem(user, "menu.layer.action.duplicateLayer");
@@ -287,9 +279,9 @@ describe("Metk menu-driven integration workflows", () => {
         await openMenu(user, "menu.layer.label");
         await clickMenuItem(user, "menu.layer.action.deleteLayer");
 
-        expect(TilemapLayerService.duplicateLayer).toHaveBeenCalledTimes(1);
-        expect(TilemapLayerService.toggleSelectedLayersVisibility).toHaveBeenCalledTimes(1);
-        expect(TilemapLayerService.deleteLayer).toHaveBeenCalledTimes(1);
+        expect(TilemapLayerActions.duplicateLayer).toHaveBeenCalledTimes(1);
+        expect(TilemapLayerActions.toggleSelectedLayersVisibility).toHaveBeenCalledTimes(1);
+        expect(TilemapLayerActions.deleteLayer).toHaveBeenCalledTimes(1);
     });
 
     it("updates console state from the view menu console toggle", async () => {

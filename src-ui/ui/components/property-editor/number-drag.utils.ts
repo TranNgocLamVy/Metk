@@ -1,6 +1,6 @@
 import type { PointerEvent } from "react";
 import { useCallback, useRef, useState } from "react";
-import { NativeCursorService } from "@/shared/services/native-cursor.service";
+import { NativeCursorService } from "@/infrastructure/gateways/native-cursor";
 
 type DragState = {
     pointerId: number;

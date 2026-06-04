@@ -1,5 +1,5 @@
 import { useConsoleStore } from "@/ui/stores/console.store";
-import { Result } from "../types/result";
+import { Result } from "@/shared/types/result";
 import { v4 as uuidv4 } from "uuid";
 
 export class Console {

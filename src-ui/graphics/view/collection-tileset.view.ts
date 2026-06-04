@@ -2,7 +2,7 @@ import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { WorkspaceService } from "@/shared/services/workspace.service";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 import { CollectionTilesetGridRenderer } from "../renderer/tileset/collection-tileset-grid.renderer";
 import { CollectionTilesetSelectorRenderer } from "../renderer/tileset/collection-tileset-selector.renderer";
@@ -67,7 +67,7 @@ export class CollectionTilesetView implements ITilesetView {
                 y: this.viewport.center.y,
             });
 
-            WorkspaceService.saveCurrentWorkspace();
+            WorkspaceActions.saveCurrentWorkspace();
         });
 
         this.viewport.on("zoomed-end", () => {
@@ -75,7 +75,7 @@ export class CollectionTilesetView implements ITilesetView {
                 zoom: this.viewport.scaled,
             });
 
-            WorkspaceService.saveCurrentWorkspace();
+            WorkspaceActions.saveCurrentWorkspace();
         });
 
         this.viewport.on("drag-start", () => {
