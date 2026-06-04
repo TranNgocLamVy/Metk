@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 
 import { EditorFacade } from "@/application/editor.facade";
+import { HistoryManager } from "@/application/resources/history/history.manager";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 
@@ -85,12 +86,12 @@ export const createEditorHarness = () => {
     const tilemap = createTilemap();
     const objectRegistry = new EditorObjectRegistry();
     objectRegistry.registerTree(tilemap);
-    const historyManager = {
-        startTransaction: vi.fn(),
-        execute: vi.fn((command: any, editorFacade: EditorFacade) => command.execute(editorFacade)),
-        commitTransaction: vi.fn(),
-        pushToUndoStack: vi.fn(),
-    };
+    const historyManager = new HistoryManager();
+    vi.spyOn(historyManager, "startTransaction");
+    vi.spyOn(historyManager, "execute");
+    vi.spyOn(historyManager, "commitTransaction");
+    vi.spyOn(historyManager, "cancelTransaction");
+    vi.spyOn(historyManager, "pushToUndoStack");
     const session = {
         tilemap,
         layerState: { selectedLayers: ["tile-root"] },

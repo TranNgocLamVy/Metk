@@ -148,7 +148,7 @@ describe("layer-specific drawing tools", () => {
         expect(historyManager.execute).toHaveBeenCalledTimes(1);
     });
 
-    it("TileEraserTool only erases tile refs", () => {
+    it("TileEraserTool erases tile refs immediately and commits one transaction", () => {
         const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
         const tool = new TileEraserTool(editorFacade);
         tool.onEnable();
@@ -158,13 +158,20 @@ describe("layer-specific drawing tools", () => {
         expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
 
         viewport.emitPointer("pointerdown", pointer(1, 0));
+
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toBeNull();
+        expect(historyManager.startTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+        expect(historyManager.commitTransaction).not.toHaveBeenCalled();
+
         viewport.emitPointer("pointerup", pointer(1, 0));
 
         expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toBeNull();
-        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+        expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
     });
 
-    it("RuleEraserTool only erases rule refs", () => {
+    it("RuleEraserTool erases rule refs immediately and commits one transaction", () => {
         const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
         const tool = new RuleEraserTool(editorFacade);
         tool.onEnable();
@@ -174,10 +181,123 @@ describe("layer-specific drawing tools", () => {
         expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })?.rulesetId).toBe("ruleset-a");
 
         viewport.emitPointer("pointerdown", pointer(0, 0));
+
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })).toBeNull();
+        expect(historyManager.startTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+        expect(historyManager.commitTransaction).not.toHaveBeenCalled();
+
         viewport.emitPointer("pointerup", pointer(0, 0));
 
         expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })).toBeNull();
-        expect(historyManager.execute).toHaveBeenCalledTimes(1);
+        expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
+    });
+
+    it("TileEraserTool groups realtime drag erases into one undoable stroke", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        tileLayer.setTilesAt([
+            { coordinate: { col: 0, row: 0 }, tileId: 1, tilesetId: "tileset-a" },
+            { coordinate: { col: 1, row: 0 }, tileId: 2, tilesetId: "tileset-a" },
+        ]);
+
+        const tool = new TileEraserTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(tileRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(0, 0));
+        expect(tileLayer.getTileRefAt({ col: 0, row: 0 })).toBeNull();
+
+        viewport.emitPointer("pointermove", pointer(1, 0));
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toBeNull();
+        expect(historyManager.startTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.execute).toHaveBeenCalledTimes(2);
+        expect(historyManager.pushToUndoStack).not.toHaveBeenCalled();
+
+        viewport.emitPointer("pointerup", pointer(1, 0));
+        expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
+
+        historyManager.undo(editorFacade);
+
+        expect(tileLayer.getTileRefAt({ col: 0, row: 0 })).toEqual({ tileId: 1, tilesetId: "tileset-a" });
+        expect(tileLayer.getTileRefAt({ col: 1, row: 0 })).toEqual({ tileId: 2, tilesetId: "tileset-a" });
+    });
+
+    it("RuleEraserTool groups realtime drag erases into one undoable stroke", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        ruleLayer.setRuleRefsAt([
+            { coordinate: { col: 0, row: 0 }, rulesetId: "ruleset-a" },
+            { coordinate: { col: 1, row: 0 }, rulesetId: "ruleset-a" },
+        ]);
+
+        const tool = new RuleEraserTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(ruleRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(0, 0));
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })).toBeNull();
+
+        viewport.emitPointer("pointermove", pointer(1, 0));
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 0 })).toBeNull();
+        expect(historyManager.startTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.execute).toHaveBeenCalledTimes(2);
+        expect(historyManager.pushToUndoStack).not.toHaveBeenCalled();
+
+        viewport.emitPointer("pointerup", pointer(1, 0));
+        expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.pushToUndoStack).toHaveBeenCalledTimes(1);
+
+        historyManager.undo(editorFacade);
+
+        expect(ruleLayer.getRulesetRefAt({ col: 0, row: 0 })?.rulesetId).toBe("ruleset-a");
+        expect(ruleLayer.getRulesetRefAt({ col: 1, row: 0 })?.rulesetId).toBe("ruleset-a");
+    });
+
+    it("TileEraserTool does not execute duplicate coordinates repeatedly", () => {
+        const { editorFacade, view, viewport, tileLayer, tileRenderer, historyManager } = createDrawingHarness();
+        tileLayer.setTilesAt([
+            { coordinate: { col: 0, row: 0 }, tileId: 1, tilesetId: "tileset-a" },
+            { coordinate: { col: 1, row: 0 }, tileId: 2, tilesetId: "tileset-a" },
+        ]);
+
+        const tool = new TileEraserTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(tileRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(0, 0));
+        viewport.emitPointer("pointermove", pointer(1, 0));
+        viewport.emitPointer("pointermove", pointer(0, 0));
+        viewport.emitPointer("pointerup", pointer(0, 0));
+
+        expect(historyManager.startTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.execute).toHaveBeenCalledTimes(2);
+        expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
+    });
+
+    it("RuleEraserTool does not execute duplicate coordinates repeatedly", () => {
+        const { editorFacade, view, viewport, ruleLayer, ruleRenderer, historyManager } = createDrawingHarness();
+        ruleLayer.setRuleRefsAt([
+            { coordinate: { col: 0, row: 0 }, rulesetId: "ruleset-a" },
+            { coordinate: { col: 1, row: 0 }, rulesetId: "ruleset-a" },
+        ]);
+
+        const tool = new RuleEraserTool(editorFacade);
+        tool.onEnable();
+        tool.setTargetLayerRenderer(ruleRenderer as any);
+        tool.attachView(view as any);
+
+        viewport.emitPointer("pointerdown", pointer(0, 0));
+        viewport.emitPointer("pointermove", pointer(1, 0));
+        viewport.emitPointer("pointermove", pointer(0, 0));
+        viewport.emitPointer("pointerup", pointer(0, 0));
+
+        expect(historyManager.startTransaction).toHaveBeenCalledTimes(1);
+        expect(historyManager.execute).toHaveBeenCalledTimes(2);
+        expect(historyManager.commitTransaction).toHaveBeenCalledTimes(1);
     });
 
     it("TileBucketTool fills contiguous matching tile refs", () => {
