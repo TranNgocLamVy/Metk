@@ -2,6 +2,7 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 import { VStack } from "@/ui/components/custom/stack/Stack";
+import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { useTilemapSessionEvent } from "@/ui/hooks/useTilemapSessionEvent.hook";
 import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
 import { useWorkspaceStore } from "@/ui/stores/workspace.store";
@@ -149,13 +150,12 @@ export default function TilemapEditor() {
     })
 
     return (
-        <VStack className="tilemapeditor w-full h-full px-frame-quarter pb-frame-quarter relative">
-            <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-				<div className="w-full h-full border border-t-0 border-foreground/30 z-10"/>
-			</div>
-            <TilemapEditorTabs />
-            <ToolBar />
-            <TilemapEditorCanvas />
-        </VStack>
+        <PanelContainer className="tilemap-editor">
+            <VStack className="w-full h-full px-frame-quarter pb-frame-quarter">
+                <TilemapEditorTabs />
+                <ToolBar />
+                <TilemapEditorCanvas />
+            </VStack>
+        </PanelContainer>
     );
 }

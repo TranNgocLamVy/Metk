@@ -2,10 +2,10 @@ import { FolderPlus, SquareArrowOutUpRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import * as ProjectActions from "@/application/actions/project.actions";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { useContextScope } from "../hooks/useContextScope.hook";
-import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { useProjectStore } from "../stores/project.store";
 
 export default function HomePage() {
@@ -16,7 +16,7 @@ export default function HomePage() {
 	useContextScope("inHome", true);
 
 	return (
-		<VStack align="center" justify="center" className="w-full h-full bg-surface-base">
+		<VStack align="center" justify="center" className="w-full h-full bg-surface-raised">
 			<VStack className="w-10/12 h-9/12 gap-2">
 				<h1 className="text-3xl text-foreground font-bold"><LocalizedText message="home.welcome" /></h1>
 				<h2 className="text-base text-muted-foreground font-semibold" ><LocalizedText message="home.description" /></h2>

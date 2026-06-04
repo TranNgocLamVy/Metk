@@ -23,8 +23,12 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 	useLayoutEffect(() => {
 		if (containerRef.current) {
 			const menuBar = document.getElementById("menu-bar");
+			const contextBar = document.getElementById("context-bar");
 			if (menuBar) {
 				containerRef.current.style.paddingTop = `${menuBar.clientHeight}px`;
+			}
+			if (contextBar) {
+				containerRef.current.style.paddingBottom = `${contextBar.clientHeight}px`;
 			}
 		}
 	}, [containerRef.current]);

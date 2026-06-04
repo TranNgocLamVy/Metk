@@ -20,7 +20,7 @@ export default function MenuBar() {
 	};
 
 	return (
-		<HStack id="menu-bar" className="w-full h-fit overflow-hidden bg-surface-sunken shadow-lg fixed top-0">
+		<HStack id="menu-bar" className="w-full h-fit bg-surface-base fixed top-0">
 			<HStack className="text-foreground/70 h-fit">
 				<MenuBarItem item={FileDropdownOptions} />
 				<MenuBarItem item={EditDropdownOptions} />

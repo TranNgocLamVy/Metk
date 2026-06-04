@@ -13,6 +13,7 @@ import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOv
 import MainContainer from "@/ui/components/layout/MainContainer";
 import MenuBar from "@/ui/components/menu-bar/MenuBar";
 import { Toaster } from "@/ui/components/shadcn/sonner";
+import ContextBar from "@/ui/workspace/ContextBar";
 import I18nProvider from "./providers/i18n.provider";
 import AppRoutes from "./routes";
 
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 						<AppRoutes />
 					</MainContainer>
 				</Router>
+				<ContextBar />
 			</ThemeProvider>
 		</ErrorBoundary>
 	</I18nProvider>,
