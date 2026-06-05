@@ -11,18 +11,18 @@ interface MenuBarItemProps {
 }
 
 export default function MenuBarItem({ item }: MenuBarItemProps) {
-    const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 
-    useEffect(() => {
-        const onWindowLoseFocus = () => setIsOpen(false);
-        window.addEventListener("blur", onWindowLoseFocus);
-        return () => window.removeEventListener("blur", onWindowLoseFocus);
-    }, [])
+	useEffect(() => {
+		const onWindowLoseFocus = () => setIsOpen(false);
+		window.addEventListener("blur", onWindowLoseFocus);
+		return () => window.removeEventListener("blur", onWindowLoseFocus);
+	}, [])
 
 	if (item.visible != undefined && !item.visible()) return null;
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
-    const label = typeof item.label === "function" ? item.label() : item.label;
+	const label = typeof item.label === "function" ? item.label() : item.label;
 	const className = twMerge("w-96 bg-surface-base shadow-xl", item.className);
 
 	return (
@@ -47,7 +47,7 @@ function MenuBarDropdownGroup({ groups }: MenuBarDropdownGroupProps) {
 	return (
 		<Fragment>
 			{groups.map((group, index) => {
-                const items = typeof group === "function" ? group() : group;
+				const items = typeof group === "function" ? group() : group;
 				return (
 					<Fragment key={index}>
 						<DropdownMenuGroup>
@@ -68,7 +68,7 @@ type MenuBarDropdownItemProps = {
 };
 
 function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
-    const [, forceUpdate] = useReducer(x => x + 1, 0)
+	const [, forceUpdate] = useReducer(x => x + 1, 0)
 	if (item.visible != undefined && !item.visible()) return null;
 
 	const disabled = (item.disabled != undefined && item.disabled()) || false;
@@ -114,11 +114,13 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 	}
 
 	if (item.type === "check") {
+		const onSelect = (e: Event) => {
+			e.preventDefault();
+			item.toggle();
+			forceUpdate();
+		}
 		return (
-			<DropdownMenuCheckboxItem className="gap-2 h-7 text-xs" checked={item.checked()} disabled={disabled} onSelect={(e) => {
-                e.preventDefault();
-                item.toggle();
-            }}>
+			<DropdownMenuCheckboxItem className="gap-2 h-7 text-xs" checked={item.checked()} disabled={disabled} onSelect={onSelect}>
 				{wrapIcon(item.startIcon, false)}
 				<LocalizedText message={labelKey} />
 				{wrapIcon(item.endIcon, false)}
@@ -129,8 +131,12 @@ function MenuBarDropdownItem({ item }: MenuBarDropdownItemProps) {
 	}
 
 	if (item.type === "radio") {
+		const onValueChange = (value: string) => {
+			item.onValueChange(value);
+			forceUpdate();
+		}
 		return (
-			<DropdownMenuRadioGroup value={item.value()} onValueChange={item.onValueChange}>
+			<DropdownMenuRadioGroup value={item.value()} onValueChange={onValueChange}>
 				{item.items.map((radioItem) => {
 					const disabled = (radioItem.disabled != undefined && radioItem.disabled()) || false;
 					return (

@@ -123,20 +123,16 @@
         "view": {
             "label": "View",
             "action": {
-                "viewAndToolbars": {
+                "layout": {
                     "label": "View and Toolbars",
-                    "project": "Project",
                     "console": "Console",
                     "issues": "Issues",
                     "properties": "Properties",
-                    "layer": "Layer",
-                    "history": "History",
-                    "objects": "Objects",
-                    "templateEditor": "Template Editor",
+                    "layers": "Layers",
+                    "entities": "Entities",
                     "tilesets": "Tilesets",
-                    "terrainSets": "Terrain Sets",
+                    "rulesets": "Rulesets",
                     "minimap": "Mini-map",
-                    "tileStamps": "Tile Stamps",
                     "mainToolbar": "Main Toolbar",
                     "tools": "Tools",
                     "toolOptions": "Tool Options",
@@ -145,21 +141,19 @@
                 },
                 "searchActions": "Search Actions",
                 "showGrid": "Show Grid",
-                "showTileObjectOutlines": "Show Tile Object Outlines",
-                "showObjectReferences": "Show Object References",
-                "showObjectNames": {
-                    "label": "Show Object Names",
+                "showTileEntityOutlines": "Show Tile Entity Outlines",
+                "showEntityNames": {
+                    "label": "Show Entity Names",
                     "never": "Never",
-                    "forSelectedObjects": "For Selected Objects",
-                    "forAllObjects": "For All Objects",
-                    "forHoveredObjects": "For Hovered Objects"
+                    "forSelectedEntities": "For Selected Entities",
+                    "forAllEntities": "For All Entities",
+                    "forHoveredEntities": "For Hovered Entities"
                 },
                 "showTileAnimations": "Show Tile Animations",
                 "showTileCollisionShapes": "Show Tile Collision Shapes",
-                "showWorld": "Show World",
                 "enableParallax": "Enable Parallax",
                 "highlightCurrentLayer": "Highlight Current Layer",
-                "highlightHoveredObject": "Highlight Hovered Object",
+                "highlightHoveredEntity": "Highlight Hovered Entity",
                 "snapping": {
                     "label": "Snapping",
                     "noSnapping": "No Snapping",

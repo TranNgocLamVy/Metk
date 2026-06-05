@@ -45,6 +45,6 @@ export const useSettingStore = create<SettingStoreState>((set) => ({
     },
 }));
 
-appKernel.settings.onDidChangeSetting(() => {
+appKernel.settings.onDidChangeSetting("any", () => {
     useSettingStore.getState().syncFromManager();
 });

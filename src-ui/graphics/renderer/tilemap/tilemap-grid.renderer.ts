@@ -7,6 +7,7 @@ import { DrawDashLineOption, DrawLineOption, GraphicUtils } from "@/shared/utils
 type CreateGridRendererContext = {
     viewport: Viewport;
     tilemap: Tilemap;
+    gridEnabled?: boolean;
 }
 
 export class TilemapGridRenderer {
@@ -17,9 +18,10 @@ export class TilemapGridRenderer {
 
     private bindDrawGrid: () => void;
 
-    constructor(editorFacade: CreateGridRendererContext) {
-        this.viewport = editorFacade.viewport;
-        this.tilemap = editorFacade.tilemap;
+    constructor(context: CreateGridRendererContext) {
+        this.viewport = context.viewport;
+        this.tilemap = context.tilemap;
+        this.gridEnabled = context.gridEnabled ?? false;
 
         this.graphics = new Graphics();
 

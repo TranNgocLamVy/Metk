@@ -18,9 +18,21 @@ import {
     UserSettingsData,
 } from "./setting.types";
 
-type SettingManagerEvents<TPages extends readonly SettingPage[]> = {
-    didChangeSetting: (event: SettingChangeEventFromPages<TPages>) => void;
+type SettingManagerEvents = {
+    didChangeSetting: (event: RuntimeSettingChangeEvent) => void;
 };
+
+type RuntimeSettingChangeEvent = {
+    key: string;
+    oldValue: SettingValue;
+    newValue: SettingValue;
+    definition: RegisteredSettingDefinition;
+};
+
+type SettingChangeEventForKey<
+    TPages extends readonly SettingPage[],
+    TKey extends SettingKeyFromPages<TPages>,
+> = Extract<SettingChangeEventFromPages<TPages>, { key: TKey }>;
 
 const defaultUserSettingsData = (): UserSettingsData => ({
     version: 1,
@@ -28,7 +40,7 @@ const defaultUserSettingsData = (): UserSettingsData => ({
 });
 
 export class SettingManager<TPages extends readonly SettingPage[] = DefaultSettingPages> {
-    private readonly eventEmitter = new EventEmitter<SettingManagerEvents<TPages>>();
+    private readonly eventEmitter = new EventEmitter<SettingManagerEvents>();
     private userSettings: UserSettingsData = defaultUserSettingsData();
 
     constructor(
@@ -175,9 +187,41 @@ export class SettingManager<TPages extends readonly SettingPage[] = DefaultSetti
         return Result.Success();
     }
 
-    public onDidChangeSetting(listener: (event: SettingChangeEventFromPages<TPages>) => void): () => void {
-        this.eventEmitter.on("didChangeSetting", listener);
-        return () => this.eventEmitter.off("didChangeSetting", listener);
+    public onDidChangeSetting(listener: (event: SettingChangeEventFromPages<TPages>) => void): () => void;
+
+    public onDidChangeSetting<TKey extends SettingKeyFromPages<TPages>>(key: TKey, listener: (event: SettingChangeEventForKey<TPages, TKey>) => void): () => void;
+
+    public onDidChangeSetting(key: "any", listener: (event: SettingChangeEventFromPages<TPages>) => void): () => void;
+
+    public onDidChangeSetting<TKey extends SettingKeyFromPages<TPages>>(keyOrListener: TKey | "any" | ((event: SettingChangeEventFromPages<TPages>) => void), listener?: unknown): () => void {
+        if (typeof keyOrListener === "function") {
+            const typedListener = keyOrListener;
+
+            const wrappedListener = (event: RuntimeSettingChangeEvent) => {
+                typedListener(event as SettingChangeEventFromPages<TPages>);
+            };
+
+            this.eventEmitter.on("didChangeSetting", wrappedListener);
+            return () => this.eventEmitter.off("didChangeSetting", wrappedListener);
+        }
+
+        const key = keyOrListener;
+
+        const wrappedListener = (event: RuntimeSettingChangeEvent) => {
+            if (key !== "any" && event.key !== key) return;
+
+            if (key === "any") {
+                const listenerForAny = listener as (event: SettingChangeEventFromPages<TPages>) => void;
+                listenerForAny(event as SettingChangeEventFromPages<TPages>);
+                return;
+            }
+
+            const listenerForKey = listener as (event: SettingChangeEventForKey<TPages, TKey>) => void;
+            listenerForKey(event as SettingChangeEventForKey<TPages, TKey>);
+        };
+
+        this.eventEmitter.on("didChangeSetting", wrappedListener);
+        return () => this.eventEmitter.off("didChangeSetting", wrappedListener);
     }
 
     private resolveValue<TKey extends SettingKeyFromPages<TPages>>(

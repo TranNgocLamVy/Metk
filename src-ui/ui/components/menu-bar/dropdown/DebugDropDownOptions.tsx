@@ -31,21 +31,6 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 			console.log(appKernel.projectManager.serialize());
 		}
 	},
-	{
-		type: "option",
-		label: "Print setting",
-		onClick() {
-			console.log(appKernel.settings.get("general.view.showGrid"));
-		}
-	},
-	{
-		type: "option",
-		label: "Toggle setting",
-		onClick() {
-            const showGrid = appKernel.settings.get("general.view.showGrid");
-            appKernel.settings.update("general.view.showGrid", !showGrid);
-		}
-	},
 ];
 
 export const DebugDropdownOptions: MenuItemType = {

@@ -1,8 +1,10 @@
-import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Info, Pen, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
+import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Info, Plus, Redo, Scissors, Stamp, Trash2, Undo } from "lucide-react";
 
-import { appKernel } from "@/application/bootstrap/app-kernel";
 import * as TilemapActions from "@/application/actions/tilemap.actions";
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { usePropertyStore } from "@/ui/stores/property.store";
+
+const settings = appKernel.settings;
 
 const ActionGroup: MenuDropDownGroupType = [
     {
@@ -161,16 +163,8 @@ const GridGroup: MenuDropDownGroupType = [
         type: "check",
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
-        checked() {
-            const activeTilemapView = appKernel.editorFacade.getActiveTilemapView();
-            if (!activeTilemapView) return false;
-            return activeTilemapView.grid.gridEnabled
-        },
-        toggle() {
-            const activeTilemapView = appKernel.editorFacade.getActiveTilemapView();
-            if (!activeTilemapView) return;
-            return activeTilemapView.toggleGrid();
-        },
+        checked: () => settings.get("general.view.showGrid"),
+		toggle: () => settings.update("general.view.showGrid", !settings.get("general.view.showGrid"))
     }
 ];
 

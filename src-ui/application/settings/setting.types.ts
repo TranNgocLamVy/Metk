@@ -15,16 +15,23 @@ export type SettingEnumOption = {
     description?: string;
 };
 
-type SettingBaseDefinition<TType extends SettingType, TValue extends SettingValue> = {
-    key: string;
+export type VisibleSettingBaseDefinition = {
     label: string;
     description: string;
+}
+
+export type InvisibleSettingBaseDefinition = {
+    visible: false;
+}
+
+type SettingBaseDefinition<TType extends SettingType, TValue extends SettingValue> = {
+    key: string;
     type: TType;
     defaultValue: TValue;
     order?: number;
     requiresReload?: boolean;
     scope?: SettingScope;
-};
+} & (VisibleSettingBaseDefinition | InvisibleSettingBaseDefinition);
 
 export type StringSettingDefinition = SettingBaseDefinition<"string", string> & {
     minLength?: number;
@@ -49,21 +56,40 @@ export type SettingDefinition =
     | BooleanSettingDefinition
     | EnumSettingDefinition;
 
-export type SettingGroup = {
+export type VisibleSettingGroup = {
     key: string;
     label: string;
     description: string;
     order?: number;
     settings: readonly SettingDefinition[];
-};
+}
 
-export type SettingPage = {
+export type InvisibleSettingGroup = {
+    key: string;
+    visible: false;
+    order?: number;
+    settings: readonly SettingDefinition[];
+}
+
+export type SettingGroup = VisibleSettingGroup | InvisibleSettingGroup;
+
+
+export type VisibleSettingPage = {
     key: string;
     label: string;
     description: string;
     order?: number;
     groups: readonly SettingGroup[];
-};
+}
+
+export type InvisibleSettingPage = {
+    key: string;
+    visible: false;
+    order?: number;
+    groups: readonly SettingGroup[];
+}
+
+export type SettingPage = VisibleSettingPage | InvisibleSettingPage;
 
 export type SettingEntryFromPages<TPages extends readonly SettingPage[]> =
     TPages[number] extends infer TPage

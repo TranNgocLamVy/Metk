@@ -1,10 +1,11 @@
 import { Viewport } from "pixi-viewport";
 import { Application, Container } from "pixi.js";
 
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { IBaseView } from "@/editor/interface/base-session.interface";
 import { TilemapSession } from "@/editor/session/tilemap.session";
-import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
+import { appKernel } from "@/application/bootstrap/app-kernel";
 import { TilemapGridRenderer } from "../renderer/tilemap/tilemap-grid.renderer";
 import { TilemapRenderer } from "../renderer/tilemap/tilemap.renderer";
 
@@ -18,6 +19,8 @@ export class TilemapView implements IBaseView {
     public grid: TilemapGridRenderer;
 
     private isInit: boolean = false;
+
+    private disposable: (() => void)[] = []
 
     constructor(session: TilemapSession) {
         this.session = session;
@@ -87,8 +90,11 @@ export class TilemapView implements IBaseView {
             this.viewport.cursor = "default";
         });
 
+        const settings = appKernel.settings
+        const showGrid = settings.get("general.view.showGrid")
+
         // Initialize Renderer
-        this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap });
+        this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap, gridEnabled: showGrid });
         this.renderer = new TilemapRenderer({ tilemap: this.session.tilemap, viewport: this.viewport });
         this.overlayerContainer = new Container();
 
@@ -96,6 +102,16 @@ export class TilemapView implements IBaseView {
         this.viewport.addChild(this.renderer.container);
         this.viewport.addChild(this.overlayerContainer);
         this.viewport.addChild(this.grid.graphics);
+
+        const onShowGridChanged = settings.onDidChangeSetting("general.view.showGrid", (event) => {
+            const value = event.newValue;
+            if (value) {
+                this.grid.enableGrid();
+            } else {
+                this.grid.disableGrid();
+            }
+        })
+        this.disposable.push(onShowGridChanged)
     }
 
     public activateView(pixiApp: Application) {
@@ -135,6 +151,8 @@ export class TilemapView implements IBaseView {
         window.removeEventListener('pointermove', this.handleNativePointerState);
         window.removeEventListener('pointerup', this.handleNativePointerState);
         window.removeEventListener('wheel', this.handleNativePointerState);
+
+        this.disposable.forEach(d => d());
 
         if (this.renderer) this.renderer.destroy();
 
