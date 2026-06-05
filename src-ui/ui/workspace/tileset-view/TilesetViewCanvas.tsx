@@ -40,7 +40,7 @@ export default function TilesetViewCanvas() {
 	return (
 		<div ref={containerRef} className="flex w-full h-full overflow-hidden pt-2 px-frame-quarter relative">
 			<ContextMenuWrapper item={TilesetViewContextMenu}>
-				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas rounded-md inset-shadow-panel border-t border-foreground/30" />
+				<PixiApplication onInit={onInit} autoStart backgroundAlpha={0} className="bg-canvas rounded-md inset-shadow-panel border-t-(length:--panel-border-width) border-frame" />
 			</ContextMenuWrapper>
 			{activeSession == null && <VStack justify="center" align="center" className="absolute w-full h-full top-0 left-0 pr-2">
 				<span className="text-sm">

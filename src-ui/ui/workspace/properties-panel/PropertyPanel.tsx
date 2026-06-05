@@ -92,8 +92,8 @@ export default function PropertyPanel() {
     return (
         <PanelContainer className="property-panel">
             <VStack className="w-full h-full px-frame-quarter pb-frame-half pt-2">
-                <VStack className="w-full h-full bg-surface-base">
-                {object && <PropertiesList object={object} />}
+                <VStack className="w-full h-full bg-surface-base border-(length:--panel-border-width) border-frame">
+                    {object && <PropertiesList object={object} />}
                 </VStack>
             </VStack>
         </PanelContainer>

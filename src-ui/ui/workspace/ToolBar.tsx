@@ -64,12 +64,12 @@ export default function ToolBar() {
 	};
 
 	return (
-		<VStack className="w-fit h-fit p-1 bg-surface">
-			<HStack className="w-full h-8 gap-1">
+		<VStack className="w-fit h-fit p-1 px-1.5 bg-surface">
+			<HStack className="w-full h-8 gap-1.5">
 				{groups.sort((a, b) => a.items[0].index - b.items[0].index).map((group, index) => {
 					return (
 						<Fragment key={group.id}>
-							<HStack className="gap-0.5">
+							<HStack className="gap-1">
 								{group.items.map((tool, index) => {
 									const isActive = activeFamilyId === tool.id;
 									const isAvailable = availableFamilyIds.includes(tool.id);

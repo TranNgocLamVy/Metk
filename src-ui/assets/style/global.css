@@ -46,6 +46,8 @@
 	--spacing-frame: var(--frame-size);
   	--spacing-frame-half: calc(var(--frame-size) / 2);
   	--spacing-frame-quarter: calc(var(--frame-size) / 4);
+
+	--color-frame: var(--panel-border-color);
 }
 
 @layer base {
@@ -94,6 +96,10 @@
 	--frame-size: 20px;
 	--frame-size-half: calc(var(--frame-size) / 2);
 	--frame-size-quarter: calc(var(--frame-size) / 4);
+
+	/* Flexlayout panel border */
+	--panel-border-width: 1px;
+	--panel-border-color: color-mix(in srgb, var(--foreground) 40%, transparent)
 }
 
 .dark {

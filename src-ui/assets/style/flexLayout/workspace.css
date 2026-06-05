@@ -101,7 +101,7 @@
     right: 0;
     bottom: 0;
     
-    border: 1px solid color-mix(in srgb, var(--foreground) 40%, transparent);
+    border: var(--panel-border-width) solid var(--panel-border-color);
 	border-bottom: none;
     pointer-events: none; 
 }
@@ -118,7 +118,7 @@
     right: 0;
     bottom: 0;
     
-    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 40%, transparent);
+    border-bottom: var(--panel-border-width) solid var(--panel-border-color);
     pointer-events: none; 
 }
 

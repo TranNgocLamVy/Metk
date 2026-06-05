@@ -11,7 +11,7 @@ export default function PanelContainer({ children, className }: Props) {
     return (
         <VStack className={mergeClassName}>
             <div className="flex absolute top-0 left-0 right-0 bottom-0 pointer-events-none pb-frame-half px-frame-quarter">
-                <div className="w-full h-full border border-t-0 border-foreground/30 z-10 shadow-md" />
+                <div className="w-full h-full border-(length:--panel-border-width) border-t-0 border-frame z-10 shadow-md" />
             </div>
             {children}
         </VStack>

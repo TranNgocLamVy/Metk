@@ -123,7 +123,7 @@ export default function EntityCollectionManager() {
         <PanelContainer className="entity-collection-manager">
             <VStack className="w-full h-full px-frame-quarter pb-frame-half pt-1 bg-surface">
                 <EntityCollectionMenuBar />
-                <ScrollArea className="flex flex-1 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
+                <ScrollArea className="flex flex-1 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t-(length:--panel-border-width) border-frame">
                     {!activeEntityCollection ? (
                         <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
                             <LocalizedText message="workspace.entityCollectionManager.empty" />

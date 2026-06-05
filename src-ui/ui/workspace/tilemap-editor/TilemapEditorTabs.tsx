@@ -17,7 +17,7 @@ export default function TilemapEditorTabs() {
 
 	return (
 		<HStack className="w-full h-fit relative bg-surface z-10" justify="start" align="center">
-			<div className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none border-b border-foreground/30" />
+			<div className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none border-b-(length:--panel-border-width) border-frame" />
 			<div ref={ref} className="flex flex-row items-center overflow-x-auto scroll-smooth no-scrollbar w-full h-8 bg-surface-sunken">
 				{tilemapSessions.map((session) => {
 					const isCurrent = activeSession?.id === session.sessionId;
@@ -42,7 +42,7 @@ export default function TilemapEditorTabs() {
                             className={`group relative h-full pr-1 rounded-none cursor-pointer border-none ${isCurrent ? "text-foreground bg-surface" : "text-muted-foreground hover:text-foreground bg-transparent"}`}
                         >
 							{session.name}
-							{isCurrent && <div className="absolute bottom-0 top-0 left-0 right-0 border border-b-0 pointer-events-none border-foreground/30" />}
+							{isCurrent && <div className="absolute bottom-0 top-0 left-0 right-0 border-(length:--panel-border-width) border-b-0 pointer-events-none border-frame" />}
 							<div className="group/icon ml-1 flex w-6 h-6 items-center justify-center rounded-md hover:bg-surface-sunken" onClick={closeTilemapSession}>
 								{isDirty ? (
 									<Fragment>

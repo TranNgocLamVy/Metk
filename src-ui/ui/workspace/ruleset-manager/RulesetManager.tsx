@@ -51,7 +51,7 @@ export default function RulesetManager() {
                 <RulesetMenuBar />
                 <ContextMenu>
                     <ContextMenuTrigger asChild>
-                        <ScrollArea className="w-full h-full min-h-0 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
+                        <ScrollArea className="w-full h-full min-h-0 no-scrollbar bg-surface-base rounded-md inset-shadow-panel border-t-(length:--panel-border-width) border-frame">
                             <div className="flex flex-col w-full h-full">
                                 {rulesetDisplayDatas.map((ruleset) => {
                                     const isSelected = currentSelectedRuleId === ruleset.id;

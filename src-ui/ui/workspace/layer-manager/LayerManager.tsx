@@ -148,7 +148,7 @@ export default function LayerManager() {
 				<LayerMenuBar />
 				<ContextMenu onOpenChange={onOpenChange}>
 					<ContextMenuTrigger asChild>
-						<ScrollArea className="w-full h-full min-h-0 shadow-sm bg-surface-base rounded-md inset-shadow-panel border-t border-foreground/30">
+						<ScrollArea className="w-full h-full min-h-0 shadow-sm bg-surface-base rounded-md inset-shadow-panel border-t-(length:--panel-border-width) border-frame">
 							<div className="flex flex-col w-full h-full pb-20">
 								{layerViews.map((view) => (
 									<LayerNodeRow key={view.id} view={view} isSelected={selectedLayers.includes(view.id)} updatedLayerView={updateLayerView} />

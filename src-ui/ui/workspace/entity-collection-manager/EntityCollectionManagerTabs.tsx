@@ -21,7 +21,7 @@ export default function EntityCollectionManagerTabs() {
         <HStack className="w-full" justify="start" align="center">
             <DropdownMenu>
                 <DropdownMenuTrigger>
-                    <Button variant={"ghost"} size={"icon"} asChild className="p-1.5 border border-foreground/30 border-x-0">
+                    <Button variant={"ghost"} size={"icon"} asChild className="p-1.5 border-(length:--panel-border-width) border-frame border-x-0">
                         <Ellipsis />
                     </Button>
                 </DropdownMenuTrigger>
@@ -47,7 +47,7 @@ export default function EntityCollectionManagerTabs() {
                 </DropdownMenuContent>
             </DropdownMenu>
             <div ref={ref} className="flex flex-row relative items-center overflow-y-scroll scroll-smooth no-scrollbar bg-surface-sunken w-full h-8">
-                <div className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none border border-foreground/30" />
+                <div className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none border-(length:--panel-border-width) border-frame" />
                 {entityCollectionDisplayDatas.map((collection) => {
                     const isCurrent = currentSelectedEntityCollectionId === collection.id;
 
@@ -65,7 +65,7 @@ export default function EntityCollectionManagerTabs() {
                                 : "bg-transparent"
                                 }`}
                         >
-                            {isCurrent && <div className="absolute bottom-0 top-0 left-0 right-0 border pointer-events-none border-foreground/30" />}
+                            {isCurrent && <div className="absolute bottom-0 top-0 left-0 right-0 border-(length:--panel-border-width) pointer-events-none border-frame" />}
                             {collection.name}
                         </Button>
                     );
