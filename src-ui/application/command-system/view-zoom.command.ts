@@ -71,7 +71,7 @@ export class ViewNormalSizeCommand implements ISystemCommand {
     id: SYSTEM_COMMAND_IDS.TilemapViewFitMapInView,
     name: "Fit Map in View",
     description: "",
-    shortcuts: ["Ctrl+Shift+0"],
+    shortcuts: ["Ctrl+\\"],
     when: "tilmapSessionOpened && !isModalOpen",
 })
 export class ViewFitMapInViewCommand implements ISystemCommand {
