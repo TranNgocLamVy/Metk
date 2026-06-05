@@ -16,7 +16,7 @@ export class LayerUtils {
             switch (data.type) {
                 case "tile":
                     return new TileLayer(data as TileLayerData, parent, tilemap, objectIdScope);
-                case "auto_rule":
+                case "rule":
                     return new RuleLayer(data as RuleLayerData, parent, tilemap, objectIdScope);
                 case "image":
                     return new ImageLayer(data as ImageLayerData, parent, tilemap, objectIdScope);

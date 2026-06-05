@@ -9,15 +9,10 @@ import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { GroupLayerRenderer } from "@/graphics/renderer/tilemap/group-layer.renderer";
 import { BUILTIN_TOOL_GROUPS } from "@/graphics/tool/builtin-tools";
-import {
-    LayerKind,
-    ResolvedToolDefinition,
-    ToolAvailabilityContext,
-    ToolFamilyDefinition,
-    ToolGroupDefinition,
-} from "@/graphics/tool/tool.definition";
+import { ResolvedToolDefinition, ToolAvailabilityContext, ToolFamilyDefinition, ToolGroupDefinition } from "@/graphics/tool/tool.definition";
 import { ToolRegistry } from "@/graphics/tool/tool.registry";
 import { TilemapView } from "@/graphics/view/tilemap.view";
+import { LayerKind } from "@/shared/data-types/layer.data";
 
 type ToolManagerEvent = {
     onToolChanged: (familyId: string | null, concreteToolId?: string | null) => void;
@@ -74,6 +69,10 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
 
     public getCurrentFamilyId(): string | null {
         return this.currentFamilyId;
+    }
+
+    public getCurrentLayerKind(): LayerKind {
+        return this.currentLayerKind;
     }
 
     public getToolGroups(): ToolGroupDefinition[] {
@@ -208,7 +207,8 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
             }
         }
 
-        const fallbackFamilyId = this.getFallbackFamilyIdForCurrentContext();
+        const rememberedFamilyId = this.getRememberedFamilyIdForCurrentContext();
+        const fallbackFamilyId = rememberedFamilyId ?? this.getFallbackFamilyIdForCurrentContext();
         if (!fallbackFamilyId) {
             this.clearTool();
             return;
@@ -221,6 +221,15 @@ export class ToolManager extends EventEmitter<ToolManagerEvent> {
         }
 
         this.startConcreteTool(fallbackTool, fallbackFamilyId);
+    }
+
+    private getRememberedFamilyIdForCurrentContext(): string | null {
+        const rememberedFamilyId = this.editorFacade.currentWorkspace?.toolSessionManager?.getRememberedToolFamilyForLayerKind(this.currentLayerKind);
+        if (!rememberedFamilyId) return null;
+
+        return this.registry.resolveToolForFamily(rememberedFamilyId, this.getAvailabilityContext())
+            ? rememberedFamilyId
+            : null;
     }
 
     private getFallbackFamilyIdForCurrentContext(): string | null {

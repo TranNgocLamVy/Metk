@@ -1,13 +1,13 @@
 import { defaultWorkspaceData } from "@/shared/data-types/workspace.data";
 import { Result } from "@/shared/types/result";
 
-import { EditorFacade } from "../editor.facade";
+import { Project } from "@/editor/model/project/project";
 import { Workspace } from "@/editor/model/workspace/workspace";
 import { WorkspaceStorageService } from "@/infrastructure/container";
 import { PathUtils } from "@/shared/utils/path.utils";
-import EventEmitter from "eventemitter3";
-import { Project } from "@/editor/model/project/project";
 import { Console } from "@/ui/notifications/console-gateway";
+import EventEmitter from "eventemitter3";
+import { EditorFacade } from "../editor.facade";
 
 type WorkspaceManagerEvent = {
     onWorkspaceLoaded: (workspace: Workspace) => void;

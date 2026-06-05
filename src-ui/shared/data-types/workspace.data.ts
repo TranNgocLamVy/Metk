@@ -1,11 +1,11 @@
 import { EntityCollectionSessionManagerData } from "./entity-collection-session.data";
+import { LayerKind } from "./layer.data";
 import { RulesetSessionManagerData } from "./ruleset-session.data";
 import { TilemapSessionManagerData } from "./tilemap-session.data";
 import { TilesetSessionManagerData } from "./tileset-session.data";
 
-export type ToolStateData = {
-    currentToolFamily: string | null;
-};
+
+export type ToolStateData = Partial<Record<LayerKind, string>>;
 
 export type ExportPathData = {
     tilemapId: string;
@@ -24,17 +24,21 @@ export type PropertyPanelStateData = {
     selectedObjectId: string | null;
 };
 
-export type WorkpsaceData = {
+export type TilemapEditorWorkspaceData = {
     tilesets: TilesetSessionManagerData;
     tilemaps: TilemapSessionManagerData;
     ruleset: RulesetSessionManagerData;
     entityCollection: EntityCollectionSessionManagerData;
     toolState: ToolStateData;
-    savedPath: SavedPathData;
     propertyPanel: PropertyPanelStateData;
 };
 
-export const defaultWorkspaceData: WorkpsaceData = {
+export type WorkpsaceData = {
+    tilemapEditorWorkspace: TilemapEditorWorkspaceData;
+    savedPath: SavedPathData;
+};
+
+export const defaultTilemapEditorWorkspaceData: TilemapEditorWorkspaceData = {
     tilesets: {
         tilesetSessions: [],
         currentTilesetSessionId: null,
@@ -50,17 +54,19 @@ export const defaultWorkspaceData: WorkpsaceData = {
         selectedEntityCollectionId: null,
         selectedEntityId: null,
     },
-    toolState: {
-        currentToolFamily: null,
+    toolState: {},
+    propertyPanel: {
+        selectedObjectId: null,
     },
+};
+
+export const defaultWorkspaceData: WorkpsaceData = {
+    tilemapEditorWorkspace: defaultTilemapEditorWorkspaceData,
     savedPath: {
         exportPaths: [],
         tilemapDir: null,
         tilesetDir: null,
         rulesetDir: null,
         textureDir: null,
-    },
-    propertyPanel: {
-        selectedObjectId: null,
     },
 };

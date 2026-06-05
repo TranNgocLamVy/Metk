@@ -20,8 +20,9 @@ import moveIcon from "@/assets/icons/move.svg?raw";
 import rectangleIcon from "@/assets/icons/rect.svg?raw";
 import lineIcon from "@/assets/icons/ruler.svg?raw";
 import stampIcon from "@/assets/icons/stamp.svg?raw";
+import { LayerKind } from "@/shared/data-types/layer.data";
 
-const canUseKinds = (...layerKinds: ToolAvailabilityContext["layerKind"][]) => {
+const canUseKinds = (...layerKinds: LayerKind[]) => {
     return (ctx: ToolAvailabilityContext) => !!ctx.activeView && layerKinds.includes(ctx.layerKind);
 };
 
@@ -190,3 +191,33 @@ export const BUILTIN_TOOL_GROUPS: ToolGroupDefinition[] = [
         ],
     },
 ];
+
+export const createBuiltinToolFamilyIdSetForLayerKinds = (layerKinds: readonly LayerKind[]): Set<string> => {
+    const result = new Set<string>();
+
+    for (const group of BUILTIN_TOOL_GROUPS) {
+        for (const family of group.families) {
+            const supportsAllLayerKinds = layerKinds.every((layerKind) => {
+                const context: ToolAvailabilityContext = {
+                    activeView: {} as ToolAvailabilityContext["activeView"],
+                    targetLayerRenderer: null,
+                    layerKind,
+                };
+
+                return family.tools.some((tool) => {
+                    try {
+                        return tool.canUse(context);
+                    } catch {
+                        return false;
+                    }
+                });
+            });
+
+            if (supportsAllLayerKinds) {
+                result.add(family.id);
+            }
+        }
+    }
+
+    return result;
+};

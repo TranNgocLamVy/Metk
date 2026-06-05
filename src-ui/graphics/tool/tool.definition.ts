@@ -1,14 +1,7 @@
+import { IToolContructor } from "@/editor/interface/tool.interface";
 import { BaseLayerRenderer } from "@/graphics/renderer/tilemap/base-layer.renderer";
 import { TilemapView } from "@/graphics/view/tilemap.view";
-import { IToolContructor } from "@/editor/interface/tool.interface";
-
-export type LayerKind =
-    | "none"
-    | "group"
-    | "tile"
-    | "rule"
-    | "entity"
-    | "image";
+import { LayerKind } from "@/shared/data-types/layer.data";
 
 export type ToolGroupId =
     | "navigation"

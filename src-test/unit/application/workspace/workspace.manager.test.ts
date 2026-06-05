@@ -21,6 +21,7 @@ const createEditorFacade = () => ({
         startTool: vi.fn(),
         startToolFamily: vi.fn(),
         getCurrentFamilyId: vi.fn(() => null),
+        getCurrentLayerKind: vi.fn(() => "none"),
         on: vi.fn(),
         off: vi.fn(),
     },
@@ -38,7 +39,22 @@ const createProject = () => ({
 
 const createStoredWorkspaceData = (): WorkpsaceData => ({
     ...defaultWorkspaceData,
-    toolState: { currentToolFamily: "stamp" },
+    tilemapEditorWorkspace: {
+        ...defaultWorkspaceData.tilemapEditorWorkspace,
+        toolState: { tile: "tool.stamp", rule: "tool.stamp" },
+    },
+    savedPath: {
+        exportPaths: [{ tilemapId: "tilemap-a", exportPath: "C:/exports/tilemap-a.tmx" }],
+        tilemapDir: "C:/maps",
+        tilesetDir: "C:/tilesets",
+        rulesetDir: "C:/rulesets",
+        textureDir: "C:/textures",
+    },
+});
+
+const createLegacyStoredWorkspaceData = () => ({
+    ...defaultWorkspaceData.tilemapEditorWorkspace,
+    toolState: { currentToolFamily: "tool.stamp" },
     savedPath: {
         exportPaths: [{ tilemapId: "tilemap-a", exportPath: "C:/exports/tilemap-a.tmx" }],
         tilemapDir: "C:/maps",
@@ -99,9 +115,37 @@ describe("WorkspaceManager", () => {
 
         expect(result.status).toBe(Result.Status.Success);
         expect(WorkspaceStorageService.load).toHaveBeenCalledWith("C:/Project/Metk/test-project/.metk/session.json");
-        expect(editorFacade.toolManager.startToolFamily).toHaveBeenCalledWith("stamp");
         expect(manager.currentWorkspace?.serialize()).toEqual(storedWorkspaceData);
         expect(WorkspaceStorageService.save).not.toHaveBeenCalled();
+    });
+
+    it("migrates an existing legacy workspace session to the nested tilemap editor workspace shape", async () => {
+        const manager = new WorkspaceManager();
+        const editorFacade = createEditorFacade();
+        const project = createProject();
+        const legacyWorkspaceData = createLegacyStoredWorkspaceData();
+        manager.setEditorContext(editorFacade);
+        (WorkspaceStorageService.exists as any).mockResolvedValue(true);
+        (WorkspaceStorageService.load as any).mockResolvedValue(Result.Success(legacyWorkspaceData));
+
+        const result = await manager.loadWorkspace(project);
+
+        expect(result.status).toBe(Result.Status.Success);
+        expect(manager.currentWorkspace?.serialize()).toEqual(createStoredWorkspaceData());
+        expect(WorkspaceStorageService.save).toHaveBeenCalledWith(
+            "C:/Project/Metk/test-project/.metk/session.json",
+            createStoredWorkspaceData(),
+        );
+        const savedData = (WorkspaceStorageService.save as any).mock.calls[0][1];
+        expect(savedData.savedPath).toEqual(createStoredWorkspaceData().savedPath);
+        expect(savedData.tilemapEditorWorkspace.toolState).toEqual({ tile: "tool.stamp", rule: "tool.stamp" });
+        expect(savedData.tilemapEditorWorkspace.toolState).not.toHaveProperty("currentToolFamily");
+        expect(savedData).not.toHaveProperty("tilesets");
+        expect(savedData).not.toHaveProperty("tilemaps");
+        expect(savedData).not.toHaveProperty("ruleset");
+        expect(savedData).not.toHaveProperty("entityCollection");
+        expect(savedData).not.toHaveProperty("propertyPanel");
+        expect(savedData).not.toHaveProperty("toolState");
     });
 
     it("falls back to a default workspace and schedules a save when existing session loading fails", async () => {
@@ -121,6 +165,15 @@ describe("WorkspaceManager", () => {
             "C:/Project/Metk/test-project/.metk/session.json",
             defaultWorkspaceData,
         );
+        const savedData = (WorkspaceStorageService.save as any).mock.calls[0][1];
+        expect(savedData).toHaveProperty("tilemapEditorWorkspace");
+        expect(savedData).toHaveProperty("savedPath");
+        expect(savedData).not.toHaveProperty("tilesets");
+        expect(savedData).not.toHaveProperty("tilemaps");
+        expect(savedData).not.toHaveProperty("ruleset");
+        expect(savedData).not.toHaveProperty("entityCollection");
+        expect(savedData).not.toHaveProperty("propertyPanel");
+        expect(savedData).not.toHaveProperty("toolState");
     });
 
     it("destroys the existing workspace before loading a replacement workspace", async () => {

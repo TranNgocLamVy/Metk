@@ -38,7 +38,7 @@ const workspaceModelMocks = vi.hoisted(() => {
     class MockToolSessionManager {
         public load = vi.fn();
         public destroy = vi.fn();
-        public serialize = vi.fn(() => ({ currentToolFamily: "tool.stamp" }));
+        public serialize = vi.fn(() => ({ tile: "tool.stamp", rule: "tool.stamp" }));
         constructor(public data: any, public editorFacade: any) {
             instances.toolSessionManager = this;
         }
@@ -166,12 +166,14 @@ describe("Workspace model", () => {
         expect(workspaceModelMocks.instances.toolSessionManager.load).toHaveBeenCalledTimes(1);
 
         expect(workspace.serialize()).toEqual({
-            tilesets: { tilesetSessions: [{ id: "tileset-session" }], currentTilesetSessionId: "tileset-session" },
-            tilemaps: { tilemapSessions: [{ id: "tilemap-session" }], currentTilemapSessionId: "tilemap-session" },
-            ruleset: { selectedRuleId: "ruleset-a" },
-            entityCollection: { selectedEntityCollectionId: null, selectedEntityId: null },
-            propertyPanel: { selectedObjectId: null },
-            toolState: { currentToolFamily: "tool.stamp" },
+            tilemapEditorWorkspace: {
+                tilesets: { tilesetSessions: [{ id: "tileset-session" }], currentTilesetSessionId: "tileset-session" },
+                tilemaps: { tilemapSessions: [{ id: "tilemap-session" }], currentTilemapSessionId: "tilemap-session" },
+                ruleset: { selectedRuleId: "ruleset-a" },
+                entityCollection: { selectedEntityCollectionId: null, selectedEntityId: null },
+                propertyPanel: { selectedObjectId: null },
+                toolState: { tile: "tool.stamp", rule: "tool.stamp" },
+            },
             savedPath: { exportPaths: ["C:/exports"], tilemapDir: "C:/tilemaps" },
         });
 

@@ -1,13 +1,13 @@
-import { v4 as uuidv4 } from "uuid";
 import { RuleLayerData, RulesetRefData } from "@/shared/data-types/layer.data";
 import { Result } from "@/shared/types/result";
 import { MatrixUtils } from "@/shared/utils/maxtrix.utils";
+import { v4 as uuidv4 } from "uuid";
 
-import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 import { Point2DProperty } from "@/editor/properties/properties.decorator";
-import { Tilemap } from "../tilemap";
-import type { PropertyUpdateMeta } from "../../base-object";
 import { validate } from "@/shared/utils/validate.utils";
+import type { PropertyUpdateMeta } from "../../base-object";
+import { Tilemap } from "../tilemap";
+import { BaseLayer, BaseLayerEvents, IGroupLayer } from "./base-layer";
 
 interface RuleLayerEvents extends BaseLayerEvents {
     rulesetRefsOutputChanged: (coordinates: Coordinate[]) => void
@@ -282,7 +282,7 @@ export class RuleLayer extends BaseLayer<RuleLayerEvents> {
 
         return {
             id: this.id,
-            type: "auto_rule",
+            type: "rule",
             name: this.name,
             x: this.coordinate.col,
             y: this.coordinate.row,

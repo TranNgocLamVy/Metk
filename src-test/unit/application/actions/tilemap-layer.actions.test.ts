@@ -13,6 +13,8 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({
     appKernel: kernelState.appKernel,
 }));
 
+import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
 import { CreateRuleLayerCommand } from "@/application/commands/layer/create-rule-layer.command";
 import { CreateTileLayerCommand } from "@/application/commands/layer/create-tile-layer.command";
@@ -20,12 +22,10 @@ import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.co
 import { DuplicateLayerCommand } from "@/application/commands/layer/duplicate-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
 import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
-import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { EditorFacade } from "@/application/editor.facade";
+import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
-import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 import {
     createTilemap,
@@ -160,7 +160,7 @@ describe("TilemapLayerService layer creation", () => {
         const editingId = useLayerManagerStore.getState().editingId;
         expect(root.findLayer(editingId!)?.parentLayer.id).toBe("group-a");
         expect(root.findLayer(editingId!)?.serialize()).toMatchObject({
-            type: "auto_rule",
+            type: "rule",
             width: 4,
             height: 4,
         });

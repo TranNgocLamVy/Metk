@@ -38,7 +38,7 @@ const createTileLayerData = (overrides: Partial<TileLayerData> = {}): TileLayerD
 
 const createRuleLayerData = (overrides: Partial<RuleLayerData> = {}): RuleLayerData => ({
     id: "rule-layer",
-    type: "auto_rule",
+    type: "rule",
     name: "Auto Rules",
     x: 0,
     y: 0,

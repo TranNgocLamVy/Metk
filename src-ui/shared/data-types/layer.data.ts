@@ -11,8 +11,19 @@ export type RulesetRefData = {
     output?: TileRefData;
 };
 
+export const LayerKind = [
+    "none",
+    "group",
+    "tile",
+    "rule",
+    "entity",
+    "image",
+] as const;
+export type LayerKind = typeof LayerKind[number];
+
 type LayerCommonData = {
     id: string;
+    type: LayerKind;
     name?: string;
     opacity?: number;
     visible?: boolean;
@@ -34,7 +45,7 @@ export type TileLayerData = GridLayerData & {
 };
 
 export type RuleLayerData = GridLayerData & {
-    type: "auto_rule";
+    type: "rule";
 };
 
 export type ImageLayerData = LayerCommonData & {
@@ -99,7 +110,7 @@ export const defaultRuleLayerData = (data: Pick<RuleLayerData, "width" | "height
     return {
         id: uuidv4(),
         name: "New Rule Layer",
-        type: "auto_rule",
+        type: "rule",
         width: data.width,
         height: data.height,
     };

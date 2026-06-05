@@ -31,7 +31,7 @@ export const createTileLayerData = (overrides: Partial<TileLayerData> = {}): Til
 
 export const createRuleLayerData = (overrides: Partial<RuleLayerData> = {}): RuleLayerData => ({
     id: "new-rule",
-    type: "auto_rule",
+    type: "rule",
     name: "New Rule",
     x: 0,
     y: 0,

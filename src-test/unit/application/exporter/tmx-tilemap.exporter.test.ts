@@ -450,7 +450,7 @@ describe("TmxTilemapExporter", () => {
             rulesets: { refs: [{ index: 0, id: "terrain-rule", name: "Terrain Rule" }], nextIndex: 1 },
             layers: [{
                 id: "rules",
-                type: "auto_rule",
+                type: "rule",
                 name: "Rules",
                 x: 0,
                 y: 0,
@@ -521,7 +521,7 @@ describe("TmxTilemapExporter", () => {
                 },
                 {
                     id: "rules",
-                    type: "auto_rule",
+                    type: "rule",
                     name: "Rules",
                     x: 0,
                     y: 0,

@@ -1,8 +1,11 @@
+import { createBuiltinToolFamilyIdSetForLayerKinds } from "@/graphics/tool/builtin-tools";
+import { LayerKind } from "@/shared/data-types/layer.data";
 import { TilemapSessionData } from "@/shared/data-types/tilemap-session.data";
 import { TilesetSessionData } from "@/shared/data-types/tileset-session.data";
-import { defaultWorkspaceData, WorkpsaceData } from "@/shared/data-types/workspace.data";
+import { defaultWorkspaceData, ToolStateData, WorkpsaceData } from "@/shared/data-types/workspace.data";
 import { validate } from "@/shared/utils/validate.utils";
 
+const tileAndRuleToolFamilyIds = createBuiltinToolFamilyIdSetForLayerKinds(LayerKind)
 
 const nullableString = (value: unknown): string | null => {
     return typeof value === "string" ? value : null;
@@ -19,11 +22,11 @@ const normalizeViewState = (value: unknown) => {
 
 export const normalizeTilemapSession = (value: unknown): TilemapSessionData | null => {
     try {
-        const data = validate.requiredObject({ value, field: "workspace.tilemaps.tilemapSessions[]" });
+        const data = validate.requiredObject({ value, field: "workspace.tilemapEditorWorkspace.tilemaps.tilemapSessions[]" });
         const layerState = validate.object<Record<string, unknown>>({ value: data.layerState, defaultValue: {} });
         return {
-            id: validate.requiredString({ value: data.id, field: "workspace.tilemaps.tilemapSessions[].id" }),
-            tilemapId: validate.requiredString({ value: data.tilemapId, field: "workspace.tilemaps.tilemapSessions[].tilemapId" }),
+            id: validate.requiredString({ value: data.id, field: "workspace.tilemapEditorWorkspace.tilemaps.tilemapSessions[].id" }),
+            tilemapId: validate.requiredString({ value: data.tilemapId, field: "workspace.tilemapEditorWorkspace.tilemaps.tilemapSessions[].tilemapId" }),
             viewState: normalizeViewState(data.viewState),
             layerState: {
                 selectedLayers: validate.array<unknown>({ value: layerState.selectedLayers, defaultValue: [] })
@@ -37,11 +40,11 @@ export const normalizeTilemapSession = (value: unknown): TilemapSessionData | nu
 
 export const normalizeTilesetSession = (value: unknown): TilesetSessionData | null => {
     try {
-        const data = validate.requiredObject({ value, field: "workspace.tilesets.tilesetSessions[]" });
+        const data = validate.requiredObject({ value, field: "workspace.tilemapEditorWorkspace.tilesets.tilesetSessions[]" });
         const selectionState = validate.object<Record<string, unknown>>({ value: data.selectionState, defaultValue: {} });
         return {
-            id: validate.requiredString({ value: data.id, field: "workspace.tilesets.tilesetSessions[].id" }),
-            tilesetId: validate.requiredString({ value: data.tilesetId, field: "workspace.tilesets.tilesetSessions[].tilesetId" }),
+            id: validate.requiredString({ value: data.id, field: "workspace.tilemapEditorWorkspace.tilesets.tilesetSessions[].id" }),
+            tilesetId: validate.requiredString({ value: data.tilesetId, field: "workspace.tilemapEditorWorkspace.tilesets.tilesetSessions[].tilesetId" }),
             viewState: data.viewState === null ? null : normalizeViewState(data.viewState),
             selectionState: {
                 selectedTilesSet: validate.array<unknown>({ value: selectionState.selectedTilesSet, defaultValue: [] })
@@ -53,38 +56,64 @@ export const normalizeTilesetSession = (value: unknown): TilesetSessionData | nu
     }
 };
 
+const normalizeToolState = (value: unknown): ToolStateData => {
+    const data = validate.object<Record<string, unknown>>({ value, defaultValue: {} });
+    const normalized: ToolStateData = {};
+
+    LayerKind.forEach((layerKind) => {
+        const toolFamilyId = nullableString(data[layerKind]);
+        if (toolFamilyId) normalized[layerKind] = toolFamilyId;
+    });
+
+    const legacyCurrentToolFamily = nullableString(data.currentToolFamily);
+    if (legacyCurrentToolFamily && tileAndRuleToolFamilyIds.has(legacyCurrentToolFamily)) {
+        LayerKind.forEach((layerKind) => {
+            normalized[layerKind] ??= legacyCurrentToolFamily;
+        });
+    }
+
+    return normalized;
+};
+
 export const normalizeWorkspaceData = (workspaceData: unknown): WorkpsaceData => {
     const data = validate.object<Record<string, unknown>>({ value: workspaceData, defaultValue: defaultWorkspaceData });
-    const tilesets = validate.object<Record<string, unknown>>({ value: data.tilesets, defaultValue: {} });
-    const tilemaps = validate.object<Record<string, unknown>>({ value: data.tilemaps, defaultValue: {} });
-    const ruleset = validate.object<Record<string, unknown>>({ value: data.ruleset, defaultValue: {} });
-    const entityCollection = validate.object<Record<string, unknown>>({ value: data.entityCollection, defaultValue: {} });
-    const toolState = validate.object<Record<string, unknown>>({ value: data.toolState, defaultValue: {} });
+    const tilemapEditorWorkspace = validate.object<Record<string, unknown>>({
+        value: data.tilemapEditorWorkspace,
+        defaultValue: {},
+    });
+    const tilesets = validate.object<Record<string, unknown>>({ value: tilemapEditorWorkspace.tilesets ?? data.tilesets, defaultValue: {} });
+    const tilemaps = validate.object<Record<string, unknown>>({ value: tilemapEditorWorkspace.tilemaps ?? data.tilemaps, defaultValue: {} });
+    const ruleset = validate.object<Record<string, unknown>>({ value: tilemapEditorWorkspace.ruleset ?? data.ruleset, defaultValue: {} });
+    const entityCollection = validate.object<Record<string, unknown>>({ value: tilemapEditorWorkspace.entityCollection ?? data.entityCollection, defaultValue: {} });
+    const toolState = tilemapEditorWorkspace.toolState ?? data.toolState;
     const savedPath = validate.object<Record<string, unknown>>({ value: data.savedPath, defaultValue: {} });
-    const propertyPanel = validate.object<Record<string, unknown>>({ value: data.propertyPanel, defaultValue: {} });
+    const propertyPanel = validate.object<Record<string, unknown>>({ value: tilemapEditorWorkspace.propertyPanel ?? data.propertyPanel, defaultValue: {} });
 
     return {
-        tilesets: {
-            tilesetSessions: validate.array<unknown>({ value: tilesets.tilesetSessions, defaultValue: [] })
-                .map(normalizeTilesetSession)
-                .filter((session): session is TilesetSessionData => session !== null),
-            currentTilesetSessionId: nullableString(tilesets.currentTilesetSessionId),
-        },
-        tilemaps: {
-            tilemapSessions: validate.array<unknown>({ value: tilemaps.tilemapSessions, defaultValue: [] })
-                .map(normalizeTilemapSession)
-                .filter((session): session is TilemapSessionData => session !== null),
-            currentTilemapSessionId: nullableString(tilemaps.currentTilemapSessionId),
-        },
-        ruleset: {
-            selectedRuleId: nullableString(ruleset.selectedRuleId),
-        },
-        entityCollection: {
-            selectedEntityCollectionId: nullableString(entityCollection.selectedEntityCollectionId),
-            selectedEntityId: nullableString(entityCollection.selectedEntityId),
-        },
-        toolState: {
-            currentToolFamily: nullableString(toolState.currentToolFamily),
+        tilemapEditorWorkspace: {
+            tilesets: {
+                tilesetSessions: validate.array<unknown>({ value: tilesets.tilesetSessions, defaultValue: [] })
+                    .map(normalizeTilesetSession)
+                    .filter((session): session is TilesetSessionData => session !== null),
+                currentTilesetSessionId: nullableString(tilesets.currentTilesetSessionId),
+            },
+            tilemaps: {
+                tilemapSessions: validate.array<unknown>({ value: tilemaps.tilemapSessions, defaultValue: [] })
+                    .map(normalizeTilemapSession)
+                    .filter((session): session is TilemapSessionData => session !== null),
+                currentTilemapSessionId: nullableString(tilemaps.currentTilemapSessionId),
+            },
+            ruleset: {
+                selectedRuleId: nullableString(ruleset.selectedRuleId),
+            },
+            entityCollection: {
+                selectedEntityCollectionId: nullableString(entityCollection.selectedEntityCollectionId),
+                selectedEntityId: nullableString(entityCollection.selectedEntityId),
+            },
+            propertyPanel: {
+                selectedObjectId: nullableString(propertyPanel.selectedObjectId),
+            },
+            toolState: normalizeToolState(toolState),
         },
         savedPath: {
             exportPaths: validate.array<unknown>({ value: savedPath.exportPaths, defaultValue: [] })
@@ -104,9 +133,6 @@ export const normalizeWorkspaceData = (workspaceData: unknown): WorkpsaceData =>
             tilesetDir: nullableString(savedPath.tilesetDir),
             rulesetDir: nullableString(savedPath.rulesetDir),
             textureDir: nullableString(savedPath.textureDir),
-        },
-        propertyPanel: {
-            selectedObjectId: nullableString(propertyPanel.selectedObjectId),
         },
     };
 };

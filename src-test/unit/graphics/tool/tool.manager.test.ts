@@ -82,6 +82,24 @@ class HybridRuleTool extends FakeTool {
     }
 }
 
+class RuleFallbackTool extends FakeTool {
+    public static override instances: RuleFallbackTool[] = [];
+
+    constructor(editorFacade: any) {
+        super(editorFacade);
+        RuleFallbackTool.instances.push(this);
+    }
+}
+
+class RuleRememberedTool extends FakeTool {
+    public static override instances: RuleRememberedTool[] = [];
+
+    constructor(editorFacade: any) {
+        super(editorFacade);
+        RuleRememberedTool.instances.push(this);
+    }
+}
+
 const createToolGroups = (): ToolGroupDefinition[] => [
     {
         id: "tile-editing",
@@ -128,12 +146,43 @@ const createToolGroups = (): ToolGroupDefinition[] => [
                     },
                 ],
             },
+            {
+                id: "fake.rule-fallback",
+                label: "Rule fallback",
+                priority: 0,
+                tools: [
+                    {
+                        id: "fake.rule-fallback",
+                        constructor: RuleFallbackTool as any,
+                        canUse: (ctx) => ctx.layerKind === "rule",
+                    },
+                ],
+            },
+            {
+                id: "fake.rule-remembered",
+                label: "Rule remembered",
+                priority: 3,
+                tools: [
+                    {
+                        id: "fake.rule-remembered",
+                        constructor: RuleRememberedTool as any,
+                        canUse: (ctx) => ctx.layerKind === "rule",
+                    },
+                ],
+            },
         ],
     },
 ];
 
-const createToolManagerHarness = () => {
+const createToolManagerHarness = (rememberedTools: Partial<Record<"tile" | "rule", string>> = {}) => {
     const editor = createEditorHarness();
+    const toolSessionManager = {
+        getRememberedToolFamilyForLayerKind: vi.fn((layerKind: string) => rememberedTools[layerKind as "tile" | "rule"] ?? null),
+    };
+    (editor.editorFacade as any).currentWorkspace = {
+        ...(editor.editorFacade.currentWorkspace ?? {}),
+        toolSessionManager,
+    };
     const layer = editor.tilemap.rootLayer.findLayer("tile-root") as TileLayer;
     const ruleLayer = editor.tilemap.rootLayer.findLayer("rule-root") as RuleLayer;
     const layerRenderer = createTileLayerRenderer(layer, editor.tilemap);
@@ -167,6 +216,7 @@ const createToolManagerHarness = () => {
         ruleLayer,
         layerRenderer,
         ruleLayerRenderer,
+        toolSessionManager,
         getSelectedLayerListener: () => selectedLayerListener,
     };
 };
@@ -178,6 +228,8 @@ describe("ToolManager", () => {
         SecondFakeTool.instances = [];
         HybridTileTool.instances = [];
         HybridRuleTool.instances = [];
+        RuleFallbackTool.instances = [];
+        RuleRememberedTool.instances = [];
     });
 
     it("falls back to the first available family when a tile layer view becomes active", () => {
@@ -271,6 +323,72 @@ describe("ToolManager", () => {
         expect(tileTool.onDisable).toHaveBeenCalledTimes(1);
         expect(HybridRuleTool.instances).toHaveLength(1);
         expect(HybridRuleTool.instances[0].setTargetLayerRenderer).toHaveBeenCalledWith(ruleLayerRenderer);
+    });
+
+    it("uses the remembered valid tool for a layer before the fallback family when the current tool is invalid", () => {
+        const { manager, view, session, ruleLayerRenderer, getSelectedLayerListener } = createToolManagerHarness({
+            rule: "fake.rule-remembered",
+        });
+        (view.renderer.findLayerRenderer as any).mockImplementation((id: string) => {
+            if (id === "tile-root") return createTileLayerRenderer(session.tilemap.rootLayer.findLayer("tile-root") as TileLayer, session.tilemap);
+            if (id === "rule-root") return ruleLayerRenderer;
+            return null;
+        });
+
+        manager.setActiveView(view as any);
+        manager.startToolFamily("fake.second");
+
+        session.layerState.selectedLayers = ["rule-root"];
+        getSelectedLayerListener()!(session.layerState.selectedLayers);
+
+        expect(manager.getCurrentFamilyId()).toBe("fake.rule-remembered");
+        expect(manager.getCurrentToolId()).toBe("fake.rule-remembered");
+        expect(RuleRememberedTool.instances).toHaveLength(1);
+        expect(RuleFallbackTool.instances).toHaveLength(0);
+    });
+
+    it("uses fallback when the remembered tool is not valid for the selected layer", () => {
+        const { manager, view, session, ruleLayerRenderer, getSelectedLayerListener } = createToolManagerHarness({
+            rule: "fake.second",
+        });
+        (view.renderer.findLayerRenderer as any).mockImplementation((id: string) => {
+            if (id === "tile-root") return createTileLayerRenderer(session.tilemap.rootLayer.findLayer("tile-root") as TileLayer, session.tilemap);
+            if (id === "rule-root") return ruleLayerRenderer;
+            return null;
+        });
+
+        manager.setActiveView(view as any);
+        manager.startToolFamily("fake.second");
+
+        session.layerState.selectedLayers = ["rule-root"];
+        getSelectedLayerListener()!(session.layerState.selectedLayers);
+
+        expect(manager.getCurrentFamilyId()).toBe("fake.rule-fallback");
+        expect(manager.getCurrentToolId()).toBe("fake.rule-fallback");
+        expect(RuleFallbackTool.instances).toHaveLength(1);
+        expect(RuleRememberedTool.instances).toHaveLength(0);
+    });
+
+    it("keeps the current valid tool when switching layers even if another remembered tool exists", () => {
+        const { manager, view, session, ruleLayerRenderer, getSelectedLayerListener } = createToolManagerHarness({
+            rule: "fake.rule-remembered",
+        });
+        (view.renderer.findLayerRenderer as any).mockImplementation((id: string) => {
+            if (id === "tile-root") return createTileLayerRenderer(session.tilemap.rootLayer.findLayer("tile-root") as TileLayer, session.tilemap);
+            if (id === "rule-root") return ruleLayerRenderer;
+            return null;
+        });
+
+        manager.setActiveView(view as any);
+        manager.startToolFamily("fake.hybrid");
+
+        session.layerState.selectedLayers = ["rule-root"];
+        getSelectedLayerListener()!(session.layerState.selectedLayers);
+
+        expect(manager.getCurrentFamilyId()).toBe("fake.hybrid");
+        expect(manager.getCurrentToolId()).toBe("fake.hybrid.rule");
+        expect(HybridRuleTool.instances).toHaveLength(1);
+        expect(RuleRememberedTool.instances).toHaveLength(0);
     });
 
     it("detaches the current tool and unregisters selected-layer listeners when active view changes", () => {

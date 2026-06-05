@@ -40,7 +40,7 @@ const createTilemapData = (): TilemapData => ({
         },
         {
             id: "rule-layer",
-            type: "auto_rule",
+            type: "rule",
             name: "Rules",
             x: 0,
             y: 0,

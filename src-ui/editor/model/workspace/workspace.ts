@@ -29,13 +29,14 @@ export class Workspace {
         public readonly projectPathSystem: ProjectPathSystem,
         private readonly editorFacade: EditorFacade,
     ) {
-        this.tilesetSessionManager = new TilesetSessionManager(data.tilesets, this.editorFacade);
-        this.tilemapSessionManager = new TilemapSessionManager(data.tilemaps, this.editorFacade);
-        this.rulesetSessionManager = new RulesetSessionManager(data.ruleset, this.editorFacade);
-        this.entityCollectionSessionManager = new EntityCollectionSessionManager(data.entityCollection, this.editorFacade);
-        this.toolSessionManager = new ToolSessionManager(data.toolState, this.editorFacade);
+        const tilemapEditorWorkspace = data.tilemapEditorWorkspace;
+        this.tilesetSessionManager = new TilesetSessionManager(tilemapEditorWorkspace.tilesets, this.editorFacade);
+        this.tilemapSessionManager = new TilemapSessionManager(tilemapEditorWorkspace.tilemaps, this.editorFacade);
+        this.rulesetSessionManager = new RulesetSessionManager(tilemapEditorWorkspace.ruleset, this.editorFacade);
+        this.entityCollectionSessionManager = new EntityCollectionSessionManager(tilemapEditorWorkspace.entityCollection, this.editorFacade);
+        this.toolSessionManager = new ToolSessionManager(tilemapEditorWorkspace.toolState, this.editorFacade);
         this.savedPathManager = new WorkspaceSavedPathManager(data.savedPath, this.projectPathSystem);
-        this.propertyPanelManager = new WorkspacePropertyPanelManager(data.propertyPanel, this.editorFacade);
+        this.propertyPanelManager = new WorkspacePropertyPanelManager(tilemapEditorWorkspace.propertyPanel, this.editorFacade);
     }
 
     public static createFromFileData(workspaceData: unknown,tilesetManager: TilesetManager,tilemapManager: TilemapManager,projectPathSystem: ProjectPathSystem,editorFacade: EditorFacade): Result<Workspace> {
@@ -62,13 +63,15 @@ export class Workspace {
 
     public serialize(): WorkpsaceData {
         return {
-            tilesets: this.tilesetSessionManager.serialize(),
-            tilemaps: this.tilemapSessionManager.serialize(),
-            ruleset: this.rulesetSessionManager.serialize(),
-            entityCollection: this.entityCollectionSessionManager.serialize(),
-            toolState: this.toolSessionManager.serialize(),
+            tilemapEditorWorkspace: {
+                tilesets: this.tilesetSessionManager.serialize(),
+                tilemaps: this.tilemapSessionManager.serialize(),
+                ruleset: this.rulesetSessionManager.serialize(),
+                entityCollection: this.entityCollectionSessionManager.serialize(),
+                propertyPanel: this.propertyPanelManager.serialize(),
+                toolState: this.toolSessionManager.serialize(),
+            },
             savedPath: this.savedPathManager.serialize(),
-            propertyPanel: this.propertyPanelManager.serialize(),
         }
     }
 }

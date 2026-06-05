@@ -53,6 +53,7 @@ export const createEditorFacadeHarness = () => {
         startToolFamily: vi.fn(),
         getCurrentToolId: vi.fn(() => null as string | null),
         getCurrentFamilyId: vi.fn(() => null as string | null),
+        getCurrentLayerKind: vi.fn(() => "none"),
         on: vi.fn(),
         off: vi.fn(),
     };

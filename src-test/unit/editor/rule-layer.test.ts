@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { RootLayer } from "@/editor/model/tilemap/layer/root-layer";
+import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { RuleLayerData } from "@/shared/data-types/layer.data";
 import {
     createReferenceContext,
     createRuleset,
-    createTilemap,
     createRulesetData,
+    createTilemap,
     loadRulesetRefs,
     loadTilesetRefs,
     registerLoadedRuleset,
@@ -34,7 +34,7 @@ const createRuleLayer = (overrides: Partial<RuleLayerData> = {}) => {
     const parent = new RootLayer([], tilemap);
     const data: RuleLayerData = {
         id: "rule-layer",
-        type: "auto_rule",
+        type: "rule",
         name: "Auto Rules",
         x: 0,
         y: 0,
@@ -100,7 +100,7 @@ describe("RuleLayer", () => {
 
         expect(layer.serialize()).toEqual(expect.objectContaining({
             id: "rule-layer",
-            type: "auto_rule",
+            type: "rule",
             layerData: "0:12:0,0,0\n0,0:12:0,0\n0,0,0",
         }));
         expect(changed).toHaveBeenCalledWith([{ col: 0, row: 0 }, { col: 1, row: 1 }]);
