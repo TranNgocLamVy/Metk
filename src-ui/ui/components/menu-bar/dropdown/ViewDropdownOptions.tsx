@@ -1,25 +1,11 @@
 import { CaseSensitive, Eye, Grid3x3, Info, Lock, RectangleHorizontal, RotateCcw, Scan, Search, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
 
-import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ShowEntityName, Snapping } from "@/application/settings/setting.enum";
+import { getSetting, toggleSetting, updateSetting } from "@/application/settings/setting.utils";
 import { useConsoleStore } from "@/ui/stores/console.store";
 
 
 const noop = () => {};
-
-const drawingViewDefaults = {
-	showTileObjectOutlines: false,
-	showObjectReferences: false,
-	showNamesForHoveredObjects: false,
-	showTileAnimations: false,
-	showTileCollisionShapes: false,
-	showWorld: false,
-	enableParallax: false,
-	highlightCurrentLayer: false,
-	highlightHoveredObject: false,
-} as const;
-
-const settings = appKernel.settings;
 
 const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -45,32 +31,32 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 				{
 					type: "check",
 					label: "menu.view.action.layout.properties",
-					checked: () => settings.get("general.layout.properties"),
-					toggle: () => settings.update("general.layout.properties", !settings.get("general.layout.properties"))
+					checked: () => getSetting("general.layout.properties"),
+					toggle: () => toggleSetting("general.layout.properties")
 				},
 				{
 					type: "check",
 					label: "menu.view.action.layout.layers",
-					checked: () => settings.get("general.layout.layers"),
-					toggle: () => settings.update("general.layout.layers", !settings.get("general.layout.layers"))
+					checked: () => getSetting("general.layout.layers"),
+					toggle: () => toggleSetting("general.layout.layers")
 				},
 				{
 					type: "check",
 					label: "menu.view.action.layout.entities",
-					checked: () => settings.get("general.layout.entities"),
-					toggle: () => settings.update("general.layout.entities", !settings.get("general.layout.entities"))
+					checked: () => getSetting("general.layout.entities"),
+					toggle: () => toggleSetting("general.layout.entities")
 				},
 				{
 					type: "check",
 					label: "menu.view.action.layout.tilesets",
-					checked: () => settings.get("general.layout.tilesets"),
-					toggle: () => settings.update("general.layout.tilesets", !settings.get("general.layout.tilesets"))
+					checked: () => getSetting("general.layout.tilesets"),
+					toggle: () => toggleSetting("general.layout.tilesets")
 				},
 				{
 					type: "check",
 					label: "menu.view.action.layout.rulesets",
-					checked: () => settings.get("general.layout.rulesets"),
-					toggle: () => settings.update("general.layout.rulesets", !settings.get("general.layout.rulesets"))
+					checked: () => getSetting("general.layout.rulesets"),
+					toggle: () => toggleSetting("general.layout.rulesets")
 				},
 				{
 					type: "check",
@@ -134,14 +120,14 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "check",
 		label: "menu.view.action.showGrid",
-		checked: () => settings.get("general.view.showGrid"),
-		toggle: () => settings.update("general.view.showGrid", !settings.get("general.view.showGrid"))
+		checked: () => getSetting("general.view.showGrid"),
+		toggle: () => toggleSetting("general.view.showGrid")
 	},
 	{
 		type: "check",
 		label: "menu.view.action.showTileEntityOutlines",
-		checked: () => settings.get("general.view.showEntityOutline"),
-		toggle: () => settings.update("general.view.showEntityOutline", !settings.get("general.view.showEntityOutline"))
+		checked: () => getSetting("general.view.showEntityOutline"),
+		toggle: () => toggleSetting("general.view.showEntityOutline")
 	},
 	{
 		type: "subMenu",
@@ -153,10 +139,10 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
                     type: "radio",
                     label: "menu.view.action.showEntityNames.label",
                     value: () => {
-						return settings.get("general.view.showEntityName")
+						return getSetting("general.view.showEntityName")
 					},
                     onValueChange: (value: ShowEntityName) => {
-						settings.update("general.view.showEntityName", value)
+						updateSetting("general.view.showEntityName", value)
 					},
                     items: [
                         {
@@ -183,32 +169,32 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	{
 		type: "check",
 		label: "menu.view.action.showTileAnimations",
-		checked: () => settings.get("general.view.showTileAnimations"),
-		toggle: () => settings.update("general.view.showTileAnimations", !settings.get("general.view.showTileAnimations"))
+		checked: () => getSetting("general.view.showTileAnimations"),
+		toggle: () => toggleSetting("general.view.showTileAnimations")
 	},
 	{
 		type: "check",
 		label: "menu.view.action.showTileCollisionShapes",
-		checked: () => settings.get("general.view.showTileCollisionShapes"),
-		toggle: () => settings.update("general.view.showTileCollisionShapes", !settings.get("general.view.showTileCollisionShapes")),
+		checked: () => getSetting("general.view.showTileCollisionShapes"),
+		toggle: () => toggleSetting("general.view.showTileCollisionShapes")
 	},
 	{
 		type: "check",
 		label: "menu.view.action.enableParallax",
-		checked: () => settings.get("general.view.enableParallax"),
-		toggle: () => settings.update("general.view.enableParallax", !settings.get("general.view.enableParallax")),
+		checked: () => getSetting("general.view.enableParallax"),
+		toggle: () => toggleSetting("general.view.enableParallax")
 	},
 	{
 		type: "check",
 		label: "Highlight Current Layer",
-		checked: () => settings.get("general.view.highlightCurrentLayer"),
-		toggle: () => settings.update("general.view.highlightCurrentLayer", !settings.get("general.view.highlightCurrentLayer"))
+		checked: () => getSetting("general.view.highlightCurrentLayer"),
+		toggle: () => toggleSetting("general.view.highlightCurrentLayer")
 	},
 	{
 		type: "check",
 		label: "menu.view.action.highlightHoveredEntity",
-		checked: () => settings.get("general.view.highlightHoveredEntity"),
-		toggle: () => settings.update("general.view.highlightHoveredEntity", !settings.get("general.view.highlightHoveredEntity"))
+		checked: () => getSetting("general.view.highlightHoveredEntity"),
+		toggle: () => toggleSetting("general.view.highlightHoveredEntity")
 	},
 ];
 
@@ -222,9 +208,9 @@ const ViewDropdownOptionGroup3: MenuDropDownGroupType = [
                 {
                     type: "radio",
                     label: "menu.view.action.snapping.label",
-                    value: () => settings.get("general.view.snapping"),
+                    value: () => getSetting("general.view.snapping"),
                     onValueChange: (value: Snapping) => {
-						settings.update("general.view.snapping", value)
+						updateSetting("general.view.snapping", value)
 					},
                     items: [
                         {

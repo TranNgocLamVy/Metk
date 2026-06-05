@@ -136,12 +136,12 @@ vi.mock("@/graphics/renderer/tileset/single-tileset.renderer", () => ({ TilesetR
 vi.mock("@/graphics/renderer/tileset/single-tileset-selector.renderer", () => ({ TilesetSelectorRenderer: viewMocks.MockTilesetSelectorRenderer }));
 vi.mock("@/application/actions/workspace.actions", () => viewMocks.workspaceService);
 
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { SingleImageTilesetView } from "@/graphics/view/single-tileset.view";
 import { TilemapView } from "@/graphics/view/tilemap.view";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import * as WorkspaceActions from "@/application/actions/workspace.actions";
 
 type MockViewport = InstanceType<typeof viewMocks.MockViewport>;
 
@@ -270,11 +270,6 @@ describe("TilemapView", () => {
         const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
         const view = new TilemapView(createTilemapSession() as any);
         view.activateView(createPixiApp() as any);
-
-        view.toggleGrid();
-        expect(view.grid.disableGrid).toHaveBeenCalledTimes(1);
-        view.toggleGrid();
-        expect(view.grid.enableGrid).toHaveBeenCalledTimes(1);
 
         view.unActivateView();
         expect(view.viewport.removeFromParent).toHaveBeenCalled();

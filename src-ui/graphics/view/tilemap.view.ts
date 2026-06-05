@@ -165,12 +165,4 @@ export class TilemapView implements IBaseView {
         }
         this.viewport.setZoom(this.session.viewState.zoom);
     }
-
-    public toggleGrid(): void {
-        if (this.grid.gridEnabled) {
-            this.grid.disableGrid();
-        } else {
-            this.grid.enableGrid();
-        }
-    }
 }
