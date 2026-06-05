@@ -75,22 +75,22 @@ export const defaultSettingPages = [
                         key: "showEntityName",
                         type: "enum",
                         visible: false,
-                        defaultValue: ShowEntityName.ForAllEntities,
+                        defaultValue: ShowEntityName.Always,
                         enumValues: [
                             {
                                 value: ShowEntityName.Never,
                                 label: "",
                             },
                             {
-                                value: ShowEntityName.ForSelectedEntities,
-                                label: "",
-                            },
-                            {
-                                value: ShowEntityName.ForAllEntities,
+                                value: ShowEntityName.Always,
                                 label: ""
                             },
                             {
-                                value: ShowEntityName.ForHoveredEntitie,
+                                value: ShowEntityName.Selected,
+                                label: ""
+                            },
+                            {
+                                value: ShowEntityName.Hovered,
                                 label: ""
                             }
                         ]

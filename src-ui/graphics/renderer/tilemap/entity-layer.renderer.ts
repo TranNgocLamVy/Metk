@@ -1,6 +1,7 @@
 import { Color, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { ShowEntityName } from "@/application/settings/setting.enum";
 import type { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { EntityInstance } from "@/editor/model/entity/entity-instance";
@@ -35,9 +36,14 @@ const ENTITY_LABEL_COLOR = 0xffffff;
 const ENTITY_LABEL_OUTLINE_COLOR = 0x0f172a;
 
 export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
+    private viewport: Viewport;
     private entityDisplays: Map<string, EntityDisplayRecord> = new Map();
     private entityCollectionManager: EntityCollectionManager | null = null;
     private isDestroyed = false;
+    private showEntityOutline = true;
+    private showEntityName: ShowEntityName = ShowEntityName.Always;
+    private enableParallax = true;
+    private disposable: (() => void)[] = [];
 
     private handleEntitiesChanged = (entityIds: string[]): void => {
         void this.updateChangedEntities(entityIds);
@@ -55,16 +61,52 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         void this.renderLayer();
     };
 
+    private handleViewportChanged = (): void => {
+        this.updateLayerParallax();
+    };
+
     constructor(context: CreateEntityLayerRendererContext) {
         super(context.layer, context.tilemap);
 
+        this.viewport = context.viewport;
         this.entityCollectionManager = appKernel.editorFacade.currentProject?.entityCollectionManager ?? null;
+        const settings = appKernel.settings;
+        if (settings) {
+            this.showEntityOutline = settings.get("general.view.showEntityOutline");
+            this.showEntityName = settings.get("general.view.showEntityName");
+            this.enableParallax = settings.get("general.view.enableParallax");
+        }
 
         this.layer.eventEmitter.on("entitiesChanged", this.handleEntitiesChanged);
         appKernel.textureManager.on("onTextureReloaded", this.handleTextureReloaded);
         this.entityCollectionManager?.on("onEntityCollectionUpdated", this.handleEntityCollectionUpdated);
+        if (typeof this.viewport.on === "function") {
+            this.viewport.on("moved", this.handleViewportChanged);
+            this.viewport.on("zoomed", this.handleViewportChanged);
+            this.viewport.on("resize", this.handleViewportChanged);
+        }
+
+        if (settings) {
+            const onShowEntityOutlineChanged = settings.onDidChangeSetting("general.view.showEntityOutline", (event) => {
+                this.showEntityOutline = event.newValue;
+                this.syncEntityDisplays();
+            });
+
+            const onShowEntityNameChanged = settings.onDidChangeSetting("general.view.showEntityName", (event) => {
+                this.showEntityName = event.newValue;
+                this.syncEntityDisplays();
+            });
+
+            const onEnableParallaxChanged = settings.onDidChangeSetting("general.view.enableParallax", (event) => {
+                this.enableParallax = event.newValue;
+                this.updateLayerParallax();
+            });
+
+            this.disposable.push(onShowEntityOutlineChanged, onShowEntityNameChanged, onEnableParallaxChanged);
+        }
 
         void this.renderLayer();
+        this.updateLayerParallax();
     }
 
     private async renderLayer(): Promise<void> {
@@ -194,11 +236,13 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
                 alpha: 0.85,
                 pixelLine: true,
             });
+        record.overlay.visible = this.showEntityOutline;
 
         record.label.text = entity.name || definition.name || entity.id;
         record.label.x = record.sprite.width / 2;
         record.label.y = 0;
         record.label.anchor.set(0.5, 1);
+        record.label.visible = this.showEntityName === ShowEntityName.Always;
     }
 
     private getEntityBounds(
@@ -234,6 +278,15 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
             this.updateEntityTransform(record, entity, definition);
             this.updateEntityOverlay(record, entity, definition);
         });
+    }
+
+    private updateLayerParallax(): void {
+        if (!this.enableParallax) {
+            this.container.position.set(0, 0);
+            return;
+        }
+
+        this.container.position.set(0, 0);
     }
 
     private async updateChangedEntities(entityIds: string[]): Promise<void> {
@@ -311,6 +364,12 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         this.layer.eventEmitter.off("entitiesChanged", this.handleEntitiesChanged);
         appKernel.textureManager.off("onTextureReloaded", this.handleTextureReloaded);
         this.entityCollectionManager?.off("onEntityCollectionUpdated", this.handleEntityCollectionUpdated);
+        if (typeof this.viewport.off === "function") {
+            this.viewport.off("moved", this.handleViewportChanged);
+            this.viewport.off("zoomed", this.handleViewportChanged);
+            this.viewport.off("resize", this.handleViewportChanged);
+        }
+        this.disposable.forEach(d => d());
 
         this.entityDisplays.forEach((record, entityId) => {
             this.destroyEntityDisplay(entityId, record);

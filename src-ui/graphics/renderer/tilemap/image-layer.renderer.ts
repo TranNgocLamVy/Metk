@@ -23,6 +23,8 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
     private renderGeneration = 0;
     private isDestroyed = false;
     private suppressNextImageChanged = false;
+    private enableParallax = true;
+    private disposable: (() => void)[] = [];
 
     private handleImageChanged = (): void => {
         if (this.suppressNextImageChanged) {
@@ -41,11 +43,23 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         super(context.layer, context.tilemap);
 
         this.viewport = context.viewport;
+        const settings = appKernel.settings;
+        if (settings) {
+            this.enableParallax = settings.get("general.view.enableParallax");
+        }
 
         this.layer.eventEmitter.on("imageChanged", this.handleImageChanged);
         this.viewport.on("moved", this.handleViewportChanged);
         this.viewport.on("zoomed", this.handleViewportChanged);
         this.viewport.on("resize", this.handleViewportChanged);
+
+        if (settings) {
+            const onEnableParallaxChanged = settings.onDidChangeSetting("general.view.enableParallax", (event) => {
+                this.enableParallax = event.newValue;
+                this.updateTransform();
+            });
+            this.disposable.push(onEnableParallaxChanged);
+        }
 
         void this.renderImage();
     }
@@ -110,8 +124,8 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
     private updateTransform(): void {
         if (!this.image) return;
 
-        const parallaxX = this.layer.parallax.x ?? 1;
-        const parallaxY = this.layer.parallax.y ?? 1;
+        const parallaxX = this.enableParallax ? this.layer.parallax.x ?? 1 : 1;
+        const parallaxY = this.enableParallax ? this.layer.parallax.y ?? 1 : 1;
 
         const parallaxOriginX = (this.tilemap as any).parallaxoriginx ?? 0;
         const parallaxOriginY = (this.tilemap as any).parallaxoriginy ?? 0;
@@ -219,6 +233,7 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         this.viewport.off("moved", this.handleViewportChanged);
         this.viewport.off("zoomed", this.handleViewportChanged);
         this.viewport.off("resize", this.handleViewportChanged);
+        this.disposable.forEach(d => d());
 
         this.clearImage();
 

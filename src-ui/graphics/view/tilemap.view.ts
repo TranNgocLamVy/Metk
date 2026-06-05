@@ -159,6 +159,57 @@ export class TilemapView implements IBaseView {
         this.viewport.destroy({ children: true });
     }
 
+    public zoomIn(delta = 0.2): void {
+        if (!this.viewport) return;
+        this.setZoom(this.viewport.scaled + delta);
+    }
+
+    public zoomOut(delta = 0.2): void {
+        if (!this.viewport) return;
+        this.setZoom(this.viewport.scaled - delta);
+    }
+
+    public normalSize(): void {
+        this.setZoom(1);
+    }
+
+    public fitMapInView(): void {
+        if (!this.viewport) return;
+
+        const mapPixelWidth = this.session.tilemap.width * this.session.tilemap.tileWidth;
+        const mapPixelHeight = this.session.tilemap.height * this.session.tilemap.tileHeight;
+        const viewportWidth = this.viewport.screenWidth;
+        const viewportHeight = this.viewport.screenHeight;
+
+        if (mapPixelWidth <= 0 || mapPixelHeight <= 0 || viewportWidth <= 0 || viewportHeight <= 0) return;
+
+        const scale = Math.min(viewportWidth / mapPixelWidth, viewportHeight / mapPixelHeight);
+        if (!Number.isFinite(scale) || scale <= 0) return;
+
+        this.viewport.scale.set(scale);
+        this.viewport.moveCenter(mapPixelWidth / 2, mapPixelHeight / 2);
+        this.viewport.emit("zoomed", { viewport: this.viewport, type: "animate" });
+        this.viewport.emit("moved", { viewport: this.viewport, type: "animate" });
+        this.persistViewState();
+    }
+
+    private setZoom(zoom: number): void {
+        if (!this.viewport || !Number.isFinite(zoom)) return;
+
+        this.viewport.setZoom(zoom, true);
+        this.viewport.emit("zoomed", { viewport: this.viewport, type: "animate" });
+        this.persistViewState();
+    }
+
+    private persistViewState(): void {
+        this.session.updateViewState({
+            x: this.viewport.center.x,
+            y: this.viewport.center.y,
+            zoom: this.viewport.scaled
+        });
+        WorkspaceActions.saveCurrentWorkspace();
+    }
+
     public updateViewport() {
         if (this.session.viewState.x != null && this.session.viewState.y != null) {
             this.viewport.moveCenter(this.session.viewState.x, this.session.viewState.y);

@@ -2,9 +2,9 @@
 
 export const ShowEntityName = {
     Never: "never",
-    ForSelectedEntities: "forSelectedEntities",
-    ForAllEntities: "forAllEntities",
-    ForHoveredEntitie: "forHoverEntities",
+    Always: "always",
+    Selected: "selected",
+    Hovered: "hovered",
 } as const;
 export type ShowEntityName = typeof ShowEntityName[keyof typeof ShowEntityName];
 

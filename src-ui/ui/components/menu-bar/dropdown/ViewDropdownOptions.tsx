@@ -1,5 +1,6 @@
 import { CaseSensitive, Eye, Grid3x3, Info, Lock, RectangleHorizontal, RotateCcw, Scan, Search, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
 
+import { canExecuteCommand, executeCommand } from "@/application/actions/command.actions";
 import { getSetting, toggleSetting, updateSetting } from "@/application/actions/setting.actions";
 import { ShowEntityName, Snapping } from "@/application/settings/setting.enum";
 import { useConsoleStore } from "@/ui/stores/console.store";
@@ -125,7 +126,7 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "check",
-		label: "menu.view.action.showTileEntityOutlines",
+		label: "menu.view.action.showEntityOutline",
 		checked: () => getSetting("general.view.showEntityOutline"),
 		toggle: () => toggleSetting("general.view.showEntityOutline")
 	},
@@ -150,17 +151,19 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
                             value: ShowEntityName.Never,
                         },
                         {
-                            label: "menu.view.action.showEntityNames.forSelectedEntities",
-                            value: ShowEntityName.ForSelectedEntities,
+                            label: "menu.view.action.showEntityNames.always",
+                            value: ShowEntityName.Always,
                         },
                         {
-                            label: "menu.view.action.showEntityNames.forAllEntities",
-                            value: ShowEntityName.ForAllEntities,
+                            label: "menu.view.action.showEntityNames.selected",
+                            value: ShowEntityName.Selected,
+							disabled: () => true,
                         },
-						{
-							label: "menu.view.action.showEntityNames.forHoveredEntities",
-							value: ShowEntityName.ForHoveredEntitie,
-						}
+                        {
+                            label: "menu.view.action.showEntityNames.hovered",
+                            value: ShowEntityName.Hovered,
+							disabled: () => true,
+                        },
                     ]
                 }
             ]
@@ -170,13 +173,15 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 		type: "check",
 		label: "menu.view.action.showTileAnimations",
 		checked: () => getSetting("general.view.showTileAnimations"),
-		toggle: () => toggleSetting("general.view.showTileAnimations")
+		toggle: () => toggleSetting("general.view.showTileAnimations"),
+		disabled: () => true,
 	},
 	{
 		type: "check",
 		label: "menu.view.action.showTileCollisionShapes",
 		checked: () => getSetting("general.view.showTileCollisionShapes"),
-		toggle: () => toggleSetting("general.view.showTileCollisionShapes")
+		toggle: () => toggleSetting("general.view.showTileCollisionShapes"),
+		disabled: () => true,
 	},
 	{
 		type: "check",
@@ -188,13 +193,15 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 		type: "check",
 		label: "Highlight Current Layer",
 		checked: () => getSetting("general.view.highlightCurrentLayer"),
-		toggle: () => toggleSetting("general.view.highlightCurrentLayer")
+		toggle: () => toggleSetting("general.view.highlightCurrentLayer"),
+		disabled: () => true,
 	},
 	{
 		type: "check",
 		label: "menu.view.action.highlightHoveredEntity",
 		checked: () => getSetting("general.view.highlightHoveredEntity"),
-		toggle: () => toggleSetting("general.view.highlightHoveredEntity")
+		toggle: () => toggleSetting("general.view.highlightHoveredEntity"),
+		disabled: () => true,
 	},
 ];
 
@@ -209,6 +216,7 @@ const ViewDropdownOptionGroup3: MenuDropDownGroupType = [
                     type: "radio",
                     label: "menu.view.action.snapping.label",
                     value: () => getSetting("general.view.snapping"),
+					disabled: () => true,
                     onValueChange: (value: Snapping) => {
 						updateSetting("general.view.snapping", value)
 					},
@@ -241,29 +249,29 @@ const ViewDropdownOptionGroup4: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.view.action.zoomIn",
         startIcon: <ZoomIn />,
-		disabled: () => true,
-		onClick() {},
+		disabled: () => !canExecuteCommand("workspace.tilemap.view.zoomIn"),
+		onClick: () => executeCommand("workspace.tilemap.view.zoomIn"),
 	},
 	{
 		type: "option",
 		label: "menu.view.action.zoomOut",
         startIcon: <ZoomOut />,
-		disabled: () => true,
-		onClick() {},
+		disabled: () => !canExecuteCommand("workspace.tilemap.view.zoomOut"),
+		onClick: () => executeCommand("workspace.tilemap.view.zoomOut"),
 	},
 	{
 		type: "option",
 		label: "menu.view.action.normalSize",
         startIcon: <RectangleHorizontal />,
-		disabled: () => true,
-		onClick() {},
+		disabled: () => !canExecuteCommand("workspace.tilemap.view.normalSize"),
+		onClick: () => executeCommand("workspace.tilemap.view.normalSize"),
 	},
 	{
 		type: "option",
 		label: "menu.view.action.fitMapInView",
         startIcon: <Scan />,
-		disabled: () => true,
-		onClick() {},
+		disabled: () => !canExecuteCommand("workspace.tilemap.view.fitMapInView"),
+		onClick: () => executeCommand("workspace.tilemap.view.fitMapInView"),
 	},
 ];
 
@@ -273,9 +281,7 @@ const ViewDropdownOptionGroup5: MenuDropDownGroupType = [
 		label: "menu.view.action.clearView",
 		checked: () => false,
 		disabled: () => true,
-		toggle: () => {
-
-        },
+		toggle: noop
 	},
 ];
 

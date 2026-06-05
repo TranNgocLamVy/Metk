@@ -141,13 +141,13 @@
                 },
                 "searchActions": "Search Actions",
                 "showGrid": "Show Grid",
-                "showTileEntityOutlines": "Show Tile Entity Outlines",
+                "showEntityOutline": "Show Entity Outline",
                 "showEntityNames": {
-                    "label": "Show Entity Names",
+                    "label": "Show Entity Name",
                     "never": "Never",
-                    "forSelectedEntities": "For Selected Entities",
-                    "forAllEntities": "For All Entities",
-                    "forHoveredEntities": "For Hovered Entities"
+                    "always": "Always",
+                    "selected": "For Selected Entities",
+                    "hovered": "For Hovered Entities"
                 },
                 "showTileAnimations": "Show Tile Animations",
                 "showTileCollisionShapes": "Show Tile Collision Shapes",
