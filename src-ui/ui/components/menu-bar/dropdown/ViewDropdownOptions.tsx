@@ -45,8 +45,8 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 				{
 					type: "check",
 					label: "menu.view.action.layout.properties",
-					checked: () => settings.get("general.layout.console"),
-					toggle: () => settings.update("general.layout.console", !settings.get("general.layout.console"))
+					checked: () => settings.get("general.layout.properties"),
+					toggle: () => settings.update("general.layout.properties", !settings.get("general.layout.properties"))
 				},
 				{
 					type: "check",
