@@ -1,7 +1,6 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { Result } from "@/shared/types/result";
-import { ProjectStorageService, TauriFileStorage } from "@/infrastructure/container";
+import { FileDialogService, FileSystemService, ProjectStorageService } from "@/infrastructure/container";
 import { defaultProjectData } from "@/shared/data-types/project.data";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
@@ -12,7 +11,7 @@ import { Console } from "@/ui/notifications/console-gateway";
 import { Project } from "@/editor/model/project/project";
 
 export async function importProject(): Promise<void> {
-        const projectAbsPath = await FileDialogUtils.open({ multiple: false, filters: [{ name: "Project", extensions: ["json"] }] });
+        const projectAbsPath = await FileDialogService.open({ multiple: false, filters: [{ name: "Project", extensions: ["json"] }] });
         if (!projectAbsPath) return;
         const projectDataResult = await ProjectStorageService.load(projectAbsPath);
         if (projectDataResult.status !== Result.Status.Success) {
@@ -38,20 +37,20 @@ export async function importProject(): Promise<void> {
 }
 
 export async function createProject(): Promise<void> {
-        const form = await DialogService.openFormDialog(createProjectForm());
+        const form = await DialogService.openFormDialog(createProjectForm({ fileSystem: FileSystemService }));
 
         if (!form) return;
 
         const projectAbsDir = PathUtils.join(form.destination, form.name);
         const metkDir = PathUtils.join(projectAbsDir, ".metk");
 
-        const mkdirResult = await TauriFileStorage.mkdir(projectAbsDir);
+        const mkdirResult = await FileSystemService.mkdir(projectAbsDir);
         if (mkdirResult.status !== Result.Status.Success) {
             Console.error({ message: mkdirResult.message })
             return;
         }
 
-        const mkdirMetkResult = await TauriFileStorage.mkdir(metkDir);
+        const mkdirMetkResult = await FileSystemService.mkdir(metkDir);
         if (mkdirMetkResult.status !== Result.Status.Success) {
             Console.error({ message: mkdirMetkResult.message })
             return;

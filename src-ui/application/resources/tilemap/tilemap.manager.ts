@@ -1,18 +1,19 @@
 import { Result } from "@/shared/types/result";
 
+import { importTilemap, removeTilemapFromProject } from "@/application/actions/tilemap.actions";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
-import { TilesetManager } from "../tileset/tileset.manager";
-import { TilesetRefManager } from "../references/tileset-ref.manager";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { TilemapStorageService } from "@/infrastructure/container";
-import { RulesetRefManager } from "../references/ruleset-ref.manager";
-import { RulesetManager } from "../ruleset/ruleset.manager";
-import { Console } from "@/ui/notifications/console-gateway";
-import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { TilemapStorageService } from "@/infrastructure/container";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { TilemapData, TilemapMetadata } from "@/shared/data-types/tilemap.data";
+import { Console } from "@/ui/notifications/console-gateway";
 import { EntityCollectionManager } from "../entity/entity-collection.manager";
 import { EntityCollectionRefManager } from "../references/entity-collection-ref.manager";
+import { RulesetRefManager } from "../references/ruleset-ref.manager";
+import { TilesetRefManager } from "../references/tileset-ref.manager";
+import { RulesetManager } from "../ruleset/ruleset.manager";
+import { TilesetManager } from "../tileset/tileset.manager";
 
 export class TilemapManager {
     public readonly tilemapMetadata: Map<string, TilemapMetadata> = new Map<string, TilemapMetadata>(); // id -> tilemapMetadata
@@ -105,8 +106,7 @@ export class TilemapManager {
                 actions: [{
                     label: "global.action.tilemap.import", variant: "outline",
                     onClick: async () => {
-                        const TilemapActions = await import("@/application/actions/tilemap.actions");
-                        return await TilemapActions.importTilemap(id)
+                        return await importTilemap(id)
                     }
                 }]
             }, customId);
@@ -125,15 +125,13 @@ export class TilemapManager {
                     {
                         label: "global.action.tilemap.import", variant: "outline",
                         onClick: async () => {
-                            const TilemapActions = await import("@/application/actions/tilemap.actions");
-                            return await TilemapActions.importTilemap(id);
+                            return await importTilemap(id);
                         }
                     },
                     {
                         label: "global.action.tilemap.remove", variant: "destructive",
                         onClick: async () => {
-                            const TilemapActions = await import("@/application/actions/tilemap.actions");
-                            return await TilemapActions.removeTilemapFromProject(id);
+                            return await removeTilemapFromProject(id);
                         }
                     },
                 ]

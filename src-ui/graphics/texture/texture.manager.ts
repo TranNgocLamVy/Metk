@@ -1,11 +1,12 @@
+import { importTexture } from "@/application/actions/texture.actions";
 import errorTexture from "@/assets/sprites/Missing_texture.png";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { Console } from "@/ui/notifications/console-gateway";
+import { FileSystemService } from "@/infrastructure/container";
 import { Result } from "@/shared/types/result";
 import { TextureUtils } from "@/shared/utils/texture.utils";
-import { exists, readFile } from "@tauri-apps/plugin-fs";
+import { Console } from "@/ui/notifications/console-gateway";
 import { EventEmitter } from "eventemitter3";
 import { Assets, Rectangle, Texture } from "pixi.js";
 
@@ -144,11 +145,7 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
                         label: "global.action.texture.import",
                         variant: "outline",
                         onClick: async () => {
-                            const TextureActions = await import("@/application/actions/texture.actions");
-
-                            return await TextureActions.importTexture(
-                                tileset.id,
-                            );
+                            return await importTexture(tileset.id);
                         },
                     },
                 ],
@@ -158,7 +155,7 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
     }
 
     private async loadTexture(textureAbsPath: string): Promise<Result<Texture | null>> {
-        const exist = await exists(textureAbsPath);
+        const exist = await FileSystemService.exists(textureAbsPath);
 
         if (!exist) {
             return Result.Error({
@@ -167,7 +164,7 @@ export class TextureManager extends EventEmitter<TextureManagerEvent> {
             });
         }
 
-        const fileBuffer = await readFile(textureAbsPath);
+        const fileBuffer = await FileSystemService.readFile(textureAbsPath);
         const texture = await TextureUtils.processTexture(fileBuffer);
 
         return Result.Success(texture);

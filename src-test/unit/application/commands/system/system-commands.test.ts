@@ -14,7 +14,7 @@ import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
 import { useConsoleStore } from "@/ui/stores/console.store";
 import { useDialogStore } from "@/ui/stores/dialog.store";
-import { save } from "@tauri-apps/plugin-dialog";
+import { FileDialogService } from "@/infrastructure/container";
 
 type ResettableStore<T> = {
     getInitialState: () => T;
@@ -34,8 +34,10 @@ const mockState = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("@tauri-apps/plugin-dialog", () => ({
-    save: mockState.dialogSave,
+vi.mock("@/infrastructure/container", () => ({
+    FileDialogService: {
+        saveFile: mockState.dialogSave,
+    },
 }));
 
 vi.mock("@/application/exporter/tmx-tilemap.exporter", () => ({
@@ -301,7 +303,7 @@ describe("system command orchestration", () => {
                 message: undefined,
             });
 
-            expect(save).not.toHaveBeenCalled();
+            expect(FileDialogService.saveFile).not.toHaveBeenCalled();
             expect(TmxTilemapExporter).toHaveBeenCalledTimes(1);
             expect(mockState.exporterExport).toHaveBeenCalledWith(
                 session.tilemap,
@@ -337,7 +339,7 @@ describe("system command orchestration", () => {
                 status: "Cancel",
             });
 
-            expect(save).toHaveBeenCalledWith({
+            expect(FileDialogService.saveFile).toHaveBeenCalledWith({
                 filters: [{ name: "TMX", extensions: ["tmx"] }],
                 canCreateDirectories: true,
                 title: "Export Tilemap",

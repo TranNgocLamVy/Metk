@@ -1,7 +1,6 @@
 import { Result } from "@/shared/types/result";
 import { ISerializer } from "./interface/serializer.interface";
 import { IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
-import { exists } from '@tauri-apps/plugin-fs';
 import { IStorageService } from "./interface/storage-service.interface";
 
 export class JsonStorageService<T> implements IStorageService {
@@ -13,7 +12,7 @@ export class JsonStorageService<T> implements IStorageService {
     ) { }
 
     public async exists(absFilePath: string): Promise<boolean> {
-        return await exists(absFilePath, this.defaultOptions);
+        return await this.storage.exists(absFilePath, this.defaultOptions);
     }
 
 

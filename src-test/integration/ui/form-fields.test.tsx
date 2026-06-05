@@ -9,7 +9,7 @@ const formFieldMocks = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("@/shared/utils/file-dialog.utils", () => ({ FileDialogUtils: formFieldMocks.fileDialogs }));
+vi.mock("@/infrastructure/container", () => ({ FileDialogService: formFieldMocks.fileDialogs }));
 vi.mock("react-i18next", () => ({
     initReactI18next: {
         type: "3rdParty",

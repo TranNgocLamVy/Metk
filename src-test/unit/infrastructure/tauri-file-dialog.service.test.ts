@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { TauriFileDialogService } from "@/infrastructure/tauri-file-dialog.service";
 import { open, save } from "@tauri-apps/plugin-dialog";
 
 const dialogMock = vi.hoisted(() => ({
@@ -13,7 +13,7 @@ vi.mock("@tauri-apps/plugin-dialog", () => ({
     save: dialogMock.save,
 }));
 
-describe("FileDialogUtils", () => {
+describe("TauriFileDialogService", () => {
     beforeEach(() => {
         dialogMock.open.mockReset();
         dialogMock.save.mockReset();
@@ -21,8 +21,9 @@ describe("FileDialogUtils", () => {
 
     it("normalizes a selected single file path", async () => {
         dialogMock.open.mockResolvedValue("C:\\Project\\Metk\\maps\\world.tm.json");
+        const service = new TauriFileDialogService();
 
-        await expect(FileDialogUtils.open({ multiple: false })).resolves.toBe("C:/Project/Metk/maps/world.tm.json");
+        await expect(service.open({ multiple: false })).resolves.toBe("C:/Project/Metk/maps/world.tm.json");
 
         expect(open).toHaveBeenCalledWith({ multiple: false });
     });
@@ -32,8 +33,9 @@ describe("FileDialogUtils", () => {
             "C:\\Project\\Metk\\maps\\world.tm.json",
             "C:/Project/Metk/maps/../tilesets/terrain.ts.json",
         ]);
+        const service = new TauriFileDialogService();
 
-        await expect(FileDialogUtils.open({ multiple: true })).resolves.toEqual([
+        await expect(service.open({ multiple: true })).resolves.toEqual([
             "C:/Project/Metk/maps/world.tm.json",
             "C:/Project/Metk/tilesets/terrain.ts.json",
         ]);
@@ -42,15 +44,17 @@ describe("FileDialogUtils", () => {
     it("returns null when open or save dialogs are cancelled", async () => {
         dialogMock.open.mockResolvedValue(null);
         dialogMock.save.mockResolvedValue(null);
+        const service = new TauriFileDialogService();
 
-        await expect(FileDialogUtils.open()).resolves.toBeNull();
-        await expect(FileDialogUtils.saveFile()).resolves.toBeNull();
+        await expect(service.open()).resolves.toBeNull();
+        await expect(service.saveFile()).resolves.toBeNull();
     });
 
     it("normalizes saved file paths", async () => {
         dialogMock.save.mockResolvedValue("C:\\Project\\Metk\\exports\\world.tmx");
+        const service = new TauriFileDialogService();
 
-        await expect(FileDialogUtils.saveFile({ title: "Export" })).resolves.toBe("C:/Project/Metk/exports/world.tmx");
+        await expect(service.saveFile({ title: "Export" })).resolves.toBe("C:/Project/Metk/exports/world.tmx");
 
         expect(save).toHaveBeenCalledWith({ title: "Export" });
     });

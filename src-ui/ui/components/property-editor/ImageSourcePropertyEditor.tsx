@@ -1,10 +1,9 @@
-import { readFile } from "@tauri-apps/plugin-fs";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ImageSourcePropertyClass } from "@/editor/properties/properties";
+import { FileDialogService, FileSystemService } from "@/infrastructure/container";
 import type { ImageSourceData } from "@/shared/data-types/image-source.data";
 import { Result } from "@/shared/types/result";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { Button } from "@/ui/components/shadcn/button";
 import { Input } from "@/ui/components/shadcn/input";
@@ -111,7 +110,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
 
         const oldValue = clonePropertyValue(normalizeImageSource(property.getter()));
 
-        const selectedPath = await FileDialogUtils.open({
+        const selectedPath = await FileDialogService.open({
             directory: false,
             multiple: false,
             filters: [
@@ -125,7 +124,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
         if (!selectedPath || Array.isArray(selectedPath)) return;
 
         try {
-            const buffer = await readFile(selectedPath);
+            const buffer = await FileSystemService.readFile(selectedPath);
             const image = await TextureUtils.processImage(buffer);
             const source = property.absToRef(selectedPath);
 

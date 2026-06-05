@@ -1,10 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { EntityCollectionStorageService } from "@/infrastructure/container";
+import { EntityCollectionStorageService, FileDialogService } from "@/infrastructure/container";
 import { EntityCollectionData } from "@/shared/data-types/entity-collection.data";
 import { Result } from "@/shared/types/result";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { Console } from "@/ui/notifications/console-gateway";
 import i18n from "@/app/providers/i18n";
@@ -40,7 +39,7 @@ export async function createEntityCollection(): Promise<void> {
         const form = await DialogService.openFormDialog(createEntityCollectionForm);
         if (!form) return;
 
-        const entityCollectionAbsPath = await FileDialogUtils.saveFile({
+        const entityCollectionAbsPath = await FileDialogService.saveFile({
             title: i18n.t("dialog.save.entityCollection.title"),
             defaultPath: currentProject.projectPathSystem.absDir,
             filters: [

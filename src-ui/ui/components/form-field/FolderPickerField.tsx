@@ -1,4 +1,4 @@
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { FileDialogService } from "@/infrastructure/container";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from '@/ui/components/shadcn/button';
@@ -23,7 +23,7 @@ export default function FolderPickerField(props: FolderPickerProps) {
 	const { id, name, label, placeholder, defaultDir, required, disabled, value, handleChange } = props;
 
 	const selectFolder = async () => {
-		const path = await FileDialogUtils.open({
+		const path = await FileDialogService.open({
 			directory: true,
 			defaultPath: defaultDir,
 			multiple: false,

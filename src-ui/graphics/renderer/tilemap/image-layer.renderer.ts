@@ -1,9 +1,9 @@
-import { exists, readFile } from "@tauri-apps/plugin-fs";
 import { Sprite, Texture, TilingSprite } from "pixi.js";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
+import { FileSystemService } from "@/infrastructure/container";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 
 import { Viewport } from "pixi-viewport";
@@ -85,7 +85,7 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         const imageAbsPath = this.tilemap.tilemapPathSystem.getAbsPathFromRelPath(this.layer.imageSource.source);
 
         try {
-            const imageExists = await exists(imageAbsPath);
+            const imageExists = await FileSystemService.exists(imageAbsPath);
 
             if (!imageExists) {
                 return {
@@ -94,7 +94,7 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
                 };
             }
 
-            const fileBuffer = await readFile(imageAbsPath);
+            const fileBuffer = await FileSystemService.readFile(imageAbsPath);
             return {
                 texture: await TextureUtils.processTexture(fileBuffer),
                 owned: true,

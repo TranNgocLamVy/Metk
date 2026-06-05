@@ -2,11 +2,11 @@ import { EditorFacade } from "@/application/editor.facade";
 import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
-import { save } from "@tauri-apps/plugin-dialog";
 
 import { Console } from "@/ui/notifications/console-gateway";
 import { SystemCommand } from "../commands/command.decorator";
 import { ExportStorageService } from "@/infrastructure/export-storage.service";
+import { FileDialogService } from "@/infrastructure/container";
 
 @SystemCommand({
     id: "workspace.tilemap.export.tmx",
@@ -27,8 +27,7 @@ export class ExportTilemapTMXCommand implements ISystemCommand {
         const exportPathManager = workspace.savedPathManager;
         let exportPath = exportPathManager.getExportPath(tilemap.id);
         if (!exportPath) {
-            // TODO: Move this to infrastructure
-            const savePath = await save({
+            const savePath = await FileDialogService.saveFile({
                 filters: [{ name: "TMX", extensions: ["tmx"] }],
                 canCreateDirectories: true,
                 title: "Export Tilemap", // TODO: i18n

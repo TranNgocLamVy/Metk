@@ -186,7 +186,9 @@ vi.mock("pixi.js", () => ({
 }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: rendererMocks.appKernel }));
 vi.mock("@/application/actions/workspace.actions", () => rendererMocks.workspaceService);
-vi.mock("@tauri-apps/plugin-fs", () => rendererMocks.fs);
+vi.mock("@/infrastructure/container", () => ({
+    FileSystemService: rendererMocks.fs,
+}));
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: rendererMocks.textureUtils }));
 
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";

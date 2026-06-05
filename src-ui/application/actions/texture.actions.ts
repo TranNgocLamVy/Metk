@@ -1,7 +1,6 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { Result } from "@/shared/types/result";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
-import { readFile } from "@tauri-apps/plugin-fs";
+import { FileDialogService, FileSystemService } from "@/infrastructure/container";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { Texture } from "pixi.js";
 import { PathUtils } from "@/shared/utils/path.utils";
@@ -18,10 +17,10 @@ export async function importTexture(tilesetId: string): Promise<Result> {
 
         const defaultTextureDir = currentWorkspace.savedPathManager.getTextureDir();
 
-        const textureAbsPath = await FileDialogUtils.open({ defaultPath: defaultTextureDir, multiple: false, filters: [{ name: "Texture", extensions: ["png", "jpg", "jpeg"] }] });
+        const textureAbsPath = await FileDialogService.open({ defaultPath: defaultTextureDir, multiple: false, filters: [{ name: "Texture", extensions: ["png", "jpg", "jpeg"] }] });
         if (!textureAbsPath) return Result.Cancel();
 
-        const buffer = await readFile(textureAbsPath);
+        const buffer = await FileSystemService.readFile(textureAbsPath);
         let texture: Texture;
         try {
             texture = await TextureUtils.processTexture(buffer);

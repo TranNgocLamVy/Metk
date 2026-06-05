@@ -4,18 +4,10 @@ import { JsonStorageService } from "@/infrastructure/json-storage.service";
 import { ISerializer } from "@/infrastructure/interface/serializer.interface";
 import { IStorageProvider, StorageOptions } from "@/infrastructure/interface/storage-provider.interface";
 import { Result } from "@/shared/types/result";
-import { exists } from "@tauri-apps/plugin-fs";
-
-const fsMock = vi.hoisted(() => ({
-    exists: vi.fn(),
-}));
-
-vi.mock("@tauri-apps/plugin-fs", () => ({
-    exists: fsMock.exists,
-}));
 
 const createStorage = (): IStorageProvider => ({
     exists: vi.fn(),
+    mkdir: vi.fn(),
     readTextFile: vi.fn(),
     writeTextFile: vi.fn(),
     readFile: vi.fn(),
@@ -30,17 +22,18 @@ const createSerializer = <T,>(): ISerializer<T> => ({
 
 describe("JsonStorageService", () => {
     beforeEach(() => {
-        fsMock.exists.mockReset();
+        vi.clearAllMocks();
     });
 
-    it("checks existence through the filesystem plugin with default options", async () => {
+    it("checks existence through the storage provider with default options", async () => {
+        const storage = createStorage();
         const options: StorageOptions = { baseDir: "AppData" };
-        const service = new JsonStorageService(createStorage(), createSerializer(), options);
-        fsMock.exists.mockResolvedValue(true);
+        const service = new JsonStorageService(storage, createSerializer(), options);
+        vi.mocked(storage.exists).mockResolvedValue(true);
 
         await expect(service.exists("projects/project.json")).resolves.toBe(true);
 
-        expect(exists).toHaveBeenCalledWith("projects/project.json", options);
+        expect(storage.exists).toHaveBeenCalledWith("projects/project.json", options);
     });
 
     it("loads text content and deserializes it", async () => {

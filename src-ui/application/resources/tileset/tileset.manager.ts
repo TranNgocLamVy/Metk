@@ -1,14 +1,15 @@
-import { Result } from "@/shared/types/result";
+import { importTileset, removeTilesetFromProject } from "@/application/actions/tileset.actions";
+import { cloneTilesetData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { TilesetStorageService } from "@/infrastructure/container";
-import { PathUtils } from "@/shared/utils/path.utils";
-import { Console } from "@/ui/notifications/console-gateway";
-import { TilesetData, TilesetMetadata } from "@/shared/data-types/tileset.data";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { TilesetFactory } from "@/editor/model/tileset/tileset.factory";
 import { normalizeTilesetData } from "@/editor/model/tileset/tileset.normalizer";
-import { cloneTilesetData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
+import { TilesetStorageService } from "@/infrastructure/container";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { TilesetData, TilesetMetadata } from "@/shared/data-types/tileset.data";
+import { Result } from "@/shared/types/result";
+import { PathUtils } from "@/shared/utils/path.utils";
+import { Console } from "@/ui/notifications/console-gateway";
 
 export class TilesetManager {
     public readonly tilesetMetadata: Map<string, TilesetMetadata> = new Map<string, TilesetMetadata>(); // id -> tilesetMetadata
@@ -85,8 +86,7 @@ export class TilesetManager {
                 actions: [{
                     label: "global.action.tileset.import", variant: "outline",
                     onClick: async () => {
-                        const TilesetActions = await import("@/application/actions/tileset.actions");
-                        return await TilesetActions.importTileset(id);
+                        return await importTileset(id);
                     }
                 }]
             }, customId);
@@ -105,15 +105,13 @@ export class TilesetManager {
                     {
                         label: "global.action.tileset.import", variant: "outline",
                         onClick: async () => {
-                            const TilesetActions = await import("@/application/actions/tileset.actions");
-                            return await TilesetActions.importTileset(id);
+                            return await importTileset(id);
                         }
                     },
                     {
                         label: "global.action.tileset.remove", variant: "destructive",
                         onClick: async () => {
-                            const TilesetActions = await import("@/application/actions/tileset.actions");
-                            return await TilesetActions.removeTilesetFromProject(id);
+                            return await removeTilesetFromProject(id);
                         }
                     },
                 ]

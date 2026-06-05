@@ -1,4 +1,3 @@
-import { readFile } from "@tauri-apps/plugin-fs";
 import {
     Application,
     Container,
@@ -12,6 +11,7 @@ import {
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
+import { FileSystemService } from "@/infrastructure/container";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 
@@ -170,7 +170,7 @@ class TilesetOverviewPixiRenderer {
                 const tileAbsPath = tileset.tilesetPathSystem.getAbsPathFromRelPath(
                     layout.tile.imageSource.source,
                 );
-                const fileBuffer = await readFile(tileAbsPath);
+                const fileBuffer = await FileSystemService.readFile(tileAbsPath);
                 const texture = await TextureUtils.processTexture(fileBuffer);
                 if (this.disposed) {
                     texture.destroy(true);

@@ -1,17 +1,18 @@
-import { RulesetData, RulesetMetadata } from "@/shared/data-types/ruleset.data";
+import { importRuleset, removeRulesetFromProject } from "@/application/actions/ruleset.actions";
+import { cloneRulesetData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
 import { Ruleset } from "@/editor/model/ruleset/ruleset";
-import { TilesetManager } from "../tileset/tileset.manager";
-import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
-import { Result } from "@/shared/types/result";
+import { normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
+import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { RulesetStorageService } from "@/infrastructure/container";
-import { TilesetRefManager } from "../references/tileset-ref.manager";
-import { RulesetRefManager } from "../references/ruleset-ref.manager";
+import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { RulesetData, RulesetMetadata } from "@/shared/data-types/ruleset.data";
+import { Result } from "@/shared/types/result";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/ui/notifications/console-gateway";
 import EventEmitter from "eventemitter3";
-import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { normalizeRulesetData } from "@/editor/model/ruleset/ruleset.normalizer";
-import { cloneRulesetData, deepCloneResourceData } from "@/editor/model/resource-clone.utils";
+import { RulesetRefManager } from "../references/ruleset-ref.manager";
+import { TilesetRefManager } from "../references/tileset-ref.manager";
+import { TilesetManager } from "../tileset/tileset.manager";
 
 export interface RulesetManagerEvent {
     onRulesetManagerUpdated: (rulesets: RulesetMetadata[]) => void;
@@ -110,8 +111,7 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
                 actions: [{
                     label: "global.action.ruleset.import", variant: "outline",
                     onClick: async () => {
-                        const RulesetActions = await import("@/application/actions/ruleset.actions");
-                        return await RulesetActions.importRuleset(id);
+                        return await importRuleset(id);
                     }
                 }]
             }, customId);
@@ -130,15 +130,13 @@ export class RulesetManager extends EventEmitter<RulesetManagerEvent> {
                     {
                         label: "global.action.ruleset.import", variant: "outline",
                         onClick: async () => {
-                            const RulesetActions = await import("@/application/actions/ruleset.actions");
-                            return await RulesetActions.importRuleset(id);
+                            return await importRuleset(id);
                         }
                     },
                     {
                         label: "global.action.ruleset.remove", variant: "destructive",
                         onClick: async () => {
-                            const RulesetActions = await import("@/application/actions/ruleset.actions");
-                            return await RulesetActions.removeRulesetFromProject(id);
+                            return await removeRulesetFromProject(id);
                         }
                     },
                 ]

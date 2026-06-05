@@ -49,7 +49,9 @@ vi.mock("pixi.js", () => ({
     Rectangle: textureMocks.Rectangle,
     Texture: textureMocks.Texture,
 }));
-vi.mock("@tauri-apps/plugin-fs", () => textureMocks.fs);
+vi.mock("@/infrastructure/container", () => ({
+    FileSystemService: textureMocks.fs,
+}));
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: textureMocks.textureUtils }));
 vi.mock("@/ui/notifications/console-gateway", () => ({ Console: textureMocks.console }));
 

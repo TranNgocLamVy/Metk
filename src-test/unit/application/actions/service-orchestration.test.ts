@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const serviceMocks = vi.hoisted(() => ({
     uuid: vi.fn(() => "generated-id"),
-    readFile: vi.fn(),
     appKernel: {
         projectManager: {
             setAndLoadProject: vi.fn(),
@@ -39,10 +38,6 @@ const serviceMocks = vi.hoisted(() => ({
             updateTilesetTexture: vi.fn(),
         },
     },
-    fileDialogs: {
-        open: vi.fn(),
-        saveFile: vi.fn(),
-    },
     storage: {
         ProjectStorageService: {
             load: vi.fn(),
@@ -60,7 +55,13 @@ const serviceMocks = vi.hoisted(() => ({
             load: vi.fn(),
             save: vi.fn(),
         },
-        TauriFileStorage: {
+        FileDialogService: {
+            open: vi.fn(),
+            saveFile: vi.fn(),
+        },
+        FileSystemService: {
+            exists: vi.fn(),
+            readFile: vi.fn(),
             mkdir: vi.fn(),
         },
     },
@@ -76,9 +77,7 @@ const serviceMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("uuid", () => ({ v4: serviceMocks.uuid }));
-vi.mock("@tauri-apps/plugin-fs", () => ({ readFile: serviceMocks.readFile }));
 vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: serviceMocks.appKernel }));
-vi.mock("@/shared/utils/file-dialog.utils", () => ({ FileDialogUtils: serviceMocks.fileDialogs }));
 vi.mock("@/infrastructure/container", () => serviceMocks.storage);
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: serviceMocks.textureUtils }));
 vi.mock("@/ui/notifications/console-gateway", () => ({ Console: serviceMocks.console }));
@@ -216,8 +215,8 @@ beforeEach(() => {
     serviceMocks.appKernel.saveProjectManager.mockResolvedValue(undefined);
     serviceMocks.appKernel.editorFacade.projectManager.saveCurrrentProject.mockResolvedValue(undefined);
     serviceMocks.appKernel.projectManager.saveCurrrentProject.mockResolvedValue(undefined);
-    serviceMocks.fileDialogs.open.mockResolvedValue(null);
-    serviceMocks.fileDialogs.saveFile.mockResolvedValue(null);
+    serviceMocks.storage.FileDialogService.open.mockResolvedValue(null);
+    serviceMocks.storage.FileDialogService.saveFile.mockResolvedValue(null);
     serviceMocks.storage.ProjectStorageService.load.mockResolvedValue(Result.Success({ id: "project-a", name: "Project A" }));
     serviceMocks.storage.ProjectStorageService.save.mockResolvedValue(Result.Success());
     serviceMocks.storage.TilemapStorageService.load.mockResolvedValue(Result.Success());
@@ -226,8 +225,9 @@ beforeEach(() => {
     serviceMocks.storage.TilesetStorageService.save.mockResolvedValue(Result.Success());
     serviceMocks.storage.RulesetStorageService.load.mockResolvedValue(Result.Success());
     serviceMocks.storage.RulesetStorageService.save.mockResolvedValue(Result.Success());
-    serviceMocks.storage.TauriFileStorage.mkdir.mockResolvedValue(Result.Success());
-    serviceMocks.readFile.mockResolvedValue(new Uint8Array([1, 2, 3]));
+    serviceMocks.storage.FileSystemService.exists.mockResolvedValue(false);
+    serviceMocks.storage.FileSystemService.mkdir.mockResolvedValue(Result.Success());
+    serviceMocks.storage.FileSystemService.readFile.mockResolvedValue(new Uint8Array([1, 2, 3]));
     serviceMocks.textureUtils.processImage.mockResolvedValue({ width: 64, height: 32 });
     serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 32, height: 32 });
 });
@@ -289,7 +289,7 @@ describe("ProjectService orchestration", () => {
     it("imports project metadata and navigates when the user chooses to open it", async () => {
         const navigate = vi.fn();
         useNavigationStore.getState().setNavigate(navigate);
-        serviceMocks.fileDialogs.open.mockResolvedValue("C:/projects/metk/.metk/project.json");
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/projects/metk/.metk/project.json");
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(true);
 
         await ProjectActions.importProject();
@@ -301,7 +301,7 @@ describe("ProjectService orchestration", () => {
     });
 
     it("does not import a project when file selection is cancelled", async () => {
-        serviceMocks.fileDialogs.open.mockResolvedValue(null);
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue(null);
 
         await ProjectActions.importProject();
 
@@ -317,8 +317,8 @@ describe("ProjectService orchestration", () => {
 
         await ProjectActions.createProject();
 
-        expect(serviceMocks.storage.TauriFileStorage.mkdir).toHaveBeenNthCalledWith(1, "C:/projects/New Project");
-        expect(serviceMocks.storage.TauriFileStorage.mkdir).toHaveBeenNthCalledWith(2, "C:/projects/New Project/.metk");
+        expect(serviceMocks.storage.FileSystemService.mkdir).toHaveBeenNthCalledWith(1, "C:/projects/New Project");
+        expect(serviceMocks.storage.FileSystemService.mkdir).toHaveBeenNthCalledWith(2, "C:/projects/New Project/.metk");
         expect(serviceMocks.storage.ProjectStorageService.save).toHaveBeenCalledWith(
             "C:/projects/New Project/.metk/project.json",
             expect.objectContaining({ name: "New Project" }),
@@ -352,7 +352,7 @@ describe("TilemapService orchestration", () => {
                 tile: { tileWidth: 16, tileHeight: 16 },
             },
         } as any);
-        serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/tilemaps/overworld.tm.json");
+        serviceMocks.storage.FileDialogService.saveFile.mockResolvedValue("C:/project/tilemaps/overworld.tm.json");
 
         await TilemapActions.createTilemap();
 
@@ -369,7 +369,7 @@ describe("TilemapService orchestration", () => {
 
     it("imports a tilemap and returns cancellation on id mismatch without adding metadata", async () => {
         const { project } = attachProjectAndWorkspace();
-        serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/tilemaps/imported.tm.json");
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/project/tilemaps/imported.tm.json");
         serviceMocks.storage.TilemapStorageService.load.mockResolvedValue(Result.Success({ id: "other-id", name: "Imported" }));
 
         const result = await TilemapActions.importTilemap("expected-id");
@@ -405,12 +405,12 @@ describe("TilesetService orchestration", () => {
                 setting: { tile: { tileWidth: 16, tileHeight: 16 } },
             },
         } as any);
-        serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/tilesets/terrain.ts.json");
+        serviceMocks.storage.FileDialogService.saveFile.mockResolvedValue("C:/project/tilesets/terrain.ts.json");
         serviceMocks.textureUtils.processImage.mockResolvedValue({ width: 64, height: 32 });
 
         await TilesetActions.createTileset();
 
-        expect(serviceMocks.readFile).toHaveBeenCalledWith("C:/project/textures/terrain.png");
+        expect(serviceMocks.storage.FileSystemService.readFile).toHaveBeenCalledWith("C:/project/textures/terrain.png");
         expect(serviceMocks.textureUtils.processImage).toHaveBeenCalledWith(new Uint8Array([1, 2, 3]));
         expect(serviceMocks.storage.TilesetStorageService.save).toHaveBeenCalledWith(
             "C:/project/tilesets/terrain.ts.json",
@@ -448,7 +448,7 @@ describe("RulesetService orchestration", () => {
     it("creates a ruleset and persists project plus workspace state", async () => {
         const { project, workspace } = attachProjectAndWorkspace();
         vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({ ruleset: { name: "Terrain Rules", color: "#22cc88" } } as any);
-        serviceMocks.fileDialogs.saveFile.mockResolvedValue("C:/project/rulesets/terrain.rs.json");
+        serviceMocks.storage.FileDialogService.saveFile.mockResolvedValue("C:/project/rulesets/terrain.rs.json");
 
         await RulesetActions.createRuleset();
 
@@ -478,7 +478,7 @@ describe("RulesetService orchestration", () => {
 
     it("returns an error result when importing a ruleset fails to load", async () => {
         attachProjectAndWorkspace();
-        serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/rulesets/bad.rs.json");
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/project/rulesets/bad.rs.json");
         serviceMocks.storage.RulesetStorageService.load.mockResolvedValue(Result.Error("bad-json"));
 
         const result = await RulesetActions.importRuleset();
@@ -494,7 +494,7 @@ describe("TextureService orchestration", () => {
         const tileset = createSingleImageTileset();
         const updateImageSource = vi.spyOn(tileset, "updateImageSource");
         project.tilesetManager.getTilesetById.mockReturnValue(tileset);
-        serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/replacement.png");
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/project/textures/replacement.png");
         serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 32, height: 32 });
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(false);
 
@@ -517,7 +517,7 @@ describe("TextureService orchestration", () => {
         const tileset = createSingleImageTileset();
         const updateImageSource = vi.spyOn(tileset, "updateImageSource");
         project.tilesetManager.getTilesetById.mockReturnValue(tileset);
-        serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/large.png");
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/project/textures/large.png");
         serviceMocks.textureUtils.processTexture.mockResolvedValue({ width: 64, height: 64 });
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(false);
 
@@ -534,7 +534,7 @@ describe("TextureService orchestration", () => {
 
     it("returns an error result when texture processing fails", async () => {
         attachProjectAndWorkspace();
-        serviceMocks.fileDialogs.open.mockResolvedValue("C:/project/textures/bad.png");
+        serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/project/textures/bad.png");
         serviceMocks.textureUtils.processTexture.mockRejectedValue(new Error("decode failed"));
 
         const result = await TextureActions.importTexture("tileset-a");

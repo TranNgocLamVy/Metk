@@ -1,12 +1,11 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { extractTilemapId, normalizeTilemapData } from "@/editor/model/tilemap/tilemap.normalizer";
-import { TilemapStorageService } from "@/infrastructure/container";
+import { FileDialogService, TilemapStorageService } from "@/infrastructure/container";
 import i18n from "@/app/providers/i18n";
 import { v4 as uuidv4 } from "uuid";
 import { createTilemapForm } from "@/shared/constant/form/create-tilemap.form";
 import { CreateTilemapPayload, TilemapData, TilemapOrientation } from "@/shared/data-types/tilemap.data";
 import { Result } from "@/shared/types/result";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/ui/notifications/console-gateway";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
@@ -23,7 +22,7 @@ export async function createTilemap(): Promise<void> {
 
         const defaultTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
 
-        const tilemapAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultTilemapDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultTilemapDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return;
 
         const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
@@ -74,7 +73,7 @@ export async function importTilemap(refTilemapId?: string): Promise<Result> {
 
         const defaultTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
 
-        const tilemapAbsPath = await FileDialogUtils.open({ defaultPath: defaultTilemapDir, multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogService.open({ defaultPath: defaultTilemapDir, multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return Result.Cancel();
 
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);

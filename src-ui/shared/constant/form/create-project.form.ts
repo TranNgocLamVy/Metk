@@ -1,8 +1,13 @@
 import { PathUtils } from "@/shared/utils/path.utils";
-import { exists } from "@tauri-apps/plugin-fs";
 import { createForm } from "./form.utils";
 
-export const createProjectForm = () => {
+type CreateProjectFormDependencies = {
+    fileSystem: {
+        exists(path: string): Promise<boolean>;
+    };
+};
+
+export const createProjectForm = ({ fileSystem }: CreateProjectFormDependencies) => {
     return createForm({
         title: "form.project.title",
         okText: "form.project.action.create",
@@ -28,7 +33,7 @@ export const createProjectForm = () => {
         ],
         async validateBeforeSubmit(values) {
             const path = PathUtils.join(values.destination, values.name);
-            const isExists = await exists(path);
+            const isExists = await fileSystem.exists(path);
             if (isExists) {
                 return { valid: false, message: "form.project.message.folderExists" }
             }

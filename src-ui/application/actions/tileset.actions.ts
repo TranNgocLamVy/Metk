@@ -4,12 +4,10 @@ import { appKernel } from "@/application/bootstrap/app-kernel";
 import { TilesetData, TilesetType } from "@/shared/data-types/tileset.data";
 
 import { extractTilesetId } from "@/editor/model/tileset/tileset.normalizer";
-import { TilesetStorageService } from "@/infrastructure/container";
+import { FileDialogService, FileSystemService, TilesetStorageService } from "@/infrastructure/container";
 import i18n from "@/app/providers/i18n";
-import { readFile } from "@tauri-apps/plugin-fs";
 import { createTilesetForm } from "@/shared/constant/form/create-tileset.form";
 import { Result } from "@/shared/types/result";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { Console } from "@/ui/notifications/console-gateway";
@@ -29,7 +27,7 @@ export async function createTileset(): Promise<void> {
 
         const defaultTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
 
-        const tilesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        const tilesetAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
 
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
@@ -76,7 +74,7 @@ export async function createTileset(): Promise<void> {
 }
 
 async function createSingleImageTilesetData(args: { name: string; tilesetAbsDir: string; textureAbsPath: string; tileWidth: number; tileHeight: number }): Promise<TilesetData> {
-        const fileBuffer = await readFile(args.textureAbsPath);
+        const fileBuffer = await FileSystemService.readFile(args.textureAbsPath);
         const image = await TextureUtils.processImage(fileBuffer);
 
         const columns = Math.ceil(image.width / args.tileWidth);
@@ -121,7 +119,7 @@ export async function importTileset(refTilesetId?: string): Promise<Result> {
 
         const defaultTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
 
-        const tilesetAbsPath = await FileDialogUtils.open({ defaultPath: defaultTilesetDir, multiple: false, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        const tilesetAbsPath = await FileDialogService.open({ defaultPath: defaultTilesetDir, multiple: false, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return Result.Cancel();
 
         const loadTilesetResult = await TilesetStorageService.load(tilesetAbsPath);

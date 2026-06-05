@@ -2,9 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Result } from "@/shared/types/result";
 import { CreateRulesetPayload, RulesetData } from "@/shared/data-types/ruleset.data";
-import { RulesetStorageService } from "@/infrastructure/container";
+import { FileDialogService, RulesetStorageService } from "@/infrastructure/container";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { createRulesetForm } from "@/shared/constant/form/create-ruleset.form";
 import { saveCurrentWorkspace } from "@/application/actions/workspace.actions";
@@ -24,7 +23,7 @@ export async function createRuleset(): Promise<void> {
 
         const defaultRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
 
-        const rulesetAbsPath = await FileDialogUtils.saveFile({ title: i18n.t("dialog.save.ruleset.title"), defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        const rulesetAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.ruleset.title"), defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return;
 
         const rulesetAbsDir = PathUtils.dirname(rulesetAbsPath);
@@ -71,7 +70,7 @@ export async function importRuleset(refRulesetId?: string): Promise<Result> {
 
         const defaultRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
 
-        const rulesetAbsPath = await FileDialogUtils.open({ defaultPath: defaultRulesetDir, multiple: false, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        const rulesetAbsPath = await FileDialogService.open({ defaultPath: defaultRulesetDir, multiple: false, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return Result.Cancel();
 
         const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);

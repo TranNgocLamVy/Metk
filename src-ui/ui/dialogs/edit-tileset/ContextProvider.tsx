@@ -1,11 +1,10 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { readFile } from "@tauri-apps/plugin-fs";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tileset } from "@/editor/model/tileset/tileset";
+import { FileDialogService, FileSystemService } from "@/infrastructure/container";
 import { Console } from "@/ui/notifications/console-gateway";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { useDialogStore } from "@/ui/stores/dialog.store";
@@ -53,7 +52,7 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         const currentWorkspace = appKernel.editorFacade.currentWorkspace;
         const defaultTextureDir = currentWorkspace?.savedPathManager.getTextureDir();
 
-        const imageAbsPaths = await FileDialogUtils.open({
+        const imageAbsPaths = await FileDialogService.open({
             title: "Add tiles",
             defaultPath: defaultTextureDir,
             multiple: true,
@@ -70,7 +69,7 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         try {
             const imageSources = await Promise.all(
                 imageAbsPaths.map(async (imageAbsPath) => {
-                    const fileBuffer = await readFile(imageAbsPath);
+                    const fileBuffer = await FileSystemService.readFile(imageAbsPath);
                     const image = await TextureUtils.processImage(fileBuffer);
 
                     return {

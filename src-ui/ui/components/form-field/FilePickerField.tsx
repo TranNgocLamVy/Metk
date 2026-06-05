@@ -1,5 +1,5 @@
 import { FileFilter } from "@/shared/types/form-dialog";
-import { FileDialogUtils } from "@/shared/utils/file-dialog.utils";
+import { FileDialogService } from "@/infrastructure/container";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -26,7 +26,7 @@ export default function FilePickerField(props: FilePickerProps) {
 	const { id, name, label, placeholder, defaultDir, required, disabled, multiple, filter, value, handleChange } = props;
 
 	const selectFile = async () => {
-		const path = await FileDialogUtils.open({
+		const path = await FileDialogService.open({
 			directory: false, // Only allow selecting files
 			defaultPath: defaultDir,
 			multiple: multiple ?? false, // Prevent multiple selection
