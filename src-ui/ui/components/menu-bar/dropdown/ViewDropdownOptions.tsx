@@ -1,7 +1,7 @@
 import { CaseSensitive, Eye, Grid3x3, Info, Lock, RectangleHorizontal, RotateCcw, Scan, Search, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
 
+import { getSetting, toggleSetting, updateSetting } from "@/application/actions/setting.actions";
 import { ShowEntityName, Snapping } from "@/application/settings/setting.enum";
-import { getSetting, toggleSetting, updateSetting } from "@/application/settings/setting.utils";
 import { useConsoleStore } from "@/ui/stores/console.store";
 
 

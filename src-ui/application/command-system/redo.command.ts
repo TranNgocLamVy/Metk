@@ -17,4 +17,10 @@ export class RedoCommand implements ISystemCommand {
         session.historyManager.redo(session);
         return Result.Success();
     }
+
+    public canExecute(editorFacade: EditorFacade): boolean {
+        const historyManager = editorFacade.getCurrentEditorSession()?.historyManager;
+        if (!historyManager) return false;
+        return historyManager.canRedo;
+    }
 }

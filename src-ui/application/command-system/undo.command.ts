@@ -17,4 +17,10 @@ export class UndoCommand implements ISystemCommand {
         session.historyManager.undo(session);
         return Result.Success();
     }
+
+    public canExecute(editorFacade: EditorFacade): boolean {
+        const historyManager = editorFacade.getCurrentEditorSession()?.historyManager;
+        if (!historyManager) return false;
+        return historyManager.canUndo;
+    }
 }

@@ -29,12 +29,22 @@ export class SystemCommandManager {
     public canExecute(commandId: string): boolean {
         const commandData = SystemCommandManager.COMMAND_REGISTRY.get(commandId);
         const commandConstructor = this.commands.get(commandId);
-
+    
         if (!commandData || !commandConstructor) {
             return false;
         }
-
-        return this.contextManager.evaluateWhen(commandData.when);
+    
+        if (!this.contextManager.evaluateWhen(commandData.when)) {
+            return false;
+        }
+    
+        const command = new commandConstructor();
+    
+        if (command.canExecute) {
+            return command.canExecute(this.editorFacade);
+        }
+    
+        return true;
     }
 
     public async execute(commandId: string) {

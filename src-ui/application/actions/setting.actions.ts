@@ -1,7 +1,7 @@
 import { Result } from "@/shared/types/result";
 import { Console } from "@/ui/notifications/console-gateway";
 import { appKernel } from "../bootstrap/app-kernel";
-import { DefaultSettingKey, DefaultSettingValue } from "./default-settings";
+import { DefaultSettingKey, DefaultSettingValue } from "../settings/default-settings";
 
 const settings = appKernel.settings;
 
