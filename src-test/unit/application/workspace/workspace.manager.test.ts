@@ -41,7 +41,7 @@ const createStoredWorkspaceData = (): WorkpsaceData => ({
     ...defaultWorkspaceData,
     tilemapEditorWorkspace: {
         ...defaultWorkspaceData.tilemapEditorWorkspace,
-        toolState: { tile: "tool.stamp", rule: "tool.stamp" },
+        toolState: {},
     },
     savedPath: {
         exportPaths: [{ tilemapId: "tilemap-a", exportPath: "C:/exports/tilemap-a.tmx" }],
@@ -132,20 +132,17 @@ describe("WorkspaceManager", () => {
 
         expect(result.status).toBe(Result.Status.Success);
         expect(manager.currentWorkspace?.serialize()).toEqual(createStoredWorkspaceData());
-        expect(WorkspaceStorageService.save).toHaveBeenCalledWith(
-            "C:/Project/Metk/test-project/.metk/session.json",
-            createStoredWorkspaceData(),
-        );
-        const savedData = (WorkspaceStorageService.save as any).mock.calls[0][1];
-        expect(savedData.savedPath).toEqual(createStoredWorkspaceData().savedPath);
-        expect(savedData.tilemapEditorWorkspace.toolState).toEqual({ tile: "tool.stamp", rule: "tool.stamp" });
-        expect(savedData.tilemapEditorWorkspace.toolState).not.toHaveProperty("currentToolFamily");
-        expect(savedData).not.toHaveProperty("tilesets");
-        expect(savedData).not.toHaveProperty("tilemaps");
-        expect(savedData).not.toHaveProperty("ruleset");
-        expect(savedData).not.toHaveProperty("entityCollection");
-        expect(savedData).not.toHaveProperty("propertyPanel");
-        expect(savedData).not.toHaveProperty("toolState");
+        expect(WorkspaceStorageService.save).not.toHaveBeenCalled();
+        const serializedData = manager.currentWorkspace!.serialize();
+        expect(serializedData.savedPath).toEqual(createStoredWorkspaceData().savedPath);
+        expect(serializedData.tilemapEditorWorkspace.toolState).toEqual({});
+        expect(serializedData.tilemapEditorWorkspace.toolState).not.toHaveProperty("currentToolFamily");
+        expect(serializedData).not.toHaveProperty("tilesets");
+        expect(serializedData).not.toHaveProperty("tilemaps");
+        expect(serializedData).not.toHaveProperty("ruleset");
+        expect(serializedData).not.toHaveProperty("entityCollection");
+        expect(serializedData).not.toHaveProperty("propertyPanel");
+        expect(serializedData).not.toHaveProperty("toolState");
     });
 
     it("falls back to a default workspace and schedules a save when existing session loading fails", async () => {

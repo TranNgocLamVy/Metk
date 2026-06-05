@@ -35,6 +35,11 @@ const editRulesetMocks = vi.hoisted(() => {
             },
             editorFacade: {
                 currentProject: null as any,
+                activationContext: {
+                    setFlag: vi.fn(),
+                },
+                pushFocusedEditorSession: vi.fn(),
+                removeFocusedEditorSession: vi.fn(),
                 textureManager: {
                     getTileTexture: vi.fn(() => ({ id: "texture" })),
                 },
@@ -237,6 +242,9 @@ beforeEach(() => {
     editRulesetMocks.resetUuid();
     editRulesetMocks.rulesetSessionInstances.length = 0;
     editRulesetMocks.appKernel.activationContext.setFlag.mockClear();
+    editRulesetMocks.appKernel.editorFacade.activationContext.setFlag.mockClear();
+    editRulesetMocks.appKernel.editorFacade.pushFocusedEditorSession.mockClear();
+    editRulesetMocks.appKernel.editorFacade.removeFocusedEditorSession.mockClear();
     Element.prototype.scrollIntoView = vi.fn();
     vi.clearAllMocks();
 });

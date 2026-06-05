@@ -71,6 +71,11 @@ const mockState = vi.hoisted(() => {
                 getCurrentHistoryManager: vi.fn(() => null),
                 textureManager: {},
             },
+            settings: {
+                get: vi.fn(() => true),
+                update: vi.fn(async () => undefined),
+                onDidChangeSetting: vi.fn(() => vi.fn()),
+            },
             layoutManager,
             projectManager,
             toolManager,
@@ -151,7 +156,23 @@ vi.mock("flexlayout-react", () => {
 
     return {
         Model: {
-            fromJson: vi.fn((layout: any) => layout),
+            fromJson: vi.fn((layout: any) => ({
+                ...layout,
+                getNodeById: (id: string) => {
+                    const findNode = (node: any): any => {
+                        if (!node) return null;
+                        if (node.id === id || node.component === id) return node;
+                        for (const child of node.children ?? []) {
+                            const found = findNode(child);
+                            if (found) return found;
+                        }
+                        return null;
+                    };
+                    return findNode(layout.layout);
+                },
+                doAction: vi.fn(),
+                toJson: () => layout,
+            })),
         },
         Layout: ({ model, factory }: { model: any; factory: any }) => (
             <div data-testid="workspace-layout">{renderTabs(model.layout, factory)}</div>
@@ -459,7 +480,7 @@ const setWorkspaceFixture = () => {
 };
 
 const setWorkspaceLayoutModel = () => {
-    useLayoutStore.getState().setModel({
+    const layout = {
         layout: {
             type: "row",
             children: [
@@ -469,7 +490,24 @@ const setWorkspaceLayoutModel = () => {
                 { type: "tab", id: "ruleset-manager", name: "Ruleset Manager", component: "rulesetManager" },
             ],
         },
-        toJson: () => ({}),
+    };
+
+    useLayoutStore.getState().setModel({
+        ...layout,
+        getNodeById: (id: string) => {
+            const findNode = (node: any): any => {
+                if (!node) return null;
+                if (node.id === id || node.component === id) return node;
+                for (const child of node.children ?? []) {
+                    const found = findNode(child);
+                    if (found) return found;
+                }
+                return null;
+            };
+            return findNode(layout.layout);
+        },
+        doAction: vi.fn(),
+        toJson: () => layout,
     } as any);
 };
 
@@ -490,6 +528,9 @@ describe("Metk UI integration workflows", () => {
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset();
         mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.appKernel.layoutManager.updateLayout.mockClear();
+        mockState.appKernel.settings.get.mockClear();
+        mockState.appKernel.settings.update.mockClear();
+        mockState.appKernel.settings.onDidChangeSetting.mockClear();
         mockState.appKernel.toolManager.setActiveSession.mockClear();
         mockState.workspaceService.openTilemapSession.mockReset();
         mockState.workspaceService.openTilesetSession.mockReset();
@@ -548,7 +589,7 @@ describe("Metk UI integration workflows", () => {
         });
         expect(WorkspaceActions.openTilesetSession).toHaveBeenCalledWith(dungeonTiles.id);
         expect(dungeonTilesTab).toHaveClass("bg-surface");
-        expect(screen.getByRole("button", { name: /Terrain Tiles/ })).toHaveClass("text-muted-foreground");
+        expect(screen.getByRole("button", { name: /Terrain Tiles/ })).toHaveClass("bg-transparent");
     });
 
     it("shows the console panel selected by console state and user tab changes", async () => {

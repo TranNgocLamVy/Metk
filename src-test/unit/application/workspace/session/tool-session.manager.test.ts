@@ -43,7 +43,7 @@ describe("ToolSessionManager", () => {
         expect(workspaceManager.saveCurrentWorkspace).toHaveBeenCalledTimes(1);
     });
 
-    it("ignores tool changes when the active layer kind is unsupported or no family is active", async () => {
+    it("persists supported layer kinds and ignores changes when no family is active", async () => {
         const { editorFacade, toolManager, workspaceManager } = createEditorFacadeHarness();
         const manager = new ToolSessionManager({ tile: "tool.stamp" }, editorFacade);
 
@@ -52,17 +52,17 @@ describe("ToolSessionManager", () => {
         (toolManager.getCurrentLayerKind as any).mockReturnValue("tile");
         await manager.onToolChange(null);
 
-        expect(manager.serialize()).toEqual({ tile: "tool.stamp" });
-        expect(workspaceManager.saveCurrentWorkspace).not.toHaveBeenCalled();
+        expect(manager.serialize()).toEqual({ tile: "tool.stamp", image: "tool.image.move" });
+        expect(workspaceManager.saveCurrentWorkspace).toHaveBeenCalledTimes(1);
     });
 
-    it("returns remembered tools only for persisted layer kinds", () => {
+    it("returns remembered tools for persisted layer kinds", () => {
         const { editorFacade } = createEditorFacadeHarness();
-        const manager = new ToolSessionManager({ tile: "tool.stamp", rule: "tool.bucket" }, editorFacade);
+        const manager = new ToolSessionManager({ tile: "tool.stamp", rule: "tool.bucket", image: "tool.image.move" }, editorFacade);
 
         expect(manager.getRememberedToolFamilyForLayerKind("tile")).toBe("tool.stamp");
         expect(manager.getRememberedToolFamilyForLayerKind("rule")).toBe("tool.bucket");
-        expect(manager.getRememberedToolFamilyForLayerKind("image")).toBeNull();
+        expect(manager.getRememberedToolFamilyForLayerKind("image")).toBe("tool.image.move");
     });
 
     it("updates state directly and unregisters the tool-change listener on destroy", async () => {

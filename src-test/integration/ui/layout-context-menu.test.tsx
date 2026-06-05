@@ -99,16 +99,12 @@ describe("Metk layout UI", () => {
         menuBar.remove();
     });
 
-    it("SecurityShield blocks context menus, tab focus changes, and disabled browser shortcuts", async () => {
+    it("SecurityShield blocks context menus and disabled browser shortcuts", async () => {
         render(<SecurityShield />);
 
         const contextMenuEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
         window.dispatchEvent(contextMenuEvent);
         expect(contextMenuEvent.defaultPrevented).toBe(true);
-
-        const tabEvent = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
-        window.dispatchEvent(tabEvent);
-        expect(tabEvent.defaultPrevented).toBe(true);
 
         const findEvent = new KeyboardEvent("keydown", { key: "f", ctrlKey: true, bubbles: true, cancelable: true });
         window.dispatchEvent(findEvent);

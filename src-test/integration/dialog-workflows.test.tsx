@@ -35,6 +35,11 @@ const mockState = vi.hoisted(() => {
             },
             editorFacade: {
                 currentProject: null as any,
+                activationContext: {
+                    setFlag: vi.fn(),
+                },
+                pushFocusedEditorSession: vi.fn(),
+                removeFocusedEditorSession: vi.fn(),
             },
         },
         workspaceService: {
@@ -174,6 +179,9 @@ describe("Metk dialog and form integration workflows", () => {
         mockState.uuid.reset();
         mockState.uuid.v4.mockClear();
         mockState.appKernel.activationContext.setFlag.mockClear();
+        mockState.appKernel.editorFacade.activationContext.setFlag.mockClear();
+        mockState.appKernel.editorFacade.pushFocusedEditorSession.mockClear();
+        mockState.appKernel.editorFacade.removeFocusedEditorSession.mockClear();
         mockState.appKernel.editorFacade.currentProject = null;
         mockState.workspaceService.createTilemapSession.mockReset();
         mockState.workspaceService.createTilesetSession.mockReset();

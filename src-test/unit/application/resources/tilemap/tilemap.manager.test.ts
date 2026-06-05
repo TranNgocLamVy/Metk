@@ -9,6 +9,10 @@ const storageState = vi.hoisted(() => ({
 }));
 
 vi.mock("@/infrastructure/container", () => storageState);
+vi.mock("@/application/actions/tilemap.actions", () => ({
+    importTilemap: vi.fn(),
+    removeTilemapFromProject: vi.fn(),
+}));
 vi.mock("@/ui/notifications/console-gateway", () => ({
     Console: {
         log: vi.fn(),

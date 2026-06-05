@@ -52,6 +52,9 @@ vi.mock("pixi.js", () => ({
 vi.mock("@/infrastructure/container", () => ({
     FileSystemService: textureMocks.fs,
 }));
+vi.mock("@/application/actions/texture.actions", () => ({
+    importTexture: vi.fn(),
+}));
 vi.mock("@/shared/utils/texture.utils", () => ({ TextureUtils: textureMocks.textureUtils }));
 vi.mock("@/ui/notifications/console-gateway", () => ({ Console: textureMocks.console }));
 

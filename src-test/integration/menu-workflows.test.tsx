@@ -23,6 +23,7 @@ const mockState = vi.hoisted(() => ({
     },
     commandService: {
         executeCommand: vi.fn(),
+        canExecuteCommand: vi.fn(() => true),
     },
     projectService: {
         createProject: vi.fn(),
@@ -68,6 +69,11 @@ const mockState = vi.hoisted(() => ({
         workspaceManager: {
             currentWorkspace: null as any,
         },
+        settings: {
+            get: vi.fn(() => true),
+            update: vi.fn(async () => undefined),
+            onDidChangeSetting: vi.fn(() => vi.fn()),
+        },
         saveProjectManager: vi.fn(),
     },
 }));
@@ -85,6 +91,7 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({
 
 vi.mock("@/application/actions/command.actions", () => ({
     executeCommand: mockState.commandService.executeCommand,
+    canExecuteCommand: mockState.commandService.canExecuteCommand,
 }));
 
 vi.mock("@/application/actions/project.actions", () => mockState.projectService);

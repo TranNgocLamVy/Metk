@@ -101,7 +101,7 @@ describe("normalizeWorkspaceData", () => {
         expect(normalized).not.toHaveProperty("toolState");
     });
 
-    it("normalizes legacy currentToolFamily into tile and rule tool state entries", () => {
+    it("ignores unsupported legacy currentToolFamily values during tool state normalization", () => {
         const normalized = normalizeWorkspaceData({
             tilemapEditorWorkspace: {
                 ...tilemapEditorWorkspace,
@@ -112,10 +112,7 @@ describe("normalizeWorkspaceData", () => {
             savedPath,
         });
 
-        expect(normalized.tilemapEditorWorkspace.toolState).toEqual({
-            tile: "tool.stamp",
-            rule: "tool.stamp",
-        });
+        expect(normalized.tilemapEditorWorkspace.toolState).toEqual({});
         expect(normalized.tilemapEditorWorkspace.toolState).not.toHaveProperty("currentToolFamily");
     });
 

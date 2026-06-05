@@ -37,7 +37,7 @@ const createKeyboardEvent = (target?: Element) => {
 };
 
 const createManager = () => {
-    const commandManager = { execute: vi.fn() };
+    const commandManager = { execute: vi.fn(), canExecute: vi.fn(() => true) };
     const toolManager = {
         getToolFamilies: vi.fn(() => registryMock.toolFamilies),
         startToolFamily: vi.fn(),
@@ -87,6 +87,7 @@ describe("KeybindingManager", () => {
 
         manager.handleKeyDown(event);
 
+        expect(commandManager.canExecute).toHaveBeenCalledWith("workspace.save");
         expect(commandManager.execute).toHaveBeenCalledWith("workspace.save");
         expect(event.preventDefault).toHaveBeenCalledTimes(1);
         expect(event.stopPropagation).toHaveBeenCalledTimes(1);
@@ -125,7 +126,7 @@ describe("KeybindingManager", () => {
         manager.handleKeyDown(createKeyboardEvent(element));
 
         expect(commandManager.execute).not.toHaveBeenCalled();
-        expect(KeyUtils.getKeystrokeString).not.toHaveBeenCalled();
+        expect(KeyUtils.getKeystrokeString).toHaveBeenCalledTimes(1);
     });
 
     it("ignores shortcuts while contenteditable elements have focus", () => {

@@ -214,7 +214,7 @@ describe("Layer manager UI", () => {
         expect(transfer.setData).toHaveBeenCalledWith("application/json", JSON.stringify({ ids: ["environment", "collision"] }));
 
         const rootTransfer = createDataTransfer({ "application/json": JSON.stringify({ ids: ["collision"] }) });
-        const layerManagerDropTarget = container.querySelector(".absolute.inset") as HTMLElement;
+        const layerManagerDropTarget = container.querySelector(".layer-manager > .w-full.h-full") as HTMLElement;
         fireEvent.drop(layerManagerDropTarget, { dataTransfer: rootTransfer });
 
         expect(workspaceUiMocks.layerService.moveLayers).toHaveBeenCalledWith(["collision"], "root", "inside");
