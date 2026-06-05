@@ -1,13 +1,25 @@
 import { EntityCollectionRefData } from "@/shared/data-types/entity-collection.data";
 import { LayerData } from "@/shared/data-types/layer.data";
 import { RulesetRefData } from "@/shared/data-types/ruleset.data";
-import { TilemapData, TilemapOrientationValues } from "@/shared/data-types/tilemap.data";
+import {
+    DEFAULT_TILE_HEIGHT,
+    DEFAULT_TILE_WIDTH,
+    DEFAULT_TILEMAP_HEIGHT,
+    DEFAULT_TILEMAP_WIDTH,
+    TilemapData,
+    TilemapOrientationValues,
+} from "@/shared/data-types/tilemap.data";
 import { TilesetRefData } from "@/shared/data-types/tileset.data";
 import { validate } from "@/shared/utils/validate.utils";
 
-export const DEFAULT_TILEMAP_WIDTH = 64;
-export const DEFAULT_TILEMAP_HEIGHT = 64;
-export const DEFAULT_TILE_SIZE = 16;
+export {
+    DEFAULT_TILE_HEIGHT,
+    DEFAULT_TILE_WIDTH,
+    DEFAULT_TILEMAP_HEIGHT,
+    DEFAULT_TILEMAP_WIDTH,
+} from "@/shared/data-types/tilemap.data";
+
+export const DEFAULT_TILE_SIZE = DEFAULT_TILE_WIDTH;
 export const DEFAULT_TILEMAP_BACKGROUND_COLOR = "#00000000";
 
 type RawRefData = Partial<TilesetRefData & RulesetRefData & EntityCollectionRefData>;
@@ -129,13 +141,13 @@ export const normalizeTilemapData = (tilemapData: unknown): TilemapData => {
         }),
         tileWidth: validate.number({
             value: data.tileWidth,
-            defaultValue: DEFAULT_TILE_SIZE,
+            defaultValue: DEFAULT_TILE_WIDTH,
             min: 1,
             integer: true,
         }),
         tileHeight: validate.number({
             value: data.tileHeight,
-            defaultValue: DEFAULT_TILE_SIZE,
+            defaultValue: DEFAULT_TILE_HEIGHT,
             min: 1,
             integer: true,
         }),

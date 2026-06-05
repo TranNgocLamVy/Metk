@@ -6,8 +6,18 @@ import { IBaseView } from "@/editor/interface/base-session.interface";
 import { TilemapSession } from "@/editor/session/tilemap.session";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { SETTING_KEYS } from "@/application/settings/setting.enum";
+import { NORMAL_ZOOM_SCALE } from "@/shared/data-types/view-state.data";
 import { TilemapGridRenderer } from "../renderer/tilemap/tilemap-grid.renderer";
 import { TilemapRenderer } from "../renderer/tilemap/tilemap.renderer";
+import {
+    DEFAULT_ZOOM_STEP,
+    TILEMAP_MAX_ZOOM_SCALE,
+    TILEMAP_MIN_ZOOM_SCALE,
+    VIEWPORT_DECELERATION_FRICTION,
+    VIEWPORT_INIT_DELAY_MS,
+    VIEWPORT_WHEEL_SMOOTHING,
+} from "./viewport.defaults";
 
 export class TilemapView implements IBaseView {
     public session: TilemapSession;
@@ -53,11 +63,11 @@ export class TilemapView implements IBaseView {
 
         this.viewport
             .drag({ mouseButtons: "middle" })
-            .wheel({ smooth: 15 })
-            .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.05, maxScale: 50 });
+            .wheel({ smooth: VIEWPORT_WHEEL_SMOOTHING })
+            .decelerate({ friction: VIEWPORT_DECELERATION_FRICTION })
+            .clampZoom({ minScale: TILEMAP_MIN_ZOOM_SCALE, maxScale: TILEMAP_MAX_ZOOM_SCALE });
 
-        setTimeout(() => this.updateViewport(), 0);
+        setTimeout(() => this.updateViewport(), VIEWPORT_INIT_DELAY_MS);
 
         this.pixiApp.renderer.on("resize", () => {
             const w = this.pixiApp.renderer.width;
@@ -91,7 +101,7 @@ export class TilemapView implements IBaseView {
         });
 
         const settings = appKernel.settings
-        const showGrid = settings.get("general.view.showGrid")
+        const showGrid = settings.get(SETTING_KEYS.View.ShowGrid)
 
         // Initialize Renderer
         this.grid = new TilemapGridRenderer({ viewport: this.viewport, tilemap: this.session.tilemap, gridEnabled: showGrid });
@@ -103,7 +113,7 @@ export class TilemapView implements IBaseView {
         this.viewport.addChild(this.overlayerContainer);
         this.viewport.addChild(this.grid.graphics);
 
-        const onShowGridChanged = settings.onDidChangeSetting("general.view.showGrid", (event) => {
+        const onShowGridChanged = settings.onDidChangeSetting(SETTING_KEYS.View.ShowGrid, (event) => {
             const value = event.newValue;
             if (value) {
                 this.grid.enableGrid();
@@ -159,18 +169,18 @@ export class TilemapView implements IBaseView {
         this.viewport.destroy({ children: true });
     }
 
-    public zoomIn(delta = 0.2): void {
+    public zoomIn(delta = DEFAULT_ZOOM_STEP): void {
         if (!this.viewport) return;
         this.setZoom(this.viewport.scaled + delta);
     }
 
-    public zoomOut(delta = 0.2): void {
+    public zoomOut(delta = DEFAULT_ZOOM_STEP): void {
         if (!this.viewport) return;
         this.setZoom(this.viewport.scaled - delta);
     }
 
     public normalSize(): void {
-        this.setZoom(1);
+        this.setZoom(NORMAL_ZOOM_SCALE);
     }
 
     public fitMapInView(): void {

@@ -2,7 +2,8 @@ import { Viewport } from "pixi-viewport";
 import { Graphics } from "pixi.js";
 
 import { Tileset } from "@/editor/model/tileset/tileset";
-import { DrawLineOption, GraphicUtils } from "@/shared/utils/graphic-utils";
+import { GraphicUtils } from "@/shared/utils/graphic-utils";
+import { TILESET_GRID_LINE_OPTIONS } from "./tileset-renderer.constants";
 
 type CreateGridRendererContext = {
     viewport: Viewport;
@@ -37,14 +38,12 @@ export class TilesetGridRenderer {
         const columns = this.tileset.columns;
         const rows = Math.ceil(this.tileset.tiles.length / columns);
 
-        const drawLineOptions: DrawLineOption = { color: 0xc9c9c9, alpha: 0.5, pixelLine: true }
-
         for (let col = 0; col <= columns; col++) {
-            GraphicUtils.drawVerticelLine(this.graphics, col * (tileWidth), 0, rows * (tileHeight), drawLineOptions);
+            GraphicUtils.drawVerticelLine(this.graphics, col * (tileWidth), 0, rows * (tileHeight), TILESET_GRID_LINE_OPTIONS);
         }
 
         for (let row = 0; row <= rows; row++) {
-            GraphicUtils.drawHorizontalLine(this.graphics, row * (tileHeight), 0, columns * (tileWidth), drawLineOptions);
+            GraphicUtils.drawHorizontalLine(this.graphics, row * (tileHeight), 0, columns * (tileWidth), TILESET_GRID_LINE_OPTIONS);
         }
     }
 

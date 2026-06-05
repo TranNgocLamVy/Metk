@@ -1,25 +1,10 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { type SystemCommandId } from "@/application/command-system/command-ids";
 
-const CommandList = [
-    "workspace.openFile",
-    "workspace.tilemap.redo",
-    "workspace.tilemap.undo",
-    "workspace.tilemap.view.zoomIn",
-    "workspace.tilemap.view.zoomOut",
-    "workspace.tilemap.view.normalSize",
-    "workspace.tilemap.view.fitMapInView",
-    "workspace.tilemap.save",
-    "workspace.tilemap.saveAll",
-    "workspace.tilemap.export.tmx",
-    "workspace.toggleConsole",
-] as const;
-
-export type CommandId = typeof CommandList[number];
-
-export function executeCommand(id: CommandId): void {
+export function executeCommand(id: SystemCommandId): void {
     appKernel.systemCommandManager.execute(id);
 }
 
-export function canExecuteCommand(id: CommandId): boolean {
+export function canExecuteCommand(id: SystemCommandId): boolean {
     return appKernel.systemCommandManager.canExecute(id);
 }

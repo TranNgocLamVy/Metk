@@ -11,6 +11,11 @@ import {
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { Tile, Tileset } from "@/editor/model/tileset/tileset";
+import {
+    TILESET_GRID_LINE_OPTIONS,
+    TILESET_SELECTION_ALPHA,
+    TILESET_SELECTION_COLOR,
+} from "@/graphics/renderer/tileset/tileset-renderer.constants";
 import { FileSystemService } from "@/infrastructure/container";
 import { GraphicUtils } from "@/shared/utils/graphic-utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
@@ -95,14 +100,14 @@ class TilesetOverviewPixiRenderer {
 
     private createRoot(layoutInfo: TilesetLayoutInfo) {
         const root = new Container();
-        const padding = 16;
-        const { width, height } = this.options;
+    const OVERVIEW_PADDING = 16;
+    const { width, height } = this.options;
 
         const scale = Math.max(
             0.01,
             Math.min(
-                (width - padding * 2) / layoutInfo.width,
-                (height - padding * 2) / layoutInfo.height,
+                (width - OVERVIEW_PADDING * 2) / layoutInfo.width,
+                (height - OVERVIEW_PADDING * 2) / layoutInfo.height,
             ),
         );
 
@@ -206,8 +211,8 @@ function makeSelectionGraphics(layout: TileLayout) {
     const selection = new Graphics();
 
     selection.fill({
-        color: 0x0090f1,
-        alpha: 0.4,
+        color: TILESET_SELECTION_COLOR,
+        alpha: TILESET_SELECTION_ALPHA,
     });
 
     selection.rect(
@@ -353,19 +358,13 @@ function getTileNaturalSize(
 function makeGridGraphics(layoutInfo: TilesetLayoutInfo): Graphics {
     const graphics = new Graphics();
 
-    const lineOptions = {
-        color: 0xc9c9c9,
-        alpha: 0.5,
-        pixelLine: true,
-    };
-
     for (let col = 0; col <= layoutInfo.columns; col++) {
         GraphicUtils.drawVerticelLine(
             graphics,
             col * layoutInfo.cellWidth,
             0,
             layoutInfo.height,
-            lineOptions,
+            TILESET_GRID_LINE_OPTIONS,
         );
     }
 
@@ -375,7 +374,7 @@ function makeGridGraphics(layoutInfo: TilesetLayoutInfo): Graphics {
             row * layoutInfo.cellHeight,
             0,
             layoutInfo.width,
-            lineOptions,
+            TILESET_GRID_LINE_OPTIONS,
         );
     }
 

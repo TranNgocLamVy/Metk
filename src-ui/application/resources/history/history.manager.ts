@@ -2,6 +2,8 @@ import { BatchCommand } from "@/application/commands/batch.command";
 import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 
+const DEFAULT_HISTORY_LIMIT = 50;
+
 export class HistoryManager {
     private undoStack: IUndoableCommand[] = [];
     private redoStack: IUndoableCommand[] = [];
@@ -12,7 +14,7 @@ export class HistoryManager {
 
     public onStateChange?: () => void;
 
-    constructor(limit: number = 50) {
+    constructor(limit: number = DEFAULT_HISTORY_LIMIT) {
         this.limit = limit;
     }
 

@@ -3,6 +3,11 @@ import { RootLayerData } from "./layer.data";
 import { RulesetRefData } from "./ruleset.data";
 import { TilesetRefData } from "./tileset.data";
 
+export const DEFAULT_TILEMAP_WIDTH = 64;
+export const DEFAULT_TILEMAP_HEIGHT = 64;
+export const DEFAULT_TILE_WIDTH = 16;
+export const DEFAULT_TILE_HEIGHT = 16;
+
 export type TilemapMetadata = {
     name: string;
     id: string;

@@ -8,6 +8,11 @@ import { CollectionTilesetGridRenderer } from "../renderer/tileset/collection-ti
 import { CollectionTilesetSelectorRenderer } from "../renderer/tileset/collection-tileset-selector.renderer";
 import { CollectionTilesetRenderer } from "../renderer/tileset/collection-tileset.renderer";
 import { ITilesetView } from "./tileset.view";
+import {
+    VIEWPORT_DECELERATION_FRICTION,
+    VIEWPORT_INIT_DELAY_MS,
+    VIEWPORT_WHEEL_SMOOTHING,
+} from "./viewport.defaults";
 
 export class CollectionTilesetView implements ITilesetView {
     public session: TilesetSession;
@@ -56,8 +61,8 @@ export class CollectionTilesetView implements ITilesetView {
 
         this.viewport
             .drag({ mouseButtons: "middle" })
-            .wheel({ smooth: 15 })
-            .decelerate({ friction: 0 })
+            .wheel({ smooth: VIEWPORT_WHEEL_SMOOTHING })
+            .decelerate({ friction: VIEWPORT_DECELERATION_FRICTION })
 
         this.pixiApp.renderer.on("resize", this.onResize);
 
@@ -107,7 +112,7 @@ export class CollectionTilesetView implements ITilesetView {
         this.viewport.addChild(this.grid.graphics);
         this.viewport.addChild(this.selector.graphics);
 
-        setTimeout(() => this.updateViewport(), 0);
+        setTimeout(() => this.updateViewport(), VIEWPORT_INIT_DELAY_MS);
     }
 
     public activateView(pixiApp: Application): void {

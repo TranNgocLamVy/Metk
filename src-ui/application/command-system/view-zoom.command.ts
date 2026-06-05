@@ -2,9 +2,10 @@ import { EditorFacade } from "@/application/editor.facade";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { SystemCommand } from "../commands/command.decorator";
+import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
-    id: "workspace.tilemap.view.zoomIn",
+    id: SYSTEM_COMMAND_IDS.TilemapViewZoomIn,
     name: "Zoom In",
     description: "",
     shortcuts: ["Ctrl+="],
@@ -25,7 +26,7 @@ export class ViewZoomInCommand implements ISystemCommand {
 }
 
 @SystemCommand({
-    id: "workspace.tilemap.view.zoomOut",
+    id: SYSTEM_COMMAND_IDS.TilemapViewZoomOut,
     name: "Zoom Out",
     description: "",
     shortcuts: ["Ctrl+-"],
@@ -46,7 +47,7 @@ export class ViewZoomOutCommand implements ISystemCommand {
 }
 
 @SystemCommand({
-    id: "workspace.tilemap.view.normalSize",
+    id: SYSTEM_COMMAND_IDS.TilemapViewNormalSize,
     name: "Normal Size",
     description: "",
     shortcuts: ["Ctrl+0"],
@@ -67,7 +68,7 @@ export class ViewNormalSizeCommand implements ISystemCommand {
 }
 
 @SystemCommand({
-    id: "workspace.tilemap.view.fitMapInView",
+    id: SYSTEM_COMMAND_IDS.TilemapViewFitMapInView,
     name: "Fit Map in View",
     description: "",
     shortcuts: ["Ctrl+Shift+0"],

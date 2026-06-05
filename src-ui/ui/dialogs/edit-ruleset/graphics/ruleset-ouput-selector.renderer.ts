@@ -2,10 +2,20 @@ import { appKernel } from '@/application/bootstrap/app-kernel';
 import { Rule } from '@/editor/model/ruleset/rule';
 import { Ruleset } from '@/editor/model/ruleset/ruleset';
 import { Tileset } from '@/editor/model/tileset/tileset';
+import { TILESET_GRID_LINE_OPTIONS } from '@/graphics/renderer/tileset/tileset-renderer.constants';
+import {
+    TILESET_MAX_ZOOM_SCALE,
+    TILESET_MIN_ZOOM_SCALE,
+    VIEWPORT_DECELERATION_FRICTION,
+    VIEWPORT_WHEEL_SMOOTHING,
+} from '@/graphics/view/viewport.defaults';
 import { Result } from '@/shared/types/result';
-import { DrawLineOption, GraphicUtils } from '@/shared/utils/graphic-utils';
+import { GraphicUtils } from '@/shared/utils/graphic-utils';
 import { Viewport } from 'pixi-viewport';
 import { Application, Container, Graphics, Sprite } from 'pixi.js';
+
+const OUTPUT_HIGHLIGHT_COLOR = 0x3b82f6;
+const OUTPUT_HIGHLIGHT_ALPHA = 0.4;
 
 export class RulesetOutputSelector {
     private pixiApp: Application;
@@ -49,9 +59,9 @@ export class RulesetOutputSelector {
 
         this.viewport
             .drag({ mouseButtons: "middle " })
-            .wheel({ smooth: 15 })
-            .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.5, maxScale: 50 })
+            .wheel({ smooth: VIEWPORT_WHEEL_SMOOTHING })
+            .decelerate({ friction: VIEWPORT_DECELERATION_FRICTION })
+            .clampZoom({ minScale: TILESET_MIN_ZOOM_SCALE, maxScale: TILESET_MAX_ZOOM_SCALE })
 
         this.pixiApp.renderer.on("resize", () => {
             this.resizeViewport();
@@ -176,7 +186,7 @@ export class RulesetOutputSelector {
             const y = ty * (tileHeight + this.gridGap);
 
             this.highlightGraphics.rect(x, y, tileWidth, tileHeight);
-            this.highlightGraphics.fill({ color: 0x3b82f6, alpha: 0.4 });
+            this.highlightGraphics.fill({ color: OUTPUT_HIGHLIGHT_COLOR, alpha: OUTPUT_HIGHLIGHT_ALPHA });
         });
     }
 
@@ -201,14 +211,12 @@ export class RulesetOutputSelector {
         const columns = this.currentTileset.columns;
         const rows = Math.ceil(this.currentTileset.tiles.length / columns);
 
-        const drawLineOptions: DrawLineOption = { color: 0xc9c9c9, alpha: 0.5, pixelLine: true }
-
         for (let col = 0; col <= columns; col++) {
-            GraphicUtils.drawVerticelLine(this.gridGraphics, col * (tileWidth + this.gridGap), 0, rows * (tileHeight + this.gridGap), drawLineOptions);
+            GraphicUtils.drawVerticelLine(this.gridGraphics, col * (tileWidth + this.gridGap), 0, rows * (tileHeight + this.gridGap), TILESET_GRID_LINE_OPTIONS);
         }
 
         for (let row = 0; row <= rows; row++) {
-            GraphicUtils.drawHorizontalLine(this.gridGraphics, row * (tileHeight + this.gridGap), 0, columns * (tileWidth + this.gridGap), drawLineOptions);
+            GraphicUtils.drawHorizontalLine(this.gridGraphics, row * (tileHeight + this.gridGap), 0, columns * (tileWidth + this.gridGap), TILESET_GRID_LINE_OPTIONS);
         }
     }
 

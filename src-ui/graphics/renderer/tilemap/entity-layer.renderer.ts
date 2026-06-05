@@ -1,7 +1,7 @@
 import { Color, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { ShowEntityName } from "@/application/settings/setting.enum";
+import { SETTING_KEYS, ShowEntityName } from "@/application/settings/setting.enum";
 import type { EntityCollectionManager } from "@/application/resources/entity/entity-collection.manager";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
 import { EntityInstance } from "@/editor/model/entity/entity-instance";
@@ -34,6 +34,7 @@ const LABEL_MARGIN = 4;
 const ENTITY_BORDER_COLOR = 0xffffff;
 const ENTITY_LABEL_COLOR = 0xffffff;
 const ENTITY_LABEL_OUTLINE_COLOR = 0x0f172a;
+const ENTITY_OUTLINE_ALPHA = 0.85;
 
 export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
     private viewport: Viewport;
@@ -72,9 +73,9 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         this.entityCollectionManager = appKernel.editorFacade.currentProject?.entityCollectionManager ?? null;
         const settings = appKernel.settings;
         if (settings) {
-            this.showEntityOutline = settings.get("general.view.showEntityOutline");
-            this.showEntityName = settings.get("general.view.showEntityName");
-            this.enableParallax = settings.get("general.view.enableParallax");
+            this.showEntityOutline = settings.get(SETTING_KEYS.View.ShowEntityOutline);
+            this.showEntityName = settings.get(SETTING_KEYS.View.ShowEntityName);
+            this.enableParallax = settings.get(SETTING_KEYS.View.EnableParallax);
         }
 
         this.layer.eventEmitter.on("entitiesChanged", this.handleEntitiesChanged);
@@ -87,17 +88,17 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
         }
 
         if (settings) {
-            const onShowEntityOutlineChanged = settings.onDidChangeSetting("general.view.showEntityOutline", (event) => {
+            const onShowEntityOutlineChanged = settings.onDidChangeSetting(SETTING_KEYS.View.ShowEntityOutline, (event) => {
                 this.showEntityOutline = event.newValue;
                 this.syncEntityDisplays();
             });
 
-            const onShowEntityNameChanged = settings.onDidChangeSetting("general.view.showEntityName", (event) => {
+            const onShowEntityNameChanged = settings.onDidChangeSetting(SETTING_KEYS.View.ShowEntityName, (event) => {
                 this.showEntityName = event.newValue;
                 this.syncEntityDisplays();
             });
 
-            const onEnableParallaxChanged = settings.onDidChangeSetting("general.view.enableParallax", (event) => {
+            const onEnableParallaxChanged = settings.onDidChangeSetting(SETTING_KEYS.View.EnableParallax, (event) => {
                 this.enableParallax = event.newValue;
                 this.updateLayerParallax();
             });
@@ -233,7 +234,7 @@ export class EntityLayerRenderer extends BaseLayerRenderer<EntityLayer> {
             .rect(0, 0, bounds.width, bounds.height)
             .stroke({
                 color: ENTITY_BORDER_COLOR,
-                alpha: 0.85,
+                alpha: ENTITY_OUTLINE_ALPHA,
                 pixelLine: true,
             });
         record.overlay.visible = this.showEntityOutline;

@@ -1,6 +1,11 @@
 import { CollisionObjectData } from "./collision-object.data";
 import { ImageSourceData } from "./image-source.data";
 
+export const DEFAULT_TILESET_COLUMNS = 16;
+export const DEFAULT_TILESET_ROWS = 16;
+export const DEFAULT_TILESET_TILE_WIDTH = 16;
+export const DEFAULT_TILESET_TILE_HEIGHT = 16;
+
 export const TilesetType = {
     SingleImage: "single-image",
     ImageCollection: "image-collection",

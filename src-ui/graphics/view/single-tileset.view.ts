@@ -1,14 +1,21 @@
 import { Viewport } from "pixi-viewport";
 import { Application } from "pixi.js";
 
-import { TilesetSession } from "@/editor/session/tileset.session";
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
+import { TilesetSession } from "@/editor/session/tileset.session";
 
-import { TilesetGridRenderer } from "../renderer/tileset/single-tileset-grid.renderer";
-import { TilesetRenderer } from "../renderer/tileset/single-tileset.renderer";
-import { TilesetSelectorRenderer } from "../renderer/tileset/single-tileset-selector.renderer";
-import { ITilesetView } from "./tileset.view";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import { TilesetGridRenderer } from "../renderer/tileset/single-tileset-grid.renderer";
+import { TilesetSelectorRenderer } from "../renderer/tileset/single-tileset-selector.renderer";
+import { TilesetRenderer } from "../renderer/tileset/single-tileset.renderer";
+import { ITilesetView } from "./tileset.view";
+import {
+    TILESET_MAX_ZOOM_SCALE,
+    TILESET_MIN_ZOOM_SCALE,
+    VIEWPORT_DECELERATION_FRICTION,
+    VIEWPORT_INIT_DELAY_MS,
+    VIEWPORT_WHEEL_SMOOTHING,
+} from "./viewport.defaults";
 
 export class SingleImageTilesetView implements ITilesetView {
     public session: TilesetSession;
@@ -48,11 +55,11 @@ export class SingleImageTilesetView implements ITilesetView {
 
         this.viewport
             .drag({ mouseButtons: "middle " })
-            .wheel({ smooth: 15 })
-            .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.5, maxScale: 50 })
+            .wheel({ smooth: VIEWPORT_WHEEL_SMOOTHING })
+            .decelerate({ friction: VIEWPORT_DECELERATION_FRICTION })
+            .clampZoom({ minScale: TILESET_MIN_ZOOM_SCALE, maxScale: TILESET_MAX_ZOOM_SCALE })
 
-        setTimeout(() => this.updateViewport(), 0)
+        setTimeout(() => this.updateViewport(), VIEWPORT_INIT_DELAY_MS)
 
         this.pixiApp.renderer.on("resize", () => {
             const w = this.pixiApp.renderer.width;

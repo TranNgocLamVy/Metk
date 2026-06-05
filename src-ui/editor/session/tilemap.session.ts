@@ -1,6 +1,6 @@
 import { IEditorSession } from "@/editor/interface/base-session.interface";
 import { LayerState, TilemapSessionData } from "@/shared/data-types/tilemap-session.data";
-import { ViewState } from "@/shared/data-types/view-state.data";
+import { createDefaultViewState, ViewState } from "@/shared/data-types/view-state.data";
 
 import { EditorFacade } from "@/application/editor.facade";
 import { HistoryManager } from "@/application/resources/history/history.manager";
@@ -38,7 +38,7 @@ export class TilemapSession extends EventEmitter<TilemapSessionEvents> implement
 
         this.historyManager = new HistoryManager();
 
-        this.viewState = tilemapSessionData.viewState ?? { x: null, y: null, zoom: 1 };
+        this.viewState = tilemapSessionData.viewState ?? createDefaultViewState();
 
         const layers = Array.from(this.tilemap.rootLayer.getAllIds());
         const selectedLayers = tilemapSessionData.layerState?.selectedLayers ?? [];

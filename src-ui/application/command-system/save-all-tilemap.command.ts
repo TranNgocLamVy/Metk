@@ -1,11 +1,12 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { SystemCommand } from "../commands/command.decorator";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
-import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
+import { Console } from "@/ui/notifications/console-gateway";
+import { SystemCommand } from "../commands/command.decorator";
+import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
-    id: "workspace.tilemap.saveAll",
+    id: SYSTEM_COMMAND_IDS.TilemapSaveAll,
     name: "Save All",
     description: "",
     shortcuts: ["Ctrl+Shift+S"],

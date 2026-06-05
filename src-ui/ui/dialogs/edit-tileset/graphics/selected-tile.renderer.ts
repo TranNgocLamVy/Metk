@@ -7,6 +7,18 @@ import { Tile, Tileset } from "@/editor/model/tileset/tileset";
 import { CollisionEditorLayerRenderer } from "@/graphics/renderer/collision/collision-editor-layer.renderer";
 import { CollisionEditorController } from "@/graphics/renderer/collision/collision-editor.controller";
 import { PointLike, TileLayout, TileLayoutResolver, TileLayoutResolverContext } from "@/graphics/renderer/collision/tile-layout-resolver";
+import {
+    SELECTED_TILE_FIT_MAX_ZOOM_SCALE,
+    SELECTED_TILE_FIT_MIN_ZOOM_SCALE,
+    SELECTED_TILE_FIT_PADDING,
+    SELECTED_TILE_MAX_ZOOM_SCALE,
+    SELECTED_TILE_MIN_ZOOM_SCALE,
+    VIEWPORT_DECELERATION_FRICTION,
+    VIEWPORT_WHEEL_SMOOTHING,
+} from "@/graphics/view/viewport.defaults";
+
+const SELECTED_TILE_BOUNDS_COLOR = 0xffcc00;
+const SELECTED_TILE_BOUNDS_WIDTH = 1;
 
 type SelectedTileRendererOptions = {
     pixiApp: Application;
@@ -135,9 +147,9 @@ export class SelectedTilePixiRenderer {
 
         viewport
             .drag({ mouseButtons: "middle" })
-            .wheel({ smooth: 15 })
-            .decelerate({ friction: 0 })
-            .clampZoom({ minScale: 0.25, maxScale: 64 });
+            .wheel({ smooth: VIEWPORT_WHEEL_SMOOTHING })
+            .decelerate({ friction: VIEWPORT_DECELERATION_FRICTION })
+            .clampZoom({ minScale: SELECTED_TILE_MIN_ZOOM_SCALE, maxScale: SELECTED_TILE_MAX_ZOOM_SCALE });
 
         pixiApp.renderer.on("resize", () => {
             const w = pixiApp.renderer.width;
@@ -289,8 +301,8 @@ export class SelectedTilePixiRenderer {
         this.tileBoundsGraphics
             .rect(layout.cellX, layout.cellY, layout.cellWidth, layout.cellHeight)
             .stroke({
-                color: 0xffcc00,
-                width: 1,
+                color: SELECTED_TILE_BOUNDS_COLOR,
+                width: SELECTED_TILE_BOUNDS_WIDTH,
                 pixelLine: true,
             });
     }
@@ -334,7 +346,7 @@ export class SelectedTilePixiRenderer {
 
         if (screenWidth <= 0 || screenHeight <= 0) return;
 
-        const padding = 64;
+        const padding = SELECTED_TILE_FIT_PADDING;
         const availableWidth = Math.max(1, screenWidth - padding * 2);
         const availableHeight = Math.max(1, screenHeight - padding * 2);
 
@@ -343,7 +355,7 @@ export class SelectedTilePixiRenderer {
             availableHeight / layout.height,
         );
 
-        const clampedScale = Math.max(0.25, Math.min(32, scale));
+        const clampedScale = Math.max(SELECTED_TILE_FIT_MIN_ZOOM_SCALE, Math.min(SELECTED_TILE_FIT_MAX_ZOOM_SCALE, scale));
 
         this.viewport.setZoom(clampedScale, true);
         this.viewport.moveCenter(

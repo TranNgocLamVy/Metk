@@ -2,6 +2,7 @@ import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Info, Plus, Redo, Scissor
 
 import * as TilemapActions from "@/application/actions/tilemap.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { SETTING_KEYS } from "@/application/settings/setting.enum";
 import { usePropertyStore } from "@/ui/stores/property.store";
 
 const settings = appKernel.settings;
@@ -163,8 +164,8 @@ const GridGroup: MenuDropDownGroupType = [
         type: "check",
         label: "workspace.tilemapEditor.contextMenu.showGrid",
         startIcon: <Grid3x3 className="stroke-1" />,
-        checked: () => settings.get("general.view.showGrid"),
-		toggle: () => settings.update("general.view.showGrid", !settings.get("general.view.showGrid"))
+        checked: () => settings.get(SETTING_KEYS.View.ShowGrid),
+		toggle: () => settings.update(SETTING_KEYS.View.ShowGrid, !settings.get(SETTING_KEYS.View.ShowGrid))
     }
 ];
 

@@ -1,4 +1,5 @@
 import { canExecuteCommand, executeCommand } from "@/application/actions/command.actions";
+import { SYSTEM_COMMAND_IDS } from "@/application/command-system/command-ids";
 import { ClipboardPaste, Copy, Redo, Scissors, SquareDashed, SquareDashedMousePointer, SquareMousePointer, Trash2, Undo, UserRoundCog } from "lucide-react";
 
 const EditDropdownOptionGroup1: MenuDropDownGroupType = [
@@ -6,15 +7,15 @@ const EditDropdownOptionGroup1: MenuDropDownGroupType = [
 		type: "option",
 		label: "menu.edit.action.undo",
 		startIcon: <Undo />,
-		disabled: () => !canExecuteCommand("workspace.tilemap.undo"),
-		onClick: () => executeCommand("workspace.tilemap.undo")
+		disabled: () => !canExecuteCommand(SYSTEM_COMMAND_IDS.TilemapUndo),
+		onClick: () => executeCommand(SYSTEM_COMMAND_IDS.TilemapUndo)
 	},
 	{
 		type: "option",
 		label: "menu.edit.action.redo",
 		startIcon: <Redo />,
-		disabled: () => !canExecuteCommand("workspace.tilemap.redo"),
-		onClick: () => executeCommand("workspace.tilemap.redo")
+		disabled: () => !canExecuteCommand(SYSTEM_COMMAND_IDS.TilemapRedo),
+		onClick: () => executeCommand(SYSTEM_COMMAND_IDS.TilemapRedo)
 	},
 ];
 

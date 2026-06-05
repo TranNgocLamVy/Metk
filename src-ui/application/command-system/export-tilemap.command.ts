@@ -7,9 +7,10 @@ import { Console } from "@/ui/notifications/console-gateway";
 import { SystemCommand } from "../commands/command.decorator";
 import { ExportStorageService } from "@/infrastructure/export-storage.service";
 import { FileDialogService } from "@/infrastructure/container";
+import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
-    id: "workspace.tilemap.export.tmx",
+    id: SYSTEM_COMMAND_IDS.TilemapExportTmx,
     name: "Export Tilemap",
     description: "",
     shortcuts: ["Ctrl+E"],

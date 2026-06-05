@@ -1,10 +1,11 @@
 import { Container, FederatedPointerEvent, Graphics, Point } from "pixi.js";
 
+import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tile } from "@/editor/model/tileset/tileset";
 import { TilesetSession } from "@/editor/session/tileset.session";
-import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { usePropertyStore } from "@/ui/stores/property.store";
+import { TILESET_SELECTION_ALPHA, TILESET_SELECTION_COLOR } from "./tileset-renderer.constants";
 
 export type CreateTilesetViewSelectorContext = {
     tileset: SingleImageTileset;
@@ -31,8 +32,8 @@ export class TilesetSelectorRenderer {
     private previewEndCoords: Coordinate | null = null;
     private previewTopLeft: Coordinate | null = null;
 
-    private selectedColor: number = 0x0090f1;
-    private selectedTransparency: number = 0.4;
+    private selectedColor: number = TILESET_SELECTION_COLOR;
+    private selectedTransparency: number = TILESET_SELECTION_ALPHA;
 
 
     private bindOnPointerDown: (event: FederatedPointerEvent) => void;

@@ -1,13 +1,12 @@
-import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, PenLine, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
+import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
 
+import { executeCommand } from "@/application/actions/command.actions";
 import * as ProjectActions from "@/application/actions/project.actions";
+import * as RulesetActions from "@/application/actions/ruleset.actions";
 import * as TilemapActions from "@/application/actions/tilemap.actions";
 import * as TilesetActions from "@/application/actions/tileset.actions";
-import * as RulesetActions from "@/application/actions/ruleset.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { executeCommand } from "@/application/actions/command.actions";
+import { SYSTEM_COMMAND_IDS } from "@/application/command-system/command-ids";
 
 const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
@@ -61,7 +60,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 		label: "menu.file.action.open.file",
 		startIcon: <FolderOpen />,
 		disabled: () => !(appKernel.projectManager.currentProject != null),
-        onClick: () => executeCommand("workspace.openFile")
+        onClick: () => executeCommand(SYSTEM_COMMAND_IDS.OpenFile)
 	},
 	{
 		type: "option",
@@ -117,7 +116,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 			if (!currentSession) return true;
 			return !currentSession.isDirty;
 		},
-        onClick: () => executeCommand("workspace.tilemap.save"),
+        onClick: () => executeCommand(SYSTEM_COMMAND_IDS.TilemapSave),
 	},
 	{
 		type: "option",
@@ -136,7 +135,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 			const tilemapsSession = currentWorkspace.tilemapSessionManager.tilemapsSession;
 			return !tilemapsSession.some(s => s.isDirty);
 		},
-        onClick: () => executeCommand("workspace.tilemap.saveAll"),
+        onClick: () => executeCommand(SYSTEM_COMMAND_IDS.TilemapSaveAll),
 	},
 	{
 		type: "subMenu",
@@ -185,7 +184,7 @@ const FileDropdownOptionGroup2: MenuDropDownGroupType = [
 						return !currentSession.isDirty;
 					},
                     onClick() {
-						executeCommand("workspace.tilemap.export.tmx");
+						executeCommand(SYSTEM_COMMAND_IDS.TilemapExportTmx);
 					},
 				},
 				{

@@ -1,8 +1,8 @@
 import { Boxes, ChevronDown, ChevronRight, Eye, EyeOff, Folder, FolderOpen, Grid, Image, LockKeyhole, LockOpen } from "lucide-react";
 import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
-import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
+import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
 import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
 
 import { PropertyUpdateMeta } from "@/editor/model/base-object";
@@ -12,6 +12,20 @@ import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Button } from "@/ui/components/shadcn/button";
 import { usePropertyStore } from "@/ui/stores/property.store";
+
+
+const RENAME_INPUT_FOCUS_DELAY_MS = 100;
+const DROP_EDGE_THRESHOLD_RATIO = 0.25;
+const DROP_BOTTOM_THRESHOLD_RATIO = 0.75;
+const LAYER_DEPTH_INDENT_PX = 20;
+const ROOT_LAYER_INDENT_PX = 10;
+const DROP_BORDER_WIDTH_PX = 2;
+const DROP_HIGHLIGHT_COLOR = "#3b82f6";
+const TRANSPARENT_DROP_BORDER = `${DROP_BORDER_WIDTH_PX}px solid transparent`;
+const DROP_HIGHLIGHT_BORDER = `${DROP_BORDER_WIDTH_PX}px solid ${DROP_HIGHLIGHT_COLOR}`;
+const DROP_HIGHLIGHT_OUTLINE = `${DROP_BORDER_WIDTH_PX}px dashed ${DROP_HIGHLIGHT_COLOR}`;
+const TRANSPARENT_DROP_OUTLINE = `${DROP_BORDER_WIDTH_PX}px dashed transparent`;
+const DROP_OUTLINE_OFFSET = `-${DROP_BORDER_WIDTH_PX}px`;
 
 type LayerNodeRowProps = {
 	view: LayerView;
@@ -82,9 +96,9 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 		const y = e.clientY - rect.top;
 		const height = rect.height;
 
-		if (y < height * 0.25) {
+		if (y < height * DROP_EDGE_THRESHOLD_RATIO) {
 			setDragOverPos("top");
-		} else if (y > height * 0.75) {
+		} else if (y > height * DROP_BOTTOM_THRESHOLD_RATIO) {
 			setDragOverPos("bottom");
 		} else {
 			if (isGroup) {
@@ -127,18 +141,18 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 
 	// Styles for Drop Feedback
 	const getOuterDropStyle = () => {
-		if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
-		if (dragOverPos === "top") return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
-		if (dragOverPos === "bottom") return { borderBottom: "2px solid transparent", borderTop: "2px solid transparent" };
-		if (dragOverPos === "inside") return { outline: "2px dashed #3b82f6", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
+		if (!dragOverPos) return { borderTop: TRANSPARENT_DROP_BORDER, borderBottom: TRANSPARENT_DROP_BORDER };
+		if (dragOverPos === "top") return { borderTop: TRANSPARENT_DROP_BORDER, borderBottom: TRANSPARENT_DROP_BORDER };
+		if (dragOverPos === "bottom") return { borderBottom: TRANSPARENT_DROP_BORDER, borderTop: TRANSPARENT_DROP_BORDER };
+		if (dragOverPos === "inside") return { outline: DROP_HIGHLIGHT_OUTLINE, outlineOffset: DROP_OUTLINE_OFFSET, borderTop: TRANSPARENT_DROP_BORDER, borderBottom: TRANSPARENT_DROP_BORDER };
 		return {};
 	};
 
 	const getInnerDropStyle = () => {
-		if (!dragOverPos) return { borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
-		if (dragOverPos === "top") return { borderTop: "2px solid #3b82f6", borderBottom: "2px solid transparent" };
-		if (dragOverPos === "bottom") return { borderBottom: "2px solid #3b82f6", borderTop: "2px solid transparent" };
-		if (dragOverPos === "inside") return { outline: "2px dashed transparent", outlineOffset: "-2px", borderTop: "2px solid transparent", borderBottom: "2px solid transparent" };
+		if (!dragOverPos) return { borderTop: TRANSPARENT_DROP_BORDER, borderBottom: TRANSPARENT_DROP_BORDER };
+		if (dragOverPos === "top") return { borderTop: DROP_HIGHLIGHT_BORDER, borderBottom: TRANSPARENT_DROP_BORDER };
+		if (dragOverPos === "bottom") return { borderBottom: DROP_HIGHLIGHT_BORDER, borderTop: TRANSPARENT_DROP_BORDER };
+		if (dragOverPos === "inside") return { outline: TRANSPARENT_DROP_OUTLINE, outlineOffset: DROP_OUTLINE_OFFSET, borderTop: TRANSPARENT_DROP_BORDER, borderBottom: TRANSPARENT_DROP_BORDER };
 		return {};
 	}
 
@@ -152,7 +166,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 	}
 
 	return (
-		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * 20 + 10, ...getOuterDropStyle() }}>
+		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * LAYER_DEPTH_INDENT_PX + ROOT_LAYER_INDENT_PX, ...getOuterDropStyle() }}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
 					<div className="w-4 cursor-pointer" onClick={(e) => { e.stopPropagation(); TilemapLayerActions.toggleOpenGroupLayer(layer.id) }}>
@@ -214,7 +228,7 @@ export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: Rena
 				inputRef.current.focus();
 				inputRef.current.select();
 			}
-		}, 100);
+		}, RENAME_INPUT_FOCUS_DELAY_MS);
 		return () => clearTimeout(timeOut);
 	}, []);
 

@@ -1,6 +1,7 @@
 import { Sprite, Texture, TilingSprite } from "pixi.js";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
+import { SETTING_KEYS } from "@/application/settings/setting.enum";
 import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { Tilemap } from "@/editor/model/tilemap/tilemap";
 import { FileSystemService } from "@/infrastructure/container";
@@ -45,7 +46,7 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         this.viewport = context.viewport;
         const settings = appKernel.settings;
         if (settings) {
-            this.enableParallax = settings.get("general.view.enableParallax");
+            this.enableParallax = settings.get(SETTING_KEYS.View.EnableParallax);
         }
 
         this.layer.eventEmitter.on("imageChanged", this.handleImageChanged);
@@ -54,7 +55,7 @@ export class ImageLayerRenderer extends BaseLayerRenderer<ImageLayer> {
         this.viewport.on("resize", this.handleViewportChanged);
 
         if (settings) {
-            const onEnableParallaxChanged = settings.onDidChangeSetting("general.view.enableParallax", (event) => {
+            const onEnableParallaxChanged = settings.onDidChangeSetting(SETTING_KEYS.View.EnableParallax, (event) => {
                 this.enableParallax = event.newValue;
                 this.updateTransform();
             });

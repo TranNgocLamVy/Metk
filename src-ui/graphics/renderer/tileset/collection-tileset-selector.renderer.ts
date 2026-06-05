@@ -14,6 +14,7 @@ import {
     CollectionTilesetGridRenderer,
 } from "./collection-tileset-grid.renderer";
 import { usePropertyStore } from "@/ui/stores/property.store";
+import { TILESET_SELECTION_ALPHA, TILESET_SELECTION_COLOR } from "./tileset-renderer.constants";
 
 export type CreateCollectionTilesetSelectorContext = {
     tilesetSession: TilesetSession;
@@ -30,8 +31,8 @@ export class CollectionTilesetSelectorRenderer {
 
     private selectedTileIds: Set<number> = new Set();
 
-    private selectedColor: number = 0x0090f1;
-    private selectedTransparency: number = 0.4;
+    private selectedColor: number = TILESET_SELECTION_COLOR;
+    private selectedTransparency: number = TILESET_SELECTION_ALPHA;
 
     private bindOnPointerDown: (event: FederatedPointerEvent) => void;
     private bindOnTilesetUpdate: () => void;

@@ -1,5 +1,6 @@
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { buildPanelRegistry } from "@/application/layout/layout-persistence";
+import { SETTING_KEYS } from "@/application/settings/setting.enum";
 import { workspaceLayout } from "@/shared/constant/workspaceJsonModel";
 import { Actions, DockLocation, IJsonTabNode, Model, TabNode } from "flexlayout-react";
 
@@ -11,11 +12,7 @@ export type WorkspacePanelId =
 	| "properties";
 
 export type WorkspaceLayoutSettingKey =
-	| "general.layout.tilesets"
-	| "general.layout.rulesets"
-	| "general.layout.entities"
-	| "general.layout.layers"
-	| "general.layout.properties";
+	(typeof WORKSPACE_LAYOUT_SETTING_KEYS)[keyof typeof WORKSPACE_LAYOUT_SETTING_KEYS];
 
 export type WorkspacePanelDefinition = {
 	id: WorkspacePanelId;
@@ -23,6 +20,14 @@ export type WorkspacePanelDefinition = {
 };
 
 const MAIN_EDITOR_TABSET_ID = "mainEditorTabset";
+
+const WORKSPACE_LAYOUT_SETTING_KEYS = {
+	Tilesets: SETTING_KEYS.Layout.Tilesets,
+	Rulesets: SETTING_KEYS.Layout.Rulesets,
+	Entities: SETTING_KEYS.Layout.Entities,
+	Layers: SETTING_KEYS.Layout.Layers,
+	Properties: SETTING_KEYS.Layout.Properties,
+} as const;
 
 const LEFT_PRIMARY_PANEL_IDS: readonly WorkspacePanelId[] = [
 	"tilesetView",
@@ -33,23 +38,23 @@ const LEFT_PRIMARY_PANEL_IDS: readonly WorkspacePanelId[] = [
 export const WORKSPACE_LAYOUT_PANELS = [
 	{
 		id: "tilesetView",
-		settingKey: "general.layout.tilesets",
+		settingKey: WORKSPACE_LAYOUT_SETTING_KEYS.Tilesets,
 	},
 	{
 		id: "rulesetManager",
-		settingKey: "general.layout.rulesets",
+		settingKey: WORKSPACE_LAYOUT_SETTING_KEYS.Rulesets,
 	},
 	{
 		id: "entityCollectionManager",
-		settingKey: "general.layout.entities",
+		settingKey: WORKSPACE_LAYOUT_SETTING_KEYS.Entities,
 	},
 	{
 		id: "layerManager",
-		settingKey: "general.layout.layers",
+		settingKey: WORKSPACE_LAYOUT_SETTING_KEYS.Layers,
 	},
 	{
 		id: "properties",
-		settingKey: "general.layout.properties",
+		settingKey: WORKSPACE_LAYOUT_SETTING_KEYS.Properties,
 	},
 ] as const satisfies readonly WorkspacePanelDefinition[];
 

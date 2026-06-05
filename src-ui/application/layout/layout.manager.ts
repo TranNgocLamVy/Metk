@@ -18,6 +18,8 @@ interface LayoutManagerEvents {
     onLayoutUnloaded: () => void;
 }
 
+const LAYOUT_SAVE_DEBOUNCE_MS = 500;
+
 export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
     public layoutData: IJsonModel | null = null;
     private project: Project | null = null;
@@ -64,7 +66,7 @@ export class LayoutManager extends EventEmitter<LayoutManagerEvents> {
 
         this.saveTimeout = setTimeout(() => {
             this.performSaveLayout();
-        }, 500);
+        }, LAYOUT_SAVE_DEBOUNCE_MS);
     }
 
     private async performSaveLayout(): Promise<Result> {

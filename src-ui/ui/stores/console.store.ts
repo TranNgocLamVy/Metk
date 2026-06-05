@@ -1,7 +1,10 @@
-import { create } from "zustand";
 import { ErrorMessage, LogMessage } from "@/ui/notifications/console-gateway";
+import { create } from "zustand";
 
 type ConsoleType = "log" | "error";
+
+const MAX_LOG_MESSAGES = 200;
+const MAX_ERROR_MESSAGES = 50;
 
 interface ConsoleState {
     isConsoleOpen: boolean;
@@ -44,14 +47,14 @@ export const useConsoleStore = create<ConsoleState>((set, get) => ({
     addLog: (log) => {
         set((state) => {
             const updatedLogs = [...state.logs.filter(l => l.id !== log.id), log];
-            return { logs: updatedLogs.slice(-200) };
+            return { logs: updatedLogs.slice(-MAX_LOG_MESSAGES) };
         })
     },
     addError: (error) => {
         set((state) => {
             const updatedErrors = [...state.errors.filter(e => e.id !== error.id), error];
             return { 
-                errors: updatedErrors.slice(-50), 
+                errors: updatedErrors.slice(-MAX_ERROR_MESSAGES),
                 isConsoleOpen: true, 
                 consoleType: "error" 
             };

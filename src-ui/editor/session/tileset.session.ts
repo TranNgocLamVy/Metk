@@ -1,7 +1,7 @@
 import { IViewSession } from "@/editor/interface/base-session.interface";
 import { SelectionState } from "@/shared/data-types/selection-state.data";
 import { TilesetSessionData } from "@/shared/data-types/tileset-session.data";
-import { ViewState } from "@/shared/data-types/view-state.data";
+import { createDefaultViewState, ViewState } from "@/shared/data-types/view-state.data";
 
 import { EditorFacade } from "@/application/editor.facade";
 import EventEmitter from "eventemitter3";
@@ -21,7 +21,7 @@ export class TilesetSession extends EventEmitter<TilesetSessionEvents> implement
         super();
         this.tileset = tileset;
         this.id = tilesetSessionData.id;
-        this.viewState = tilesetSessionData.viewState ?? { x: null, y: null, zoom: 1 };
+        this.viewState = tilesetSessionData.viewState ?? createDefaultViewState();
         this.selectionState = { selectedTilesSet: this.normalizeSelectedTileIds(tilesetSessionData.selectionState) } 
 
     }

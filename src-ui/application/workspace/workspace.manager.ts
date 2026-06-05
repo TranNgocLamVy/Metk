@@ -14,6 +14,8 @@ type WorkspaceManagerEvent = {
     onWorkspaceUnloaded: () => void;
 }
 
+const WORKSPACE_SAVE_DEBOUNCE_MS = 1000;
+
 export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
     public currentWorkspace: Workspace | null = null;
     private editorFacade: EditorFacade;
@@ -89,7 +91,7 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
 
         this.saveTimeout = setTimeout(() => {
             this.performSaveWorkspace();
-        }, 1000);
+        }, WORKSPACE_SAVE_DEBOUNCE_MS);
 
         return Result.Success();
     }

@@ -1,4 +1,10 @@
-import { TilemapOrientation } from "@/shared/data-types/tilemap.data";
+import {
+    DEFAULT_TILE_HEIGHT,
+    DEFAULT_TILE_WIDTH,
+    DEFAULT_TILEMAP_HEIGHT,
+    DEFAULT_TILEMAP_WIDTH,
+    TilemapOrientation,
+} from "@/shared/data-types/tilemap.data";
 import { createForm } from "./form.utils";
 
 export const createTilemapForm = () => {
@@ -77,7 +83,7 @@ export const createTilemapForm = () => {
                                 name: "mapwidth",
                                 type: "number",
                                 label: "form.tilemap.size.width",
-                                defaultValue: 64,
+                                defaultValue: DEFAULT_TILEMAP_WIDTH,
                                 required: true,
                             },
                             {
@@ -85,7 +91,7 @@ export const createTilemapForm = () => {
                                 name: "mapheight",
                                 type: "number",
                                 label: "form.tilemap.size.height",
-                                defaultValue: 64,
+                                defaultValue: DEFAULT_TILEMAP_HEIGHT,
                                 required: true,
                             },
                         ]
@@ -101,7 +107,7 @@ export const createTilemapForm = () => {
                                 name: "tileWidth",
                                 type: "number",
                                 label: "form.tilemap.tileSize.width",
-                                defaultValue: 16,
+                                defaultValue: DEFAULT_TILE_WIDTH,
                                 required: true,
                             },
                             {
@@ -109,7 +115,7 @@ export const createTilemapForm = () => {
                                 name: "tileHeight",
                                 type: "number",
                                 label: "form.tilemap.tileSize.height",
-                                defaultValue: 16,
+                                defaultValue: DEFAULT_TILE_HEIGHT,
                                 required: true,
                             },
                         ]

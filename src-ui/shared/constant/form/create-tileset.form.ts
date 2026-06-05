@@ -1,3 +1,4 @@
+import { DEFAULT_TILESET_TILE_HEIGHT, DEFAULT_TILESET_TILE_WIDTH } from "@/shared/data-types/tileset.data";
 import { createForm } from "./form.utils";
 
 export const createTilesetForm = (textureDefaultDir?: string) => {
@@ -82,7 +83,7 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                                         name: "tileWidth",
                                         type: "number",
                                         label: "form.tileset.size.width",
-                                        defaultValue: 16,
+                                        defaultValue: DEFAULT_TILESET_TILE_WIDTH,
                                         required: true,
                                     },
                                     {
@@ -90,7 +91,7 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                                         name: "tileHeight",
                                         type: "number",
                                         label: "form.tileset.size.height",
-                                        defaultValue: 16,
+                                        defaultValue: DEFAULT_TILESET_TILE_HEIGHT,
                                         required: true,
                                     },
                                 ],

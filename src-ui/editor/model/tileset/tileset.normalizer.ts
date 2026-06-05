@@ -1,6 +1,15 @@
 import { CollisionObjectData, CollisionObjectKindValues } from "@/shared/data-types/collision-object.data";
 import { ImageSourceData } from "@/shared/data-types/image-source.data";
-import { TileData, TilesetData, TilesetType, TilesetTypeValues } from "@/shared/data-types/tileset.data";
+import {
+    DEFAULT_TILESET_COLUMNS,
+    DEFAULT_TILESET_ROWS,
+    DEFAULT_TILESET_TILE_HEIGHT,
+    DEFAULT_TILESET_TILE_WIDTH,
+    TileData,
+    TilesetData,
+    TilesetType,
+    TilesetTypeValues,
+} from "@/shared/data-types/tileset.data";
 import { validate } from "@/shared/utils/validate.utils";
 
 const normalizeCloneFrom = (value: unknown): string | undefined => {
@@ -100,10 +109,10 @@ export const normalizeTilesetData = (tilesetData: unknown): TilesetData => {
         ...cloneFromField(data.cloneFrom),
         name: validate.string({ value: data.name, defaultValue: "Untitled Tileset" }),
         type: validate.enum({ value: data.type, values: TilesetTypeValues, defaultValue: TilesetType.SingleImage }),
-        columns: validate.number({ value: data.columns, defaultValue: 16, min: 1, integer: true }),
-        rows: validate.number({ value: data.rows, defaultValue: 16, min: 1, integer: true }),
-        tileWidth: validate.number({ value: data.tileWidth, defaultValue: 16, min: 1, integer: true }),
-        tileHeight: validate.number({ value: data.tileHeight, defaultValue: 16, min: 1, integer: true }),
+        columns: validate.number({ value: data.columns, defaultValue: DEFAULT_TILESET_COLUMNS, min: 1, integer: true }),
+        rows: validate.number({ value: data.rows, defaultValue: DEFAULT_TILESET_ROWS, min: 1, integer: true }),
+        tileWidth: validate.number({ value: data.tileWidth, defaultValue: DEFAULT_TILESET_TILE_WIDTH, min: 1, integer: true }),
+        tileHeight: validate.number({ value: data.tileHeight, defaultValue: DEFAULT_TILESET_TILE_HEIGHT, min: 1, integer: true }),
         image,
         tiles,
     };

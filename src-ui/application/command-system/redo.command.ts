@@ -2,9 +2,10 @@ import { EditorFacade } from "@/application/editor.facade";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { Result } from "@/shared/types/result";
 import { SystemCommand } from "../commands/command.decorator";
+import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
-    id: "workspace.tilemap.redo",
+    id: SYSTEM_COMMAND_IDS.TilemapRedo,
     name: "Redo",
     description: "",
     shortcuts: ["Ctrl+Y"],

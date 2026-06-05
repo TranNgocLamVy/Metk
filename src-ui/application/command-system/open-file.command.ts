@@ -1,12 +1,13 @@
 import { EditorFacade } from "@/application/editor.facade";
-import { SystemCommand } from "../commands/command.decorator";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { Result } from "@/shared/types/result";
 import { useDialogStore } from "@/ui/stores/dialog.store";
+import { SystemCommand } from "../commands/command.decorator";
+import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
-    id: "workspace.openFile",
+    id: SYSTEM_COMMAND_IDS.OpenFile,
     name: "Open File",
     description: "",
     shortcuts: ["Ctrl+P", "Ctrl+O"],
