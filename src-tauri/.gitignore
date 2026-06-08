@@ -8,5 +8,5 @@
 
 
 /data/*
-!/data/example-projects/
-!/data/example-projects/**
+/data/example-projects/
+/data/example-projects/**
