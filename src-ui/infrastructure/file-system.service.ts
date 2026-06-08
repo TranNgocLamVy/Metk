@@ -1,12 +1,20 @@
 import { Result } from "@/shared/types/result";
 import { IFileSystemService } from "./interface/file-system-service.interface";
-import { IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
+import { CopyFileOptions, DirectoryEntry, IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
 
 export class FileSystemServiceImpl implements IFileSystemService {
     constructor(private readonly storage: IStorageProvider) {}
 
     public async exists(path: string, options?: StorageOptions): Promise<boolean> {
         return await this.storage.exists(path, options);
+    }
+
+    public async readDir(path: string, options?: StorageOptions): Promise<DirectoryEntry[]> {
+        const result = await this.storage.readDir(path, options);
+        if (result.status !== Result.Status.Success) {
+            throw new Error(resolveMessage(result.message));
+        }
+        return result.data;
     }
 
     public async readFile(path: string, options?: StorageOptions): Promise<Uint8Array> {
@@ -23,6 +31,10 @@ export class FileSystemServiceImpl implements IFileSystemService {
             throw new Error(resolveMessage(result.message));
         }
         return result.data;
+    }
+
+    public async copyFile(fromPath: string, toPath: string, options?: CopyFileOptions): Promise<Result> {
+        return await this.storage.copyFile(fromPath, toPath, options);
     }
 
     public async writeFile(path: string, content: Uint8Array, options?: StorageOptions): Promise<Result> {

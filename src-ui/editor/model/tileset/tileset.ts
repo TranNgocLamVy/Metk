@@ -84,7 +84,7 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
         protected readonly objectRegistry: EditorObjectRegistry,
         type: TilesetType,
     ) {
-        super(`tileset:${tilesetData.id}`, tilesetData.cloneFrom);
+        super(`tileset:${tilesetData.id}`);
 
         this.id = tilesetData.id;
         this.name = tilesetData.name;

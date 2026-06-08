@@ -1,7 +1,8 @@
-import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LogOut, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
+import { BrushCleaning, FileClock, FolderClock, FolderOpen, FolderOpenDot, FolderPlus, FolderUp, FolderX, Grid2x2Plus, ImageUp, LayoutTemplate, LogOut, Save, SaveAll, SquarePlus, SquareX, X } from "lucide-react";
 
 import { executeCommand } from "@/application/actions/command.actions";
 import * as ProjectActions from "@/application/actions/project.actions";
+import * as ExampleProjectActions from "@/application/templates/example-project.actions";
 import * as RulesetActions from "@/application/actions/ruleset.actions";
 import * as TilemapActions from "@/application/actions/tilemap.actions";
 import * as TilesetActions from "@/application/actions/tileset.actions";
@@ -17,7 +18,7 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
 			[
 				{
 					type: "option",
-					label: "menu.file.action.new.project",
+					label: "menu.file.action.new.emptyProject",
 					startIcon: <FolderPlus />,
                     onClick() {
                         ProjectActions.createProject();
@@ -51,6 +52,16 @@ const FileDropdownOptionGroup1: MenuDropDownGroupType = [
                     onClick() {
 						RulesetActions.createRuleset();
 					},
+				},
+			],
+			[
+				{
+					type: "option",
+					label: "menu.file.action.new.exampleProject",
+					startIcon: <LayoutTemplate />,
+                    onClick() {
+                        ExampleProjectActions.createExampleProject();
+                    },
 				},
 			],
 		],

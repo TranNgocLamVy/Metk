@@ -11,11 +11,9 @@ export function deepCloneResourceData<T>(data: T): T {
 
 export function cloneTilesetData(data: TilesetData): TilesetData {
     const clone = deepCloneResourceData(data);
-    const sourceId = data.id;
     const tileIdStart = Math.max(-1, ...data.tiles.map((tile) => tile.id)) + 1;
 
     clone.id = uuidv4();
-    clone.cloneFrom = sourceId;
     clone.tiles = clone.tiles.map((tile, index) => ({
         ...tile,
         id: tileIdStart + index,

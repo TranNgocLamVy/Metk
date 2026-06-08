@@ -1,7 +1,8 @@
-import { FolderPlus, SquareArrowOutUpRight, X } from "lucide-react";
+import { FolderPlus, LayoutTemplate, SquareArrowOutUpRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import * as ProjectActions from "@/application/actions/project.actions";
+import * as ExampleProjectActions from "@/application/templates/example-project.actions";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -30,7 +31,12 @@ export default function HomePage() {
 
 					<Button variant={"link"} onClick={ProjectActions.createProject}>
 						<FolderPlus />
-						<LocalizedText message="home.newProject" />
+						<LocalizedText message="home.createEmptyProject" />
+					</Button>
+
+					<Button variant={"link"} onClick={ExampleProjectActions.createExampleProject}>
+						<LayoutTemplate />
+						<LocalizedText message="home.createExampleProject" />
 					</Button>
 				</VStack>
 				<h2 className="mt-2 font-semibold text-foreground"><LocalizedText message="home.recentProjects" /></h2>

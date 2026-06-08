@@ -31,7 +31,6 @@ export type TileData = {
 
 export type TilesetData = {
     id: string;
-    cloneFrom?: string;
     name: string;
     type?: TilesetType;
     columns: number;

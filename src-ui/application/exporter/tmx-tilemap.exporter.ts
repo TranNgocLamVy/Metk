@@ -50,8 +50,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
             renderorder: "right-down",
             width: tilemap.width,
             height: tilemap.height,
-            tileWidth: tilemap.tileWidth,
-            tileHeight: tilemap.tileHeight,
+            tilewidth: tilemap.tileWidth,
+            tileheight: tilemap.tileHeight,
             nextlayerid: this.nextLayerId,
             nextobjectid: this.nextMapObjectId,
         });
@@ -135,8 +135,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
             tileset: {
                 "@firstgid": firstGid,
                 "@name": tileset.name,
-                "@tileWidth": tileset.tileWidth,
-                "@tileHeight": tileset.tileHeight,
+                "@tilewidth": tileset.tileWidth,
+                "@tileheight": tileset.tileHeight,
                 "@tilecount": tileset.tiles.length,
                 "@columns": tileset.columns,
                 image: {
@@ -167,8 +167,8 @@ export class TmxTilemapExporter implements ITilemapExporter {
             tileset: {
                 "@firstgid": firstGid,
                 "@name": tileset.name,
-                "@tileWidth": tileset.tileWidth,
-                "@tileHeight": tileset.tileHeight,
+                "@tilewidth": tileset.tileWidth,
+                "@tileheight": tileset.tileHeight,
                 "@tilecount": tileset.tiles.length,
                 "@columns": tileset.columns,
                 ...(tiles.length > 0 ? { tile: tiles } : {}),

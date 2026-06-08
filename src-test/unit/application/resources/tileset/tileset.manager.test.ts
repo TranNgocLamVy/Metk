@@ -267,7 +267,6 @@ describe("TilesetManager", () => {
 
         expect(clone).not.toBeNull();
         expect(clonedData.id).not.toBe("tileset-a");
-        expect(clonedData.cloneFrom).toBe("tileset-a");
         expect(clonedData.tiles[0].id).not.toBe(3);
         expect(clonedData.tiles[0].cloneFrom).toBe("3");
         expect(clonedData.tiles[0].collisionObjects?.[0].id).not.toBe("collision-a");

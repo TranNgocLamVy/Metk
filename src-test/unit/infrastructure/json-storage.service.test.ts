@@ -8,6 +8,8 @@ import { Result } from "@/shared/types/result";
 const createStorage = (): IStorageProvider => ({
     exists: vi.fn(),
     mkdir: vi.fn(),
+    readDir: vi.fn(),
+    copyFile: vi.fn(),
     readTextFile: vi.fn(),
     writeTextFile: vi.fn(),
     readFile: vi.fn(),

@@ -68,6 +68,8 @@
                 "new": {
                     "label": "New",
                     "project": "New Project",
+                    "emptyProject": "Create Empty Project",
+                    "exampleProject": "Create Example Project",
                     "tilemap": "New Tilemap",
                     "tileset": "New Tileset",
                     "ruleset": "New Ruleset"
@@ -238,6 +240,8 @@
         "start": "Start",
         "importProject": "Import Project",
         "newProject": "New Project",
+        "createEmptyProject": "Create Empty Project",
+        "createExampleProject": "Create Example Project",
         "recentProjects": "Recent Projects"
     },
     "workspace": {
@@ -393,6 +397,22 @@
             },
             "message": {
                 "folderExists": "Folder already exists."
+            }
+        },
+        "exampleProject": {
+            "title": "Create Example Project - Metk",
+            "description": "Clone a bundled template into a normal project folder.",
+            "name": {
+                "label": "Project Name",
+                "placeholder": "e.g., My Starter Example"
+            },
+            "destination": {
+                "label": "Destination",
+                "placeholder": "Select a folder"
+            },
+            "action": {
+                "create": "Create",
+                "cancel": "Cancel"
             }
         },
         "tilemap": {

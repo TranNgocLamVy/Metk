@@ -6,6 +6,8 @@
                 "new": {
                     "label": "Mới",
                     "project": "Dự án mới",
+                    "emptyProject": "Tạo dự án trống",
+                    "exampleProject": "Tạo dự án ví dụ",
                     "tilemap": "Tilemap mới",
                     "tileset": "Tileset mới",
                     "ruleset": "Ruleset mới"
@@ -182,6 +184,8 @@
         "start": "Bắt đầu",
         "importProject": "Nhập dự án",
         "newProject": "Dự án mới",
+        "createEmptyProject": "Tạo dự án trống",
+        "createExampleProject": "Tạo dự án ví dụ",
         "recentProjects": "Dự án gần đây"
     },
     "workspace": {
@@ -317,6 +321,22 @@
             },
             "message": {
                 "folderExists": "Thư mục này đã tồn tại."
+            }
+        },
+        "exampleProject": {
+            "title": "Tạo dự án ví dụ - Metk",
+            "description": "Sao chép template đi kèm thành một dự án Metk bình thường.",
+            "name": {
+                "label": "Tên dự án",
+                "placeholder": "Ví dụ: My Starter Example"
+            },
+            "destination": {
+                "label": "Đường dẫn lưu",
+                "placeholder": "Chọn một thư mục"
+            },
+            "action": {
+                "create": "Tạo mới",
+                "cancel": "Hủy"
             }
         },
         "tilemap": {

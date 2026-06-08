@@ -1,6 +1,6 @@
 import { Result } from "@/shared/types/result";
-import { create, exists, mkdir, readFile, readTextFile, remove, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
-import { IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
+import { copyFile, create, exists, mkdir, readDir, readFile, readTextFile, remove, writeFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { CopyFileOptions, DirectoryEntry, IStorageProvider, StorageOptions } from "./interface/storage-provider.interface";
 
 export class TauriFileSystemProvider implements IStorageProvider {
     public async exists(path: string, options?: StorageOptions): Promise<boolean> {
@@ -14,6 +14,34 @@ export class TauriFileSystemProvider implements IStorageProvider {
         } catch (error) {
             console.error(error);
             return Result.Error({ key: "message.system.fs.mkdirFail", options: { path } });
+        }
+    }
+
+    public async readDir(path: string, options?: StorageOptions): Promise<Result<DirectoryEntry[]>> {
+        try {
+            if (!(await this.exists(path, options))) {
+                return Result.Error({ key: "message.system.fs.directoryNotFoundAt", options: { path }});
+            }
+            const entries = await readDir(path, options);
+            return Result.Success(entries.map((entry) => ({
+                name: entry.name,
+                isFile: entry.isFile,
+                isDirectory: entry.isDirectory,
+                isSymlink: entry.isSymlink,
+            })));
+        } catch (error) {
+            console.error(error);
+            return Result.Error({ key: "message.system.fs.readFail", options: { path }});
+        }
+    }
+
+    public async copyFile(fromPath: string, toPath: string, options?: CopyFileOptions): Promise<Result> {
+        try {
+            await copyFile(fromPath, toPath, options);
+            return Result.Success();
+        } catch (error) {
+            console.error(error);
+            return Result.Error(`Failed to copy file from ${fromPath} to ${toPath}`);
         }
     }
 

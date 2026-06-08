@@ -166,7 +166,7 @@ export default function LayerNodeRow({ view, isSelected, updatedLayerView }: Lay
 	}
 
 	return (
-		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * LAYER_DEPTH_INDENT_PX + ROOT_LAYER_INDENT_PX, ...getOuterDropStyle() }}>
+		<div draggable={!isRenaming} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} onContextMenu={onContextMenu} className={`pr-2 w-full h-full group relative ${isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"}`} style={{ paddingLeft: view.depth * LAYER_DEPTH_INDENT_PX + ROOT_LAYER_INDENT_PX, ...getOuterDropStyle() }}>
 			<div style={{ ...getInnerDropStyle() }} className="flex items-center gap-2">
 				{isGroup ? (
 					<div className="w-4 cursor-pointer" onClick={(e) => { e.stopPropagation(); TilemapLayerActions.toggleOpenGroupLayer(layer.id) }}>
@@ -251,7 +251,7 @@ export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: Rena
 				if (e.key === "Escape") store.setEditingId(null);
 			}}
 			onClick={(e) => e.stopPropagation()}
-			className="truncate w-40 text-xs border bg-surface-base/50"
+			className="truncate w-40 text-xs border text-foreground p-1 left-20 absolute"
 		/>
 	);
 }

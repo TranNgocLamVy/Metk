@@ -7,4 +7,6 @@
 /gen/schemas
 
 
-/data/
+/data/*
+!/data/example-projects/
+!/data/example-projects/**

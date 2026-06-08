@@ -4,6 +4,7 @@ import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "@/shared
 import { DialogZLevel } from "@/shared/types/dialog";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { Result } from "@/shared/types/result";
+import type { DiscoveredExampleProjectTemplate } from "@/application/templates/example-project.types";
 
 
 export class DialogService {
@@ -22,6 +23,12 @@ export class DialogService {
     public static async openSaveDialog(opts: SaveDialogOptions): Promise<SaveResult> {
         return new Promise<SaveResult>((resolve) => {
             useDialogStore.getState().openDialog("SAVE_DIALOG", { zLevel: DialogZLevel.AlertDialog }, { resolve, saveDialog: opts });
+        });
+    }
+
+    public static async openExampleProjectTemplateDialog(templates: DiscoveredExampleProjectTemplate[]): Promise<string | null> {
+        return new Promise<string | null>((resolve) => {
+            useDialogStore.getState().openDialog("EXAMPLE_PROJECT_TEMPLATE_DIALOG", { zLevel: DialogZLevel.Modal }, { resolve, templates });
         });
     }
 
