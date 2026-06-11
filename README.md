@@ -1,6 +1,8 @@
-# Metk (Map Editor Toolkit)
+# Metk - Map Editor Toolkit
 
 **Metk** is a comprehensive 2D tilemap editor designed to make building game levels easy. It speeds up your workflow by providing multiple drawing tools, multi-layer editing, and ruleset-based auto-tiling. Once your design is complete, you can easily export your maps into standard formats (like JSON or .tmx) that are ready to drop directly into any game engine.
+
+![Metk Screenshot](./docs/assets/metk-editor-preview.png)
 
 # Installing Metk
 
