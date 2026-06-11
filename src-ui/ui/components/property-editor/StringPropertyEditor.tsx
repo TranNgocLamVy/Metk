@@ -5,6 +5,7 @@ import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface StringEditorProps {
@@ -12,6 +13,7 @@ export interface StringEditorProps {
 }
 
 export function StringPropertyEditor({ property }: StringEditorProps) {
+    const { t } = useTranslation();
     const version = usePropertyStoreVersion()
 
     const [error, setError] = useState<TranslatableMessage | null>(null);
@@ -89,7 +91,7 @@ export function StringPropertyEditor({ property }: StringEditorProps) {
     return (
         <div className="px-2 h-8">
             <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] items-center h-full gap-2">
-                <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <Label title={t(property.label)} className="text-2xs min-w-0 truncate">
                     <LocalizedText message={property.label} />
                 </Label>
 

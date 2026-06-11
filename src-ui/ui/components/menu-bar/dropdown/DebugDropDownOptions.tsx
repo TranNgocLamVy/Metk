@@ -5,28 +5,28 @@ import { useNavigationStore } from "@/ui/stores/navigation.store";
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "option",
-		label: "Home",
+		label: "menu.debug.action.home",
         onClick() {
             useNavigationStore.getState().navigate?.("/");
         },
 	},
 	{
 		type: "option",
-		label: "Clear Local Storage",
+		label: "menu.debug.action.clearLocalStorage",
 		onClick() {
 			localStorage.clear();
 		}
 	},
 	{
 		type: "option",
-		label: "Toggle Language",
+		label: "menu.debug.action.toggleLanguage",
 		onClick() {
 			i18nService.changeLanguage(i18n.language === "en" ? "vi" : "en");
 		}
 	},
 	{
 		type: "option",
-		label: "Print Projects",
+		label: "menu.debug.action.printProjects",
 		onClick() {
 			console.log(appKernel.projectManager.serialize());
 		}
@@ -34,7 +34,7 @@ const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 ];
 
 export const DebugDropdownOptions: MenuItemType = {
-    label: "Debug",
+    label: "menu.debug.label",
     className: "w-60",
     groups: [DebugDropdownOptionGroup1],
 };

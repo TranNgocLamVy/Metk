@@ -1,4 +1,5 @@
 import { PropertyGroupModel } from "@/editor/properties/group-properties.utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import PropertyRow from "./PropertyRow";
 
 export interface PropertyGroupProps {
@@ -10,7 +11,7 @@ export function PropertyGroup({ group, groupIndex }: PropertyGroupProps) {
     return (
         <section className="bg-surface-base">
             <header className="bg-foreground/40 text-accent-foreground/80 px-2 py-1.5 text-xs font-semibold">
-                {group.name}
+                <LocalizedText message={group.name} />
             </header>
             <div className="flex flex-col">
                 {group.properties.map((property, index) => (

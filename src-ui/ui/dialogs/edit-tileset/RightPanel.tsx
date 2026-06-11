@@ -17,6 +17,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/ui/compo
 import { PropertyGroup } from "@/ui/workspace/properties-panel/PropertyGroup";
 import { Boxes, Dot, LineSquiggle, Plus, Trash2 } from "lucide-react";
 import { useEditTileset } from "./ContextProvider";
+import i18n from "@/app/providers/i18n";
 
 export function RightPanel() {
     const { selectedTile } = useEditTileset();
@@ -26,7 +27,7 @@ export function RightPanel() {
             <VStack className="w-full h-full min-h-0 overflow-hidden bg-surface-base flex flex-col">
                 {!selectedTile && (
                     <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                        Select one tile
+                        <LocalizedText message="dialog.editTileset.empty.selectTile" />
                     </div>
                 )}
 
@@ -55,11 +56,11 @@ function PropertyPanel({ selectedTile }: { selectedTile: Tile }) {
     return (
         <VStack className="w-full h-full">
             <div className="flex h-8 items-center px-1 bg-surface">
-                <span className="text-xs font-medium text-foreground"><LocalizedText message={"Properties"} /></span>
+                <span className="text-xs font-medium text-foreground"><LocalizedText message="dialog.editTileset.properties.title" /></span>
             </div>
             {groups.length === 0 && (
                 <div className="w-full h-full p-3 text-xs text-muted-foreground">
-                    <LocalizedText message={"This tile has no registered properties."} />
+                    <LocalizedText message="dialog.editTileset.properties.empty" />
                 </div>
             )}
             {groups.length > 0 && (
@@ -103,12 +104,12 @@ function CollisionObjectPanel({ selectedTile }: { selectedTile: Tile }) {
     return (
         <VStack className="w-full h-full">
             <div className="flex h-8 items-center px-1 bg-surface">
-                <span className="text-xs font-medium text-foreground"><LocalizedText message={"Collision Objects"} /></span>
+                <span className="text-xs font-medium text-foreground"><LocalizedText message="dialog.editTileset.collisionObjects.title" /></span>
             </div>
 
             {collisionObjects.length === 0 && (
                 <div className="flex h-[calc(100%-2rem)] items-center justify-center px-4 text-center text-xs text-muted-foreground">
-                    This tile has no collision objects.
+                    <LocalizedText message="dialog.editTileset.collisionObjects.empty" />
                 </div>
             )}
 
@@ -180,15 +181,15 @@ function ObjectCollisionMenuBar({ selectedTile }: { selectedTile: Tile }) {
                 <DropdownMenuContent side="top" className="min-w-60">
                     <DropdownMenuItem onClick={() => addCollisionObject(createBoxCollision(selectedTile))}>
                         <Boxes className="text-emerald-500" />
-                        <LocalizedText message="New Boxes Collision" />
+                        <LocalizedText message="dialog.editTileset.collisionObjects.actions.newBox" />
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => addCollisionObject(createPointCollision(selectedTile))}>
                         <Dot className="text-yellow-300" />
-                        <LocalizedText message="New Point Collision" />
+                        <LocalizedText message="dialog.editTileset.collisionObjects.actions.newPoint" />
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => addCollisionObject(createPolygonCollision(selectedTile))}>
                         <LineSquiggle className="text-fuchsia-500" />
-                        <LocalizedText message="New Polygon Collision" />
+                        <LocalizedText message="dialog.editTileset.collisionObjects.actions.newPolygon" />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -207,7 +208,7 @@ function createBoxCollision(tile: Tile): BoxCollision {
     return new BoxCollision({
         id: uuidv4(),
         kind: "box",
-        name: "Boxes Collision",
+        name: i18n.t("dialog.editTileset.collisionObjects.defaults.boxName"),
         x: Math.round((tileSize.width - width) / 2),
         y: Math.round((tileSize.height - height) / 2),
         width,
@@ -223,7 +224,7 @@ function createPointCollision(tile: Tile): PointCollision {
     return new PointCollision({
         id: uuidv4(),
         kind: "point",
-        name: "Point Collision",
+        name: i18n.t("dialog.editTileset.collisionObjects.defaults.pointName"),
         x: Math.round(tileSize.width / 2),
         y: Math.round(tileSize.height / 2),
         visible: true,
@@ -239,7 +240,7 @@ function createPolygonCollision(tile: Tile): PolygonCollision {
     return new PolygonCollision({
         id: uuidv4(),
         kind: "polygon",
-        name: "Polygon Collision",
+        name: i18n.t("dialog.editTileset.collisionObjects.defaults.polygonName"),
         x: Math.round((tileSize.width - width) / 2),
         y: Math.round((tileSize.height - height) / 2),
         points: [

@@ -17,12 +17,14 @@ import {
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
 import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { useTranslation } from "react-i18next";
 
 export interface NumberEditorProps {
     property: NumberPropertyClass<any>;
 }
 
 export function NumberPropertyEditor({ property }: NumberEditorProps) {
+    const { t } = useTranslation();
     const version = usePropertyStoreVersion()
 
     const [error, setError] = useState<TranslatableMessage | null>(null);
@@ -202,7 +204,7 @@ export function NumberPropertyEditor({ property }: NumberEditorProps) {
         <div className="px-2 h-8">
             <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] h-full items-center gap-2">
                 <Label
-                    title={property.label}
+                    title={t(property.label)}
                     {...dragProps}
                     className={[
                         "text-2xs min-w-0 truncate select-none",

@@ -21,7 +21,7 @@ export async function createExampleProject(): Promise<void> {
 
     const templates = templatesResult.data;
     if (templates.length === 0) {
-        Console.error({ message: "No bundled example project templates were found." });
+        Console.error({ message: "message.project.exampleTemplatesNotFound" });
         return;
     }
 
@@ -65,8 +65,8 @@ export async function createExampleProject(): Promise<void> {
     await appKernel.saveProjectManager();
 
     const openProject = await DialogService.openPermissionDialog({
-        title: "Example project created successfully",
-        description: "Do you want to open the project?",
+        title: "dialog.project.exampleCreated.title",
+        description: "dialog.project.exampleCreated.description",
     });
 
     if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);

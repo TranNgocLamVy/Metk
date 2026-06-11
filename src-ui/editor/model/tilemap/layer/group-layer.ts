@@ -19,8 +19,8 @@ export class GroupLayer extends BaseLayer<GroupLayerEvents> implements IGroupLay
     public layers: BaseLayer[] = [];
 
     @BooleanProperty<GroupLayer>({
-        label: "Open",
-        group: "Layer",
+        label: "property.layer.open",
+        group: "property.group.layer",
         visible: false,
         get: (target) => target.isOpen,
         set: (target, value, meta) => target.toggleOpen(value, meta),

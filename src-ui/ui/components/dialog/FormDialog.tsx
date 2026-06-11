@@ -68,7 +68,7 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
 
     if (!formDialog) return null;
 
-    const { title, description, okText = "OK", cancelText = "Cancel", size = "md", inputs, validateBeforeSubmit } = formDialog;
+    const { title, description, okText = "global.action.ok", cancelText = "global.action.cancel", size = "md", inputs, validateBeforeSubmit } = formDialog;
 
     const validateRecursive = async (inputList: readonly Field[], currentValues: Record<string, any>, rootValues: Record<string, any>, inheritedDisabled = false): Promise<boolean> => {
         for (const input of inputList) {

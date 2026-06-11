@@ -8,7 +8,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.OpenFile,
-    name: "Open File",
+    name: "menu.file.action.open.file",
     description: "",
     shortcuts: ["Ctrl+P", "Ctrl+O"],
     when: "projectOpened && !isModalOpen",

@@ -1,3 +1,4 @@
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -62,20 +63,20 @@ export default function WorkspaceConsole() {
                     <HStack align="center" className="w-full gap-2">
                         <HStack align="center" className={`text-xs px-4 h-6 w-fit border-b-2 gap-1 ${consoleType === "log" ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`} onClick={() => setConsoleType("log")}>
                             <Info size={12} />
-                            Log
+                            <LocalizedText message="console.tabs.log" />
                         </HStack>
                         <HStack align="center" className={`text-xs px-4 h-6 w-fit border-b-2 gap-1 ${consoleType === "error" ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`} onClick={() => setConsoleType("error")}>
                             <TriangleAlert size={12} />
-                            Error
+                            <LocalizedText message="console.tabs.error" />
                         </HStack>
 
 
-                        <QuickToolTip toolTip="Clear Console">
+                        <QuickToolTip toolTip="console.actions.clear">
                             <Button variant={"ghost"} size={"icon-xs"} className="ml-auto" onClick={clearCurrentConsole}>
                                 <Ban />
                             </Button>
                         </QuickToolTip>
-                        <QuickToolTip toolTip="Close Console">
+                        <QuickToolTip toolTip="console.actions.close">
                             <Button variant={"ghost"} size={"icon-sm"} onClick={closeConsole}>
                                 <ChevronsDown />
                             </Button>

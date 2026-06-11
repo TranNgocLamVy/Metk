@@ -58,7 +58,7 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
     
         if (loadSessionResult.status !== Result.Status.Success) {
             Console.error({
-                message: "Workspace data could not be loaded. Falling back to default workspace.",
+                message: "message.workspace.loadFailFallback",
                 stacks: loadSessionResult.message ? [loadSessionResult.message] : [],
             });
     
@@ -75,7 +75,7 @@ export class WorkspaceManager extends EventEmitter<WorkspaceManagerEvent> {
         }
     
         Console.error({
-            message: "Workspace data is invalid. Falling back to default workspace.",
+            message: "message.workspace.invalidFallback",
             stacks: workspaceResult.message ? [workspaceResult.message] : [],
         });
     

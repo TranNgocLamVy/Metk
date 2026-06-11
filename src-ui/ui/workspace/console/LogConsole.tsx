@@ -26,7 +26,7 @@ export default function LogConsole() {
 
                 {logs.length === 0 && (
                     <div className="w-full text-center p-4 text-muted-foreground text-sm">
-                        No logs to display.
+                        <LocalizedText message="console.empty.logs" />
                     </div>
                 )}
                 <div ref={bottomRef} className="h-1" />

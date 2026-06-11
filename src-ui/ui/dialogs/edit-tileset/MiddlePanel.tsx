@@ -6,6 +6,7 @@ import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
 
 import { useEditTileset } from "./ContextProvider";
 import { SelectedTilePixiRenderer } from "./graphics/selected-tile.renderer";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 
 export function MiddlePanel() {
     const { tileset, selectedTile, selectedCollisionObject } = useEditTileset();
@@ -77,7 +78,7 @@ export function MiddlePanel() {
 
                 {!selectedTile && (
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-                        Select a tile from the left panel to edit collision.
+                        <LocalizedText message="dialog.editTileset.empty.selectTileToEditCollision" />
                     </div>
                 )}
             </div>

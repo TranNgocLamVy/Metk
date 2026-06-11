@@ -68,7 +68,10 @@ export class Ruleset extends BaseObject<RulesetEvent> {
         }
         if (this.id !== data.id) {
             Console.warn({
-                message: `Trying to update Ruleset with mismatching id. Current id: ${this.id}, provided id: ${data.id}`, // TODO: i18n
+                message: {
+                    key: "message.ruleset.updateMismatchingId",
+                    options: { currentId: this.id, providedId: data.id },
+                },
             });
             return;
         }

@@ -38,7 +38,17 @@ vi.mock("react-i18next", () => ({
         init: vi.fn(),
     },
     useTranslation: () => ({
-        t: (message: string, options?: Record<string, any>) => options?.name ? `${message}:${options.name}` : message,
+        t: (message: string, options?: Record<string, any>) => {
+            const translated = {
+                "console.tabs.log": "Log",
+                "console.tabs.error": "Error",
+                "console.actions.clear": "Clear Console",
+                "console.actions.close": "Close Console",
+                "console.empty.logs": "No logs to display.",
+                "console.empty.errors": "No errors.",
+            }[message] ?? message;
+            return options?.name ? `${translated}:${options.name}` : translated;
+        },
     }),
 }));
 

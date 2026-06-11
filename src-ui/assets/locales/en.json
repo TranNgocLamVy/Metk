@@ -14,6 +14,8 @@
             "open": "Open",
             "apply": "Apply",
             "reset": "Reset",
+            "select": "Select",
+            "update": "Update",
             "undo": "Undo",
             "redo": "Redo",
             "cut": "Cut",
@@ -232,6 +234,57 @@
                 "supportDeveloper": "Support developer",
                 "shortcuts": "Shortcuts"
             }
+        },
+        "debug": {
+            "label": "Debug",
+            "action": {
+                "home": "Home",
+                "clearLocalStorage": "Clear Local Storage",
+                "toggleLanguage": "Toggle Language",
+                "printProjects": "Print Projects"
+            }
+        }
+    },
+    "status": {
+        "earlyDevelopment": "App is in early development stage, expect bugs and missing features. Report issues: ",
+        "reportIssuesLink": "Here"
+    },
+    "console": {
+        "tabs": {
+            "log": "Log",
+            "error": "Error"
+        },
+        "actions": {
+            "clear": "Clear Console",
+            "close": "Close Console"
+        },
+        "empty": {
+            "logs": "No logs to display.",
+            "errors": "No errors."
+        }
+    },
+    "errorBoundary": {
+        "title": "Something went wrong:"
+    },
+    "command": {
+        "delete": {
+            "description": "Delete selected entities based on the active context."
+        },
+        "toggleConsole": {
+            "name": "Toggle Console"
+        }
+    },
+    "fileDialog": {
+        "filters": {
+            "project": "Project",
+            "tilemap": "Tilemap",
+            "tileset": "Tileset",
+            "ruleset": "Ruleset",
+            "entityCollection": "Entity Collection",
+            "texture": "Texture",
+            "image": "Image",
+            "images": "Images",
+            "tmx": "TMX"
         }
     },
     "home": {
@@ -278,6 +331,7 @@
                 "delete": "Delete Tileset"
             },
             "contextMenu": {
+                "label": "Edit",
                 "new": "New Tileset",
                 "property": "Tileset Property",
                 "edit": "Edit Tileset",
@@ -291,6 +345,7 @@
             "open": "Open Tilemap",
             "create": "New Tilemap",
             "contextMenu": {
+                "label": "Edit",
                 "new": "New Tilemap",
                 "property": "Tilemap Property",
                 "currentTool": "Current Tool",
@@ -312,6 +367,7 @@
                     "ruleLayer": "Rule Layer",
                     "objectLayer": "Object Layer",
                     "imageLayer": "Image Layer",
+                    "entityLayer": "Entity Layer",
                     "groupLayer": "Group Layer"
                 },
                 "raiseLayer": "Raise Layer",
@@ -453,6 +509,8 @@
                 "cancel": "Cancel"
             },
             "tileset": "Tileset",
+            "setting": "Setting",
+            "marginAndSpacing": "MarginAndSpacing",
             "name": {
                 "label": "Name",
                 "placeholder": "e.g., Forest Props"
@@ -505,6 +563,55 @@
         }
     },
     "dialog": {
+        "exampleProjectTemplate": {
+            "title": "Create Example Project",
+            "description": "Choose a bundled template to clone into a new project."
+        },
+        "project": {
+            "opened": {
+                "title": "Project opened successfully",
+                "description": "Do you want to open this project?"
+            },
+            "created": {
+                "title": "Project created successfully",
+                "description": "Do you want to open the project?"
+            },
+            "exampleCreated": {
+                "title": "Example project created successfully",
+                "description": "Do you want to open the project?"
+            }
+        },
+        "editTileset": {
+            "title": "Edit Tileset",
+            "tileset": "Tileset",
+            "actions": {
+                "addTiles": "Add tiles",
+                "addTileImages": "Add tile images",
+                "deleteSelectedTile": "Delete selected tile"
+            },
+            "empty": {
+                "selectTile": "Select one tile",
+                "selectTileToEditCollision": "Select a tile from the left panel to edit collision."
+            },
+            "properties": {
+                "title": "Properties",
+                "empty": "This tile has no registered properties."
+            },
+            "collisionObjects": {
+                "title": "Collision Objects",
+                "empty": "This tile has no collision objects.",
+                "actions": {
+                    "newBox": "New Boxes Collision",
+                    "newPoint": "New Point Collision",
+                    "newPolygon": "New Polygon Collision"
+                },
+                "defaults": {
+                    "boxName": "Boxes Collision",
+                    "pointName": "Point Collision",
+                    "polygonName": "Polygon Collision"
+                }
+            }
+        },
         "openFile": {
             "title": "Open File",
             "description": "Open Tilemap or Tileset",
@@ -556,6 +663,11 @@
                 "title": "Save Entity Collection"
             }
         },
+        "export": {
+            "tilemap": {
+                "title": "Export Tilemap"
+            }
+        },
         "import": {
             "textureMismatchSize": {
                 "title": "Invalid Texture Size",
@@ -585,6 +697,10 @@
             }
         },
         "remove": {
+            "project": {
+                "title": "Remove Project",
+                "description": "Are you sure you want to remove this project?"
+            },
             "tilemap": {
                 "title": "Remove Tilemap",
                 "description": "Are you sure you want to Remove this tilemap?"
@@ -605,8 +721,98 @@
             }
         }
     },
+    "property": {
+        "group": {
+            "general": "General",
+            "transform": "Transform",
+            "rendering": "Rendering",
+            "physics": "Physics",
+            "gameplay": "Gameplay",
+            "custom": "Custom",
+            "map": "Map",
+            "image": "Image",
+            "layer": "Layer",
+            "properties": "Properties"
+        },
+        "axis": {
+            "x": "X",
+            "y": "Y",
+            "width": "Width",
+            "height": "Height",
+            "column": "Col",
+            "row": "Row"
+        },
+        "common": {
+            "id": "ID",
+            "source": "Source",
+            "size": "Size",
+            "tileSize": "Tile Size",
+            "coordinate": "Coordinate",
+            "offset": "Offset"
+        },
+        "tilemap": {
+            "name": "Map name",
+            "orientation": "Orientation",
+            "mapSize": "Map size",
+            "orientationOptions": {
+                "orthogonal": "Orthogonal",
+                "isometric": "Isometric",
+                "oblique": "Oblique",
+                "staggered": "Staggered",
+                "hexagonal": "Hexagonal"
+            }
+        },
+        "tileset": {
+            "name": "Name",
+            "type": "Type",
+            "typeOptions": {
+                "singleImage": "Single image",
+                "imageCollection": "Image Collection"
+            }
+        },
+        "layer": {
+            "name": "Layer name",
+            "opacity": "Opacity",
+            "visible": "Visible",
+            "locked": "Locked",
+            "type": "Layer Type",
+            "open": "Open",
+            "tintColor": "Tint Color",
+            "repeatX": "Repeat X",
+            "repeatY": "Repeat Y",
+            "parallax": "Parallax"
+        }
+    },
     "message": {
-        "project": {},
+        "project": {
+            "metadataNotFound": "Project meta data not found",
+            "exampleTemplatesNotFound": "No bundled example project templates were found.",
+            "exampleTemplate": {
+                "discoverFail": "Failed to discover bundled example projects: {{error}}",
+                "skipped": "Skipping example project template '{{name}}': {{reason}}",
+                "destinationExists": "Destination already exists: {{path}}",
+                "entryMissing": "Template entry file is missing: {{entry}}",
+                "destinationCreateFail": "Failed to create destination project folder",
+                "manifestMissing": "Missing manifest: {{path}}. {{error}}",
+                "manifestInvalidJson": "Invalid template manifest JSON: {{error}}",
+                "manifestExpectedObject": "Invalid template manifest: expected object",
+                "manifestFieldRequired": "Invalid template manifest: '{{field}}' is required",
+                "versionUnsupported": "Unsupported example template version: {{version}}",
+                "directoryReadFail": "Failed to read template directory '{{path}}': {{error}}",
+                "fileCopyFail": "Failed to copy template file '{{path}}'",
+                "previewCopyFail": "Failed to copy template preview image '{{path}}'",
+                "resourceMetadataInvalid": "Invalid {{resourceName}} metadata in template project",
+                "resourceIdMismatch": "Template {{resourceName}} id mismatch: metadata '{{metadataId}}' does not match file '{{fileId}}'",
+                "resourceFileMissing": "Missing referenced {{resourceName}} file: {{path}}. {{error}}",
+                "resourceInvalidJson": "Invalid {{resourceName}} JSON: {{path}}",
+                "resourceDataInvalid": "Invalid {{resourceName}} data: {{path}}. {{error}}",
+                "resourceSaveFail": "Failed to save remapped template resource: {{path}}"
+            }
+        },
+        "workspace": {
+            "loadFailFallback": "Workspace data could not be loaded. Falling back to default workspace.",
+            "invalidFallback": "Workspace data is invalid. Falling back to default workspace."
+        },
         "tilemap": {
             "loadSuccess": "Tilemap loaded",
             "createSuccess": "Tilemap created successfully",
@@ -645,6 +851,7 @@
             "saveFail": "Tileset save failed",
             "deleteFail": "Tileset deletion failed",
             "importFail": "Tileset import failed",
+            "addTilesFail": "Failed to add tiles.",
             "notFound": "Tileset not found: id: {{id}}",
             "metadataNotFound": "Tileset metadata not found: id: {{id}}",
             "mismatchId": "Mismatching id between tileset",
@@ -673,7 +880,8 @@
             "notFound": "Ruleset not found: id: {{id}}",
             "metadataNotFound": "Ruleset metadata not found: id: {{id}}",
             "mismatchId": "Mismatching id between ruleset",
-            "unknownError": "Unknown error when load ruleset"
+            "unknownError": "Unknown error when load ruleset",
+            "updateMismatchingId": "Trying to update Ruleset with mismatching id. Current id: {{currentId}}, provided id: {{providedId}}"
         },
         "entityCollection": {
             "loadSuccess": "Entity collection loaded",
@@ -694,6 +902,7 @@
             "entityEditFail": "Entity update failed",
             "entityDeleteFail": "Entity deletion failed",
             "entityCloneFail": "Entity clone failed",
+            "normalizeFail": "Failed to normalize entity collection data. Update aborted.",
             "entityNotFound": "Entity not found: id: {{id}}",
             "notFound": "Entity collection not found: id: {{id}}",
             "metadataNotFound": "Entity collection metadata not found: id: {{id}}",

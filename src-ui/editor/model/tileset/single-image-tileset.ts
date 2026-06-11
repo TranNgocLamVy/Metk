@@ -10,8 +10,8 @@ import { normalizeTilesetData } from "./tileset.normalizer";
 
 export class SingleImageTileset extends Tileset {
     @StringProperty<SingleImageTileset>({
-        label: "Source",
-        group: "Image",
+        label: "property.common.source",
+        group: "property.group.image",
         order: 1,
         readonly: true,
         get: (target) => target.imageSource?.source ?? "",
@@ -19,11 +19,11 @@ export class SingleImageTileset extends Tileset {
     public imageSource: ImageSource;
 
     @Point2DProperty<SingleImageTileset>({
-        label: "Size",
-        group: "Image",
+        label: "property.common.size",
+        group: "property.group.image",
         order: 2,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         get: (target) => ({
             x: target.imageSource.width,
             y: target.imageSource.height,

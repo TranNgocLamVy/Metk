@@ -8,10 +8,11 @@ import { SystemCommand } from "../commands/command.decorator";
 import { ExportStorageService } from "@/infrastructure/export-storage.service";
 import { FileDialogService } from "@/infrastructure/container";
 import { SYSTEM_COMMAND_IDS } from "./command-ids";
+import i18n from "@/app/providers/i18n";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapExportTmx,
-    name: "Export Tilemap",
+    name: "global.action.tilemap.export",
     description: "",
     shortcuts: ["Ctrl+E"],
     when: "tilmapSessionOpened && !isModalOpen",
@@ -29,9 +30,9 @@ export class ExportTilemapTMXCommand implements ISystemCommand {
         let exportPath = exportPathManager.getExportPath(tilemap.id);
         if (!exportPath) {
             const savePath = await FileDialogService.saveFile({
-                filters: [{ name: "TMX", extensions: ["tmx"] }],
+                filters: [{ name: i18n.t("fileDialog.filters.tmx"), extensions: ["tmx"] }],
                 canCreateDirectories: true,
-                title: "Export Tilemap", // TODO: i18n
+                title: i18n.t("dialog.export.tilemap.title"),
             });
             if (!savePath) return Result.Cancel();
             exportPath = savePath;

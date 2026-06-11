@@ -155,7 +155,7 @@ describe("ProjectManager", () => {
 
         expect(result).toMatchObject({
             status: Result.Status.Error,
-            message: { key: "Project meta data not found" },
+            message: { key: "message.project.metadataNotFound" },
         });
         expect(ProjectStorageService.load).not.toHaveBeenCalled();
     });

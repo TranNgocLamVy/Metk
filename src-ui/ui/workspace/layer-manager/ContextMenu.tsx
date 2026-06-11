@@ -64,7 +64,7 @@ const CreateActionGroup: MenuDropDownGroupType = [
 	},
 	{
 		type: "subMenu",
-		label: "Group",
+		label: "workspace.layerManager.contextMenu.group.label",
 		subMenusClassName: "w-60",
 		subMenus: [
 			[

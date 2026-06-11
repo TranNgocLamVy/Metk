@@ -155,7 +155,7 @@ export class EntityCollection extends BaseObject<EntityCollectionEvent> {
         try {
             data = normalizeEntityCollectionData(fileData);
         } catch {
-            Console.error({ message: "Failed to normalize entity collection data. Update aborted." });
+            Console.error({ message: "message.entityCollection.normalizeFail" });
             return;
         }
 

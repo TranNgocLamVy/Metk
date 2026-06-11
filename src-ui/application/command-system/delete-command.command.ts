@@ -7,8 +7,8 @@ import { Result } from "@/shared/types/result";
 
 @SystemCommand({
     id: "workspace.delete",
-    name: "Delete",
-    description: "Delete selected entities based on the active context.",
+    name: "global.action.delete",
+    description: "command.delete.description",
     shortcuts: ["DELETE"],
     when: "tilmapSessionOpened && !isModalOpen",
 })

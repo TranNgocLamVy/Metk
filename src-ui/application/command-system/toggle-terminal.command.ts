@@ -7,7 +7,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.ToggleConsole,
-    name: "Toggle Console",
+    name: "command.toggleConsole.name",
     description: "",
     shortcuts: ["Ctrl+`"],
     when: "!isModalOpen",

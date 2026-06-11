@@ -6,6 +6,7 @@ import { Checkbox } from "@/ui/components/shadcn/checkbox";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { Label } from "@/ui/components/shadcn/label";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
+import { useTranslation } from "react-i18next";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
 
 export interface BooleanEditorProps {
@@ -13,6 +14,7 @@ export interface BooleanEditorProps {
 }
 
 export function BooleanPropertyEditor({ property }: BooleanEditorProps) {
+    const { t } = useTranslation();
     const version = usePropertyStoreVersion()
 
     const [draft, setDraft] = useState<boolean>(property.getter());
@@ -31,7 +33,7 @@ export function BooleanPropertyEditor({ property }: BooleanEditorProps) {
 
     return (
         <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] px-2 h-8 items-center gap-2">
-            <Label title={property.label} className="text-2xs min-w-0 truncate">
+            <Label title={t(property.label)} className="text-2xs min-w-0 truncate">
                 <LocalizedText message={property.label} />
             </Label>
 

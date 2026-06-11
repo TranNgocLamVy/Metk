@@ -44,7 +44,7 @@ export async function createEntityCollection(): Promise<void> {
             defaultPath: currentProject.projectPathSystem.absDir,
             filters: [
                 {
-                    name: "Entity Collection",
+                    name: i18n.t("fileDialog.filters.entityCollection"),
                     extensions: ["ec.json"],
                 },
             ],

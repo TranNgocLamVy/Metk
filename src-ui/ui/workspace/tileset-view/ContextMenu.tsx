@@ -78,7 +78,7 @@ const Group3: MenuDropDownGroupType = [
 ];
 
 export const TilesetViewContextMenu: MenuItemType = {
-    label: "Edit",
+    label: "workspace.tilesetSelector.contextMenu.label",
     className: "w-60",
     groups: [Group1, Group2, Group3],
 };

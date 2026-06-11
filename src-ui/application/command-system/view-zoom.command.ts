@@ -6,7 +6,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapViewZoomIn,
-    name: "Zoom In",
+    name: "menu.view.action.zoomIn",
     description: "",
     shortcuts: ["Ctrl+="],
     when: "tilmapSessionOpened && !isModalOpen",
@@ -27,7 +27,7 @@ export class ViewZoomInCommand implements ISystemCommand {
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapViewZoomOut,
-    name: "Zoom Out",
+    name: "menu.view.action.zoomOut",
     description: "",
     shortcuts: ["Ctrl+-"],
     when: "tilmapSessionOpened && !isModalOpen",
@@ -48,7 +48,7 @@ export class ViewZoomOutCommand implements ISystemCommand {
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapViewNormalSize,
-    name: "Normal Size",
+    name: "menu.view.action.normalSize",
     description: "",
     shortcuts: ["Ctrl+0"],
     when: "tilmapSessionOpened && !isModalOpen",
@@ -69,7 +69,7 @@ export class ViewNormalSizeCommand implements ISystemCommand {
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapViewFitMapInView,
-    name: "Fit Map in View",
+    name: "menu.view.action.fitMapInView",
     description: "",
     shortcuts: ["Ctrl+\\"],
     when: "tilmapSessionOpened && !isModalOpen",

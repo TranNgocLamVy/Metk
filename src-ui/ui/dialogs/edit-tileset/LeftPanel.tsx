@@ -2,6 +2,7 @@ import { Application as PixiReactApplication } from "@pixi/react";
 import { Plus, Trash2 } from "lucide-react";
 import { Application as PixiApp } from "pixi.js";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ImageCollectionTileset } from "@/editor/model/tileset/image-collection-tileset";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
@@ -10,8 +11,10 @@ import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
 
 import { useEditTileset } from "./ContextProvider";
 import { renderTilesetOverview } from "./graphics/tileset-overview.renderer";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 
 export function LeftPanel() {
+    const { t } = useTranslation();
     const { tileset, tilesetName, selectedTileId, version, actions } = useEditTileset();
     const { selectTile } = actions;
     const isImageCollectionTileset = tileset instanceof ImageCollectionTileset;
@@ -56,7 +59,7 @@ export function LeftPanel() {
             <VStack className="gap-2">
                 <HStack className="items-center gap-2">
                     <span className="text-sm font-semibold shrink-0">
-                        Edit Tileset
+                        <LocalizedText message="dialog.editTileset.title" />
                     </span>
                 </HStack>
 
@@ -69,7 +72,7 @@ export function LeftPanel() {
 
             <VStack className="flex-1 min-h-0 bg-surface-base shadow-sm">
                 <header className="px-2 py-1.5 text-xs font-semibold bg-foreground/40 text-accent-foreground/80">
-                    Tileset
+                    <LocalizedText message="dialog.editTileset.tileset" />
                 </header>
 
                 <HStack className="bg-surface w-full px-1 py-1 gap-0.5">
@@ -77,7 +80,7 @@ export function LeftPanel() {
                         variant="ghost"
                         size="icon-sm"
                         type="button"
-                        title="Add tile images"
+                        title={t("dialog.editTileset.actions.addTileImages")}
                         disabled={!isImageCollectionTileset}
                         onClick={actions.addImageTiles}
                     >
@@ -87,7 +90,7 @@ export function LeftPanel() {
                         variant="ghost"
                         size="icon-sm"
                         type="button"
-                        title="Delete selected tile"
+                        title={t("dialog.editTileset.actions.deleteSelectedTile")}
                         className="text-destructive"
                         disabled={!isImageCollectionTileset || selectedTileId == null}
                         onClick={actions.removeSelectedTile}
@@ -108,11 +111,11 @@ export function LeftPanel() {
 
             <HStack justify="end" className="w-full gap-2">
                 <Button variant="outline" type="button" onClick={actions.closeDialog}>
-                    Cancel
+                    <LocalizedText message="global.action.cancel" />
                 </Button>
 
                 <Button type="button" onClick={actions.updateTileset}>
-                    Update
+                    <LocalizedText message="global.action.update" />
                 </Button>
             </HStack>
         </VStack>

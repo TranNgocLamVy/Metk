@@ -52,17 +52,17 @@ export function groupProperties(properties: Map<string, BaseProperty<any>>): Pro
 
 function getGroupOrder(groupName: string): number {
     switch (groupName) {
-        case "General":
+        case "property.group.general":
             return 0;
-        case "Transform":
+        case "property.group.transform":
             return 10;
-        case "Rendering":
+        case "property.group.rendering":
             return 20;
-        case "Physics":
+        case "property.group.physics":
             return 30;
-        case "Gameplay":
+        case "property.group.gameplay":
             return 40;
-        case "Custom":
+        case "property.group.custom":
             return 100;
         default:
             return 50;

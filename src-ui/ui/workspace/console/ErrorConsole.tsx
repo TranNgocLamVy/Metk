@@ -24,7 +24,7 @@ export default function ErrorConsole() {
                 ))}
                 {errors.length === 0 && (
                     <div className="w-full text-center p-4 text-muted-foreground text-sm">
-                        No errors.
+                        <LocalizedText message="console.empty.errors" />
                     </div>
                 )}
                 <div ref={bottomRef} className="h-1" />

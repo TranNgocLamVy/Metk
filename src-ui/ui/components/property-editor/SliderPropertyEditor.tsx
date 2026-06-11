@@ -9,6 +9,7 @@ import { Label } from "@/ui/components/shadcn/label";
 import { Slider } from "@/ui/components/shadcn/slider";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { useTranslation } from "react-i18next";
 
 export interface SliderEditorProps {
     property: NumberPropertyClass<any>;
@@ -20,6 +21,7 @@ export interface SliderEditorProps {
 }
 
 export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
+    const { t } = useTranslation();
     const version = usePropertyStoreVersion();
 
     const [draft, setDraft] = useState<number>(property.getter());
@@ -81,7 +83,7 @@ export function SliderPropertyEditor({ property, slider }: SliderEditorProps) {
 
     return (
         <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] px-2 h-8 items-center gap-2">
-            <Label title={property.label} className="text-2xs min-w-0 truncate">
+            <Label title={t(property.label)} className="text-2xs min-w-0 truncate">
                 <LocalizedText message={property.label} />
             </Label>
 

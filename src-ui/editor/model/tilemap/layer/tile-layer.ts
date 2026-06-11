@@ -24,28 +24,28 @@ export class TileLayer extends BaseLayer<TileLayerEvents> {
     public tilesRef: (TileRef | null)[][] = [];
 
     @Point2DProperty<TileLayer>({
-        label: "Size",
-        group: "Properties",
+        label: "property.common.size",
+        group: "property.group.properties",
         order: 4,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         get: (target) => ({ x: target.size.width, y: target.size.height }),
     })
     public size: { width: number, height: number } = { width: 0, height: 0 }
 
     @Point2DProperty<TileLayer>({
-        label: "Coordinate",
-        group: "Properties",
+        label: "property.common.coordinate",
+        group: "property.group.properties",
         order: 5,
         readonly: true,
-        pointLabel: { x: "Col", y: "Row" },
+        pointLabel: { x: "property.axis.column", y: "property.axis.row" },
         get: (target) => ({ x: target.offset.x, y: target.offset.y }),
     })
     public coordinate: Coordinate = { col: 0, row: 0 };
 
     @Point2DProperty<TileLayer>({
-        label: "Offset",
-        group: "Properties",
+        label: "property.common.offset",
+        group: "property.group.properties",
         order: 6,
         readonly: true,
         set: (target, value, meta) => target.updateOffset(value.x, value.y, meta),

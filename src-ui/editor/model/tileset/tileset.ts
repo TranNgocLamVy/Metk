@@ -28,14 +28,14 @@ interface TilesetEvent extends BaseObjectEvents {
 
 export abstract class Tileset extends BaseObject<TilesetEvent> {
     @StringProperty<Tileset>({
-        label: "ID",
+        label: "property.common.id",
         readonly: true,
         get: (target) => target.id,
     })
     public id: string;
 
     @StringProperty<Tileset>({
-        label: "Name",
+        label: "property.tileset.name",
         get: (target) => target.name,
         set: (target, value, meta) => {
             target.rename(value, meta);
@@ -44,25 +44,25 @@ export abstract class Tileset extends BaseObject<TilesetEvent> {
     public name: string;
 
     @EnumProperty<Tileset>({
-        label: "Type",
+        label: "property.tileset.type",
         order: 3,
         readonly: true,
         get: (target) => target.type,
         options: () => {
             return [
-                { label: "Single image", value: "single-image" },
-                { label: "Image Collection", value: "image-collection" },
+                { label: "property.tileset.typeOptions.singleImage", value: "single-image" },
+                { label: "property.tileset.typeOptions.imageCollection", value: "image-collection" },
             ];
         },
     })
     public type: TilesetType;
 
     @Point2DProperty<Tileset>({
-        label: "Tile Size",
-        group: "Properties",
+        label: "property.common.tileSize",
+        group: "property.group.properties",
         order: 1,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         visible: (target) => target.type === TilesetType.SingleImage,
         get: (target) => ({
             x: target.tileWidth,
@@ -199,15 +199,15 @@ interface TileEvent extends BaseObjectEvents { }
 
 export class Tile extends BaseObject<TileEvent> {
     @NumberProperty<Tile>({
-        label: "ID",
+        label: "property.common.id",
         readonly: true,
         get: (target) => target.id,
     })
     public id: number;
 
     @StringProperty<Tile>({
-        label: "Source",
-        group: "Image",
+        label: "property.common.source",
+        group: "property.group.image",
         readonly: true,
         visible: (target) => !!target.imageSource?.source,
         get: (target) => target.imageSource?.source ?? "",
@@ -215,11 +215,11 @@ export class Tile extends BaseObject<TileEvent> {
     public imageSource: ImageSource | null;
 
     @Point2DProperty<Tile>({
-        label: "Size",
-        group: "Image",
+        label: "property.common.size",
+        group: "property.group.image",
         order: 1,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         visible: (target) => !!target.imageSource?.source,
         get: (target) => ({
             x: target.imageSource?.width ?? target.tileset.tileWidth,
@@ -229,11 +229,11 @@ export class Tile extends BaseObject<TileEvent> {
     private imageSize: any;
 
     @Point2DProperty<Tile>({
-        label: "Tile Size",
-        group: "Properties",
+        label: "property.common.tileSize",
+        group: "property.group.properties",
         order: 1,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         visible: (target) => target.imageSource == null,
         get: (target) => ({
             x: target.tileset.tileWidth,

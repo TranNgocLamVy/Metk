@@ -27,7 +27,7 @@ export async function createTileset(): Promise<void> {
 
         const defaultTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
 
-        const tilesetAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        const tilesetAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.tileset.title"), defaultPath: defaultTilesetDir, filters: [{ name: i18n.t("fileDialog.filters.tileset"), extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return;
 
         const tilesetAbsDir = PathUtils.dirname(tilesetAbsPath);
@@ -119,7 +119,7 @@ export async function importTileset(refTilesetId?: string): Promise<Result> {
 
         const defaultTilesetDir = currentWorkspace.savedPathManager.getTilesetDir();
 
-        const tilesetAbsPath = await FileDialogService.open({ defaultPath: defaultTilesetDir, multiple: false, filters: [{ name: "Tileset", extensions: ["ts.json"] }] });
+        const tilesetAbsPath = await FileDialogService.open({ defaultPath: defaultTilesetDir, multiple: false, filters: [{ name: i18n.t("fileDialog.filters.tileset"), extensions: ["ts.json"] }] });
         if (!tilesetAbsPath) return Result.Cancel();
 
         const loadTilesetResult = await TilesetStorageService.load(tilesetAbsPath);

@@ -7,6 +7,7 @@ import { PathUtils } from "@/shared/utils/path.utils";
 import { Console } from "@/ui/notifications/console-gateway";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
+import i18n from "@/app/providers/i18n";
 
 export async function importTexture(tilesetId: string): Promise<Result> {
         const editorFacade = appKernel.editorFacade;
@@ -17,7 +18,7 @@ export async function importTexture(tilesetId: string): Promise<Result> {
 
         const defaultTextureDir = currentWorkspace.savedPathManager.getTextureDir();
 
-        const textureAbsPath = await FileDialogService.open({ defaultPath: defaultTextureDir, multiple: false, filters: [{ name: "Texture", extensions: ["png", "jpg", "jpeg"] }] });
+        const textureAbsPath = await FileDialogService.open({ defaultPath: defaultTextureDir, multiple: false, filters: [{ name: i18n.t("fileDialog.filters.texture"), extensions: ["png", "jpg", "jpeg"] }] });
         if (!textureAbsPath) return Result.Cancel();
 
         const buffer = await FileSystemService.readFile(textureAbsPath);

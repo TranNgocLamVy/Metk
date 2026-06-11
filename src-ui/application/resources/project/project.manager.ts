@@ -1,11 +1,11 @@
-import { Result } from "@/shared/types/result";
-import { PathUtils } from "@/shared/utils/path.utils";
-import { ProjectStorageService } from "@/infrastructure/container";
-import { ProjectPathSystem } from "@/infrastructure/project-path-system";
-import EventEmitter from "eventemitter3";
-import { ProjectMetadata } from "@/shared/data-types/project.data";
 import { Project } from "@/editor/model/project/project";
 import { normalizeProjectMetadataRepo } from "@/editor/model/project/project.normalizer";
+import { ProjectStorageService } from "@/infrastructure/container";
+import { ProjectPathSystem } from "@/infrastructure/project-path-system";
+import { ProjectMetadata } from "@/shared/data-types/project.data";
+import { Result } from "@/shared/types/result";
+import { PathUtils } from "@/shared/utils/path.utils";
+import EventEmitter from "eventemitter3";
 
 type ProjectManagerEvent = {
     onProjectMetadatasChanged: (projectMetadata: ProjectMetadata[]) => void;
@@ -36,7 +36,7 @@ export class ProjectManager extends EventEmitter<ProjectManagerEvent> {
         }
 
         const metaData = this.projectMetadataMap.get(projectId);
-        if (!metaData) return Result.Error("Project meta data not found"); // TODO: i18n
+        if (!metaData) return Result.Error("message.project.metadataNotFound");
 
         const projectAbsPath = PathUtils.join(metaData.directory, ".metk", "project.json");
         const loadProjectResult = await ProjectStorageService.load(projectAbsPath);

@@ -17,6 +17,7 @@ import {
     useHorizontalNumberDrag,
 } from "./number-drag.utils";
 import { clonePropertyValue, executeUpdatePropertyCommand, previewUpdateProperty } from "./property-command.utils";
+import { useTranslation } from "react-i18next";
 
 type Point2DDraft = Record<keyof Point2D, string>;
 
@@ -25,6 +26,7 @@ export interface Point2DEditorProps {
 }
 
 export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
+    const { t } = useTranslation();
     const version = usePropertyStoreVersion()
 
     const [error, setError] = useState<TranslatableMessage | null>(null);
@@ -203,7 +205,7 @@ export function Point2DPropertyEditor({ property }: Point2DEditorProps) {
             <div className="flex h-8 items-center gap-2" onClick={toggleOpen}>
                 <ChevronUp size={14} className={`${isOpen ? "rotate-180" : "rotate-90"} duration-50`} />
 
-                <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <Label title={t(property.label)} className="text-2xs min-w-0 truncate">
                     <LocalizedText message={property.label} />
                 </Label>
             </div>
@@ -281,6 +283,7 @@ function PointAxisInput({
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
 }) {
+    const { t } = useTranslation();
     const { isDragging, dragProps } = useHorizontalNumberDrag({
         disabled,
         getValue,
@@ -299,9 +302,9 @@ function PointAxisInput({
                     disabled ? "cursor-default" : "cursor-ew-resize",
                     isDragging ? "text-primary" : "",
                 ].join(" ")}
-                title={label}
+                title={t(label)}
             >
-                {label}
+                <LocalizedText message={label} />
             </span>
 
             <Input

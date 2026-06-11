@@ -85,7 +85,7 @@ function EditTilesetDialogContainer({ dialogId, clonedTileset }: { dialogId: str
                     onOpenAutoFocus={(event) => event.preventDefault()}
                     showCloseButton={false}
                 >
-                    <DialogTitle className="hidden"><LocalizedText message={"Edit Tileset"} /></DialogTitle>
+                    <DialogTitle className="hidden"><LocalizedText message="dialog.editTileset.title" /></DialogTitle>
 
                     <HStack className="w-full h-full min-h-0 gap-4">
                         <LeftPanel />

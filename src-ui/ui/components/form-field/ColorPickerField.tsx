@@ -6,6 +6,7 @@ import { Input } from "@/ui/components/shadcn/input";
 import { Label } from "@/ui/components/shadcn/label";
 import { useState } from "react";
 import { SketchPicker } from 'react-color';
+import { useTranslation } from "react-i18next";
 
 interface ColorPickerProps {
 	id: string;
@@ -20,6 +21,7 @@ interface ColorPickerProps {
 
 export function ColorPickerField(props: ColorPickerProps) {
 	const { id, name, label, defaultValue, placeholder, value, disabled, onChange } = props;
+	const { t } = useTranslation();
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [color, setColor] = useState(value ?? defaultValue ?? "#ffffff");
@@ -55,7 +57,7 @@ export function ColorPickerField(props: ColorPickerProps) {
 		<div className="grid grid-cols-[max-content_minmax(0,1fr)] h-full items-center gap-2">
 			<Label htmlFor={id} className="text-2xs"><LocalizedText message={label} /></Label>
 			<HStack className="gap-2">
-				<Input id={id} name={name} type="text" placeholder={placeholder} value={color} disabled={disabled} onChange={(e) => handleChange(e.target.value)} className="flex-1 text-2xs h-6" />
+				<Input id={id} name={name} type="text" placeholder={placeholder ? t(placeholder) : undefined} value={color} disabled={disabled} onChange={(e) => handleChange(e.target.value)} className="flex-1 text-2xs h-6" />
 				<DropdownMenu open={isOpen} modal>
 					<DropdownMenuTrigger asChild disabled={disabled} onClick={() => setIsOpen(true)}>
 						<div className="w-6 h-6" style={{ backgroundColor: color ? color : "#ffffff" }} />
@@ -65,8 +67,8 @@ export function ColorPickerField(props: ColorPickerProps) {
 							<style>{`.custom-sketch-picker label { color: var(--foreground) !important; }`}</style>
 							<SketchPicker color={color} onChange={(color) => handleChange(color.hex)} styles={customStyles} disableAlpha presetColors={[]} />
 							<HStack className="gap-2">
-								<Button variant="outline" className="ml-auto" type="reset" size="sm" onClick={() => handleClose()}>Reset</Button>
-								<Button type="button" size="sm" onClick={() => handleSubmit()}>Select</Button>
+								<Button variant="outline" className="ml-auto" type="reset" size="sm" onClick={() => handleClose()}><LocalizedText message="global.action.reset" /></Button>
+								<Button type="button" size="sm" onClick={() => handleSubmit()}><LocalizedText message="global.action.select" /></Button>
 							</HStack>
 						</VStack>
 					</DropdownMenuContent>

@@ -63,7 +63,30 @@ vi.mock("react-i18next", () => ({
         init: vi.fn(),
     },
     useTranslation: () => ({
-        t: (message: string) => message,
+        t: (message: string) => ({
+            "global.action.cancel": "Cancel",
+            "global.action.close": "Close",
+            "global.action.update": "Update",
+            "dialog.editTileset.title": "Edit Tileset",
+            "dialog.editTileset.tileset": "Tileset",
+            "dialog.editTileset.actions.addTileImages": "Add tile images",
+            "dialog.editTileset.actions.deleteSelectedTile": "Delete selected tile",
+            "dialog.editTileset.empty.selectTile": "Select one tile",
+            "dialog.editTileset.empty.selectTileToEditCollision": "Select a tile from the left panel to edit collision.",
+            "dialog.editTileset.properties.title": "Properties",
+            "dialog.editTileset.properties.empty": "This tile has no registered properties.",
+            "dialog.editTileset.collisionObjects.title": "Collision Objects",
+            "dialog.editTileset.collisionObjects.empty": "This tile has no collision objects.",
+            "property.common.id": "ID",
+            "property.common.source": "Source",
+            "property.common.size": "Size",
+            "property.common.tileSize": "Tile Size",
+            "property.axis.width": "Width",
+            "property.axis.height": "Height",
+            "property.group.general": "General",
+            "property.group.image": "Image",
+            "property.group.properties": "Properties",
+        }[message] ?? message),
     }),
 }));
 
@@ -375,7 +398,7 @@ describe("Metk dialog and form integration workflows", () => {
 
         renderDialogRoot();
 
-        await user.click(screen.getByRole("button", { name: "global.action.cancel" }));
+        await user.click(screen.getByRole("button", { name: "Cancel" }));
 
         expect(resolve).toHaveBeenCalledWith("cancel");
         expect(useDialogStore.getState().dialogs).toEqual([]);

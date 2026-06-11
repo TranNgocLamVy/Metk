@@ -6,7 +6,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapUndo,
-    name: "Undo",
+    name: "global.action.undo",
     description: "",
     shortcuts: ["Ctrl+Z"],
     when: "tilmapSessionOpened && !isModalOpen || undoableDialogOpen",

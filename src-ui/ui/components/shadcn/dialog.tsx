@@ -6,6 +6,7 @@ import * as React from "react";
 
 import { Button } from "./button";
 import { cn } from "./utils/shadcn-utils";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
 	return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -51,7 +52,7 @@ function DialogContent({
 					<DialogPrimitive.Close data-slot="dialog-close" asChild>
 						<Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
 							<XIcon />
-							<span className="sr-only">Close</span>
+							<span className="sr-only"><LocalizedText message="global.action.close" /></span>
 						</Button>
 					</DialogPrimitive.Close>
 				)}
@@ -81,7 +82,7 @@ function DialogFooter({
 			{children}
 			{showCloseButton && (
 				<DialogPrimitive.Close asChild>
-					<Button variant="outline">Close</Button>
+					<Button variant="outline"><LocalizedText message="global.action.close" /></Button>
 				</DialogPrimitive.Close>
 			)}
 		</div>

@@ -49,9 +49,9 @@ export default function ContextBar() {
 
             </HStack>
             <HStack align="center" justify="center" className="ml-auto text-xs">
-                <span className="text-foreground">App is in early development stage, expect bugs and missing features. Report issues: </span>
+                <span className="text-foreground"><LocalizedText message="status.earlyDevelopment" /></span>
                 <a href="https://github.com/TranNgocLamVy/Metk/issues" target="_blank" rel="noopener noreferrer" className="text-accent underline ml-1" >
-                    Here
+                    <LocalizedText message="status.reportIssuesLink" />
                 </a>
             </HStack>
         </HStack>

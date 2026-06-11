@@ -92,31 +92,31 @@ const EditGroup: MenuDropDownGroupType = [
 const SnappingGroup: MenuDropDownGroupType = [
 	{
 		type: "subMenu",
-		label: "Snapping",
+		label: "menu.view.action.snapping.label",
 		startIcon: <Grid3x3 className="stroke-1" />,
         subMenusClassName: "w-60",
 		subMenus: [
 			[
 				{
 					type: "radio",
-					label: "Snapping",
+					label: "menu.view.action.snapping.label",
 					value: () => "Pixel",
 					onValueChange(value) {},
 					items: [
 						{
-							label: "No Snapping",
+							label: "menu.view.action.snapping.noSnapping",
 							value: "None",
 						},
 						{
-							label: "Snap to Grid",
+							label: "menu.view.action.snapping.snapToGrid",
 							value: "Grid",
 						},
 						{
-							label: "Snap to Fine Grid",
+							label: "menu.view.action.snapping.snapToFineGrid",
 							value: "FineGrid",
 						},
 						{
-							label: "Snap to Pixel",
+							label: "menu.view.action.snapping.snapToPixel",
 							value: "Pixel",
 						},
 					],
@@ -191,7 +191,7 @@ const DeleteGroup: MenuDropDownGroupType = [
 ];
 
 export const TilemapEditorContextMenu: MenuItemType = {
-	label: "Edit",
+	label: "workspace.tilemapEditor.contextMenu.label",
 	className: "w-60",
 	groups: [BrushGroup, UndoRedoGroup, GridGroup, ActionGroup, DeleteGroup],
 };

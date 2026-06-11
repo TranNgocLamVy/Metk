@@ -58,7 +58,7 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                         label: "form.tileset.image.source",
                         required: true,
                         filter: {
-                            name: "Image",
+                            name: "fileDialog.filters.image",
                             extensions: ["png", "jpg", "jpeg"],
                         },
                     },
@@ -66,7 +66,7 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                         id: "setting",
                         name: "setting",
                         type: "group",
-                        label: "Setting",
+                        label: "form.tileset.setting",
                         showFrame: false,
                         orientation: "horizontal",
                         inputs: [
@@ -100,7 +100,7 @@ export const createTilesetForm = (textureDefaultDir?: string) => {
                                 id: "marginSpacing",
                                 name: "marginAndSpacing",
                                 type: "group",
-                                label: "MarginAndSpacing",
+                                label: "form.tileset.marginAndSpacing",
                                 showFrame: false,
                                 orientation: "vertical",
                                 inputs: [

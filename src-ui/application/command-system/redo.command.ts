@@ -6,7 +6,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapRedo,
-    name: "Redo",
+    name: "global.action.redo",
     description: "",
     shortcuts: ["Ctrl+Y"],
     when: "tilmapSessionOpened && !isModalOpen || undoableDialogOpen",

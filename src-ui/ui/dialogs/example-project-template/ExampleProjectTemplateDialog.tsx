@@ -4,6 +4,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
 import { useDialogStore } from "@/ui/stores/dialog.store";
 import type { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
+import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 
 type ExampleProjectTemplateDialogProps = BaseDialogProps & {
     templates: DiscoveredExampleProjectTemplate[];
@@ -28,10 +29,10 @@ export function ExampleProjectTemplateDialog({
             >
                 <DialogHeader>
                     <DialogTitle>
-                        <p className="text-md font-medium">Create Example Project</p>
+                        <p className="text-md font-medium"><LocalizedText message="dialog.exampleProjectTemplate.title" /></p>
                     </DialogTitle>
                     <DialogDescription>
-                        Choose a bundled template to clone into a new project.
+                        <LocalizedText message="dialog.exampleProjectTemplate.description" />
                     </DialogDescription>
                 </DialogHeader>
 
@@ -84,7 +85,7 @@ export function ExampleProjectTemplateDialog({
                             size="sm"
                             onClick={() => close(null)}
                         >
-                            Cancel
+                            <LocalizedText message="global.action.cancel" />
                         </Button>
                     </DialogClose>
                 </DialogFooter>

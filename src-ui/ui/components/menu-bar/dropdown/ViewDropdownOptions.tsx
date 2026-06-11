@@ -192,7 +192,7 @@ const ViewDropdownOptionGroup2: MenuDropDownGroupType = [
 	},
 	{
 		type: "check",
-		label: "Highlight Current Layer",
+		label: "menu.view.action.highlightCurrentLayer",
 		checked: () => getSetting(SETTING_KEYS.View.HighlightCurrentLayer),
 		toggle: () => toggleSetting(SETTING_KEYS.View.HighlightCurrentLayer),
 		disabled: () => true,

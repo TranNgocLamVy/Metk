@@ -7,7 +7,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
 @SystemCommand({
     id: SYSTEM_COMMAND_IDS.TilemapSaveAll,
-    name: "Save All",
+    name: "menu.file.action.saveAll",
     description: "",
     shortcuts: ["Ctrl+Shift+S"],
     when: "tilmapSessionOpened && !isModalOpen",

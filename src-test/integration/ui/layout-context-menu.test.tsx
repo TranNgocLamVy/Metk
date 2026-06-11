@@ -45,7 +45,9 @@ vi.mock("react-i18next", () => ({
         init: vi.fn(),
     },
     useTranslation: () => ({
-        t: (message: string) => message,
+        t: (message: string) => ({
+            "errorBoundary.title": "Something went wrong:",
+        }[message] ?? message),
     }),
 }));
 

@@ -14,6 +14,7 @@ import {
     ExampleProjectCloneResult,
     ExampleProjectTemplateManifest,
 } from "./example-project.types";
+import i18n from "@/app/providers/i18n";
 
 const EXAMPLE_PROJECTS_RESOURCE_DIR = "data/example-projects";
 const MANIFEST_FILE_NAME = "example-template.manifest.json";
@@ -41,7 +42,10 @@ export class ExampleProjectService {
                 entries = await this.fileSystem.readDir(root.path, root.storageOptions);
             } catch (error) {
                 if (root.path === EXAMPLE_PROJECTS_RESOURCE_DIR) {
-                    return Result.Error(`Failed to discover bundled example projects: ${String(error)}`);
+                    return Result.Error({
+                        key: "message.project.exampleTemplate.discoverFail",
+                        options: { error: String(error) },
+                    });
                 }
                 continue;
             }
@@ -55,7 +59,13 @@ export class ExampleProjectService {
 
                 if (manifestResult.status !== Result.Status.Success) {
                     Console.warn({
-                        message: `Skipping example project template '${entry.name}': ${messageToString(manifestResult.message)}`,
+                        message: {
+                            key: "message.project.exampleTemplate.skipped",
+                            options: {
+                                name: entry.name,
+                                reason: messageToString(manifestResult.message),
+                            },
+                        },
                     });
                     continue;
                 }
@@ -81,7 +91,10 @@ export class ExampleProjectService {
 
         const projectAbsDir = PathUtils.join(payload.destinationDir, payload.projectName);
         if (await this.fileSystem.exists(projectAbsDir)) {
-            return Result.Error(`Destination already exists: ${projectAbsDir}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.destinationExists",
+                options: { path: projectAbsDir },
+            });
         }
 
         const sourceProjectDir = PathUtils.join(payload.template.templateDir, payload.template.manifest.rootDir);
@@ -89,11 +102,16 @@ export class ExampleProjectService {
 
         const sourceEntryExists = await this.fileSystem.exists(sourceEntryPath, payload.template.storageOptions);
         if (!sourceEntryExists) {
-            return Result.Error(`Template entry file is missing: ${payload.template.manifest.entry}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.entryMissing",
+                options: { entry: payload.template.manifest.entry },
+            });
         }
 
         const mkdirResult = await this.fileSystem.mkdir(projectAbsDir, { recursive: true });
-        if (mkdirResult.status !== Result.Status.Success) return Result.Error("Failed to create destination project folder", mkdirResult);
+        if (mkdirResult.status !== Result.Status.Success) {
+            return Result.Error("message.project.exampleTemplate.destinationCreateFail", mkdirResult);
+        }
 
         const copyResult = await this.copyDirectoryFromResource(
             sourceProjectDir,
@@ -132,21 +150,27 @@ export class ExampleProjectService {
         try {
             content = await this.fileSystem.readTextFile(path, storageOptions);
         } catch (error) {
-            return Result.Error(`Missing manifest: ${path}. ${String(error)}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.manifestMissing",
+                options: { path, error: String(error) },
+            });
         }
 
         let parsed: unknown;
         try {
             parsed = JSON.parse(content);
         } catch (error) {
-            return Result.Error(`Invalid template manifest JSON: ${String(error)}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.manifestInvalidJson",
+                options: { error: String(error) },
+            });
         }
 
         return this.normalizeManifest(parsed);
     }
 
     private normalizeManifest(value: unknown): Result<ExampleProjectTemplateManifest> {
-        if (!isRecord(value)) return Result.Error("Invalid template manifest: expected object");
+        if (!isRecord(value)) return Result.Error("message.project.exampleTemplate.manifestExpectedObject");
 
         const id = requiredString(value.id, "id");
         const name = requiredString(value.name, "name");
@@ -183,7 +207,10 @@ export class ExampleProjectService {
     private validateTemplateVersion(manifest: ExampleProjectTemplateManifest): Result {
         const major = Number(manifest.templateVersion.split(".")[0]);
         if (!Number.isFinite(major) || major !== SUPPORTED_TEMPLATE_MAJOR_VERSION) {
-            return Result.Error(`Unsupported example template version: ${manifest.templateVersion}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.versionUnsupported",
+                options: { version: manifest.templateVersion },
+            });
         }
 
         return Result.Success();
@@ -228,7 +255,10 @@ export class ExampleProjectService {
         try {
             entries = await this.fileSystem.readDir(sourceDir, sourceOptions);
         } catch (error) {
-            return Result.Error(`Failed to read template directory '${sourceDir}': ${String(error)}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.directoryReadFail",
+                options: { path: sourceDir, error: String(error) },
+            });
         }
 
         const mkdirResult = await this.fileSystem.mkdir(destinationDir, { recursive: true });
@@ -251,7 +281,10 @@ export class ExampleProjectService {
             });
 
             if (copyResult.status !== Result.Status.Success) {
-                return Result.Error(`Failed to copy template file '${sourcePath}'`, copyResult);
+                return Result.Error({
+                    key: "message.project.exampleTemplate.fileCopyFail",
+                    options: { path: sourcePath },
+                }, copyResult);
             }
         }
 
@@ -270,7 +303,10 @@ export class ExampleProjectService {
         });
 
         if (copyResult.status !== Result.Status.Success) {
-            return Result.Error(`Failed to copy template preview image '${previewImage}'`, copyResult);
+            return Result.Error({
+                key: "message.project.exampleTemplate.previewCopyFail",
+                options: { path: previewImage },
+            }, copyResult);
         }
 
         return Result.Success();
@@ -283,7 +319,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function requiredString(value: unknown, field: string): Result<string> {
     if (typeof value !== "string" || value.trim().length === 0) {
-        return Result.Error(`Invalid template manifest: '${field}' is required`);
+        return Result.Error({
+            key: "message.project.exampleTemplate.manifestFieldRequired",
+            options: { field },
+        });
     }
     return Result.Success(value);
 }
@@ -313,7 +352,7 @@ function optionalBoolean(value: unknown): boolean | undefined {
 }
 
 function messageToString(message: Result["message"]): string {
-    if (!message) return "Unknown error";
-    if (typeof message === "string") return message;
-    return message.key;
+    if (!message) return i18n.t("message.system.unknownError.default");
+    if (typeof message === "string") return i18n.t(message);
+    return i18n.t(message.key, message.options);
 }

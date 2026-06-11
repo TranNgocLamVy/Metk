@@ -32,7 +32,7 @@ export default function FilePickerField(props: FilePickerProps) {
 			multiple: multiple ?? false, // Prevent multiple selection
 			filters: filter ? [
 				{
-					name: filter.name,
+					name: translate(filter.name),
 					extensions: filter.extensions,
 				},
 			] : undefined,

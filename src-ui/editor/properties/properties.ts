@@ -43,7 +43,7 @@ export class BaseProperty<TTarget> {
             if (typeof options.group === "function") {
                 return options.group(this.target);
             }
-            return options.group ?? "General";
+            return options.group ?? "property.group.general";
         };
         this.order = options.order ?? 0;
         this.readonly = () => typeof options.readonly === "function" ? options.readonly(this.target) : (options.readonly ?? false);
@@ -162,7 +162,7 @@ export class Point2DPropertyClass<TTarget> extends BaseProperty<TTarget> {
 
     constructor(target: TTarget, key: string, options: Point2DPropertyOptions<TTarget>) {
         super(target, key, options);
-        this.pointLabel = options.pointLabel ?? { x: "X", y: "Y" };
+        this.pointLabel = options.pointLabel ?? { x: "property.axis.x", y: "property.axis.y" };
     }
 }
 

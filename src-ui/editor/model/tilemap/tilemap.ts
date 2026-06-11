@@ -16,32 +16,32 @@ interface TilemapEvent extends BaseObjectEvents {
 
 export class Tilemap extends BaseObject<TilemapEvent> {
     @StringProperty<Tilemap>({
-        label: "ID",
+        label: "property.common.id",
         readonly: true,
         get: (target) => target.id,
     })
     public id: string;
 
     @StringProperty<Tilemap>({
-        label: "Map name",
+        label: "property.tilemap.name",
         get: (target) => target.name,
         set: (target, value, meta) => { target.rename(value, meta) },
     })
     public name: string;
 
     @EnumProperty<Tilemap>({
-        label: "Orientation",
-        group: "Map",
+        label: "property.tilemap.orientation",
+        group: "property.group.map",
         order: 0,
         readonly: true,
         get: (target) => target.orientation,
         options: () => {
             return [
-                { label: "Orthogonal", value: "orthogonal" },
-                { label: "Isometric", value: "isometric" },
-                { label: "Oblique", value: "oblique" },
-                { label: "Staggered", value: "staggered" },
-                { label: "Hexagonal", value: "hexagonal" },
+                { label: "property.tilemap.orientationOptions.orthogonal", value: "orthogonal" },
+                { label: "property.tilemap.orientationOptions.isometric", value: "isometric" },
+                { label: "property.tilemap.orientationOptions.oblique", value: "oblique" },
+                { label: "property.tilemap.orientationOptions.staggered", value: "staggered" },
+                { label: "property.tilemap.orientationOptions.hexagonal", value: "hexagonal" },
             ]
         },
     })
@@ -49,22 +49,22 @@ export class Tilemap extends BaseObject<TilemapEvent> {
     public backgroundcolor: string;
 
     @Point2DProperty<Tilemap>({
-        label: "Map size",
-        group: "Map",
+        label: "property.tilemap.mapSize",
+        group: "property.group.map",
         order: 1,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         get: (target) => ({ x: target.width, y: target.height }),
     })
     public width: number;
     public height: number;
 
     @Point2DProperty<Tilemap>({
-        label: "Tile size",
-        group: "Map",
+        label: "property.common.tileSize",
+        group: "property.group.map",
         order: 1,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         get: (target) => ({ x: target.tileWidth, y: target.tileHeight }),
     })
     public tileWidth: number;

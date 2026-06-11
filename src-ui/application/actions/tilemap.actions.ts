@@ -22,7 +22,7 @@ export async function createTilemap(): Promise<void> {
 
         const defaultTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
 
-        const tilemapAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultTilemapDir, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.tilemap.title"), defaultPath: defaultTilemapDir, filters: [{ name: i18n.t("fileDialog.filters.tilemap"), extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return;
 
         const tilemapAbsDir = PathUtils.dirname(tilemapAbsPath);
@@ -73,7 +73,7 @@ export async function importTilemap(refTilemapId?: string): Promise<Result> {
 
         const defaultTilemapDir = currentWorkspace.savedPathManager.getTilemapDir();
 
-        const tilemapAbsPath = await FileDialogService.open({ defaultPath: defaultTilemapDir, multiple: false, filters: [{ name: "Tilemap", extensions: ["tm.json"] }] });
+        const tilemapAbsPath = await FileDialogService.open({ defaultPath: defaultTilemapDir, multiple: false, filters: [{ name: i18n.t("fileDialog.filters.tilemap"), extensions: ["tm.json"] }] });
         if (!tilemapAbsPath) return Result.Cancel();
 
         const loadTilemapResult = await TilemapStorageService.load(tilemapAbsPath);

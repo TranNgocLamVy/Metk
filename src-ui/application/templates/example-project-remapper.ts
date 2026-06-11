@@ -155,7 +155,10 @@ export class ExampleProjectRemapper {
             const relPath = metadata[relPathKey];
             const metadataId = metadata.id;
             if (typeof relPath !== "string" || typeof metadataId !== "string") {
-                return Result.Error(`Invalid ${resourceName} metadata in template project`);
+                return Result.Error({
+                    key: "message.project.exampleTemplate.resourceMetadataInvalid",
+                    options: { resourceName },
+                });
             }
 
             const absPath = PathUtils.join(projectAbsDir, relPath);
@@ -163,7 +166,14 @@ export class ExampleProjectRemapper {
             if (resourceResult.status !== Result.Status.Success) return Result.Error(resourceResult.message, resourceResult);
 
             if (hasStringId(resourceResult.data.data) && resourceResult.data.data.id !== metadataId) {
-                return Result.Error(`Template ${resourceName} id mismatch: metadata '${metadataId}' does not match file '${resourceResult.data.data.id}'`);
+                return Result.Error({
+                    key: "message.project.exampleTemplate.resourceIdMismatch",
+                    options: {
+                        resourceName,
+                        metadataId,
+                        fileId: resourceResult.data.data.id,
+                    },
+                });
             }
 
             resources.push({
@@ -185,12 +195,18 @@ export class ExampleProjectRemapper {
         try {
             content = await this.fileSystem.readTextFile(absPath);
         } catch (error) {
-            return Result.Error(`Missing referenced ${resourceName} file: ${absPath}. ${String(error)}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.resourceFileMissing",
+                options: { resourceName, path: absPath, error: String(error) },
+            });
         }
 
         const deserializeResult = this.serializer.deserialize(content);
         if (deserializeResult.status !== Result.Status.Success) {
-            return Result.Error(`Invalid ${resourceName} JSON: ${absPath}`, deserializeResult);
+            return Result.Error({
+                key: "message.project.exampleTemplate.resourceInvalidJson",
+                options: { resourceName, path: absPath },
+            }, deserializeResult);
         }
 
         try {
@@ -200,7 +216,10 @@ export class ExampleProjectRemapper {
                 data: normalize(deserializeResult.data),
             });
         } catch (error) {
-            return Result.Error(`Invalid ${resourceName} data: ${absPath}. ${String(error)}`);
+            return Result.Error({
+                key: "message.project.exampleTemplate.resourceDataInvalid",
+                options: { resourceName, path: absPath, error: String(error) },
+            });
         }
     }
 
@@ -300,7 +319,10 @@ export class ExampleProjectRemapper {
 
             const saveResult = await this.fileSystem.writeTextFile(resource.absPath, serialized.data);
             if (saveResult.status !== Result.Status.Success) {
-                return Result.Error(`Failed to save remapped template resource: ${resource.absPath}`, saveResult);
+                return Result.Error({
+                    key: "message.project.exampleTemplate.resourceSaveFail",
+                    options: { path: resource.absPath },
+                }, saveResult);
             }
         }
 

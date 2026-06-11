@@ -14,22 +14,22 @@ export interface BaseLayerEvents extends BaseObjectEvents {
 
 export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends BaseObject<T> {
     @StringProperty<BaseLayer>({
-        label: "ID",
+        label: "property.common.id",
         readonly: true,
         get: (target) => target.id,
     })
     public readonly id: string;
 
     @StringProperty<BaseLayer>({
-        label: "Layer name",
+        label: "property.layer.name",
         get: (target) => target.name,
         set: (target, value, meta) => { target.rename(value, meta) },
     })
     public name: string;
 
     @NumberProperty<BaseLayer>({
-        label: "Opacity",
-        group: "Properties",
+        label: "property.layer.opacity",
+        group: "property.group.properties",
         order: 1,
         slider: {
             range: [0, 1],
@@ -41,8 +41,8 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     public opacity: number = 1;
 
     @BooleanProperty<BaseLayer>({
-        label: "Visible",
-        group: "Properties",
+        label: "property.layer.visible",
+        group: "property.group.properties",
         order: 2,
         get: (target) => target._visible,
         set: (target, value, meta) => { target.toggleVisibility(value, meta) },
@@ -50,8 +50,8 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     protected _visible: boolean = true;
 
     @BooleanProperty<BaseLayer>({
-        label: "Locked",
-        group: "Properties",
+        label: "property.layer.locked",
+        group: "property.group.properties",
         order: 3,
         get: (target) => target._locked,
         set: (target, value, meta) => { target.toggleLock(value, meta) },
@@ -59,7 +59,7 @@ export class BaseLayer<T extends BaseLayerEvents = BaseLayerEvents> extends Base
     protected _locked: boolean = false;
 
     @StringProperty<BaseLayer>({
-        label: "Layer Type",
+        label: "property.layer.type",
         readonly: true,
         get: (target) => target.layerType,
     })

@@ -8,6 +8,7 @@ import { Console } from "@/ui/notifications/console-gateway";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
 import { useDialogStore } from "@/ui/stores/dialog.store";
+import i18n from "@/app/providers/i18n";
 
 export function useTilesetController(initialTileset: Tileset, dialogId: string) {
     const { closeDialog } = useDialogStore();
@@ -53,12 +54,12 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
         const defaultTextureDir = currentWorkspace?.savedPathManager.getTextureDir();
 
         const imageAbsPaths = await FileDialogService.open({
-            title: "Add tiles",
+            title: i18n.t("dialog.editTileset.actions.addTiles"),
             defaultPath: defaultTextureDir,
             multiple: true,
             filters: [
                 {
-                    name: "Images",
+                    name: i18n.t("fileDialog.filters.images"),
                     extensions: ["png", "jpg", "jpeg", "webp", "bmp", "gif"],
                 },
             ],
@@ -89,7 +90,7 @@ export function useTilesetController(initialTileset: Tileset, dialogId: string) 
             triggerUpdate();
         } catch (error) {
             Console.error({
-                message: "Failed to add tiles.",
+                message: "message.tileset.addTilesFail",
                 stacks: [String(error)],
             });
         }

@@ -23,7 +23,7 @@ export async function createRuleset(): Promise<void> {
 
         const defaultRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
 
-        const rulesetAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.ruleset.title"), defaultPath: defaultRulesetDir, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        const rulesetAbsPath = await FileDialogService.saveFile({ title: i18n.t("dialog.save.ruleset.title"), defaultPath: defaultRulesetDir, filters: [{ name: i18n.t("fileDialog.filters.ruleset"), extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return;
 
         const rulesetAbsDir = PathUtils.dirname(rulesetAbsPath);
@@ -70,7 +70,7 @@ export async function importRuleset(refRulesetId?: string): Promise<Result> {
 
         const defaultRulesetDir = currentWorkspace.savedPathManager.getRulesetDir();
 
-        const rulesetAbsPath = await FileDialogService.open({ defaultPath: defaultRulesetDir, multiple: false, filters: [{ name: "Ruleset", extensions: ["rs.json"] }] });
+        const rulesetAbsPath = await FileDialogService.open({ defaultPath: defaultRulesetDir, multiple: false, filters: [{ name: i18n.t("fileDialog.filters.ruleset"), extensions: ["rs.json"] }] });
         if (!rulesetAbsPath) return Result.Cancel();
 
         const loadRulesetResult = await RulesetStorageService.load(rulesetAbsPath);

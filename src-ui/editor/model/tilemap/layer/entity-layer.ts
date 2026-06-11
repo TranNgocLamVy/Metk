@@ -19,8 +19,8 @@ export interface EntityLayerEvents extends BaseLayerEvents {
 
 export class EntityLayer extends BaseLayer<EntityLayerEvents> {
     @Point2DProperty<EntityLayer>({
-        label: "Offset",
-        group: "Properties",
+        label: "property.common.offset",
+        group: "property.group.properties",
         order: 4,
         set: (target, value, meta) => target.updateOffset(value.x, value.y, meta),
         get: (target) => ({ x: target.offset.x, y: target.offset.y }),

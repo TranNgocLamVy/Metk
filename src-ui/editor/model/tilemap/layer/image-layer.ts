@@ -13,8 +13,8 @@ export interface ImageLayerEvents extends BaseLayerEvents {
 
 export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     @StringProperty<ImageLayer>({
-        label: "Tint Color",
-        group: "Properties",
+        label: "property.layer.tintColor",
+        group: "property.group.properties",
         order: 5,
         readonly: true,
         get: (target) => target.tintcolor,
@@ -23,8 +23,8 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public tintcolor: string = "";
 
     @BooleanProperty<ImageLayer>({
-        label: "Repeat X",
-        group: "Properties",
+        label: "property.layer.repeatX",
+        group: "property.group.properties",
         order: 6,
         get: (target) => target.repeatX,
         set: (target, value, meta) => target.updateRepeat(value, target.repeatY, meta),
@@ -32,8 +32,8 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public repeatX: boolean;
 
     @BooleanProperty<ImageLayer>({
-        label: "Repeat Y",
-        group: "Properties",
+        label: "property.layer.repeatY",
+        group: "property.group.properties",
         order: 7,
         get: (target) => target.repeatY,
         set: (target, value, meta) => target.updateRepeat(target.repeatX, value, meta),
@@ -41,8 +41,8 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public repeatY: boolean;
 
     @Point2DProperty<ImageLayer>({
-        label: "Offset",
-        group: "Properties",
+        label: "property.common.offset",
+        group: "property.group.properties",
         order: 8,
         set: (target, value, meta) => target.updateOffset(value.x, value.y, meta),
         get: (target) => ({ x: target.offset.x, y: target.offset.y }),
@@ -50,8 +50,8 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public offset: Point2D = { x: 0, y: 0 }
 
     @Point2DProperty<ImageLayer>({
-        label: "Parallax",
-        group: "Properties",
+        label: "property.layer.parallax",
+        group: "property.group.properties",
         order: 9,
         set: (target, value, meta) => target.updateParallax(value.x, value.y, meta),
         get: (target) => ({ x: target.parallax.x, y: target.parallax.y }),
@@ -59,8 +59,8 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public parallax: Point2D = { x: 1, y: 1 }
 
     @ImageSourceProperty<ImageLayer>({
-        label: "Source",
-        group: "Image",
+        label: "property.common.source",
+        group: "property.group.image",
         get: (target) => target.imageSource,
         set: (target, value, meta) => { target.updateImage(value, meta) },
         absToRef: (target, absPath) => { return target.tilemap.tilemapPathSystem.getRelPathFromAbsPath(absPath) }
@@ -68,11 +68,11 @@ export class ImageLayer extends BaseLayer<ImageLayerEvents> {
     public imageSource: ImageSourceData;
 
     @Point2DProperty<ImageLayer>({
-        label: "Size",
-        group: "Image",
+        label: "property.common.size",
+        group: "property.group.image",
         order: 1,
         readonly: true,
-        pointLabel: { x: "Width", y: "Height" },
+        pointLabel: { x: "property.axis.width", y: "property.axis.height" },
         visible: (target) => !!target.imageSource?.source,
         get: (target) => ({ x: target.imageSource.width!, y: target.imageSource.height! }),
     })

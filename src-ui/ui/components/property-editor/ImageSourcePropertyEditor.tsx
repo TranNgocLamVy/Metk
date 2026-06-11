@@ -13,12 +13,14 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { usePropertyStoreVersion } from "@/ui/stores/property.store";
 import { clonePropertyValue, executeUpdatePropertyCommand } from "./property-command.utils";
+import { useTranslation } from "react-i18next";
 
 export interface ImageSourcePropertyEditorProps {
     property: ImageSourcePropertyClass<any>;
 }
 
 export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEditorProps) {
+    const { t } = useTranslation();
     const version = usePropertyStoreVersion();
 
     const initialValue = useMemo(() => normalizeImageSource(property.getter()), [property]);
@@ -115,7 +117,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
             multiple: false,
             filters: [
                 {
-                    name: "Image",
+                    name: t("fileDialog.filters.image"),
                     extensions: ["png", "jpg", "jpeg"],
                 },
             ],
@@ -154,7 +156,7 @@ export function ImageSourcePropertyEditor({ property }: ImageSourcePropertyEdito
     return (
         <div className="px-2 h-8">
             <div className="grid grid-cols-[minmax(84px,40%)_minmax(0,1fr)] h-full items-center gap-2">
-                <Label title={property.label} className="text-2xs min-w-0 truncate">
+                <Label title={t(property.label)} className="text-2xs min-w-0 truncate">
                     <LocalizedText message={property.label} />
                 </Label>
 

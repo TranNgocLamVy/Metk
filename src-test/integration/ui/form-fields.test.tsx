@@ -16,7 +16,10 @@ vi.mock("react-i18next", () => ({
         init: vi.fn(),
     },
     useTranslation: () => ({
-        t: (message?: string) => message ?? "",
+        t: (message?: string) => ({
+            "global.action.reset": "Reset",
+            "global.action.select": "Select",
+        }[message ?? ""] ?? message ?? ""),
     }),
 }));
 vi.mock("react-color", () => ({
