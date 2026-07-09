@@ -1,6 +1,4 @@
-import { appKernel } from "@/application/bootstrap/app-kernel";
 import * as RulesetActions from "@/application/actions/ruleset.actions";
-import { usePropertyStore } from "@/ui/stores/property.store";
 import { Info, Plus } from "lucide-react";
 
 const CreateActionGroup: MenuDropDownGroupType = [

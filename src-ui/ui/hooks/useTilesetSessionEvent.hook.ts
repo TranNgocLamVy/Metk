@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 
-import { useWorkspaceStore } from '../stores/workspace.store';
+import { useActiveWorkspace } from '../stores/workspace.store';
 import { TilesetSessionManagerEvent } from '@/application/workspace/session/tileset-session.manager';
-import { useTilesetSessionStore } from '../stores/tileset-session.store';
+import { useTilesetPixiApp } from '../stores/tileset-session.store';
 
 export function useTilesetSessionEvent<TEvent extends keyof TilesetSessionManagerEvent>(eventName: TEvent, callback: TilesetSessionManagerEvent[TEvent]) {
-    const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
-    const pixiApp = useTilesetSessionStore((state) => state.pixiApp);
+    const activeWorkspace = useActiveWorkspace();
+    const pixiApp = useTilesetPixiApp();
 
     useEffect(() => {
         if (!activeWorkspace || !pixiApp) return;

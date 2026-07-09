@@ -30,9 +30,9 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: propertyPanelM
 vi.mock("@/application/actions/workspace.actions", () => propertyPanelMocks.workspaceService);
 
 import PropertyPanel from "@/ui/workspace/properties-panel/PropertyPanel";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { usePropertyStore } from "@/ui/stores/property.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { getProjectStoreState, resetProjectStoreForTest, setProjectStoreStateForTest } from "@/ui/stores/project.store";
+import { getPropertyStoreState, resetPropertyStoreForTest, setPropertyStoreStateForTest } from "@/ui/stores/property.store";
+import { getWorkspaceStoreState, resetWorkspaceStoreForTest, setWorkspaceStoreStateForTest } from "@/ui/stores/workspace.store";
 import { BaseObject } from "@/editor/model/base-object";
 
 class PanelObject extends BaseObject {}
@@ -53,18 +53,18 @@ function createPanelHarness() {
         },
     };
 
-    usePropertyStore.setState({ objectId: object.objectId, version: 0 });
-    useProjectStore.getState().setActiveProject(project as any);
-    useWorkspaceStore.getState().setActiveWorkspace(workspace as any);
+    setPropertyStoreStateForTest({ objectId: object.objectId, version: 0 });
+    getProjectStoreState().actions.setActiveProject(project as any);
+    getWorkspaceStoreState().actions.setActiveWorkspace(workspace as any);
 
     return { object, project, workspace };
 }
 
 describe("PropertyPanel updateProperty events", () => {
     beforeEach(() => {
-        usePropertyStore.setState({ objectId: null, version: 0 });
-        useProjectStore.getState().setActiveProject(null);
-        useWorkspaceStore.getState().setActiveWorkspace(null);
+        setPropertyStoreStateForTest({ objectId: null, version: 0 });
+        getProjectStoreState().actions.setActiveProject(null);
+        getWorkspaceStoreState().actions.setActiveWorkspace(null);
     });
 
     it("ignores preview updates and refreshes for committed changes", async () => {
@@ -77,7 +77,7 @@ describe("PropertyPanel updateProperty events", () => {
             expect(onSpy).toHaveBeenCalledWith("updateProperty", expect.any(Function));
         });
 
-        const initialVersion = usePropertyStore.getState().version;
+        const initialVersion = getPropertyStoreState().version;
 
         act(() => {
             object.eventEmitter.emit("updateProperty", "name", "Preview", {
@@ -86,10 +86,10 @@ describe("PropertyPanel updateProperty events", () => {
             });
         });
 
-        expect(usePropertyStore.getState().version).toBe(initialVersion);
+        expect(getPropertyStoreState().version).toBe(initialVersion);
 
         for (const origin of ["commit", "undo", "redo", "external"] as const) {
-            const previousVersion = usePropertyStore.getState().version;
+            const previousVersion = getPropertyStoreState().version;
 
             act(() => {
                 object.eventEmitter.emit("updateProperty", "name", origin, {
@@ -98,7 +98,7 @@ describe("PropertyPanel updateProperty events", () => {
                 });
             });
 
-            expect(usePropertyStore.getState().version).toBe(previousVersion + 1);
+            expect(getPropertyStoreState().version).toBe(previousVersion + 1);
         }
     });
 });

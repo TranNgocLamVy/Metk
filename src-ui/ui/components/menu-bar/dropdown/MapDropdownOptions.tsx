@@ -3,9 +3,7 @@ import { ArrowBigLeft, ArrowBigRight, Crop, Grid2x2Plus, Map, Move, SquareArrowU
 import AutoGrid from "@/ui/components/custom/icons/AutoGrid";
 import { Label } from '@/ui/components/shadcn/label';
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { usePropertyStore } from "@/ui/stores/property.store";
+import { getPropertyStoreState } from "@/ui/stores/property.store";
 
 const activeTilemapSession = () => appKernel.editorFacade.getActiveTilemapSession();
 
@@ -67,7 +65,7 @@ const MapDropdownOptionGroup5: MenuDropDownGroupType = [
 			const session = activeTilemapSession();
 			if (!session) return;
 			const tilemap = session.tilemap;
-			usePropertyStore.getState().setObjectId(tilemap.objectId);
+			getPropertyStoreState().actions.setObjectId(tilemap.objectId);
 		},
 	},
 ];

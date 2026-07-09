@@ -7,7 +7,7 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { Dialog, DialogContent, DialogTitle } from "@/ui/components/shadcn/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 
 import { EditEntityDefinitionContext, useEntityDefinitionController } from "./ContextProvider";
 import EntityDefinitionGraphicSelector from "./GraphicSelector";
@@ -45,7 +45,7 @@ export function EditEntityDefinitionDialog({ dialogId, entityCollectionId, entit
 }
 
 function EditEntityDefinitionDialogProvider({ dialogId, entityCollection, clonedEntity }: { dialogId: string; entityCollection: EntityCollection; clonedEntity: EntityDefinition }) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
 
     const controller = useEntityDefinitionController(clonedEntity, entityCollection);
 

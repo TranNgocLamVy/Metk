@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { resetStore } from "./store-test-utils";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
+import { getTilesetSessionStoreState, resetTilesetSessionStoreForTest, setTilesetSessionStoreStateForTest } from "@/ui/stores/tileset-session.store";
 
 describe("useTilesetSessionStore", () => {
     beforeEach(() => {
-        resetStore(useTilesetSessionStore);
+        resetTilesetSessionStoreForTest();
     });
 
     it("initializes without a Pixi app, sessions, or active session", () => {
-        expect(useTilesetSessionStore.getState()).toMatchObject({
+        expect(getTilesetSessionStoreState()).toMatchObject({
             pixiApp: null,
             tilesetSessions: [],
             activeSession: null,
@@ -19,26 +19,26 @@ describe("useTilesetSessionStore", () => {
     it("sets the Pixi app", () => {
         const pixiApp = { renderer: {} } as any;
 
-        useTilesetSessionStore.getState().setPixiApp(pixiApp);
+        getTilesetSessionStoreState().actions.setPixiApp(pixiApp);
 
-        expect(useTilesetSessionStore.getState().pixiApp).toBe(pixiApp);
+        expect(getTilesetSessionStoreState().pixiApp).toBe(pixiApp);
     });
 
     it("sets tileset session display data", () => {
         const sessions = [{ sessionId: "session-1", name: "Tileset One" }];
 
-        useTilesetSessionStore.getState().setTilesetSessions(sessions);
+        getTilesetSessionStoreState().actions.setTilesetSessions(sessions);
 
-        expect(useTilesetSessionStore.getState().tilesetSessions).toBe(sessions);
+        expect(getTilesetSessionStoreState().tilesetSessions).toBe(sessions);
     });
 
     it("sets the active tileset session", () => {
         const session = { id: "session-1" } as any;
 
-        useTilesetSessionStore.getState().setActiveSession(session);
-        expect(useTilesetSessionStore.getState().activeSession).toBe(session);
+        getTilesetSessionStoreState().actions.setActiveSession(session);
+        expect(getTilesetSessionStoreState().activeSession).toBe(session);
 
-        useTilesetSessionStore.getState().setActiveSession(null);
-        expect(useTilesetSessionStore.getState().activeSession).toBeNull();
+        getTilesetSessionStoreState().actions.setActiveSession(null);
+        expect(getTilesetSessionStoreState().activeSession).toBeNull();
     });
 });

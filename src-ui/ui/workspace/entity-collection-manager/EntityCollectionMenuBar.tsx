@@ -2,17 +2,15 @@ import { Copy, Pen, Plus, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 
 import * as EntityCollectionActions from "@/application/actions/entity-collection.actions";
-import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
+import { useSelectedEntityCollectionId, useSelectedEntityId } from "@/ui/stores/entity-collection.store";
 
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 
 export default function EntityCollectionMenuBar() {
-    const {
-        selectedEntityCollectionId: currentSelectedEntityCollectionId,
-        selectedEntityId,
-    } = useEntityCollectionStore();
+    const currentSelectedEntityCollectionId = useSelectedEntityCollectionId();
+    const selectedEntityId = useSelectedEntityId();
 
     const onEditEntity = useCallback(() => {
         if (!currentSelectedEntityCollectionId || !selectedEntityId) return;

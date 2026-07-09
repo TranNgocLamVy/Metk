@@ -2,7 +2,7 @@ import type { DiscoveredExampleProjectTemplate } from "@/application/templates/e
 import { Button } from "@/ui/components/shadcn/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import type { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 
@@ -16,9 +16,11 @@ export function ExampleProjectTemplateDialog({
     templates,
     resolve,
 }: ExampleProjectTemplateDialogProps) {
+    const { closeDialog } = useDialogActions();
+
     const close = (templateId: string | null) => {
         resolve(templateId);
-        useDialogStore.getState().closeDialog(dialogId);
+        closeDialog(dialogId);
     };
 
     return (

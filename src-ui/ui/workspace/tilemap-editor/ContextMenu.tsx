@@ -3,7 +3,7 @@ import { Brush, ClipboardPaste, Copy, Eraser, Grid3x3, Info, Plus, Redo, Scissor
 import * as TilemapActions from "@/application/actions/tilemap.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { SETTING_KEYS } from "@/application/settings/setting.enum";
-import { usePropertyStore } from "@/ui/stores/property.store";
+import { getPropertyStoreState } from "@/ui/stores/property.store";
 
 const settings = appKernel.settings;
 
@@ -23,7 +23,7 @@ const ActionGroup: MenuDropDownGroupType = [
         onClick() {
 			const activeTilemapSession = appKernel.editorFacade.getActiveTilemapSession();
 			if (!activeTilemapSession) return;
-			usePropertyStore.getState().setObjectId(activeTilemapSession.tilemap.objectId);
+			getPropertyStoreState().actions.setObjectId(activeTilemapSession.tilemap.objectId);
         }
     },
 ];

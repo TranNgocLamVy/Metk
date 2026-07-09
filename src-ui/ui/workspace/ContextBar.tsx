@@ -1,11 +1,13 @@
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
-import { useConsoleStore } from "@/ui/stores/console.store";
+import { useConsoleActions, useConsoleErrors, useConsoleLogs } from "@/ui/stores/console.store";
 import { Info, TriangleAlert } from "lucide-react";
 
 export default function ContextBar() {
-    const { logs, errors, toggleWithType } = useConsoleStore();
+    const logs = useConsoleLogs();
+    const errors = useConsoleErrors();
+    const { toggleWithType } = useConsoleActions();
 
     const lastLog = logs[logs.length - 1];
     const lastError = errors[errors.length - 1];

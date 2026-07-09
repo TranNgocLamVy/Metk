@@ -1,15 +1,15 @@
 import { ArrowDown, ArrowUp, Boxes, Copy, Folder, Grid3x3, Image, Plus, Trash2 } from "lucide-react";
 
 import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { getTilemapSessionStoreState } from "@/ui/stores/tilemap-session.store";
 
 const isTilemapSessionOpen = (): boolean => {
-	const activeSession = useTilemapSessionStore.getState().activeSession;
+	const activeSession = getTilemapSessionStoreState().activeSession;
 	return !!activeSession;
 }
 
 const numSelectedLayers = (): number => {
-	const activeSession = useTilemapSessionStore.getState().activeSession;
+	const activeSession = getTilemapSessionStoreState().activeSession;
 	if (!activeSession) return 0;
 	return activeSession.layerState.selectedLayers.length;
 }

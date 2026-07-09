@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { ToolBarGroupDisplayData, useToolbarStore } from "@/ui/stores/toolbar.store";
+import { ToolBarGroupDisplayData, useActiveToolbarFamilyId, useAvailableToolbarFamilyIds, useToolbarActions, useToolbarGroups } from "@/ui/stores/toolbar.store";
 
 import SVGIcon from "@/ui/components/custom/icons/SvgIcon";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
@@ -10,15 +10,10 @@ import { Button } from "@/ui/components/shadcn/button";
 import { Separator } from "../components/shadcn/separator";
 
 export default function ToolBar() {
-	const {
-		groups,
-		activeFamilyId,
-		availableFamilyIds,
-
-		setGroups,
-		setActiveFamilyId,
-		setAvailableFamilyIds,
-	} = useToolbarStore();
+	const groups = useToolbarGroups();
+	const activeFamilyId = useActiveToolbarFamilyId();
+	const availableFamilyIds = useAvailableToolbarFamilyIds();
+	const { setGroups, setActiveFamilyId, setAvailableFamilyIds } = useToolbarActions();
 
 	useEffect(() => {
 		const toolManager = appKernel.toolManager;

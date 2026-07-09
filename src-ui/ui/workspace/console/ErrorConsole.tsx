@@ -3,12 +3,12 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { useConsoleStore } from "@/ui/stores/console.store";
+import { useConsoleActions, useConsoleErrors } from "@/ui/stores/console.store";
 import { X, XCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export default function ErrorConsole() {
-    const { errors } = useConsoleStore();
+    const errors = useConsoleErrors();
     const bottomRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (bottomRef.current) {
@@ -34,6 +34,7 @@ export default function ErrorConsole() {
 }
 
 function ErrorItem({ error }: { error: any }) {
+    const { removeError } = useConsoleActions();
     const [flashState, setFlashState] = useState<"bright" | "normal">("bright");
     const [isSettled, setIsSettled] = useState(false);
 
@@ -90,7 +91,7 @@ function ErrorItem({ error }: { error: any }) {
                                 const onClick = async () => {
                                     const result = await act.onClick();
                                     if (result.status === Result.Status.Success) {
-                                        useConsoleStore.getState().removeError(error.id);
+                                        removeError(error.id);
                                     }
                                 }
                                 return (
@@ -106,7 +107,7 @@ function ErrorItem({ error }: { error: any }) {
                 <Button
                     size={"icon-xs"}
                     variant={"ghost"}
-                    onClick={() => useConsoleStore.getState().removeError(error.id)}
+                    onClick={() => removeError(error.id)}
                     className="ml-auto"
                 >
                     <X size={14} />

@@ -27,10 +27,10 @@ vi.mock("@/application/bootstrap/app-kernel", () => ({ appKernel: dialogMocks.ap
 
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreStateForTest } from "@/ui/stores/dialog.store";
 
 beforeEach(() => {
-    useDialogStore.setState(useDialogStore.getInitialState(), true);
+    resetDialogStoreForTest();
     dialogMocks.resetUuid();
     dialogMocks.uuid.mockClear();
     dialogMocks.appKernel.activationContext.setFlag.mockClear();
@@ -46,7 +46,7 @@ describe("DialogService", () => {
             ],
         });
 
-        const dialog = useDialogStore.getState().dialogs[0];
+        const dialog = getDialogStoreState().dialogs[0];
         expect(dialog).toMatchObject({
             id: "dialog-id-1",
             type: "FORM_DIALOG",
@@ -63,7 +63,7 @@ describe("DialogService", () => {
         const permissionPromise = DialogService.openPermissionDialog({ title: "Remove", description: "Remove project?" });
         const savePromise = DialogService.openSaveDialog({ title: "Unsaved", description: "Save first?" });
 
-        const [permissionDialog, saveDialog] = useDialogStore.getState().dialogs;
+        const [permissionDialog, saveDialog] = getDialogStoreState().dialogs;
         expect(permissionDialog).toMatchObject({
             id: "dialog-id-1",
             type: "PERMISSION_DIALOG",
@@ -91,7 +91,7 @@ describe("DialogService", () => {
         await DialogService.openEditRulesetDialog("ruleset-a");
 
         expect(rulesetManager.loadRuleset).toHaveBeenCalledWith("ruleset-a");
-        expect(useDialogStore.getState().dialogs[0]).toMatchObject({
+        expect(getDialogStoreState().dialogs[0]).toMatchObject({
             id: "dialog-id-1",
             type: "EDIT_RULESET_MODAL",
             params: { rulesetId: "ruleset-a" },
@@ -101,7 +101,7 @@ describe("DialogService", () => {
 
     it("does not open the edit ruleset dialog when no project or ruleset is available", async () => {
         await DialogService.openEditRulesetDialog("ruleset-a");
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
 
         dialogMocks.appKernel.editorFacade.currentProject = {
             rulesetManager: {
@@ -110,6 +110,6 @@ describe("DialogService", () => {
         };
 
         await DialogService.openEditRulesetDialog("ruleset-a");
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 });

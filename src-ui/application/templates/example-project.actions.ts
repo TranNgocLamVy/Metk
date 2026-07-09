@@ -8,7 +8,7 @@ import { createExampleProjectForm } from "@/shared/constant/form/create-example-
 import { Result } from "@/shared/types/result";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
 import { Console } from "@/ui/notifications/console-gateway";
-import { useNavigationStore } from "@/ui/stores/navigation.store";
+import { getNavigationStoreState } from "@/ui/stores/navigation.store";
 
 const exampleProjectService = new ExampleProjectService();
 
@@ -69,7 +69,7 @@ export async function createExampleProject(): Promise<void> {
         description: "dialog.project.exampleCreated.description",
     });
 
-    if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
+    if (openProject) getNavigationStoreState().navigate!(`/workspace/${project.id}`);
 }
 
 async function selectTemplate(

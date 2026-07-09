@@ -6,11 +6,18 @@ import { Project } from '@/editor/model/project/project';
 interface ProjectState {
     projects: ProjectMetadata[];
     activeProject: Project | null;
+}
+
+type ProjectActions = {
     setProjects: (projects: ProjectMetadata[]) => void;
     setActiveProject: (project: Project | null) => void;
 }
 
-export const useProjectStore = create<ProjectState>((set) => {
+type ProjectStore = ProjectState & {
+    actions: ProjectActions;
+}
+
+const useProjectStore = create<ProjectStore>((set) => {
     const project = appKernel.projectManager.currentProject;
     if (project) appKernel.activationContext.setFlag("projectOpened", true, project.id);
 
@@ -18,21 +25,31 @@ export const useProjectStore = create<ProjectState>((set) => {
     return {
         projects: projectMetadatas,
         activeProject: project,
-        setProjects: (projects) => set({ projects }),
-        setActiveProject: (project) => set({ activeProject: project }),
+        actions: {
+            setProjects: (projects) => set({ projects }),
+            setActiveProject: (project) => set({ activeProject: project }),
+        },
     }
 });
 
 appKernel.projectManager.on("onProjectLoaded", (project) => {
     appKernel.activationContext.setFlag("projectOpened", true, project.id);
-    useProjectStore.getState().setActiveProject(project);
+    useProjectStore.getState().actions.setActiveProject(project);
 });
 
 appKernel.projectManager.on("onProjectUnloaded", (projectId) => {
     appKernel.activationContext.setFlag("projectOpened", false, projectId);
-    useProjectStore.getState().setActiveProject(null);
+    useProjectStore.getState().actions.setActiveProject(null);
 });
 
 appKernel.projectManager.on("onProjectMetadatasChanged", (projectMetadatas) => {
-    useProjectStore.getState().setProjects(projectMetadatas);
+    useProjectStore.getState().actions.setProjects(projectMetadatas);
 });
+
+export const useProjects = () => useProjectStore((state) => state.projects);
+export const useActiveProject = () => useProjectStore((state) => state.activeProject);
+export const useProjectActions = () => useProjectStore((state) => state.actions);
+
+export const getProjectStoreState = () => useProjectStore.getState();
+export const resetProjectStoreForTest = () => useProjectStore.setState(useProjectStore.getInitialState(), true);
+export const setProjectStoreStateForTest = (state: Partial<ProjectState>) => useProjectStore.setState(state);

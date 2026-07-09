@@ -1,4 +1,4 @@
-import { useConsoleStore } from "@/ui/stores/console.store";
+import { getConsoleStoreState } from "@/ui/stores/console.store";
 import { Result } from "@/shared/types/result";
 import { v4 as uuidv4 } from "uuid";
 
@@ -7,21 +7,21 @@ export class Console {
         const id = customId ?? uuidv4();
         const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addLog({ id, uiId, timestamp, level: "info", ...payload });
+        getConsoleStoreState().actions.addLog({ id, uiId, timestamp, level: "info", ...payload });
     }
 
     static success(payload: Omit<LogMessage, "id" | "uiId" | "timestamp" | "level">, customId?: string) {
         const id = customId ?? uuidv4();
         const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addLog({ id, uiId, timestamp, level: "success", ...payload });
+        getConsoleStoreState().actions.addLog({ id, uiId, timestamp, level: "success", ...payload });
     }
 
     static warn(payload: Omit<LogMessage, "id" | "uiId" | "timestamp" | "level">, customId?: string) {
         const id = customId ?? uuidv4();
         const uiId = uuidv4();
         const timestamp = Date.now();
-        useConsoleStore.getState().addLog({ id, uiId, timestamp, level: "warning", ...payload });
+        getConsoleStoreState().actions.addLog({ id, uiId, timestamp, level: "warning", ...payload });
     }
 
     static error(payload: Omit<ErrorMessage, "id" | "uiId" | "timestamp">, customId?: string) {
@@ -30,27 +30,27 @@ export class Console {
         const timestamp = Date.now();
         payload.stacks = payload.stacks ?? [];
         payload.stacks.filter(stack => stack !== undefined);
-        useConsoleStore.getState().addError({ id, uiId, timestamp, ...payload });
+        getConsoleStoreState().actions.addError({ id, uiId, timestamp, ...payload });
     }
 
     static removeLog(id: string) {
-        useConsoleStore.getState().removeLog(id);
+        getConsoleStoreState().actions.removeLog(id);
     }
 
     static removeError(id: string) {
-        useConsoleStore.getState().removeError(id);
+        getConsoleStoreState().actions.removeError(id);
     }
 
     static clear() {
-        useConsoleStore.getState().clearAll();
+        getConsoleStoreState().actions.clearAll();
     }
 
     static clearLogs() {
-        useConsoleStore.getState().clearLogs();
+        getConsoleStoreState().actions.clearLogs();
     }
 
     static clearErrors() {
-        useConsoleStore.getState().clearErrors();
+        getConsoleStoreState().actions.clearErrors();
     }
 }
 

@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import * as EntityCollectionActions from "@/application/actions/entity-collection.actions";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
-import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
+import { useEntityCollectionDisplayDatas, useSelectedEntityCollectionId } from "@/ui/stores/entity-collection.store";
 
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack } from "@/ui/components/custom/stack/Stack";
@@ -15,7 +15,8 @@ export default function EntityCollectionManagerTabs() {
 
     useHorizontalScroll(ref);
 
-    const { entityCollectionDisplayDatas, selectedEntityCollectionId: currentSelectedEntityCollectionId } = useEntityCollectionStore();
+    const entityCollectionDisplayDatas = useEntityCollectionDisplayDatas();
+    const currentSelectedEntityCollectionId = useSelectedEntityCollectionId();
 
     return (
         <HStack className="w-full" justify="start" align="center">

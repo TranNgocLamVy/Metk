@@ -9,7 +9,7 @@ import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { DialogZLevel } from "@/shared/types/dialog";
 import DialogRoot from "@/ui/components/dialog/DialogRoot";
 import { DIALOG_TYPES } from "@/ui/components/dialog/dialogRegistry";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreStateForTest, useDialogActions, useDialogs } from "@/ui/stores/dialog.store";
 
 type ResettableStore<T> = {
     getInitialState: () => T;
@@ -118,7 +118,7 @@ const renderDialogRoot = () => {
 };
 
 const openFormDialog = (params: Record<string, any>) => {
-    return useDialogStore.getState().openDialog(
+    return getDialogStoreState().actions.openDialog(
         DIALOG_TYPES.FORM,
         { zLevel: DialogZLevel.Modal },
         params,
@@ -126,7 +126,7 @@ const openFormDialog = (params: Record<string, any>) => {
 };
 
 const openSaveDialog = (params: Record<string, any>) => {
-    return useDialogStore.getState().openDialog(
+    return getDialogStoreState().actions.openDialog(
         DIALOG_TYPES.SAVE,
         { zLevel: DialogZLevel.AlertDialog },
         params,
@@ -134,14 +134,14 @@ const openSaveDialog = (params: Record<string, any>) => {
 };
 
 const openOpenFileDialog = () => {
-    return useDialogStore.getState().openDialog(
+    return getDialogStoreState().actions.openDialog(
         DIALOG_TYPES.OPEM_FILE,
         { zLevel: DialogZLevel.Modal },
     );
 };
 
 const openEditTilesetDialog = (tileset: Record<string, any>) => {
-    return useDialogStore.getState().openDialog(
+    return getDialogStoreState().actions.openDialog(
         DIALOG_TYPES.EDIT_TILESET,
         { zLevel: DialogZLevel.Modal },
         { tileset },
@@ -149,8 +149,8 @@ const openEditTilesetDialog = (tileset: Record<string, any>) => {
 };
 
 function DialogStackHarness() {
-    const openDialog = useDialogStore((state) => state.openDialog);
-    const dialogCount = useDialogStore((state) => state.dialogs.length);
+    const { openDialog } = useDialogActions();
+    const dialogCount = useDialogs().length;
 
     const openStackedDialogs = () => {
         openDialog(
@@ -198,7 +198,7 @@ function DialogStackHarness() {
 
 describe("Metk dialog and form integration workflows", () => {
     beforeEach(() => {
-        resetStore(useDialogStore);
+        resetDialogStoreForTest();
         mockState.uuid.reset();
         mockState.uuid.v4.mockClear();
         mockState.appKernel.activationContext.setFlag.mockClear();
@@ -267,7 +267,7 @@ describe("Metk dialog and form integration workflows", () => {
                 visible: true,
             });
         });
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
         expect(mockState.appKernel.activationContext.setFlag).toHaveBeenLastCalledWith("isModalOpen", false, "dialog-id-1");
     });
 
@@ -301,7 +301,7 @@ describe("Metk dialog and form integration workflows", () => {
 
         expect(validateName).toHaveBeenCalledWith("ai");
         expect(resolve).not.toHaveBeenCalled();
-        expect(useDialogStore.getState().dialogs).toHaveLength(1);
+        expect(getDialogStoreState().dialogs).toHaveLength(1);
         expect(screen.getByRole("dialog", { name: "Create Ruleset" })).toBeVisible();
 
         await user.clear(screen.getByLabelText("Ruleset Name"));
@@ -311,7 +311,7 @@ describe("Metk dialog and form integration workflows", () => {
         await waitFor(() => {
             expect(resolve).toHaveBeenCalledWith({ name: "Terrain" });
         });
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 
     it("renders open-file choices and confirms a tilemap selection", async () => {
@@ -341,7 +341,7 @@ describe("Metk dialog and form integration workflows", () => {
         await user.click(screen.getByText("Dungeon"));
 
         expect(WorkspaceActions.createTilemapSession).toHaveBeenCalledWith("dungeon");
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 
     it("closes the open-file dialog when the user cancels it", async () => {
@@ -362,7 +362,7 @@ describe("Metk dialog and form integration workflows", () => {
 
         expect(WorkspaceActions.createTilemapSession).not.toHaveBeenCalled();
         expect(WorkspaceActions.createTilesetSession).not.toHaveBeenCalled();
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 
     it("resolves save dialog choices from user intent", async () => {
@@ -382,7 +382,7 @@ describe("Metk dialog and form integration workflows", () => {
         await user.click(screen.getByRole("button", { name: "global.action.save" }));
 
         expect(resolve).toHaveBeenCalledWith("save");
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 
     it("resolves save cancellation without saving", async () => {
@@ -401,7 +401,7 @@ describe("Metk dialog and form integration workflows", () => {
         await user.click(screen.getByRole("button", { name: "Cancel" }));
 
         expect(resolve).toHaveBeenCalledWith("cancel");
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 
     it("displays edit-tileset details and closes from the dialog footer", async () => {
@@ -439,7 +439,7 @@ describe("Metk dialog and form integration workflows", () => {
 
         await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 
     it("updates dialog stack state as dialogs open and close through the UI", async () => {
@@ -454,17 +454,17 @@ describe("Metk dialog and form integration workflows", () => {
 
         await user.click(screen.getByRole("button", { name: "Open stacked dialogs" }));
         expect(screen.getByLabelText("open dialog count")).toHaveTextContent("2");
-        expect(useDialogStore.getState().dialogs.map((dialog) => dialog.type)).toEqual([
+        expect(getDialogStoreState().dialogs.map((dialog) => dialog.type)).toEqual([
             DIALOG_TYPES.FORM,
             DIALOG_TYPES.SAVE,
         ]);
 
         await user.click(screen.getByRole("button", { name: "global.action.notSave", hidden: true }));
         expect(screen.getByLabelText("open dialog count")).toHaveTextContent("1");
-        expect(useDialogStore.getState().dialogs).toHaveLength(1);
+        expect(getDialogStoreState().dialogs).toHaveLength(1);
 
         await user.click(screen.getByRole("button", { name: "Dismiss", hidden: true }));
         expect(screen.getByLabelText("open dialog count")).toHaveTextContent("0");
-        expect(useDialogStore.getState().dialogs).toEqual([]);
+        expect(getDialogStoreState().dialogs).toEqual([]);
     });
 });

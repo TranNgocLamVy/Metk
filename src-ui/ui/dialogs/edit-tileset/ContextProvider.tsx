@@ -7,11 +7,11 @@ import { FileDialogService, FileSystemService } from "@/infrastructure/container
 import { Console } from "@/ui/notifications/console-gateway";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { TextureUtils } from "@/shared/utils/texture.utils";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import i18n from "@/app/providers/i18n";
 
 export function useTilesetController(initialTileset: Tileset, dialogId: string) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
 
     const [version, setVersion] = useState(0);
     const [tileset] = useState<Tileset>(initialTileset);

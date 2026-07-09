@@ -25,7 +25,7 @@ import { UpdatePropertyCommand } from "@/application/commands/update-property.co
 import { EditorFacade } from "@/application/editor.facade";
 import { IUndoableCommand, IUndoableCommandContext } from "@/editor/interface/base-command.interface";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { getLayerManagerStoreState, resetLayerManagerStoreForTest, setLayerManagerStoreStateForTest } from "@/ui/stores/layer-manager.store";
 
 import {
     createTilemap,
@@ -34,7 +34,7 @@ import {
 } from "../../application/commands/layer/layer-command-test-utils";
 
 const resetLayerManagerStore = () => {
-    useLayerManagerStore.setState(useLayerManagerStore.getInitialState(), true);
+    resetLayerManagerStoreForTest();
 };
 
 const createServiceHarness = (selectedLayers: string[] = []) => {
@@ -110,14 +110,14 @@ describe("TilemapLayerActions.getSelectedParentLayer", () => {
 
     it("returns the most recently selected group layer from the layer manager store", () => {
         const { tilemap } = createServiceHarness();
-        useLayerManagerStore.getState().setSelectedLayer(["group-a", "tile-root", "group-b"]);
+        getLayerManagerStoreState().actions.setSelectedLayer(["group-a", "tile-root", "group-b"]);
 
         expect(TilemapLayerActions.getSelectedParentLayer(tilemap)?.id).toBe("group-b");
     });
 
     it("returns null when the current store selection has no group layers", () => {
         const { tilemap } = createServiceHarness();
-        useLayerManagerStore.getState().setSelectedLayer(["tile-a", "tile-root"]);
+        getLayerManagerStoreState().actions.setSelectedLayer(["tile-a", "tile-root"]);
 
         expect(TilemapLayerActions.getSelectedParentLayer(tilemap)).toBeNull();
     });
@@ -132,13 +132,13 @@ describe("TilemapLayerService layer creation", () => {
     it("creates a tile layer under the selected group parent through one history transaction", async () => {
         const { root, historyManager } = createServiceHarness();
         const group = requireGroupLayer(root, "group-a");
-        useLayerManagerStore.getState().setSelectedLayer(["group-a"]);
+        getLayerManagerStoreState().actions.setSelectedLayer(["group-a"]);
 
         await TilemapLayerActions.createNewTileLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(CreateTileLayerCommand);
-        const editingId = useLayerManagerStore.getState().editingId;
+        const editingId = getLayerManagerStoreState().editingId;
         expect(editingId).toEqual(expect.any(String));
         expect(root.findLayer(editingId!)?.parentLayer.id).toBe("group-a");
         expect(root.findLayer(editingId!)?.serialize()).toMatchObject({
@@ -151,13 +151,13 @@ describe("TilemapLayerService layer creation", () => {
 
     it("creates a rule layer under the selected group parent through one history transaction", async () => {
         const { root, historyManager } = createServiceHarness();
-        useLayerManagerStore.getState().setSelectedLayer(["group-a"]);
+        getLayerManagerStoreState().actions.setSelectedLayer(["group-a"]);
 
         await TilemapLayerActions.createNewRuleLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(CreateRuleLayerCommand);
-        const editingId = useLayerManagerStore.getState().editingId;
+        const editingId = getLayerManagerStoreState().editingId;
         expect(root.findLayer(editingId!)?.parentLayer.id).toBe("group-a");
         expect(root.findLayer(editingId!)?.serialize()).toMatchObject({
             type: "rule",
@@ -168,13 +168,13 @@ describe("TilemapLayerService layer creation", () => {
 
     it("creates a group layer under root when no selected group parent exists", async () => {
         const { root, historyManager } = createServiceHarness();
-        useLayerManagerStore.getState().setSelectedLayer(["tile-root"]);
+        getLayerManagerStoreState().actions.setSelectedLayer(["tile-root"]);
 
         await TilemapLayerActions.createNewGroupLayer();
 
         expectSingleTransaction(historyManager, 1);
         expect(historyManager.execute.mock.calls[0][0]).toBeInstanceOf(CreateGroupLayerCommand);
-        const editingId = useLayerManagerStore.getState().editingId;
+        const editingId = getLayerManagerStoreState().editingId;
         expect(root.findLayer(editingId!)?.parentLayer.id).toBe("root");
         expect(layerIds(root)[0]).toBe(editingId);
     });

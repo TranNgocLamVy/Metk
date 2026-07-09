@@ -2,17 +2,33 @@ import { create } from "zustand";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 
-export type AppcoreState = {
+type AppcoreState = {
     isAppcoreLoaded: boolean;
+}
+
+type AppcoreActions = {
     setIsAppcoreLoaded: (value: boolean) => void;
 }
 
-export const useAppcore = create<AppcoreState>((set, get) => {
-    appKernel.load().then((result) => {
+type AppcoreStore = AppcoreState & {
+    actions: AppcoreActions;
+}
+
+const useAppcoreStore = create<AppcoreStore>((set) => {
+    appKernel.load().then(() => {
         set({ isAppcoreLoaded: true });
     })
     return {
         isAppcoreLoaded: false,
-        setIsAppcoreLoaded: (value: boolean) => set({ isAppcoreLoaded: value }),
+        actions: {
+            setIsAppcoreLoaded: (value) => set({ isAppcoreLoaded: value }),
+        },
     }
 });
+
+export const useIsAppcoreLoaded = () => useAppcoreStore((state) => state.isAppcoreLoaded);
+export const useAppcoreActions = () => useAppcoreStore((state) => state.actions);
+
+export const getAppcoreStoreState = () => useAppcoreStore.getState();
+export const resetAppcoreStoreForTest = () => useAppcoreStore.setState(useAppcoreStore.getInitialState(), true);
+export const setAppcoreStoreStateForTest = (state: Partial<AppcoreState>) => useAppcoreStore.setState(state);

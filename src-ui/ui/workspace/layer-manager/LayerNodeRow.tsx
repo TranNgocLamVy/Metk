@@ -3,7 +3,7 @@ import { DragEvent, MouseEvent, useEffect, useRef, useState } from "react";
 
 import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
 import { GroupLayer } from "@/editor/model/tilemap/layer/group-layer";
-import { DropPosition, LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { DropPosition, LayerView, useEditingLayerId, useLayerManagerActions, useSelectedLayers } from "@/ui/stores/layer-manager.store";
 
 import { PropertyUpdateMeta } from "@/editor/model/base-object";
 import { EntityLayer } from "@/editor/model/tilemap/layer/entity-layer";
@@ -11,7 +11,7 @@ import { ImageLayer } from "@/editor/model/tilemap/layer/image-layer";
 import { RuleLayer } from "@/editor/model/tilemap/layer/rule-layer";
 import { TileLayer } from "@/editor/model/tilemap/layer/tile-layer";
 import { Button } from "@/ui/components/shadcn/button";
-import { usePropertyStore } from "@/ui/stores/property.store";
+import { usePropertyActions } from "@/ui/stores/property.store";
 
 
 const RENAME_INPUT_FOCUS_DELAY_MS = 100;
@@ -34,8 +34,10 @@ type LayerNodeRowProps = {
 };
 
 export default function LayerNodeRow({ view, isSelected, updatedLayerView }: LayerNodeRowProps) {
-	const { editingId, selectedLayers, setEditingId } = useLayerManagerStore();
-	const { setObjectId } = usePropertyStore();
+	const editingId = useEditingLayerId();
+	const selectedLayers = useSelectedLayers();
+	const { setEditingId } = useLayerManagerActions();
+	const { setObjectId } = usePropertyActions();
 
 	const layer = view.layer;
 	const isGroup = layer instanceof GroupLayer;
@@ -218,7 +220,7 @@ type RenameLayerInputProps = {
 };
 
 export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: RenameLayerInputProps) {
-	const store = useLayerManagerStore();
+	const { setEditingId } = useLayerManagerActions();
 	const [tempName, setTempName] = useState(initialName);
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -237,7 +239,7 @@ export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: Rena
 			TilemapLayerActions.renameLayer(layerId, tempName, isRenameByUIRef.current);
 		}
 		isRenameByUIRef.current = false;
-		store.setEditingId(null);
+		setEditingId(null);
 	};
 
 	return (
@@ -248,7 +250,7 @@ export function RenameLayerInput({ layerId, initialName, isRenameByUIRef }: Rena
 			onBlur={handleRename}
 			onKeyDown={(e) => {
 				if (e.key === "Enter") handleRename();
-				if (e.key === "Escape") store.setEditingId(null);
+				if (e.key === "Escape") setEditingId(null);
 			}}
 			onClick={(e) => e.stopPropagation()}
 			className="truncate w-40 text-xs border text-foreground p-1 left-20 absolute"

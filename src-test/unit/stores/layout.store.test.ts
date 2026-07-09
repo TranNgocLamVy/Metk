@@ -1,15 +1,14 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { resetStore } from "./store-test-utils";
-import { useLayoutStore } from "@/ui/stores/layout.store";
+import { getLayoutStoreState, resetLayoutStoreForTest } from "@/ui/stores/layout.store";
 
 describe("useLayoutStore", () => {
     beforeEach(() => {
-        resetStore(useLayoutStore);
+        resetLayoutStoreForTest();
     });
 
     it("initializes with the default workspace layout model", () => {
-        expect(useLayoutStore.getState().model).toEqual(expect.objectContaining({
+        expect(getLayoutStoreState().model.toJson()).toEqual(expect.objectContaining({
             layout: expect.any(Object),
         }));
     });
@@ -17,7 +16,7 @@ describe("useLayoutStore", () => {
     it("sets the layout model", () => {
         const model = { id: "layout-model" } as any;
 
-        useLayoutStore.getState().setModel(model);
-        expect(useLayoutStore.getState().model).toBe(model);
+        getLayoutStoreState().actions.setModel(model);
+        expect(getLayoutStoreState().model).toBe(model);
     });
 });

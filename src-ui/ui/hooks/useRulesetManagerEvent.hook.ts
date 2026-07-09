@@ -1,11 +1,11 @@
 import { RulesetManagerEvent } from "@/application/resources/ruleset/ruleset.manager";
-import { useProjectStore } from "../stores/project.store";
+import { useActiveProject } from "../stores/project.store";
 import { useEffect } from "react";
 
 
 
 export function useRulesetManagerEvent<TEvent extends keyof RulesetManagerEvent>(eventName: TEvent, callback: RulesetManagerEvent[TEvent]) {
-    const currentProject = useProjectStore((state) => state.activeProject);
+    const currentProject = useActiveProject();
 
     useEffect(() => {
         if (!currentProject) return;

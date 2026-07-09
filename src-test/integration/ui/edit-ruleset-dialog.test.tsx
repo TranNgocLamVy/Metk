@@ -83,8 +83,8 @@ vi.mock("react-i18next", () => ({
 
 import { RuleRequirement } from "@/shared/data-types/ruleset.data";
 import { EditRulesetDialog } from "@/ui/dialogs/edit-ruleset/EditRulesetDialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreActionsForTest, setDialogStoreStateForTest } from "@/ui/stores/dialog.store";
+import { getRulesetStoreState, resetRulesetStoreForTest, setRulesetStoreStateForTest } from "@/ui/stores/ruleset.store";
 
 class FakeConstraint {
     private requirement: RuleRequirement;
@@ -233,9 +233,9 @@ const createDragEvent = (type: string, dataTransfer: DataTransfer, clientY = 0) 
 };
 
 beforeEach(() => {
-    useDialogStore.setState(useDialogStore.getInitialState(), true);
-    useRulesetStore.setState(useRulesetStore.getInitialState(), true);
-    useRulesetStore.getState().setRulesetDisplayData([
+    resetDialogStoreForTest();
+    resetRulesetStoreForTest();
+    getRulesetStoreState().actions.setRulesetDisplayData([
         { id: "terrain", name: "Terrain Rules", color: "#22c55e" },
         { id: "water", name: "Water Rules", color: "#38bdf8" },
     ]);
@@ -386,7 +386,7 @@ describe("Edit ruleset dialog workflow", () => {
             saveRuleset: vi.fn().mockResolvedValue(undefined),
         };
         const closeDialog = vi.fn();
-        useDialogStore.setState({ ...useDialogStore.getState(), closeDialog });
+        setDialogStoreActionsForTest({ closeDialog });
         editRulesetMocks.appKernel.editorFacade.currentProject = {
             rulesetManager,
             tilesetManager: {
@@ -427,7 +427,7 @@ describe("Edit ruleset dialog workflow", () => {
             updateRuleset: vi.fn(),
             saveRuleset: vi.fn(),
         };
-        useDialogStore.setState({ ...useDialogStore.getState(), closeDialog });
+        setDialogStoreActionsForTest({ closeDialog });
         editRulesetMocks.appKernel.editorFacade.currentProject = {
             rulesetManager,
             tilesetManager: {

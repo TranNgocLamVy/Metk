@@ -6,16 +6,33 @@ type RulesetDisplayData = {
     color: string,
 }
 
-type RulesetStoreState = {
+type RulesetState = {
     rulesetDisplayDatas: RulesetDisplayData[],
     currentSelectedRuleId: string | null,
+}
+
+type RulesetActions = {
     setRulesetDisplayData: (rulesetDisplayData: RulesetDisplayData[]) => void,
     setCurrentSelectedRuleId: (currentSelectedRuleId: string | null) => void,
 }
 
-export const useRulesetStore = create<RulesetStoreState>((set) => ({
+type RulesetStore = RulesetState & {
+    actions: RulesetActions;
+}
+
+const useRulesetStore = create<RulesetStore>((set) => ({
     rulesetDisplayDatas: [],
     currentSelectedRuleId: null,
-    setRulesetDisplayData: (rulesetDisplayData: RulesetDisplayData[]) => set({ rulesetDisplayDatas: rulesetDisplayData }),
-    setCurrentSelectedRuleId: (currentSelectedRuleId: string | null) => set({ currentSelectedRuleId }),
+    actions: {
+        setRulesetDisplayData: (rulesetDisplayData) => set({ rulesetDisplayDatas: rulesetDisplayData }),
+        setCurrentSelectedRuleId: (currentSelectedRuleId) => set({ currentSelectedRuleId }),
+    },
 }));
+
+export const useRulesetDisplayDatas = () => useRulesetStore((state) => state.rulesetDisplayDatas);
+export const useCurrentSelectedRuleId = () => useRulesetStore((state) => state.currentSelectedRuleId);
+export const useRulesetActions = () => useRulesetStore((state) => state.actions);
+
+export const getRulesetStoreState = () => useRulesetStore.getState();
+export const resetRulesetStoreForTest = () => useRulesetStore.setState(useRulesetStore.getInitialState(), true);
+export const setRulesetStoreStateForTest = (state: Partial<RulesetState>) => useRulesetStore.setState(state);

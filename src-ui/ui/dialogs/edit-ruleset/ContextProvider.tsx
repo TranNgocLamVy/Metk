@@ -1,7 +1,7 @@
 import { appKernel } from '@/application/bootstrap/app-kernel';
 import { Ruleset } from '@/editor/model/ruleset/ruleset';
 import { RuleRequirement } from '@/shared/data-types/ruleset.data';
-import { useRulesetStore } from '@/ui/stores/ruleset.store';
+import { useRulesetDisplayDatas } from '@/ui/stores/ruleset.store';
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { RulesetOutputSelector } from "./graphics/ruleset-ouput-selector.renderer";
 
@@ -9,7 +9,7 @@ export function useRulesetController(initialRuleset: Ruleset) {
     const [version, setVersion] = useState<number>(0);
     const triggerUpdate = useCallback(() => { setVersion((v) => v + 1) }, []);
 
-    const { rulesetDisplayDatas: rulesetList } = useRulesetStore();
+    const rulesetList = useRulesetDisplayDatas();
     
     const tilesetList = useMemo(() => {
         const currentProject = appKernel.editorFacade.currentProject;

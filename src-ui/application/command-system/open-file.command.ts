@@ -2,7 +2,7 @@ import { EditorFacade } from "@/application/editor.facade";
 import { ISystemCommand } from "@/editor/interface/base-command.interface";
 import { DialogZLevel } from "@/shared/types/dialog";
 import { Result } from "@/shared/types/result";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { getDialogStoreState } from "@/ui/stores/dialog.store";
 import { SystemCommand } from "../commands/command.decorator";
 import { SYSTEM_COMMAND_IDS } from "./command-ids";
 
@@ -15,7 +15,7 @@ import { SYSTEM_COMMAND_IDS } from "./command-ids";
 })
 export class OpenFileCommand implements ISystemCommand {
     public execute(editorFacade: EditorFacade): Result {
-        useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal });
+        getDialogStoreState().actions.openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal });
         return Result.Success();
     }
 }

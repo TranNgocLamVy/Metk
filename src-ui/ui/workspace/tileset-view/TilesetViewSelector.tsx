@@ -1,31 +1,29 @@
 import { TilesetView } from "@/graphics/view/tileset.view";
 import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { useTilesetSessionEvent } from "@/ui/hooks/useTilesetSessionEvent.hook";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useTilesetPixiApp, useTilesetSessionActions } from "@/ui/stores/tileset-session.store";
+import { useActiveWorkspace } from "@/ui/stores/workspace.store";
 import { useCallback, useEffect, useRef } from "react";
 import TilesetViewCanvas from "./TilesetViewCanvas";
 import TilesetViewTabs from "./TilesetViewTabs";
 
 export default function TilesetViewSelector() {
-	const { activeWorkspace } = useWorkspaceStore();
-	const { pixiApp, setTilesetSessions } = useTilesetSessionStore();
+	const activeWorkspace = useActiveWorkspace();
+	const pixiApp = useTilesetPixiApp();
+	const { setTilesetSessions, setActiveSession } = useTilesetSessionActions();
 
 	const activeViewRef = useRef<{ id: string, view: TilesetView } | null>(null);
 	const viewRefMap = useRef<Map<string, TilesetView>>(new Map());
 
 	const updateTilesetSessionList = useCallback(() => {
-		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
 		if (!activeWorkspace) return;
 
 		const tilesetSessionManager = activeWorkspace.tilesetSessionManager
 		const sessionList = tilesetSessionManager.tilesetsSession.map(session => ({ name: session.tileset.name, sessionId: session.id }));
 		setTilesetSessions(sessionList);
-	}, [])
+	}, [activeWorkspace, setTilesetSessions])
 
 	const activateView = useCallback((view: TilesetView) => {
-		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
 		const tilesetSessionManager = activeWorkspace.tilesetSessionManager;
@@ -35,12 +33,11 @@ export default function TilesetViewSelector() {
 
 		tilesetSessionManager.registerActiveView(view);
 
-		useTilesetSessionStore.getState().setActiveSession(view.session);
-	}, [])
+		setActiveSession(view.session);
+	}, [activeWorkspace, pixiApp, setActiveSession])
 
 	const deactivateCurrentView = useCallback(() => {
 		const activeView = activeViewRef.current;
-		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
 
 		if (!activeWorkspace || !activeView) return;
 
@@ -50,8 +47,8 @@ export default function TilesetViewSelector() {
 		const tilesetSessionManager = activeWorkspace!.tilesetSessionManager;
 		tilesetSessionManager.unregisterActiveView();
 
-		useTilesetSessionStore.getState().setActiveSession(null);
-	}, [])
+		setActiveSession(null);
+	}, [activeWorkspace, setActiveSession])
 
 	useEffect(() => {
 		if (!activeWorkspace || !pixiApp) return;
@@ -77,13 +74,11 @@ export default function TilesetViewSelector() {
 
 			tilesetSessionManager.unregisterActiveView();
 
-			useTilesetSessionStore.getState().setActiveSession(null);
+			setActiveSession(null);
 		}
-	}, [activeWorkspace, pixiApp])
+	}, [activeWorkspace, activateView, pixiApp, setActiveSession, updateTilesetSessionList])
 
 	useTilesetSessionEvent("onOpenTilesetSession", (session) => {
-		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
 		const activeView = activeViewRef.current;
@@ -101,8 +96,6 @@ export default function TilesetViewSelector() {
 	})
 
 	useTilesetSessionEvent("onCreateTilesetSession", (session) => {
-		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
 		if (viewRefMap.current.has(session.id)) return;
@@ -113,8 +106,6 @@ export default function TilesetViewSelector() {
 	})
 
 	useTilesetSessionEvent("onCloseTilesetSession", (sessionId) => {
-		const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-		const pixiApp = useTilesetSessionStore.getState().pixiApp;
 		if (!activeWorkspace || !pixiApp) return;
 
 		const activeView = activeViewRef.current;

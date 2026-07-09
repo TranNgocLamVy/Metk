@@ -4,7 +4,7 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { BaseDialogProps } from "@/ui/components/dialog/dialogRegistry";
 import { Dialog, DialogContent, DialogTitle } from "@/ui/components/shadcn/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { useEffect, useMemo, useState } from "react";
 import { EditRulesetContext, useRulesetController } from "./ContextProvider";
 import OutputSelector from "./OutputSelector";
@@ -32,7 +32,7 @@ export function EditRulesetDialog({ dialogId, rulesetId }: EditRulesetDialogProp
 }
 
 function EditRulesetDialogProvider({ clonedRuleset, dialogId }: { clonedRuleset: Ruleset, dialogId: string }) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
 
     const controller = useRulesetController(clonedRuleset);
 

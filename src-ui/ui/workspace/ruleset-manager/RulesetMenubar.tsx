@@ -3,12 +3,12 @@ import * as RulesetActions from "@/application/actions/ruleset.actions";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { useCurrentSelectedRuleId } from "@/ui/stores/ruleset.store";
 import { Pen, Plus, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 
 export default function RulesetMenuBar() {
-    const { currentSelectedRuleId } = useRulesetStore();
+    const currentSelectedRuleId = useCurrentSelectedRuleId();
 
     const onEditRule = useCallback(() => {
         if (!currentSelectedRuleId) return;

@@ -1,7 +1,7 @@
 import { PermissionDialogOptions } from "@/shared/types/confirmation-dialog";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/ui/components/shadcn/alert-dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "./dialogRegistry";
 
 interface PermissionDialogProps extends BaseDialogProps {
@@ -10,7 +10,7 @@ interface PermissionDialogProps extends BaseDialogProps {
 }
 
 export function PermissionDialog({ resolve, dialogId, permissionDialog }: PermissionDialogProps) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
 
     const { title, description, okText = "global.action.ok", cancelText = "global.action.cancel", okButtonVariant = "default" } = permissionDialog;
 

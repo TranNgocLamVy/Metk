@@ -4,7 +4,7 @@ import { canExecuteCommand, executeCommand } from "@/application/actions/command
 import { SYSTEM_COMMAND_IDS } from "@/application/command-system/command-ids";
 import { getSetting, toggleSetting, updateSetting } from "@/application/actions/setting.actions";
 import { SETTING_KEYS, ShowEntityName, Snapping } from "@/application/settings/setting.enum";
-import { useConsoleStore } from "@/ui/stores/console.store";
+import { getConsoleStoreState } from "@/ui/stores/console.store";
 
 
 const noop = () => {};
@@ -20,13 +20,13 @@ const ViewDropdownOptionGroup1: MenuDropDownGroupType = [
 					type: "option",
 					label: "menu.view.action.layout.console",
 					startIcon: <Info />,
-					onClick: () => useConsoleStore.getState().toggleWithType("log"),
+					onClick: () => getConsoleStoreState().actions.toggleWithType("log"),
 				},
 				{
 					type: "option",
 					label: "menu.view.action.layout.issues",
 					startIcon: <TriangleAlert />,
-					onClick: () => useConsoleStore.getState().toggleWithType("error"),
+					onClick: () => getConsoleStoreState().actions.toggleWithType("error"),
 				},
 			],
 			[

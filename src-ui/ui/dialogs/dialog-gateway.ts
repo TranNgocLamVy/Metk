@@ -1,4 +1,4 @@
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { getDialogStoreState } from "@/ui/stores/dialog.store";
 import { Field, FormDialogOptions, ShapeFromInputs, Simplify } from "@/shared/types/form-dialog";
 import { PermissionDialogOptions, SaveDialogOptions, SaveResult } from "@/shared/types/confirmation-dialog";
 import { DialogZLevel } from "@/shared/types/dialog";
@@ -10,25 +10,25 @@ import type { DiscoveredExampleProjectTemplate } from "@/application/templates/e
 export class DialogService {
     public static openFormDialog<const I extends readonly Field[]>(opts: FormDialogOptions<I>): Promise<Simplify<ShapeFromInputs<I>> | null> {
         return new Promise<Simplify<ShapeFromInputs<I>> | null>((resolve) => {
-            useDialogStore.getState().openDialog("FORM_DIALOG", { zLevel: DialogZLevel.Modal }, { resolve, formDialog: opts });
+            getDialogStoreState().actions.openDialog("FORM_DIALOG", { zLevel: DialogZLevel.Modal }, { resolve, formDialog: opts });
         })
     }
 
     public static async openPermissionDialog(opts: PermissionDialogOptions): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            useDialogStore.getState().openDialog("PERMISSION_DIALOG", { zLevel: DialogZLevel.AlertDialog }, { resolve, permissionDialog: opts });
+            getDialogStoreState().actions.openDialog("PERMISSION_DIALOG", { zLevel: DialogZLevel.AlertDialog }, { resolve, permissionDialog: opts });
         });
     }
 
     public static async openSaveDialog(opts: SaveDialogOptions): Promise<SaveResult> {
         return new Promise<SaveResult>((resolve) => {
-            useDialogStore.getState().openDialog("SAVE_DIALOG", { zLevel: DialogZLevel.AlertDialog }, { resolve, saveDialog: opts });
+            getDialogStoreState().actions.openDialog("SAVE_DIALOG", { zLevel: DialogZLevel.AlertDialog }, { resolve, saveDialog: opts });
         });
     }
 
     public static async openExampleProjectTemplateDialog(templates: DiscoveredExampleProjectTemplate[]): Promise<string | null> {
         return new Promise<string | null>((resolve) => {
-            useDialogStore.getState().openDialog("EXAMPLE_PROJECT_TEMPLATE_DIALOG", { zLevel: DialogZLevel.Modal }, { resolve, templates });
+            getDialogStoreState().actions.openDialog("EXAMPLE_PROJECT_TEMPLATE_DIALOG", { zLevel: DialogZLevel.Modal }, { resolve, templates });
         });
     }
 
@@ -41,7 +41,7 @@ export class DialogService {
         const ruleset = await rulesetManager.loadRuleset(id);
         if (!ruleset) return;
         
-        useDialogStore.getState().openDialog("EDIT_RULESET_MODAL", { zLevel: DialogZLevel.Modal }, { rulesetId: id })
+        getDialogStoreState().actions.openDialog("EDIT_RULESET_MODAL", { zLevel: DialogZLevel.Modal }, { rulesetId: id })
     }
 
     public static async openEditEntityDefinitionDialog(entityCollectionId: string, entityId: string): Promise<void> {
@@ -56,9 +56,7 @@ export class DialogService {
         const entity = loadResult.data.getEntityDefinitionById(entityId);
         if (!entity) return;
 
-        useDialogStore
-            .getState()
-            .openDialog(
+        getDialogStoreState().actions.openDialog(
                 "EDIT_ENTITY_DEFINITION_MODAL",
                 { zLevel: DialogZLevel.Modal },
                 { entityCollectionId, entityId },
@@ -74,9 +72,7 @@ export class DialogService {
     
         if (loadResult.status !== Result.Status.Success) return;
     
-        useDialogStore
-            .getState()
-            .openDialog(
+        getDialogStoreState().actions.openDialog(
                 "EDIT_TILESET_MODAL",
                 { zLevel: DialogZLevel.Modal },
                 { tilesetId: id },

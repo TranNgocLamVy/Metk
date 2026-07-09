@@ -237,14 +237,14 @@ import { Tileset } from "@/editor/model/tileset/tileset";
 import { EditorObjectRegistry } from "@/editor/registry/editor-object.registry";
 import { FilePathSystem, ProjectPathSystem } from "@/infrastructure/project-path-system";
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
-import { useConsoleStore } from "@/ui/stores/console.store";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { useLayoutStore } from "@/ui/stores/layout.store";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { getConsoleStoreState, resetConsoleStoreForTest, setConsoleStoreStateForTest } from "@/ui/stores/console.store";
+import { getLayerManagerStoreState, resetLayerManagerStoreForTest, setLayerManagerStoreStateForTest } from "@/ui/stores/layer-manager.store";
+import { getLayoutStoreState, resetLayoutStoreForTest, setLayoutStoreStateForTest } from "@/ui/stores/layout.store";
+import { getProjectStoreState, resetProjectStoreForTest, setProjectStoreStateForTest } from "@/ui/stores/project.store";
+import { getRulesetStoreState, resetRulesetStoreForTest, setRulesetStoreStateForTest } from "@/ui/stores/ruleset.store";
+import { getTilemapSessionStoreState, resetTilemapSessionStoreForTest, setTilemapSessionStoreStateForTest } from "@/ui/stores/tilemap-session.store";
+import { getTilesetSessionStoreState, resetTilesetSessionStoreForTest, setTilesetSessionStoreStateForTest } from "@/ui/stores/tileset-session.store";
+import { getWorkspaceStoreState, resetWorkspaceStoreForTest, setWorkspaceStoreStateForTest } from "@/ui/stores/workspace.store";
 import Workspace from "@/ui/workspace/Workspace";
 import WorkspaceConsole from "@/ui/workspace/console/Console";
 import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
@@ -478,10 +478,10 @@ const setWorkspaceFixture = () => {
         rulesetSessionManager.setSelectedRuleId(rulesetId);
     });
 
-    useWorkspaceStore.getState().setActiveWorkspace(workspace as any);
-    useProjectStore.getState().setActiveProject(project as any);
-    useTilemapSessionStore.getState().setPixiApp({ renderer: { resize: vi.fn() } } as any);
-    useTilesetSessionStore.getState().setPixiApp({ renderer: { resize: vi.fn() } } as any);
+    getWorkspaceStoreState().actions.setActiveWorkspace(workspace as any);
+    getProjectStoreState().actions.setActiveProject(project as any);
+    getTilemapSessionStoreState().actions.setPixiApp({ renderer: { resize: vi.fn() } } as any);
+    getTilesetSessionStoreState().actions.setPixiApp({ renderer: { resize: vi.fn() } } as any);
 
     return { overworld, dungeon, terrainTiles, dungeonTiles, tilemapSessionManager, tilesetSessionManager, rulesetSessionManager, rulesetManager, workspace, project };
 };
@@ -499,7 +499,7 @@ const setWorkspaceLayoutModel = () => {
         },
     };
 
-    useLayoutStore.getState().setModel({
+    getLayoutStoreState().actions.setModel({
         ...layout,
         getNodeById: (id: string) => {
             const findNode = (node: any): any => {
@@ -520,14 +520,14 @@ const setWorkspaceLayoutModel = () => {
 
 describe("Metk UI integration workflows", () => {
     beforeEach(() => {
-        resetStore(useConsoleStore);
-        resetStore(useLayoutStore);
-        resetStore(useLayerManagerStore);
-        resetStore(useProjectStore);
-        resetStore(useRulesetStore);
-        resetStore(useTilemapSessionStore);
-        resetStore(useTilesetSessionStore);
-        resetStore(useWorkspaceStore);
+        resetConsoleStoreForTest();
+        resetLayoutStoreForTest();
+        resetLayerManagerStoreForTest();
+        resetProjectStoreForTest();
+        resetRulesetStoreForTest();
+        resetTilemapSessionStoreForTest();
+        resetTilesetSessionStoreForTest();
+        resetWorkspaceStoreForTest();
 
         mockState.appKernel.workspaceManager.currentWorkspace = null;
         mockState.appKernel.projectManager.currentProject = null;
@@ -561,8 +561,8 @@ describe("Metk UI integration workflows", () => {
         expect(screen.getByText("Overworld Group")).toBeVisible();
         expect(screen.getByText("Overworld Collision")).toBeVisible();
         expect(screen.getByText("Terrain Rules")).toBeVisible();
-        expect(useTilemapSessionStore.getState().activeSession?.id).toBe("tilemap-overworld-session");
-        expect(useTilesetSessionStore.getState().activeSession?.id).toBe("tileset-terrain-session");
+        expect(getTilemapSessionStoreState().activeSession?.id).toBe("tilemap-overworld-session");
+        expect(getTilesetSessionStoreState().activeSession?.id).toBe("tileset-terrain-session");
     });
 
     it("switches tilemap sessions and updates visible editor tab state", async () => {
@@ -575,7 +575,7 @@ describe("Metk UI integration workflows", () => {
         await user.click(dungeonTab);
 
         await waitFor(() => {
-            expect(useTilemapSessionStore.getState().activeSession?.id).toBe(dungeon.id);
+            expect(getTilemapSessionStoreState().activeSession?.id).toBe(dungeon.id);
         });
         expect(WorkspaceActions.openTilemapSession).toHaveBeenCalledWith(dungeon.id);
         expect(dungeonTab).toHaveClass("bg-surface");
@@ -592,7 +592,7 @@ describe("Metk UI integration workflows", () => {
         await user.click(dungeonTilesTab);
 
         await waitFor(() => {
-            expect(useTilesetSessionStore.getState().activeSession?.id).toBe(dungeonTiles.id);
+            expect(getTilesetSessionStoreState().activeSession?.id).toBe(dungeonTiles.id);
         });
         expect(WorkspaceActions.openTilesetSession).toHaveBeenCalledWith(dungeonTiles.id);
         expect(dungeonTilesTab).toHaveClass("bg-surface");
@@ -601,22 +601,22 @@ describe("Metk UI integration workflows", () => {
 
     it("shows the console panel selected by console state and user tab changes", async () => {
         const user = userEvent.setup();
-        useConsoleStore.getState().openWithType("log");
-        useConsoleStore.getState().addLog({
+        getConsoleStoreState().actions.openWithType("log");
+        getConsoleStoreState().actions.addLog({
             id: "log-a",
             uiId: "log-ui-a",
             timestamp: Date.now(),
             level: "info",
             message: "Loaded workspace",
         });
-        useConsoleStore.getState().addError({
+        getConsoleStoreState().actions.addError({
             id: "error-a",
             uiId: "error-ui-a",
             timestamp: Date.now(),
             message: "Failed to export",
             stacks: ["Stack trace"],
         });
-        useConsoleStore.getState().openWithType("log");
+        getConsoleStoreState().actions.openWithType("log");
 
         render(<WorkspaceConsole />);
 
@@ -625,7 +625,7 @@ describe("Metk UI integration workflows", () => {
 
         await user.click(screen.getByText("Error"));
 
-        expect(useConsoleStore.getState().consoleType).toBe("error");
+        expect(getConsoleStoreState().consoleType).toBe("error");
         expect(screen.getByText("Failed to export")).toBeVisible();
         expect(screen.queryByText("Loaded workspace")).not.toBeInTheDocument();
     });
@@ -638,12 +638,12 @@ describe("Metk UI integration workflows", () => {
 
         expect(await screen.findByText("Terrain Rules")).toBeVisible();
         expect(screen.getByText("Water Rules")).toBeVisible();
-        expect(useRulesetStore.getState().currentSelectedRuleId).toBe("terrain");
+        expect(getRulesetStoreState().currentSelectedRuleId).toBe("terrain");
 
         await user.click(screen.getByText("Water Rules"));
 
         expect(WorkspaceActions.selectRuleset).toHaveBeenCalledWith("water");
-        expect(useRulesetStore.getState().currentSelectedRuleId).toBe("water");
+        expect(getRulesetStoreState().currentSelectedRuleId).toBe("water");
 
         act(() => {
             rulesetManager.replaceRulesets([
@@ -658,7 +658,7 @@ describe("Metk UI integration workflows", () => {
 
     it("updates layer row visibility and selection state from session events", async () => {
         const { overworld } = setWorkspaceFixture();
-        useTilemapSessionStore.getState().setActiveSession(overworld as any);
+        getTilemapSessionStoreState().actions.setActiveSession(overworld as any);
 
         render(<LayerManager />);
 
@@ -679,6 +679,6 @@ describe("Metk UI integration workflows", () => {
 
         const collisionRow = screen.getByText("Overworld Collision").closest("[draggable='true']");
         expect(collisionRow).toHaveClass("bg-accent");
-        expect(useLayerManagerStore.getState().selectedLayers).toEqual(["overworld-collision"]);
+        expect(getLayerManagerStoreState().selectedLayers).toEqual(["overworld-collision"]);
     });
 });

@@ -17,14 +17,14 @@ import { DialogZLevel } from "@/shared/types/dialog";
 import { Result } from "@/shared/types/result";
 import { PermissionDialog } from "@/ui/components/dialog/PermissionDialog";
 import WorkspacePage from "@/ui/pages/Workspace";
-import { useAppcore } from "@/ui/stores/appcore.store";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
-import { useToolbarStore } from "@/ui/stores/toolbar.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { getAppcoreStoreState, resetAppcoreStoreForTest, setAppcoreStoreStateForTest } from "@/ui/stores/appcore.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreStateForTest, useDialogs } from "@/ui/stores/dialog.store";
+import { getLayerManagerStoreState, resetLayerManagerStoreForTest, setLayerManagerStoreStateForTest } from "@/ui/stores/layer-manager.store";
+import { getProjectStoreState, resetProjectStoreForTest, setProjectStoreStateForTest } from "@/ui/stores/project.store";
+import { getTilemapSessionStoreState, resetTilemapSessionStoreForTest, setTilemapSessionStoreStateForTest } from "@/ui/stores/tilemap-session.store";
+import { getTilesetSessionStoreState, resetTilesetSessionStoreForTest, setTilesetSessionStoreStateForTest } from "@/ui/stores/tileset-session.store";
+import { getToolbarStoreState, resetToolbarStoreForTest, setToolbarStoreStateForTest } from "@/ui/stores/toolbar.store";
+import { getWorkspaceStoreState, resetWorkspaceStoreForTest, setWorkspaceStoreStateForTest } from "@/ui/stores/workspace.store";
 import LayerManager from "@/ui/workspace/layer-manager/LayerManager";
 import TilemapEditorTabs from "@/ui/workspace/tilemap-editor/TilemapEditorTabs";
 import ToolBar from "@/ui/workspace/ToolBar";
@@ -321,10 +321,10 @@ const setActiveTilemapWorkspace = (session: TestTilemapSession) => {
 
 function PermissionDialogWorkflow() {
     const [status, setStatus] = useState("Layer still present");
-    const dialog = useDialogStore((state) => state.dialogs[0]);
+    const dialog = useDialogs()[0];
 
     const openDialog = () => {
-        useDialogStore.getState().openDialog(
+        getDialogStoreState().actions.openDialog(
             "PERMISSION_DIALOG",
             { zLevel: DialogZLevel.AlertDialog },
             {
@@ -355,14 +355,14 @@ function PermissionDialogWorkflow() {
 
 describe("Metk integration workflows", () => {
     beforeEach(() => {
-        resetStore(useAppcore);
-        resetStore(useDialogStore);
-        resetStore(useLayerManagerStore);
-        resetStore(useProjectStore);
-        resetStore(useTilemapSessionStore);
-        resetStore(useTilesetSessionStore);
-        resetStore(useToolbarStore);
-        resetStore(useWorkspaceStore);
+        resetAppcoreStoreForTest();
+        resetDialogStoreForTest();
+        resetLayerManagerStoreForTest();
+        resetProjectStoreForTest();
+        resetTilemapSessionStoreForTest();
+        resetTilesetSessionStoreForTest();
+        resetToolbarStoreForTest();
+        resetWorkspaceStoreForTest();
 
         mockState.appKernel.activationContext.setFlag.mockClear();
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset();
@@ -387,7 +387,7 @@ describe("Metk integration workflows", () => {
     it("loads the requested project and replaces the loading state with the workspace", async () => {
         const loadProject = createDeferred<Result>();
 
-        useAppcore.getState().setIsAppcoreLoaded(true);
+        getAppcoreStoreState().actions.setIsAppcoreLoaded(true);
         mockState.workspaceService.loadProjectWorkspace.mockReturnValue(loadProject.promise);
 
         render(<WorkspacePage />);
@@ -416,7 +416,7 @@ describe("Metk integration workflows", () => {
         });
 
         setActiveTilemapWorkspace(session);
-        useTilemapSessionStore.getState().setActiveSession(session as any);
+        getTilemapSessionStoreState().actions.setActiveSession(session as any);
 
         render(<LayerManager />);
 
@@ -425,7 +425,7 @@ describe("Metk integration workflows", () => {
         await user.click(screen.getByText("Collision"));
 
         expect(session.layerState.selectedLayers).toEqual(["collision"]);
-        expect(useLayerManagerStore.getState().selectedLayers).toEqual(["collision"]);
+        expect(getLayerManagerStoreState().selectedLayers).toEqual(["collision"]);
         expect(screen.getByText("Collision").closest("[draggable='true']")).toHaveClass("bg-accent");
     });
 
@@ -443,7 +443,7 @@ describe("Metk integration workflows", () => {
             isDirty: true,
         });
 
-        useTilemapSessionStore.setState({
+        setTilemapSessionStoreStateForTest({
             activeSession: overworldSession as any,
             tilemapSessions: [
                 { name: "Overworld", sessionId: overworldSession.id, isDirty: false },
@@ -451,9 +451,9 @@ describe("Metk integration workflows", () => {
             ],
         });
         mockState.workspaceService.openTilemapSession.mockImplementation(async (sessionId: string) => {
-            useTilemapSessionStore
-                .getState()
-                .setActiveSession((sessionId === dungeonSession.id ? dungeonSession : overworldSession) as any);
+            getTilemapSessionStoreState().actions.setActiveSession(
+                (sessionId === dungeonSession.id ? dungeonSession : overworldSession) as any,
+            );
         });
 
         render(<TilemapEditorTabs />);
@@ -467,7 +467,7 @@ describe("Metk integration workflows", () => {
         await user.click(dungeonTab);
 
         await waitFor(() => {
-            expect(useTilemapSessionStore.getState().activeSession?.id).toBe(dungeonSession.id);
+            expect(getTilemapSessionStoreState().activeSession?.id).toBe(dungeonSession.id);
         });
         expect(dungeonTab).toHaveClass("bg-surface");
         expect(overworldTab).toHaveClass("text-muted-foreground");
@@ -504,12 +504,12 @@ describe("Metk integration workflows", () => {
 
         const eraserButton = await screen.findByRole("button", { name: "Eraser tool" });
 
-        expect(useToolbarStore.getState().activeFamilyId).toBe("stamp");
+        expect(getToolbarStoreState().activeFamilyId).toBe("stamp");
 
         await user.click(eraserButton);
 
         expect(mockState.appKernel.toolManager.startToolFamily).toHaveBeenCalledWith("eraser");
-        expect(useToolbarStore.getState().activeFamilyId).toBe("eraser");
+        expect(getToolbarStoreState().activeFamilyId).toBe("eraser");
         expect(eraserButton).toHaveClass("bg-accent");
     });
 
@@ -521,7 +521,7 @@ describe("Metk integration workflows", () => {
         await user.click(screen.getByRole("button", { name: "Delete selected layer" }));
 
         expect(screen.getByRole("alertdialog", { name: "Delete selected layer" })).toBeVisible();
-        expect(useDialogStore.getState().dialogs).toHaveLength(1);
+        expect(getDialogStoreState().dialogs).toHaveLength(1);
 
         await user.click(screen.getByRole("button", { name: "Delete" }));
 
@@ -529,6 +529,6 @@ describe("Metk integration workflows", () => {
         await waitFor(() => {
             expect(screen.queryByRole("alertdialog", { name: "Delete selected layer" })).not.toBeInTheDocument();
         });
-        expect(useDialogStore.getState().dialogs).toHaveLength(0);
+        expect(getDialogStoreState().dialogs).toHaveLength(0);
     });
 });

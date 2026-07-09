@@ -1,24 +1,24 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { resetStore } from "./store-test-utils";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { getWorkspaceStoreState, resetWorkspaceStoreForTest, setWorkspaceStoreStateForTest } from "@/ui/stores/workspace.store";
 
 describe("useWorkspaceStore", () => {
     beforeEach(() => {
-        resetStore(useWorkspaceStore);
+        resetWorkspaceStoreForTest();
     });
 
     it("initializes without an active workspace", () => {
-        expect(useWorkspaceStore.getState().activeWorkspace).toBeNull();
+        expect(getWorkspaceStoreState().activeWorkspace).toBeNull();
     });
 
     it("sets the active workspace", () => {
         const workspace = { id: "workspace-1" } as any;
 
-        useWorkspaceStore.getState().setActiveWorkspace(workspace);
-        expect(useWorkspaceStore.getState().activeWorkspace).toBe(workspace);
+        getWorkspaceStoreState().actions.setActiveWorkspace(workspace);
+        expect(getWorkspaceStoreState().activeWorkspace).toBe(workspace);
 
-        useWorkspaceStore.getState().setActiveWorkspace(null);
-        expect(useWorkspaceStore.getState().activeWorkspace).toBeNull();
+        getWorkspaceStoreState().actions.setActiveWorkspace(null);
+        expect(getWorkspaceStoreState().activeWorkspace).toBeNull();
     });
 });

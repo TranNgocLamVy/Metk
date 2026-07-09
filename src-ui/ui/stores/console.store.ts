@@ -11,7 +11,9 @@ interface ConsoleState {
     consoleType: ConsoleType;
     logs: LogMessage[];
     errors: ErrorMessage[];
-    
+}
+
+type ConsoleActions = {
     toggleConsole: () => void;
     closeConsole: () => void;
     openConsole: () => void;
@@ -28,45 +30,61 @@ interface ConsoleState {
     clearAll: () => void;
 }
 
-export const useConsoleStore = create<ConsoleState>((set, get) => ({
+type ConsoleStore = ConsoleState & {
+    actions: ConsoleActions;
+}
+
+const useConsoleStore = create<ConsoleStore>((set) => ({
     isConsoleOpen: false,
     consoleType: "log",
     logs: [],
     errors: [],
 
-    toggleConsole: () => set((state) => ({ isConsoleOpen: !state.isConsoleOpen })),
-    closeConsole: () => set({ isConsoleOpen: false }),
-    openConsole: () => set({ isConsoleOpen: true }),
-    setConsoleType: (type) => set({ consoleType: type }),
-    toggleWithType: (type) => set((state) => ({ 
-        isConsoleOpen: state.isConsoleOpen ? (state.consoleType === type ? false : true) : true, 
-        consoleType: type 
-    })),
-    openWithType: (type) => set({ isConsoleOpen: true, consoleType: type }),
+    actions: {
+        toggleConsole: () => set((state) => ({ isConsoleOpen: !state.isConsoleOpen })),
+        closeConsole: () => set({ isConsoleOpen: false }),
+        openConsole: () => set({ isConsoleOpen: true }),
+        setConsoleType: (type) => set({ consoleType: type }),
+        toggleWithType: (type) => set((state) => ({
+            isConsoleOpen: state.isConsoleOpen ? state.consoleType !== type : true,
+            consoleType: type,
+        })),
+        openWithType: (type) => set({ isConsoleOpen: true, consoleType: type }),
 
-    addLog: (log) => {
-        set((state) => {
-            const updatedLogs = [...state.logs.filter(l => l.id !== log.id), log];
-            return { logs: updatedLogs.slice(-MAX_LOG_MESSAGES) };
-        })
+        addLog: (log) => {
+            set((state) => {
+                const updatedLogs = [...state.logs.filter(l => l.id !== log.id), log];
+                return { logs: updatedLogs.slice(-MAX_LOG_MESSAGES) };
+            })
+        },
+        addError: (error) => {
+            set((state) => {
+                const updatedErrors = [...state.errors.filter(e => e.id !== error.id), error];
+                return {
+                    errors: updatedErrors.slice(-MAX_ERROR_MESSAGES),
+                    isConsoleOpen: true,
+                    consoleType: "error",
+                };
+            })
+        },
+        removeLog: (id) => set((state) => ({
+            logs: state.logs.filter((log) => log.id !== id),
+        })),
+        removeError: (id) => set((state) => ({
+            errors: state.errors.filter((error) => error.id !== id),
+        })),
+        clearLogs: () => set({ logs: [] }),
+        clearErrors: () => set({ errors: [] }),
+        clearAll: () => set({ logs: [], errors: [] }),
     },
-    addError: (error) => {
-        set((state) => {
-            const updatedErrors = [...state.errors.filter(e => e.id !== error.id), error];
-            return { 
-                errors: updatedErrors.slice(-MAX_ERROR_MESSAGES),
-                isConsoleOpen: true, 
-                consoleType: "error" 
-            };
-        })
-    },
-    removeLog: (id) => set((state) => ({
-        logs: state.logs.filter((log) => log.id !== id)
-    })),
-    removeError: (id) => set((state) => ({
-        errors: state.errors.filter((error) => error.id !== id)
-    })),
-    clearLogs: () => set({ logs: [] }),
-    clearErrors: () => set({ errors: [] }),
-    clearAll: () => set({ logs: [], errors: [] })
 }));
+
+export const useIsConsoleOpen = () => useConsoleStore((state) => state.isConsoleOpen);
+export const useConsoleType = () => useConsoleStore((state) => state.consoleType);
+export const useConsoleLogs = () => useConsoleStore((state) => state.logs);
+export const useConsoleErrors = () => useConsoleStore((state) => state.errors);
+export const useConsoleActions = () => useConsoleStore((state) => state.actions);
+
+export const getConsoleStoreState = () => useConsoleStore.getState();
+export const resetConsoleStoreForTest = () => useConsoleStore.setState(useConsoleStore.getInitialState(), true);
+export const setConsoleStoreStateForTest = (state: Partial<ConsoleState>) => useConsoleStore.setState(state);

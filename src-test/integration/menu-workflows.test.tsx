@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import MenuBar from "@/ui/components/menu-bar/MenuBar";
 import DialogRoot from "@/ui/components/dialog/DialogRoot";
-import { useConsoleStore } from "@/ui/stores/console.store";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { usePropertyStore } from "@/ui/stores/property.store";
+import { getConsoleStoreState, resetConsoleStoreForTest, setConsoleStoreStateForTest } from "@/ui/stores/console.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreStateForTest } from "@/ui/stores/dialog.store";
+import { getPropertyStoreState, resetPropertyStoreForTest, setPropertyStoreStateForTest } from "@/ui/stores/property.store";
 import * as ProjectActions from "@/application/actions/project.actions";
 import * as TilemapActions from "@/application/actions/tilemap.actions";
 import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
@@ -205,9 +205,9 @@ const hoverMenuItem = async (user: ReturnType<typeof userEvent.setup>, label: st
 
 describe("Metk menu-driven integration workflows", () => {
     beforeEach(() => {
-        resetStore(useConsoleStore);
-        resetStore(useDialogStore);
-        resetStore(usePropertyStore);
+        resetConsoleStoreForTest();
+        resetDialogStoreForTest();
+        resetPropertyStoreForTest();
         mockState.appKernel.projectManager.currentProject = null;
         mockState.appKernel.workspaceManager.currentWorkspace = null;
         mockState.appKernel.editorFacade.getActiveTilemapSession.mockReset().mockReturnValue(null);
@@ -299,17 +299,17 @@ describe("Metk menu-driven integration workflows", () => {
         const user = userEvent.setup();
         renderMenuBar();
 
-        expect(useConsoleStore.getState().isConsoleOpen).toBe(false);
+        expect(getConsoleStoreState().isConsoleOpen).toBe(false);
 
         await openMenu(user, "menu.view.label");
         await user.keyboard("{ArrowDown}{ArrowRight}{ArrowDown}{Enter}");
 
-        expect(useConsoleStore.getState().isConsoleOpen).toBe(true);
+        expect(getConsoleStoreState().isConsoleOpen).toBe(true);
 
         await openMenu(user, "menu.view.label");
         await user.keyboard("{ArrowDown}{ArrowRight}{ArrowDown}{Enter}");
 
-        expect(useConsoleStore.getState().isConsoleOpen).toBe(false);
+        expect(getConsoleStoreState().isConsoleOpen).toBe(false);
     });
 
     it("selects the active tilemap for property editing from the map menu", async () => {
@@ -320,7 +320,7 @@ describe("Metk menu-driven integration workflows", () => {
         await openMenu(user, "menu.map.label");
         await clickMenuItem(user, "menu.map.action.mapProperties");
 
-        expect(useDialogStore.getState().dialogs).toHaveLength(0);
-        expect(usePropertyStore.getState().objectId).toBe("tilemap-overworld-object");
+        expect(getDialogStoreState().dialogs).toHaveLength(0);
+        expect(getPropertyStoreState().objectId).toBe("tilemap-overworld-object");
     });
 });

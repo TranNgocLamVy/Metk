@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useNavigationStore } from "@/ui/stores/navigation.store";
+import { useNavigationActions } from "@/ui/stores/navigation.store";
 
 import WorkspaceConsole from "@/ui/workspace/console/Console";
 import SecurityShield from "./SecurityShield";
@@ -14,7 +14,7 @@ export default function MainContainer({ children, ...props }: MainContainerProps
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const navigate = useNavigate();
-	const setNavigate = useNavigationStore((s) => s.setNavigate);
+	const { setNavigate } = useNavigationActions();
 
 	useLayoutEffect(() => {
 		setNavigate(navigate);

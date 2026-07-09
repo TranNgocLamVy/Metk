@@ -57,12 +57,12 @@ import SecurityShield from "@/ui/components/layout/SecurityShield";
 import { FallbackRender } from "@/ui/components/layout/FallbackRender";
 import { LanguageLoadingOverlay } from "@/ui/components/layout/LanguageLoadingOverlay";
 import { LayerManagerContextMenu } from "@/ui/workspace/layer-manager/ContextMenu";
-import { useNavigationStore } from "@/ui/stores/navigation.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { getNavigationStoreState, resetNavigationStoreForTest, setNavigationStoreStateForTest } from "@/ui/stores/navigation.store";
+import { getTilemapSessionStoreState, resetTilemapSessionStoreForTest, setTilemapSessionStoreStateForTest } from "@/ui/stores/tilemap-session.store";
 
 const resetStores = () => {
-    useNavigationStore.setState(useNavigationStore.getInitialState(), true);
-    useTilemapSessionStore.setState(useTilemapSessionStore.getInitialState(), true);
+    resetNavigationStoreForTest();
+    resetTilemapSessionStoreForTest();
 };
 
 const openContextMenu = async (target: HTMLElement) => {
@@ -96,7 +96,7 @@ describe("Metk layout UI", () => {
         expect(main).toHaveAttribute("id", "main-container");
         expect(main).toHaveTextContent("Workspace content");
         expect(main).toHaveStyle({ paddingTop: "38px" });
-        expect(useNavigationStore.getState().navigate).toEqual(expect.any(Function));
+        expect(getNavigationStoreState().navigate).toEqual(expect.any(Function));
 
         menuBar.remove();
     });
@@ -204,7 +204,7 @@ describe("Metk context menus", () => {
 
     it("invokes a realistic layer-manager context menu workflow against workspace selection state", async () => {
         const user = userEvent.setup();
-        useTilemapSessionStore.getState().setActiveSession({
+        getTilemapSessionStoreState().actions.setActiveSession({
             id: "tilemap-session",
             layerState: { selectedLayers: ["ground"] },
         } as any);

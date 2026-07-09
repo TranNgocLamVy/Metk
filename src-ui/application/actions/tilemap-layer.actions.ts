@@ -5,7 +5,7 @@ import { DeleteLayerCommand } from "@/application/commands/layer/delete-layer.co
 import { DuplicateLayerCommand } from "@/application/commands/layer/duplicate-layer.command";
 import { MoveLayerCommand } from "@/application/commands/layer/move-layer.command";
 import { UpdatePropertyCommand } from "@/application/commands/update-property.command";
-import { DropPosition, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { DropPosition, getLayerManagerStoreState } from "@/ui/stores/layer-manager.store";
 
 import { CreateGroupLayerCommand } from "@/application/commands/layer/create-group-layer.command";
 import { saveCurrentWorkspace } from "@/application/actions/workspace.actions";
@@ -37,7 +37,7 @@ const getMoveCommandIndex = (parent: IGroupLayer, layer: BaseLayer, desiredIndex
 };
 
 export function getSelectedParentLayer(tilemap: Tilemap): IGroupLayer | null {
-        const selectedIds = Array.from(useLayerManagerStore.getState().selectedLayers).reverse();
+        const selectedIds = Array.from(getLayerManagerStoreState().selectedLayers).reverse();
         
         for (const id of selectedIds) {
             const layer = tilemap.rootLayer.findLayer(id);
@@ -67,7 +67,7 @@ export async function createNewTileLayer() {
         historyManager.execute(createTileLayerCommand, currentSession)
         historyManager.commitTransaction();
 
-        useLayerManagerStore.getState().setEditingId(payload.id);
+        getLayerManagerStoreState().actions.setEditingId(payload.id);
     }
 
 export async function createNewRuleLayer() {
@@ -90,7 +90,7 @@ export async function createNewRuleLayer() {
         historyManager.execute(createRuleLayerCommand, currentSession)
         historyManager.commitTransaction();
 
-        useLayerManagerStore.getState().setEditingId(payload.id);
+        getLayerManagerStoreState().actions.setEditingId(payload.id);
     }
 
 export async function createNewImageLayer() {
@@ -114,7 +114,7 @@ export async function createNewImageLayer() {
         historyManager.execute(createImageLayerCommand, currentSession);
         historyManager.commitTransaction();
     
-        useLayerManagerStore.getState().setEditingId(payload.id);
+        getLayerManagerStoreState().actions.setEditingId(payload.id);
     }
 
 export async function createNewEntityLayer() {
@@ -142,7 +142,7 @@ export async function createNewEntityLayer() {
         historyManager.execute(createEntityLayerCommand, currentSession);
         historyManager.commitTransaction();
     
-        useLayerManagerStore.getState().setEditingId(payload.id);
+        getLayerManagerStoreState().actions.setEditingId(payload.id);
     }
 
 export async function createNewGroupLayer() {
@@ -165,7 +165,7 @@ export async function createNewGroupLayer() {
         historyManager.execute(createGroupLayerCommand, currentSession)
         historyManager.commitTransaction();
 
-        useLayerManagerStore.getState().setEditingId(payload.id);
+        getLayerManagerStoreState().actions.setEditingId(payload.id);
     }
 
 export async function duplicateLayer() {

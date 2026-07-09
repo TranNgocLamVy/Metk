@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { useRelativeFlexLayout } from "@/ui/hooks/useRelativeFlexLayout.hook";
-import { useLayoutStore } from "@/ui/stores/layout.store";
+import { useLayoutModel } from "@/ui/stores/layout.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import EntityCollectionManager from "./entity-collection-manager/EntityCollectionManager";
@@ -20,7 +20,7 @@ import { addWorkspacePanelToModel, removeWorkspacePanelFromModel, syncWorkspaceL
 const settings = appKernel.settings;
 
 export default function Workspace() {
-	const { model } = useLayoutStore();
+	const model = useLayoutModel();
 
 	const layoutRef = useRef<Layout | null>(null);
 	const modelRef = useRef(model);

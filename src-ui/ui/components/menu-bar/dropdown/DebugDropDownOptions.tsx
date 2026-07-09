@@ -1,13 +1,13 @@
 import i18n, { i18nService } from "@/app/providers/i18n";
 import { appKernel } from "@/application/bootstrap/app-kernel";
-import { useNavigationStore } from "@/ui/stores/navigation.store";
+import { getNavigationStoreState } from "@/ui/stores/navigation.store";
 
 const DebugDropdownOptionGroup1: MenuDropDownGroupType = [
 	{
 		type: "option",
 		label: "menu.debug.action.home",
         onClick() {
-            useNavigationStore.getState().navigate?.("/");
+            getNavigationStoreState().navigate?.("/");
         },
 	},
 	{

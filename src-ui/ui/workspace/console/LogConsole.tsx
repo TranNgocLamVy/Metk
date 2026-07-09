@@ -3,12 +3,12 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { useConsoleStore } from "@/ui/stores/console.store";
+import { useConsoleActions, useConsoleLogs } from "@/ui/stores/console.store";
 import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 export default function LogConsole() {
-    const { logs } = useConsoleStore();
+    const logs = useConsoleLogs();
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -36,6 +36,8 @@ export default function LogConsole() {
 }
 
 function LogItem({ log }: { log: any }) {
+    const { removeLog } = useConsoleActions();
+
     return (
         <VStack className="w-full p-2 text-sm hover:bg-foreground/5">
             <HStack align="start" className="gap-2">
@@ -67,7 +69,7 @@ function LogItem({ log }: { log: any }) {
                                 const onClick = async () => {
                                     const result = await act.onClick();
                                     if (result.status === Result.Status.Success) {
-                                        useConsoleStore.getState().removeLog(log.id);
+                                        removeLog(log.id);
                                     }
                                 }
 
@@ -84,7 +86,7 @@ function LogItem({ log }: { log: any }) {
                 <Button
                     size={"icon-xs"}
                     variant={"ghost"}
-                    onClick={() => useConsoleStore.getState().removeLog(log.id)}
+                    onClick={() => removeLog(log.id)}
                     className="ml-auto"
                 >
                     <X size={14} />

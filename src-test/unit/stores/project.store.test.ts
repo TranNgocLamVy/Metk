@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { resetStore } from "./store-test-utils";
-import { useProjectStore } from "@/ui/stores/project.store";
+import { getProjectStoreState, resetProjectStoreForTest, setProjectStoreStateForTest } from "@/ui/stores/project.store";
 
 describe("useProjectStore", () => {
     beforeEach(() => {
-        resetStore(useProjectStore);
+        resetProjectStoreForTest();
     });
 
     it("initializes with serialized projects and no active project", () => {
-        expect(useProjectStore.getState()).toMatchObject({
+        expect(getProjectStoreState()).toMatchObject({
             projects: [],
             activeProject: null,
         });
@@ -18,18 +18,18 @@ describe("useProjectStore", () => {
     it("sets project metadata entries", () => {
         const projects = [{ id: "project-1", name: "Project One" }] as any;
 
-        useProjectStore.getState().setProjects(projects);
+        getProjectStoreState().actions.setProjects(projects);
 
-        expect(useProjectStore.getState().projects).toBe(projects);
+        expect(getProjectStoreState().projects).toBe(projects);
     });
 
     it("sets the active project", () => {
         const project = { id: "project-1" } as any;
 
-        useProjectStore.getState().setActiveProject(project);
-        expect(useProjectStore.getState().activeProject).toBe(project);
+        getProjectStoreState().actions.setActiveProject(project);
+        expect(getProjectStoreState().activeProject).toBe(project);
 
-        useProjectStore.getState().setActiveProject(null);
-        expect(useProjectStore.getState().activeProject).toBeNull();
+        getProjectStoreState().actions.setActiveProject(null);
+        expect(getProjectStoreState().activeProject).toBeNull();
     });
 });

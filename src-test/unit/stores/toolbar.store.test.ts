@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { resetStore } from "./store-test-utils";
-import { useToolbarStore } from "@/ui/stores/toolbar.store";
+import { getToolbarStoreState, resetToolbarStoreForTest, setToolbarStoreStateForTest } from "@/ui/stores/toolbar.store";
 
 describe("useToolbarStore", () => {
     beforeEach(() => {
-        resetStore(useToolbarStore);
+        resetToolbarStoreForTest();
     });
 
     it("initializes with no tools and no active tool", () => {
-        expect(useToolbarStore.getState()).toMatchObject({
+        expect(getToolbarStoreState()).toMatchObject({
             groups: [],
             activeFamilyId: null,
             availableFamilyIds: [],
@@ -23,21 +23,21 @@ describe("useToolbarStore", () => {
             items: [{ id: "brush", icon: "Brush", tooltip: "Brush", index: 0, shortcuts: ["B"] }],
         }];
 
-        useToolbarStore.getState().setGroups(groups);
+        getToolbarStoreState().actions.setGroups(groups);
 
-        expect(useToolbarStore.getState().groups).toBe(groups);
+        expect(getToolbarStoreState().groups).toBe(groups);
     });
 
     it("sets the active family", () => {
-        useToolbarStore.getState().setActiveFamilyId("brush");
-        expect(useToolbarStore.getState().activeFamilyId).toBe("brush");
+        getToolbarStoreState().actions.setActiveFamilyId("brush");
+        expect(getToolbarStoreState().activeFamilyId).toBe("brush");
 
-        useToolbarStore.getState().setActiveFamilyId(null);
-        expect(useToolbarStore.getState().activeFamilyId).toBeNull();
+        getToolbarStoreState().actions.setActiveFamilyId(null);
+        expect(getToolbarStoreState().activeFamilyId).toBeNull();
     });
 
     it("sets available families", () => {
-        useToolbarStore.getState().setAvailableFamilyIds(["brush"]);
-        expect(useToolbarStore.getState().availableFamilyIds).toEqual(["brush"]);
+        getToolbarStoreState().actions.setAvailableFamilyIds(["brush"]);
+        expect(getToolbarStoreState().availableFamilyIds).toEqual(["brush"]);
     });
 });

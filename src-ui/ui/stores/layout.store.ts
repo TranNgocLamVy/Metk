@@ -6,20 +6,36 @@ import { create } from "zustand";
 
 type LayoutState = {
 	model: Model;
+};
+
+type LayoutActions = {
 	setModel: (model: Model) => void;
 };
 
-export const useLayoutStore = create<LayoutState>((set, get) => {
+type LayoutStore = LayoutState & {
+	actions: LayoutActions;
+};
+
+const useLayoutStore = create<LayoutStore>((set) => {
 	return {
 		model: Model.fromJson(workspaceLayout),
-		setModel: (model) => { set({ model }) },
+		actions: {
+			setModel: (model) => { set({ model }) },
+		},
 	};
 });
 
 appKernel.layoutManager.on("onLayoutLoaded", (layout) => {
-	useLayoutStore.getState().setModel(Model.fromJson(layout));
+	useLayoutStore.getState().actions.setModel(Model.fromJson(layout));
 });
 
 appKernel.layoutManager.on("onLayoutUnloaded", () => {
-	useLayoutStore.getState().setModel(Model.fromJson(workspaceLayout));
+	useLayoutStore.getState().actions.setModel(Model.fromJson(workspaceLayout));
 });
+
+export const useLayoutModel = () => useLayoutStore((state) => state.model);
+export const useLayoutActions = () => useLayoutStore((state) => state.actions);
+
+export const getLayoutStoreState = () => useLayoutStore.getState();
+export const resetLayoutStoreForTest = () => useLayoutStore.setState(useLayoutStore.getInitialState(), true);
+export const setLayoutStoreStateForTest = (state: Partial<LayoutState>) => useLayoutStore.setState(state);

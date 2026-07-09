@@ -5,11 +5,12 @@ import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { Separator } from "@/ui/components/shadcn/separator";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { useLayerViews, useSelectedLayers } from "@/ui/stores/layer-manager.store";
 import { ArrowBigDown, ArrowBigUp, Boxes, Copy, Eye, Folder, Grid3x3, Image, Lock, Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 export default function LayerMenuBar() {
-    const { layerViews, selectedLayers } = useLayerManagerStore();
+    const layerViews = useLayerViews();
+    const selectedLayers = useSelectedLayers();
 
     const { nonSelectedLayers, hasSelectedLayer, singleSelected } = useMemo(() => {
         const nonSelectedLayers = layerViews.filter(layer => !selectedLayers.includes(layer.id)).map(layer => layer.id);

@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/shadcn/button";
 import { DialogClose } from "@/ui/components/shadcn/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/components/shadcn/dropdown-menu";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { Copy, EllipsisVertical, GripHorizontal, Plus, Trash2 } from "lucide-react";
 import { type DragEvent, useCallback, useEffect, useRef, useState } from "react";
 import { SketchPicker } from "react-color";
@@ -21,7 +21,7 @@ type EditRulesetSidebarProps = {
 }
 
 export default function EditRulesetSidebar({ dialogId }: EditRulesetSidebarProps) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
     const { ruleset } = useEditRuleset();
 
     const handleSave = useCallback(async () => {

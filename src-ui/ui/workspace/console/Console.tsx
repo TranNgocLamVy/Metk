@@ -2,7 +2,7 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import QuickToolTip from "@/ui/components/custom/QuickToolTip";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
-import { useConsoleStore } from "@/ui/stores/console.store";
+import { useConsoleActions, useConsoleType, useIsConsoleOpen } from "@/ui/stores/console.store";
 import { Ban, ChevronsDown, Info, TriangleAlert } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import ErrorConsole from "./ErrorConsole";
@@ -10,7 +10,9 @@ import LogConsole from "./LogConsole";
 
 
 export default function WorkspaceConsole() {
-    const { isConsoleOpen, consoleType, closeConsole, setConsoleType, clearErrors, clearLogs } = useConsoleStore();
+    const isConsoleOpen = useIsConsoleOpen();
+    const consoleType = useConsoleType();
+    const { closeConsole, setConsoleType, clearErrors, clearLogs } = useConsoleActions();
 
     const [height, setHeight] = useState<number>(200);
 

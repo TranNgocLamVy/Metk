@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { resetStore } from "./store-test-utils";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
+import { getRulesetStoreState, resetRulesetStoreForTest, setRulesetStoreStateForTest } from "@/ui/stores/ruleset.store";
 
 describe("useRulesetStore", () => {
     beforeEach(() => {
-        resetStore(useRulesetStore);
+        resetRulesetStoreForTest();
     });
 
     it("initializes with no ruleset display data and no selected rule", () => {
-        expect(useRulesetStore.getState()).toMatchObject({
+        expect(getRulesetStoreState()).toMatchObject({
             rulesetDisplayDatas: [],
             currentSelectedRuleId: null,
         });
@@ -18,16 +18,16 @@ describe("useRulesetStore", () => {
     it("sets ruleset display data", () => {
         const displayData = [{ id: "rule-1", name: "Rule One", color: "#ffffff" }];
 
-        useRulesetStore.getState().setRulesetDisplayData(displayData);
+        getRulesetStoreState().actions.setRulesetDisplayData(displayData);
 
-        expect(useRulesetStore.getState().rulesetDisplayDatas).toBe(displayData);
+        expect(getRulesetStoreState().rulesetDisplayDatas).toBe(displayData);
     });
 
     it("sets the current selected rule id", () => {
-        useRulesetStore.getState().setCurrentSelectedRuleId("rule-1");
-        expect(useRulesetStore.getState().currentSelectedRuleId).toBe("rule-1");
+        getRulesetStoreState().actions.setCurrentSelectedRuleId("rule-1");
+        expect(getRulesetStoreState().currentSelectedRuleId).toBe("rule-1");
 
-        useRulesetStore.getState().setCurrentSelectedRuleId(null);
-        expect(useRulesetStore.getState().currentSelectedRuleId).toBeNull();
+        getRulesetStoreState().actions.setCurrentSelectedRuleId(null);
+        expect(getRulesetStoreState().currentSelectedRuleId).toBeNull();
     });
 });

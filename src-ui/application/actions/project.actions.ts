@@ -4,7 +4,7 @@ import { FileDialogService, FileSystemService, ProjectStorageService } from "@/i
 import { defaultProjectData } from "@/shared/data-types/project.data";
 import { ProjectPathSystem } from "@/infrastructure/project-path-system";
 import { DialogService } from "@/ui/dialogs/dialog-gateway";
-import { useNavigationStore } from "@/ui/stores/navigation.store";
+import { getNavigationStoreState } from "@/ui/stores/navigation.store";
 import { PathUtils } from "@/shared/utils/path.utils";
 import { createProjectForm } from "@/shared/constant/form/create-project.form";
 import { Console } from "@/ui/notifications/console-gateway";
@@ -34,7 +34,7 @@ export async function importProject(): Promise<void> {
 
         const openProject = await DialogService.openPermissionDialog({ title: "dialog.project.opened.title", description: "dialog.project.opened.description" })
 
-        if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
+        if (openProject) getNavigationStoreState().navigate!(`/workspace/${project.id}`);
 }
 
 export async function createProject(): Promise<void> {
@@ -78,7 +78,7 @@ export async function createProject(): Promise<void> {
 
         const openProject = await DialogService.openPermissionDialog({ title: "dialog.project.created.title", description: "dialog.project.created.description" })
 
-        if (openProject) useNavigationStore.getState().navigate!(`/workspace/${project.id}`);
+        if (openProject) getNavigationStoreState().navigate!(`/workspace/${project.id}`);
 }
 
 export async function removeProject(projectId: string): Promise<void> {

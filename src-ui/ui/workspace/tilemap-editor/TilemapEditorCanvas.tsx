@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 
 import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { useActiveTilemapSession, useTilemapPixiApp, useTilemapSessionActions } from "@/ui/stores/tilemap-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
 import * as TilemapActions from "@/application/actions/tilemap.actions";
@@ -10,12 +10,15 @@ import ContextMenuWrapper from "@/ui/components/context-menu/ContextMenuWrapper"
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { useEffect } from "react";
 import { TilemapEditorContextMenu } from "./ContextMenu";
 
 export default function TilemapEditorCanvas() {
-	const { pixiApp, activeSession,  setPixiApp } = useTilemapSessionStore();
+	const pixiApp = useTilemapPixiApp();
+	const activeSession = useActiveTilemapSession();
+	const { setPixiApp } = useTilemapSessionActions();
+	const { openDialog } = useDialogActions();
 	
 	const containerRef = useResizeObserver<HTMLDivElement>(
 		(entry) => {
@@ -48,7 +51,7 @@ export default function TilemapEditorCanvas() {
 					<LocalizedText message="workspace.tilemapEditor.empty" />
 				</span>
 				<HStack className="gap-2">
-					<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
+					<Button variant={"link"} onClick={() => openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
 						<LocalizedText message="workspace.tilemapEditor.open" />
 					</Button>
 					<Button variant={"link"} onClick={TilemapActions.createTilemap}>

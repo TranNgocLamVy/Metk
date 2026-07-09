@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import * as EntityCollectionActions from "@/application/actions/entity-collection.actions";
 import { useEntityCollectionManagerEvent } from "@/ui/hooks/useEntityCollectionManagerEvent.hook";
-import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useEntityCollectionActions, useEntityCollectionDisplayDatas, useSelectedEntityCollectionId, useSelectedEntityId } from "@/ui/stores/entity-collection.store";
+import { useActiveProject } from "@/ui/stores/project.store";
+import { useActiveWorkspace } from "@/ui/stores/workspace.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { EntityDefinition } from "@/editor/model/entity/entity-definition";
@@ -17,18 +17,14 @@ import EntityCollectionManagerTabs from "./EntityCollectionManagerTabs";
 import EntityCollectionMenuBar from "./EntityCollectionMenuBar";
 
 export default function EntityCollectionManager() {
-    const { activeProject } = useProjectStore();
-    const { activeWorkspace } = useWorkspaceStore();
+    const activeProject = useActiveProject();
+    const activeWorkspace = useActiveWorkspace();
     const [entityCollectionVersion, setEntityCollectionVersion] = useState(0);
 
-    const {
-        entityCollectionDisplayDatas,
-        selectedEntityCollectionId: currentSelectedEntityCollectionId,
-        selectedEntityId,
-        setEntityCollectionDisplayData,
-        setSelectedEntityCollectionId,
-        setSelectedEntityId,
-    } = useEntityCollectionStore();
+    const entityCollectionDisplayDatas = useEntityCollectionDisplayDatas();
+    const currentSelectedEntityCollectionId = useSelectedEntityCollectionId();
+    const selectedEntityId = useSelectedEntityId();
+    const { setEntityCollectionDisplayData, setSelectedEntityCollectionId, setSelectedEntityId } = useEntityCollectionActions();
 
     useEffect(() => {
         if (!activeProject || !activeWorkspace) return;
@@ -74,8 +70,7 @@ export default function EntityCollectionManager() {
                     })),
                 );
 
-                const currentSelectedId =
-                    useEntityCollectionStore.getState().selectedEntityCollectionId;
+                const currentSelectedId = currentSelectedEntityCollectionId;
 
                 if (
                     currentSelectedId &&
@@ -85,7 +80,7 @@ export default function EntityCollectionManager() {
                     setSelectedEntityId(null);
                 }
             },
-            [setEntityCollectionDisplayData, setSelectedEntityCollectionId, setSelectedEntityId],
+            [currentSelectedEntityCollectionId, setEntityCollectionDisplayData, setSelectedEntityCollectionId, setSelectedEntityId],
         ),
     );
 

@@ -7,12 +7,12 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { useContextScope } from "../hooks/useContextScope.hook";
-import { useProjectStore } from "../stores/project.store";
+import { useProjects } from "../stores/project.store";
 
 export default function HomePage() {
 	const navigate = useNavigate();
 
-	const { projects } = useProjectStore();
+	const projects = useProjects();
 
 	useContextScope("inHome", true);
 

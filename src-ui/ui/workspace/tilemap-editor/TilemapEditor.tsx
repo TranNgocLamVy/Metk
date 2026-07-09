@@ -4,32 +4,31 @@ import { TilemapView } from "@/graphics/view/tilemap.view";
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { useTilemapSessionEvent } from "@/ui/hooks/useTilemapSessionEvent.hook";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useActiveTilemapSession, useTilemapPixiApp, useTilemapSessionActions } from "@/ui/stores/tilemap-session.store";
+import { useActiveWorkspace } from "@/ui/stores/workspace.store";
 import { useCallback, useEffect, useRef } from "react";
 import ToolBar from "../ToolBar";
 import TilemapEditorCanvas from "./TilemapEditorCanvas";
 import TilemapEditorTabs from "./TilemapEditorTabs";
 
 export default function TilemapEditor() {
-    const { activeWorkspace } = useWorkspaceStore();
-    const { pixiApp, activeSession, setTilemapSessions } = useTilemapSessionStore();
+    const activeWorkspace = useActiveWorkspace();
+    const pixiApp = useTilemapPixiApp();
+    const activeSession = useActiveTilemapSession();
+    const { setTilemapSessions, setActiveSession } = useTilemapSessionActions();
 
     const activeViewRef = useRef<{ id: string, view: TilemapView } | null>(null);
     const viewRefMap = useRef<Map<string, TilemapView>>(new Map());
 
     const updateTilemapSessionList = useCallback(() => {
-        const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
         if (!activeWorkspace) return;
 
         const tilemapSessionManager = activeWorkspace.tilemapSessionManager
         const sessionList = tilemapSessionManager.tilemapsSession.map(session => ({ name: session.tilemap.name, sessionId: session.id, isDirty: session.isDirty }));
         setTilemapSessions(sessionList);
-    }, [])
+    }, [activeWorkspace, setTilemapSessions])
 
     const activateView = useCallback((view: TilemapView) => {
-        const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-        const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
         const toolManager = appKernel.toolManager;
@@ -43,12 +42,11 @@ export default function TilemapEditor() {
 
         view.session.on("onMarkChange", updateTilemapSessionList);
 
-        useTilemapSessionStore.getState().setActiveSession(view.session);
-    }, [])
+        setActiveSession(view.session);
+    }, [activeWorkspace, pixiApp, setActiveSession, updateTilemapSessionList])
 
     const deactivateCurrentView = useCallback(() => {
         const activeView = activeViewRef.current;
-        const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
 
         if (!activeWorkspace || !activeView) return;
 
@@ -63,8 +61,8 @@ export default function TilemapEditor() {
 
         activeView.view.session.off("onMarkChange", updateTilemapSessionList);
 
-        useTilemapSessionStore.getState().setActiveSession(null);
-    }, [])
+        setActiveSession(null);
+    }, [activeWorkspace, setActiveSession, updateTilemapSessionList])
 
     useEffect(() => {
         if (!activeSession) return;
@@ -100,13 +98,11 @@ export default function TilemapEditor() {
 
             tilemapSessionManager.unregisterActiveView();
             toolManager.setActiveView(null);
-            useTilemapSessionStore.getState().setActiveSession(null);
+            setActiveSession(null);
         }
-    }, [activeWorkspace, pixiApp])
+    }, [activeWorkspace, activateView, pixiApp, setActiveSession, updateTilemapSessionList])
 
     useTilemapSessionEvent("onOpenTilemapSession", (session) => {
-        const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-        const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
         const activeView = activeViewRef.current;
@@ -123,8 +119,6 @@ export default function TilemapEditor() {
     })
 
     useTilemapSessionEvent("onCreateTilemapSession", (session) => {
-        const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-        const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
         if (viewRefMap.current.has(session.id)) return;
@@ -135,8 +129,6 @@ export default function TilemapEditor() {
     })
 
     useTilemapSessionEvent("onCloseTilemapSession", (sessionId) => {
-        const activeWorkspace = useWorkspaceStore.getState().activeWorkspace;
-        const pixiApp = useTilemapSessionStore.getState().pixiApp;
         if (!activeWorkspace || !pixiApp) return;
 
         const activeView = activeViewRef.current;

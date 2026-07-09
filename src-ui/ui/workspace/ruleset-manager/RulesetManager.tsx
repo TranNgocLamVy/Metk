@@ -5,18 +5,19 @@ import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
 import { ScrollArea, ScrollBar } from "@/ui/components/shadcn/scroll-area";
 import { useRulesetManagerEvent } from "@/ui/hooks/useRulesetManagerEvent.hook";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { useRulesetStore } from "@/ui/stores/ruleset.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useActiveProject } from "@/ui/stores/project.store";
+import { useCurrentSelectedRuleId, useRulesetActions, useRulesetDisplayDatas } from "@/ui/stores/ruleset.store";
+import { useActiveWorkspace } from "@/ui/stores/workspace.store";
 import { useCallback, useEffect } from "react";
 import { RulesetManagerContextMenu } from "./ContextMenu";
 import RulesetMenuBar from "./RulesetMenubar";
 
 export default function RulesetManager() {
-    const { activeWorkspace } = useWorkspaceStore();
-    const { activeProject } = useProjectStore();
-
-    const { rulesetDisplayDatas, currentSelectedRuleId, setCurrentSelectedRuleId, setRulesetDisplayData } = useRulesetStore();
+    const activeWorkspace = useActiveWorkspace();
+    const activeProject = useActiveProject();
+    const rulesetDisplayDatas = useRulesetDisplayDatas();
+    const currentSelectedRuleId = useCurrentSelectedRuleId();
+    const { setCurrentSelectedRuleId, setRulesetDisplayData } = useRulesetActions();
 
     useEffect(() => {
         if (!activeWorkspace || !activeProject) return;

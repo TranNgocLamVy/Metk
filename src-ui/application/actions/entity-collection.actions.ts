@@ -9,7 +9,7 @@ import { Console } from "@/ui/notifications/console-gateway";
 import i18n from "@/app/providers/i18n";
 import { createEntityCollectionForm } from "@/shared/constant/form/create-entity-collection.form";
 import { saveCurrentWorkspace } from "@/application/actions/workspace.actions";
-import { useEntityCollectionStore } from "@/ui/stores/entity-collection.store";
+import { getEntityCollectionStoreState } from "@/ui/stores/entity-collection.store";
 import { normalizeEntityCollectionData } from "@/editor/model/entity/entity.normalizer";
 import { EntityCollection } from "@/editor/model/entity/entity-collection";
 import { EntityDefinitionData } from "@/shared/data-types/entity.data";
@@ -126,13 +126,13 @@ export async function selectEntityCollection(entityCollectionId: string | null):
             }
         }
 
-        const state = useEntityCollectionStore.getState();
+        const state = getEntityCollectionStoreState();
         const selectionChanged = state.selectedEntityCollectionId !== entityCollectionId;
 
-        state.setSelectedEntityCollectionId(entityCollectionId);
+        state.actions.setSelectedEntityCollectionId(entityCollectionId);
 
         if (selectionChanged || entityCollectionId === null) {
-            state.setSelectedEntityId(null);
+            state.actions.setSelectedEntityId(null);
         }
 
         currentWorkspace.entityCollectionSessionManager.setSelectedEntityCollectionId(entityCollectionId);
@@ -147,7 +147,7 @@ export async function selectEntity(entityId: string | null): Promise<void> {
         const currentWorkspace = appKernel.editorFacade.currentWorkspace;
         if (!currentWorkspace) return;
 
-        useEntityCollectionStore.getState().setSelectedEntityId(entityId);
+        getEntityCollectionStoreState().actions.setSelectedEntityId(entityId);
         currentWorkspace.entityCollectionSessionManager.setSelectedEntityId(entityId);
 
         await saveCurrentWorkspace({ waitForTimeout: false });
@@ -179,7 +179,7 @@ export async function deleteEntityCollection(entityCollectionId: string): Promis
         }
 
         const currentSelectedId =
-            useEntityCollectionStore.getState().selectedEntityCollectionId;
+            getEntityCollectionStoreState().selectedEntityCollectionId;
 
         if (currentSelectedId === entityCollectionId) {
             await selectEntityCollection(null);
@@ -197,7 +197,7 @@ export async function createEntity(): Promise<void> {
         if (!currentProject || !currentWorkspace) return;
 
         const entityCollectionId =
-            useEntityCollectionStore.getState().selectedEntityCollectionId ??
+            getEntityCollectionStoreState().selectedEntityCollectionId ??
             currentWorkspace.entityCollectionSessionManager.getSelectedEntityCollectionId();
 
         if (!entityCollectionId) {
@@ -304,7 +304,7 @@ export async function deleteEntity(entityCollectionId?: string, entityId?: strin
 
         currentProject.entityCollectionManager.notifyEntityCollectionUpdated(resolvedIds.entityCollectionId);
 
-        if (useEntityCollectionStore.getState().selectedEntityId === resolvedIds.entityId) {
+        if (getEntityCollectionStoreState().selectedEntityId === resolvedIds.entityId) {
             await selectEntity(null);
         }
 
@@ -366,7 +366,7 @@ export async function cloneEntity(entityCollectionId?: string, entityId?: string
     }
 
 function resolveEntityIds(entityCollectionId?: string, entityId?: string): { entityCollectionId: string; entityId: string } | null {
-        const state = useEntityCollectionStore.getState();
+        const state = getEntityCollectionStoreState();
         const resolvedEntityCollectionId = entityCollectionId ?? state.selectedEntityCollectionId;
         const resolvedEntityId = entityId ?? state.selectedEntityId;
 

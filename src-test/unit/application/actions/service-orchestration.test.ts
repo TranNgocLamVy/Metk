@@ -100,10 +100,10 @@ import * as TilemapActions from "@/application/actions/tilemap.actions";
 import * as TilesetActions from "@/application/actions/tileset.actions";
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { Result } from "@/shared/types/result";
-import { useNavigationStore } from "@/ui/stores/navigation.store";
+import { getNavigationStoreState, resetNavigationStoreForTest, setNavigationStoreStateForTest } from "@/ui/stores/navigation.store";
 
 const resetNavigationStore = () => {
-    useNavigationStore.setState({ navigate: null });
+    setNavigationStoreStateForTest({ navigate: null });
 };
 
 const createSavedPathManager = () => ({
@@ -288,7 +288,7 @@ describe("WorkspaceService orchestration", () => {
 describe("ProjectService orchestration", () => {
     it("imports project metadata and navigates when the user chooses to open it", async () => {
         const navigate = vi.fn();
-        useNavigationStore.getState().setNavigate(navigate);
+        getNavigationStoreState().actions.setNavigate(navigate);
         serviceMocks.storage.FileDialogService.open.mockResolvedValue("C:/projects/metk/.metk/project.json");
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(true);
 
@@ -311,7 +311,7 @@ describe("ProjectService orchestration", () => {
 
     it("creates the project directories, saves project data, and leaves navigation unchanged when open is declined", async () => {
         const navigate = vi.fn();
-        useNavigationStore.getState().setNavigate(navigate);
+        getNavigationStoreState().actions.setNavigate(navigate);
         vi.spyOn(DialogService, "openFormDialog").mockResolvedValue({ name: "New Project", destination: "C:/projects" } as any);
         vi.spyOn(DialogService, "openPermissionDialog").mockResolvedValue(false);
 

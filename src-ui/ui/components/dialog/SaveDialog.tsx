@@ -1,7 +1,7 @@
 import { SaveDialogOptions } from "@/shared/types/confirmation-dialog";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/ui/components/shadcn/alert-dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "./dialogRegistry";
 
 interface SaveDialogProps extends BaseDialogProps {
@@ -10,7 +10,7 @@ interface SaveDialogProps extends BaseDialogProps {
 }
 
 export function SaveDialog({ resolve, dialogId, saveDialog }: SaveDialogProps) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
 
     const { title, description } = saveDialog;
 

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { Result } from "@/shared/types/result";
 import LoadingOverlay from "@/ui/components/layout/LoadingOverlay";
-import { useAppcore } from "@/ui/stores/appcore.store";
+import { useIsAppcoreLoaded } from "@/ui/stores/appcore.store";
 import Workspace from "../workspace/Workspace";
 
 export default function WorkspacePage() {
@@ -13,7 +13,7 @@ export default function WorkspacePage() {
 
 	const [isLoading, setIsLoading] = useState(true);
 
-	const { isAppcoreLoaded } = useAppcore();
+	const isAppcoreLoaded = useIsAppcoreLoaded();
 
 	const loadProject = useCallback(async (id: string) => {
 		try {

@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
+import { useActiveTilesetSession, useTilesetSessions } from "@/ui/stores/tileset-session.store";
 
 import * as TilesetActions from "@/application/actions/tileset.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
@@ -18,7 +18,8 @@ export default function TilesetViewTabs() {
 
 	useHorizontalScroll(ref);
 
-	const { activeSession, tilesetSessions } = useTilesetSessionStore();
+	const activeSession = useActiveTilesetSession();
+	const tilesetSessions = useTilesetSessions();
 
 
 	const onEditTileset = useCallback(() => {

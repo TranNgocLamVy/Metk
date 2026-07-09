@@ -12,8 +12,8 @@ import { ExportStorageService } from "@/infrastructure/export-storage.service";
 import { TmxTilemapExporter } from "@/application/exporter/tmx-tilemap.exporter";
 import { Console } from "@/ui/notifications/console-gateway";
 import { Result } from "@/shared/types/result";
-import { useConsoleStore } from "@/ui/stores/console.store";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { getConsoleStoreState, resetConsoleStoreForTest, setConsoleStoreStateForTest } from "@/ui/stores/console.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreStateForTest } from "@/ui/stores/dialog.store";
 import { FileDialogService } from "@/infrastructure/container";
 
 type ResettableStore<T> = {
@@ -102,8 +102,8 @@ const createEditorFacade = (overrides: {
 
 describe("system command orchestration", () => {
     beforeEach(() => {
-        resetStore(useConsoleStore);
-        resetStore(useDialogStore);
+        resetConsoleStoreForTest();
+        resetDialogStoreForTest();
         mockState.dialogSave.mockReset();
         mockState.exporterExport.mockClear();
         mockState.storageExportToPath.mockReset();
@@ -122,7 +122,7 @@ describe("system command orchestration", () => {
             const result = new OpenFileCommand().execute(editorFacade);
 
             expect(result.status).toBe("Success");
-            expect(useDialogStore.getState().dialogs).toEqual([
+            expect(getDialogStoreState().dialogs).toEqual([
                 expect.objectContaining({
                     type: "OPEN_FILE_DIALOG",
                     config: { zLevel: 500 },
@@ -259,12 +259,12 @@ describe("system command orchestration", () => {
         it("toggles console visibility through the console store", () => {
             const editorFacade = createEditorFacade();
 
-            expect(useConsoleStore.getState().isConsoleOpen).toBe(false);
+            expect(getConsoleStoreState().isConsoleOpen).toBe(false);
             expect(new ToggleConsoleCommand().execute(editorFacade)).toMatchObject({ status: "Success" });
-            expect(useConsoleStore.getState().isConsoleOpen).toBe(true);
+            expect(getConsoleStoreState().isConsoleOpen).toBe(true);
 
             new ToggleConsoleCommand().execute(editorFacade);
-            expect(useConsoleStore.getState().isConsoleOpen).toBe(false);
+            expect(getConsoleStoreState().isConsoleOpen).toBe(false);
         });
     });
 

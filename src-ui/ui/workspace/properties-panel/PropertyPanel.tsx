@@ -4,9 +4,9 @@ import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { BaseObject, PropertyUpdateMeta } from "@/editor/model/base-object";
 import { groupProperties } from "@/editor/properties/group-properties.utils";
-import { useProjectStore } from "@/ui/stores/project.store";
-import { usePropertyStore } from "@/ui/stores/property.store";
-import { useWorkspaceStore } from "@/ui/stores/workspace.store";
+import { useActiveProject } from "@/ui/stores/project.store";
+import { usePropertyActions, usePropertyObjectId } from "@/ui/stores/property.store";
+import { useActiveWorkspace } from "@/ui/stores/workspace.store";
 
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import PanelContainer from "@/ui/components/layout/PanelContainer";
@@ -14,9 +14,10 @@ import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
 import { PropertyGroup } from "./PropertyGroup";
 
 export default function PropertyPanel() {
-    const { objectId, setObjectId, refresh } = usePropertyStore();
-    const { activeProject } = useProjectStore();
-    const { activeWorkspace } = useWorkspaceStore();
+    const objectId = usePropertyObjectId();
+    const { setObjectId, refresh } = usePropertyActions();
+    const activeProject = useActiveProject();
+    const activeWorkspace = useActiveWorkspace();
 
     const [object, setObject] = useState<BaseObject<any> | null>(null);
 
@@ -62,19 +63,17 @@ export default function PropertyPanel() {
     }, [object]);
 
     const onObjectDeleted = useCallback((deletedObjectId: string) => {
-        const objectId = usePropertyStore.getState().objectId;
         if (deletedObjectId === objectId) {
             setObject(null);
         }
-    }, []);
+    }, [objectId]);
 
     const onObjectAdded = useCallback((addedObjectId: string) => {
-        const objectId = usePropertyStore.getState().objectId;
         if (addedObjectId === objectId) {
             const object = appKernel.editorFacade.objectRegistry?.get(objectId) ?? null;
             setObject(object);
         }
-    }, []);
+    }, [objectId]);
 
     useEffect(() => {
         if (!activeProject) return;

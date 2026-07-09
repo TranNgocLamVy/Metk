@@ -3,7 +3,7 @@ import { Fragment, useRef } from "react";
 
 import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { useHorizontalScroll } from "@/ui/hooks/useHorizontalSCroll.hook";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { useActiveTilemapSession, useTilemapSessions } from "@/ui/stores/tilemap-session.store";
 
 import { HStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
@@ -13,7 +13,8 @@ export default function TilemapEditorTabs() {
 
 	useHorizontalScroll(ref);
 
-	const { tilemapSessions, activeSession } = useTilemapSessionStore();
+	const tilemapSessions = useTilemapSessions();
+	const activeSession = useActiveTilemapSession();
 
 	return (
 		<HStack className="w-full h-fit relative bg-surface z-10" justify="start" align="center">

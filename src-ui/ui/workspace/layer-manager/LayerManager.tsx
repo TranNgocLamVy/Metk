@@ -1,7 +1,7 @@
 import { DragEvent, FocusEvent, useCallback, useEffect, useRef } from "react";
 
 import * as TilemapLayerActions from "@/application/actions/tilemap-layer.actions";
-import { LayerView, useLayerManagerStore } from "@/ui/stores/layer-manager.store";
+import { LayerView, useLayerManagerActions, useLayerViews, useSelectedLayers } from "@/ui/stores/layer-manager.store";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import { BaseLayer } from "@/editor/model/tilemap/layer/base-layer";
@@ -14,8 +14,8 @@ import PanelContainer from "@/ui/components/layout/PanelContainer";
 import { Button } from "@/ui/components/shadcn/button";
 import { ContextMenu, ContextMenuContent, ContextMenuTrigger } from "@/ui/components/shadcn/context-menu";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
+import { useActiveTilemapSession } from "@/ui/stores/tilemap-session.store";
 import { LayerManagerContextMenu } from "./ContextMenu";
 import LayerMenuBar from "./LayerMenuBar";
 import LayerNodeRow from "./LayerNodeRow";
@@ -23,9 +23,11 @@ import LayerNodeRow from "./LayerNodeRow";
 const LAYER_MANAGER_CONTEXT_INSTIGATOR_ID = "layer-manager";
 
 export default function LayerManager() {
-	const { layerViews, selectedLayers, setLayerViews, setSelectedLayer } = useLayerManagerStore();
-
-	const { activeSession } = useTilemapSessionStore();
+	const layerViews = useLayerViews();
+	const selectedLayers = useSelectedLayers();
+	const { setLayerViews, setSelectedLayer, setTargetParentLayer } = useLayerManagerActions();
+	const { openDialog } = useDialogActions();
+	const activeSession = useActiveTilemapSession();
 
 	const layerManagerRef = useRef<HTMLDivElement>(null);
 
@@ -132,8 +134,8 @@ export default function LayerManager() {
 	}, [])
 
 	const onOpenChange = useCallback((open: boolean) => {
-		if (activeSession) useLayerManagerStore.getState().setTargetParentLayer(null);
-	}, [activeSession]);
+		if (activeSession) setTargetParentLayer(null);
+	}, [activeSession, setTargetParentLayer]);
 
 	return (
 		<PanelContainer className="layer-manager">
@@ -165,7 +167,7 @@ export default function LayerManager() {
 						<span className="text-sm">
 							<LocalizedText message="workspace.tilemapEditor.empty" />
 						</span>
-						<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
+						<Button variant={"link"} onClick={() => openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tilemap" })}>
 							<LocalizedText message="workspace.tilemapEditor.open" />
 						</Button>
 					</VStack>

@@ -1,7 +1,7 @@
 import { Application } from "pixi.js";
 
 import useResizeObserver from "@/ui/hooks/useResizeObserver.hook";
-import { useTilesetSessionStore } from "@/ui/stores/tileset-session.store";
+import { useActiveTilesetSession, useTilesetPixiApp, useTilesetSessionActions } from "@/ui/stores/tileset-session.store";
 import { Application as PixiApplication } from "@pixi/react";
 
 import { DialogZLevel } from "@/shared/types/dialog";
@@ -9,12 +9,15 @@ import ContextMenuWrapper from "@/ui/components/context-menu/ContextMenuWrapper"
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { useEffect } from "react";
 import { TilesetViewContextMenu } from "./ContextMenu";
 
 export default function TilesetViewCanvas() {
-	const { pixiApp, activeSession, setPixiApp } = useTilesetSessionStore();
+	const pixiApp = useTilesetPixiApp();
+	const activeSession = useActiveTilesetSession();
+	const { setPixiApp } = useTilesetSessionActions();
+	const { openDialog } = useDialogActions();
 
 	const containerRef = useResizeObserver<HTMLDivElement>(
 		(entry) => {
@@ -46,7 +49,7 @@ export default function TilesetViewCanvas() {
 				<span className="text-sm">
 					<LocalizedText message="workspace.tilesetSelector.empty" />
 				</span>
-				<Button variant={"link"} onClick={() => useDialogStore.getState().openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tileset" })}>
+				<Button variant={"link"} onClick={() => openDialog("OPEN_FILE_DIALOG", { zLevel: DialogZLevel.Modal }, { panel: "tileset" })}>
 					<LocalizedText message="workspace.tilesetSelector.open" />
 				</Button>
 			</VStack>}

@@ -4,7 +4,7 @@ import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { SingleImageTileset } from "@/editor/model/tileset/single-image-tileset";
 import { Tile } from "@/editor/model/tileset/tileset";
 import { TilesetSession } from "@/editor/session/tileset.session";
-import { usePropertyStore } from "@/ui/stores/property.store";
+import { getPropertyStoreState } from "@/ui/stores/property.store";
 import { TILESET_SELECTION_ALPHA, TILESET_SELECTION_COLOR } from "./tileset-renderer.constants";
 
 export type CreateTilesetViewSelectorContext = {
@@ -91,7 +91,7 @@ export class TilesetSelectorRenderer {
         this.selectionType = this.selectedTilesSet.has(id) ? "deselect" : "select";
 
         const tile = this.tileset.getTileFromId(id)
-        if (tile) usePropertyStore.getState().setObjectId(tile.objectId); // TODO: Refactor using a Service or somthing;
+        if (tile) getPropertyStoreState().actions.setObjectId(tile.objectId); // TODO: Refactor using a Service or somthing;
 
         const isCtrl = !!(original.ctrlKey || original.metaKey);
         if (!isCtrl) this.selectedTilesSet.clear();

@@ -3,7 +3,7 @@ import * as WorkspaceActions from "@/application/actions/workspace.actions";
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/components/shadcn/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { BaseDialogProps } from "./dialogRegistry";
 
 interface OpenFileModalProps extends BaseDialogProps {
@@ -11,7 +11,7 @@ interface OpenFileModalProps extends BaseDialogProps {
 }
 
 export function OpenFileDialog({ dialogId }: OpenFileModalProps) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
 
     const currentProject = appKernel.editorFacade.currentProject;
     if (!currentProject) return null;

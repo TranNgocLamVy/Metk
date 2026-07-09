@@ -57,10 +57,10 @@ import LayerMenuBar from "@/ui/workspace/layer-manager/LayerMenuBar";
 import WorkspaceConsole from "@/ui/workspace/console/Console";
 import LogConsole from "@/ui/workspace/console/LogConsole";
 import ErrorConsole from "@/ui/workspace/console/ErrorConsole";
-import { useConsoleStore } from "@/ui/stores/console.store";
-import { useDialogStore } from "@/ui/stores/dialog.store";
-import { useLayerManagerStore } from "@/ui/stores/layer-manager.store";
-import { useTilemapSessionStore } from "@/ui/stores/tilemap-session.store";
+import { getConsoleStoreState, resetConsoleStoreForTest, setConsoleStoreStateForTest } from "@/ui/stores/console.store";
+import { getDialogStoreState, resetDialogStoreForTest, setDialogStoreStateForTest } from "@/ui/stores/dialog.store";
+import { getLayerManagerStoreState, resetLayerManagerStoreForTest, setLayerManagerStoreStateForTest } from "@/ui/stores/layer-manager.store";
+import { getTilemapSessionStoreState, resetTilemapSessionStoreForTest, setTilemapSessionStoreStateForTest } from "@/ui/stores/tilemap-session.store";
 import { Result } from "@/shared/types/result";
 
 import {
@@ -77,10 +77,10 @@ type TestSession = EventEmitter & {
 };
 
 const resetStores = () => {
-    useConsoleStore.setState(useConsoleStore.getInitialState(), true);
-    useDialogStore.setState(useDialogStore.getInitialState(), true);
-    useLayerManagerStore.setState(useLayerManagerStore.getInitialState(), true);
-    useTilemapSessionStore.setState(useTilemapSessionStore.getInitialState(), true);
+    resetConsoleStoreForTest();
+    resetDialogStoreForTest();
+    resetLayerManagerStoreForTest();
+    resetTilemapSessionStoreForTest();
 };
 
 const createLayerSession = () => {
@@ -121,7 +121,7 @@ const seedLayerManagerStore = () => {
     const root = session.tilemap.rootLayer;
     const group = root.findLayer("environment")!;
     const collision = root.findLayer("collision")!;
-    useLayerManagerStore.getState().setLayerViews([
+    getLayerManagerStoreState().actions.setLayerViews([
         { id: group.id, layer: group, depth: 0 },
         { id: collision.id, layer: collision, depth: 0 },
     ]);
@@ -143,7 +143,7 @@ describe("Layer manager UI", () => {
         expect(screen.getByText("workspace.tilemapEditor.empty")).toBeVisible();
         await user.click(screen.getByRole("button", { name: "workspace.tilemapEditor.open" }));
 
-        expect(useDialogStore.getState().dialogs[0]).toMatchObject({
+        expect(getDialogStoreState().dialogs[0]).toMatchObject({
             type: "OPEN_FILE_DIALOG",
             params: { panel: "tilemap" },
         });
@@ -152,7 +152,7 @@ describe("Layer manager UI", () => {
 
     it("renders nested rows when a group opens and highlights selected rows from session state", async () => {
         const session = createLayerSession();
-        useTilemapSessionStore.getState().setActiveSession(session as any);
+        getTilemapSessionStoreState().actions.setActiveSession(session as any);
 
         render(<LayerManager />);
 
@@ -169,13 +169,13 @@ describe("Layer manager UI", () => {
 
         expect(await screen.findByText("Ground")).toBeVisible();
         expect(screen.getByText("Ground").closest("[draggable='true']")).toHaveClass("bg-accent");
-        expect(useLayerManagerStore.getState().selectedLayers).toEqual(["ground"]);
+        expect(getLayerManagerStoreState().selectedLayers).toEqual(["ground"]);
     });
 
     it("routes row selection, expand, visibility, lock, rename, and drop actions through the layer service", async () => {
         const user = userEvent.setup({ pointerEventsCheck: 0 });
         const session = createLayerSession();
-        useTilemapSessionStore.getState().setActiveSession(session as any);
+        getTilemapSessionStoreState().actions.setActiveSession(session as any);
 
         render(<LayerManager />);
 
@@ -213,7 +213,7 @@ describe("Layer manager UI", () => {
     it("sets dragged ids from the current multi-selection and moves dropped rows to the root", () => {
         const session = createLayerSession();
         session.updateLayerState({ selectedLayers: ["environment", "collision"] });
-        useTilemapSessionStore.getState().setActiveSession(session as any);
+        getTilemapSessionStoreState().actions.setActiveSession(session as any);
 
         const { container } = render(<LayerManager />);
 
@@ -233,7 +233,7 @@ describe("Layer manager UI", () => {
     it("enables menu bar actions based on selected layers and sends selected/non-selected ids", async () => {
         const user = userEvent.setup({ pointerEventsCheck: 0 });
         seedLayerManagerStore();
-        useLayerManagerStore.getState().setSelectedLayer(["collision"]);
+        getLayerManagerStoreState().actions.setSelectedLayer(["collision"]);
 
         render(<LayerMenuBar />);
 
@@ -263,7 +263,7 @@ describe("Console UI", () => {
         const { rerender } = render(<WorkspaceConsole />);
         expect(screen.queryByText("Log")).not.toBeInTheDocument();
 
-        useConsoleStore.getState().openWithType("log");
+        getConsoleStoreState().actions.openWithType("log");
         rerender(<WorkspaceConsole />);
 
         expect(screen.getByText("No logs to display.")).toBeVisible();
@@ -274,7 +274,7 @@ describe("Console UI", () => {
 
     it("renders log actions, removes successful action logs, and removes individual log entries", async () => {
         const user = userEvent.setup();
-        useConsoleStore.getState().addLog({
+        getConsoleStoreState().actions.addLog({
             id: "log-action",
             uiId: "log-ui-action",
             timestamp: new Date("2026-05-20T10:00:00Z").getTime(),
@@ -283,7 +283,7 @@ describe("Console UI", () => {
             details: "Choose a replacement texture.",
             actions: [{ label: "Import Texture", onClick: vi.fn(() => Result.Success()) }],
         });
-        useConsoleStore.getState().addLog({
+        getConsoleStoreState().actions.addLog({
             id: "log-remove",
             uiId: "log-ui-remove",
             timestamp: new Date("2026-05-20T10:01:00Z").getTime(),
@@ -296,15 +296,15 @@ describe("Console UI", () => {
         expect(screen.getByText("Texture missing")).toBeVisible();
         expect(screen.getByText("Choose a replacement texture.")).toBeVisible();
         await user.click(screen.getByRole("button", { name: "Import Texture" }));
-        expect(useConsoleStore.getState().logs.map((log) => log.id)).toEqual(["log-remove"]);
+        expect(getConsoleStoreState().logs.map((log) => log.id)).toEqual(["log-remove"]);
 
         await user.click(screen.getByText("Saved workspace").closest("[class*='hover:bg']")!.querySelector("button")!);
-        expect(useConsoleStore.getState().logs).toEqual([]);
+        expect(getConsoleStoreState().logs).toEqual([]);
     });
 
     it("renders error stacks and removes errors through successful actions", async () => {
         const user = userEvent.setup();
-        useConsoleStore.getState().addError({
+        getConsoleStoreState().actions.addError({
             id: "error-action",
             uiId: "error-ui-action",
             timestamp: new Date("2026-05-20T10:00:00Z").getTime(),
@@ -321,25 +321,25 @@ describe("Console UI", () => {
 
         await user.click(screen.getByRole("button", { name: "Retry" }));
 
-        expect(useConsoleStore.getState().errors).toEqual([]);
+        expect(getConsoleStoreState().errors).toEqual([]);
     });
 
     it("clears the active console mode, closes the console, and supports resize dragging", async () => {
         const user = userEvent.setup();
-        useConsoleStore.getState().addLog({
+        getConsoleStoreState().actions.addLog({
             id: "log-a",
             uiId: "log-ui-a",
             timestamp: Date.now(),
             level: "warning",
             message: "Unsaved changes",
         });
-        useConsoleStore.getState().addError({
+        getConsoleStoreState().actions.addError({
             id: "error-a",
             uiId: "error-ui-a",
             timestamp: Date.now(),
             message: "Save failed",
         });
-        useConsoleStore.getState().openWithType("log");
+        getConsoleStoreState().actions.openWithType("log");
 
         const { container } = render(<div style={{ height: 500 }}><WorkspaceConsole /></div>);
         const consolePanel = container.querySelector(".absolute.bottom-0") as HTMLElement;
@@ -354,15 +354,15 @@ describe("Console UI", () => {
         expect(consolePanel).toHaveStyle({ height: "250px" });
 
         await user.click(screen.getAllByRole("button")[0]);
-        expect(useConsoleStore.getState().logs).toEqual([]);
-        expect(useConsoleStore.getState().errors).toHaveLength(1);
+        expect(getConsoleStoreState().logs).toEqual([]);
+        expect(getConsoleStoreState().errors).toHaveLength(1);
 
         await user.click(screen.getByText("Error"));
         await user.click(screen.getAllByRole("button")[0]);
-        expect(useConsoleStore.getState().errors).toEqual([]);
+        expect(getConsoleStoreState().errors).toEqual([]);
 
         await user.click(screen.getAllByRole("button")[1]);
-        expect(useConsoleStore.getState().isConsoleOpen).toBe(false);
+        expect(getConsoleStoreState().isConsoleOpen).toBe(false);
     });
 });
 

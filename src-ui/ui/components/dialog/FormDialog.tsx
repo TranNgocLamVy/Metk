@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { VStack } from "@/ui/components/custom/stack/Stack";
 import { ScrollArea } from "@/ui/components/shadcn/scroll-area";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 import { CheckBoxField } from "../form-field/CheckboxField";
 import { ColorPickerField } from "../form-field/ColorPickerField";
 import FilePickerField from "../form-field/FilePickerField";
@@ -23,6 +23,7 @@ interface FormDialogProps extends BaseDialogProps {
 }
 
 export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
+    const { closeDialog } = useDialogActions();
     const [values, setValues] = useState<Record<string, any>>({});
 
     useEffect(() => {
@@ -109,12 +110,12 @@ export function FormDialog({ dialogId, formDialog, resolve }: FormDialogProps) {
         }
 
         resolve(values);
-        useDialogStore.getState().closeDialog(dialogId);
+        closeDialog(dialogId);
     };
 
     const cancelFormDialog = () => {
         resolve(null);
-        useDialogStore.getState().closeDialog(dialogId);
+        closeDialog(dialogId);
     };
 
     return (

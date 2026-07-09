@@ -191,15 +191,15 @@ describe("TmxTilemapExporter", () => {
             orientation: "orthogonal",
             width: 2,
             height: 2,
-            tileWidth: 16,
-            tileHeight: 16,
+            tilewidth: 16,
+            tileheight: 16,
         }));
         expect(parsed.map.tileset).toEqual([
             expect.objectContaining({
                 firstgid: 1,
                 name: "Terrain",
-                tileWidth: 16,
-                tileHeight: 16,
+                tilewidth: 16,
+                tileheight: 16,
                 tilecount: 3,
                 columns: 3,
                 image: expect.objectContaining({ source: "../tilesets/terrain.png", width: 48, height: 16 }),

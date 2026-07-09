@@ -2,9 +2,9 @@ import { Grid3x3, Info, Pen, Plus, Trash2 } from "lucide-react";
 
 import { appKernel } from "@/application/bootstrap/app-kernel";
 import * as TilesetActions from "@/application/actions/tileset.actions";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { getDialogStoreState } from "@/ui/stores/dialog.store";
 import { DialogZLevel } from "@/shared/types/dialog";
-import { usePropertyStore } from "@/ui/stores/property.store";
+import { getPropertyStoreState } from "@/ui/stores/property.store";
 
 const Group1: MenuDropDownGroupType = [
     {
@@ -23,7 +23,7 @@ const Group1: MenuDropDownGroupType = [
             return true;
         },
         onClick() {
-            useDialogStore.getState().openDialog("EDIT_TILESET_MODAL", { zLevel: DialogZLevel.Modal });
+            getDialogStoreState().actions.openDialog("EDIT_TILESET_MODAL", { zLevel: DialogZLevel.Modal });
         }
     },
     {
@@ -33,7 +33,7 @@ const Group1: MenuDropDownGroupType = [
         onClick() {
 			const activeTilesetSession = appKernel.editorFacade.getActiveTilesetSession();
 			if (!activeTilesetSession) return;
-			usePropertyStore.getState().setObjectId(activeTilesetSession.tileset.objectId);
+			getPropertyStoreState().actions.setObjectId(activeTilesetSession.tileset.objectId);
         }
     },
 ];

@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
 import { EntityCollectionManagerEvent } from "@/application/resources/entity/entity-collection.manager";
-import { useProjectStore } from "@/ui/stores/project.store";
+import { useActiveProject } from "@/ui/stores/project.store";
 
 export function useEntityCollectionManagerEvent<TEvent extends keyof EntityCollectionManagerEvent>(
     eventName: TEvent,
     callback: EntityCollectionManagerEvent[TEvent],
 ) {
-    const currentProject = useProjectStore((state) => state.activeProject);
+    const currentProject = useActiveProject();
 
     useEffect(() => {
         if (!currentProject) return;

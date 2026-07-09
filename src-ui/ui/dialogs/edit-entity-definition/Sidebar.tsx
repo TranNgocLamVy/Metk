@@ -8,7 +8,7 @@ import { LocalizedText } from "@/ui/components/custom/LocalizeText";
 import { HStack, VStack } from "@/ui/components/custom/stack/Stack";
 import { Button } from "@/ui/components/shadcn/button";
 import { DialogClose } from "@/ui/components/shadcn/dialog";
-import { useDialogStore } from "@/ui/stores/dialog.store";
+import { useDialogActions } from "@/ui/stores/dialog.store";
 
 import { useEditEntityDefinition } from "./ContextProvider";
 
@@ -17,7 +17,7 @@ type EditEntityDefinitionSidebarProps = {
 };
 
 export default function EditEntityDefinitionSidebar({ dialogId }: EditEntityDefinitionSidebarProps) {
-    const { closeDialog } = useDialogStore();
+    const { closeDialog } = useDialogActions();
     const { entity, entityCollection, tilesetRefManager, actions } = useEditEntityDefinition();
     const [name, setName] = useState(entity.name);
 
